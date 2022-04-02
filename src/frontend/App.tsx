@@ -1,12 +1,20 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, Link, useLocation } from "react-router-dom";
 import { Box, Heading, Container } from "react-bulma-components";
 
-import { Login } from "./ui/login/components";
+import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
 import { PageNotFound } from "./ui/error404/components";
 
 
-function Layout() {
+const Body: React.FunctionComponent<{}> = () => {
+  return (
+    <>
+      Welcome To The Casual CMS!
+    </>
+  )
+}
+
+const Layout: React.FunctionComponent<{}> = () => {
   return (
     <>
       <Box>
@@ -16,21 +24,39 @@ function Layout() {
       </Box>
       <Container>
         <Routes>
-          <Route path="login" element={<Login />} />
-          <Route path="*" element={<PageNotFound />} />
+          <Route path="login" element={<Login />} /> {/* Fix the layout */}
+          <Route path="*" element={
+            <RequireAuth>
+              <Routes>
+                <Route path="" element={<Body />} />
+                <Route path="*" element={<PageNotFound />} />
+              </Routes>
+            </RequireAuth>
+          } />
         </Routes>
       </Container>
     </>
   )
 }
 
-function App() {
+type AppProps = {
+  debugNode?: React.ReactNode;
+};
+
+
+
+const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="admin/*" element={<Layout />} />
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="admin/*" element={<Layout />} />
+          {/* Just in case, those route are not served */}
+          <Route path="*" element={<Navigate to="/admin" replace />} />
+        </Routes>
+        {props.debugNode}
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
 

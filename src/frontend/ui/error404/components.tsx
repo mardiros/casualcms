@@ -4,12 +4,8 @@ import * as React from "react";
 const PageNotFound: React.FunctionComponent<{}> = () => {
   return (
     <>
-      <Heading>
-        Page Not Found
-      </Heading>
-      <Heading subtitle>
-        This is probably not a problem with npm.
-      </Heading>
+      <Heading>Page Not Found</Heading>
+      <Heading subtitle>This is probably not a problem with npm.</Heading>
     </>
   );
 };

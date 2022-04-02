@@ -19,16 +19,21 @@ function useAuth() {
   return React.useContext(AuthContext);
 }
 
-function AuthProvider({ children }: { children: React.ReactNode }): React.ReactElement {
-
+function AuthProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   let [authenticatedUser, setUser] = React.useState<Account | null>(null);
   const config = React.useContext(AppContext);
   const loadAuthenticatedUser = async (callback: any) => {
     if (config == null) {
       throw new Error("Fatal Error: Unconfigured application");
     }
-    const accountResult = await config.uow.account.getCurrent()
-    accountResult.map((account) => setUser(account)).mapErr((err) => setUser(null));
+    const accountResult = await config.uow.account.getCurrent();
+    accountResult
+      .map((account) => setUser(account))
+      .mapErr((err) => setUser(null));
     callback();
   };
   let remember = (account: Account, callback: any) => {
@@ -46,47 +51,39 @@ function AuthProvider({ children }: { children: React.ReactNode }): React.ReactE
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-
-function RequireAuth({ children }: { children: React.ReactNode }): React.ReactElement {
-
+function RequireAuth({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement {
   let auth = useAuth();
   let navigate = useNavigate();
   const [loading, setLoading] = React.useState<boolean>(false);
 
-
-  React.useEffect(
-    () => {
-      async function loadAuthenticatedUser() {
-        auth.loadAuthenticatedUser(
-          () => {
-            if (!auth.authenticatedUser) {
-              navigate("/admin/login", { replace: true });
-            }
-            else {
-              setLoading(false);
-            }
-          }
-        )
-      }
-      loadAuthenticatedUser();
-      return function cleanup() { };
-    },
-    []
-  );
+  React.useEffect(() => {
+    async function loadAuthenticatedUser() {
+      auth.loadAuthenticatedUser(() => {
+        if (!auth.authenticatedUser) {
+          navigate("/admin/login", { replace: true });
+        } else {
+          setLoading(false);
+        }
+      });
+    }
+    loadAuthenticatedUser();
+    return function cleanup() {};
+  }, []);
   if (loading || !auth.authenticatedUser) {
-    return <>Loading...</>
+    return <>Loading...</>;
   }
 
   return <>{children}</>;
 }
 
-
 function Login() {
   return (
     <Box>
-      <Heading>
-        Sign In
-      </Heading>
+      <Heading>Sign In</Heading>
       <form method="POST">
         <Field>
           <Label>
@@ -104,16 +101,12 @@ function Login() {
             </Control>
           </Label>
         </Field>
-        <Button
-          type="button"
-          color="primary"
-        >
+        <Button type="button" color="primary">
           Sign In
         </Button>
-      </form >
-    </Box >
+      </form>
+    </Box>
   );
-};
-
+}
 
 export { AuthProvider, Login, RequireAuth, useAuth };

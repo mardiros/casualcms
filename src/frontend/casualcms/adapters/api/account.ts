@@ -5,11 +5,9 @@ import { Account } from "casualcms/domain/model";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
 
-
 class FetchAccountApi extends BaseFetchApi implements IAccountApi {
-
   async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
-   const response = await this.fetch("/api/authntokens", {
+    const response = await this.fetch("/api/authntokens", {
       method: "POST",
       headers: {
         "content-type": "application/json",

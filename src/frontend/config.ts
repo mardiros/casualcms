@@ -19,5 +19,4 @@ function useConfig() {
   return React.useContext(AppContext);
 }
 
-
 export { AppContext, AppConfig, useConfig };

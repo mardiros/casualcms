@@ -1,18 +1,20 @@
 import React from "react";
-import { BrowserRouter, Navigate, Routes, Route, Link, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Navigate,
+  Routes,
+  Route,
+  Link,
+  useLocation,
+} from "react-router-dom";
 import { Box, Heading, Container } from "react-bulma-components";
 
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
 import { PageNotFound } from "./ui/error404/components";
 
-
 const Body: React.FunctionComponent<{}> = () => {
-  return (
-    <>
-      Welcome To The Casual CMS!
-    </>
-  )
-}
+  return <>Welcome To The Casual CMS!</>;
+};
 
 const Layout: React.FunctionComponent<{}> = () => {
   return (
@@ -25,25 +27,26 @@ const Layout: React.FunctionComponent<{}> = () => {
       <Container>
         <Routes>
           <Route path="login" element={<Login />} /> {/* Fix the layout */}
-          <Route path="*" element={
-            <RequireAuth>
-              <Routes>
-                <Route path="" element={<Body />} />
-                <Route path="*" element={<PageNotFound />} />
-              </Routes>
-            </RequireAuth>
-          } />
+          <Route
+            path="*"
+            element={
+              <RequireAuth>
+                <Routes>
+                  <Route path="" element={<Body />} />
+                  <Route path="*" element={<PageNotFound />} />
+                </Routes>
+              </RequireAuth>
+            }
+          />
         </Routes>
       </Container>
     </>
-  )
-}
+  );
+};
 
 type AppProps = {
   debugNode?: React.ReactNode;
 };
-
-
 
 const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
   return (
@@ -57,7 +60,7 @@ const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
         {props.debugNode}
       </BrowserRouter>
     </AuthProvider>
-  )
-}
+  );
+};
 
 export { App };

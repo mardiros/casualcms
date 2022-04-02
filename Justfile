@@ -11,6 +11,9 @@ cleandoc:
 cleanjs:
     rm -rf src/casualcms/admin/*
 
+prettier:
+    npx prettier --write src/frontend  tests
+
 lint:
     poetry run flake8 && echo "$(tput setaf 10)Success: no lint issue$(tput setaf 7)"
 

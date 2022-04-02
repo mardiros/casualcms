@@ -1,8 +1,9 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { Box, Heading, Container } from "react-bulma-components";
-import { Login } from "./ui/login/components"
-import { PageNotFound } from "./ui/error404/components"
+
+import { Login } from "./ui/login/components";
+import { PageNotFound } from "./ui/error404/components";
 
 
 function Layout() {

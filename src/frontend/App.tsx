@@ -1,6 +1,6 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import { Box, Heading, Form, Button, Container, Tile } from "react-bulma-components";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { Box, Heading, Container } from "react-bulma-components";
 import { Login } from "./ui/login/components"
 import { PageNotFound } from "./ui/error404/components"
 
@@ -25,11 +25,12 @@ function Layout() {
 
 function App() {
   return (
-    <Routes>
-      <Route path="admin/*" element={<Layout />} />
-    </Routes>
+    <BrowserRouter>
+      <Routes>
+        <Route path="admin/*" element={<Layout />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
-
 
 export { App };

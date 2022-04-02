@@ -4,6 +4,7 @@ from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 from starlette.types import Receive, Scope, Send
+from . import api
 
 admin_ui_dir = Path(__file__).parent / "admin"
 template_dir = Path(__file__).parent / "templates"
@@ -11,6 +12,7 @@ favicon_path = Path(__file__).parent / "favicon.ico"
 
 
 app = FastAPI()
+app.include_router(api.router, prefix="/api")
 
 react_app = StaticFiles(directory=str(admin_ui_dir.resolve()), html=True)
 

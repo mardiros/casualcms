@@ -1,4 +1,3 @@
-from .base import router
-from . import authntoken
+from .views.base import router
 
-__all__ = ["router", "authntoken"]
+__all__ = ["router"]

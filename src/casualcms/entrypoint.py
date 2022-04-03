@@ -22,7 +22,7 @@ async def favicon() -> Response:
     return FileResponse(favicon_path)
 
 
-async def serve_admin_ui(scope: Scope, receive: Receive, send: Send):
+async def serve_admin_ui(scope: Scope, receive: Receive, send: Send) -> None:
     """
     Serve the react app and its static assets.
 

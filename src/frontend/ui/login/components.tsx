@@ -16,11 +16,11 @@ interface AuthContextType {
 
 let AuthContext = React.createContext<AuthContextType>(null!);
 
-function useAuth() {
+export function useAuth() {
   return React.useContext(AuthContext);
 }
 
-function AuthProvider({
+export function AuthProvider({
   children,
 }: {
   children: React.ReactNode;
@@ -52,7 +52,7 @@ function AuthProvider({
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
-function RequireAuth({
+export function RequireAuth({
   children,
 }: {
   children: React.ReactNode;
@@ -63,7 +63,7 @@ function RequireAuth({
 
   React.useEffect(() => {
     async function loadAuthenticatedUser() {
-      console.log("XXX")
+      console.log("XXX");
       auth.loadAuthenticatedUser(() => {
         if (!auth.authenticatedUser) {
           navigate("/admin/login", { replace: true });
@@ -73,7 +73,7 @@ function RequireAuth({
       });
     }
     loadAuthenticatedUser();
-    return function cleanup() { };
+    return function cleanup() {};
   }, []);
   if (loading || !auth.authenticatedUser) {
     return <>Loading...</>;
@@ -82,7 +82,7 @@ function RequireAuth({
   return <>{children}</>;
 }
 
-const Login: React.FunctionComponent<{}> = () => {
+export const Login: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   let navigate = useNavigate();
   let config = useConfig();
@@ -125,9 +125,9 @@ const Login: React.FunctionComponent<{}> = () => {
             Username:
             <Control>
               <Input name="username" placeholder="username" />
-              {error && error.has("username") &&
+              {error && error.has("username") && (
                 <p className="help is-danger">{error.get("username")}</p>
-              }
+              )}
             </Control>
           </Label>
         </Field>
@@ -146,5 +146,3 @@ const Login: React.FunctionComponent<{}> = () => {
     </Box>
   );
 };
-
-export { AuthProvider, Login, RequireAuth, useAuth };

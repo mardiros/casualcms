@@ -7,11 +7,11 @@ type ApiErrorItem = {
   // ctx: any
 };
 
-type FastApiError = {
+export type FastApiError = {
   detail: ApiErrorItem[];
 };
 
-const castError = (api_errors: FastApiError): ApiError => {
+export const castError = (api_errors: FastApiError): ApiError => {
   let errors = new Map();
   api_errors.detail.forEach((error) => {
     if (errors.has(error.loc[1])) {
@@ -23,7 +23,7 @@ const castError = (api_errors: FastApiError): ApiError => {
   return errors;
 };
 
-class BaseFetchApi {
+export class BaseFetchApi {
   _fetch: Function | null;
   constructor(...args: Function[]) {
     if (args.length > 0) {
@@ -37,6 +37,3 @@ class BaseFetchApi {
     return fetch_(req, ini);
   };
 }
-
-export { castError, BaseFetchApi };
-export type { FastApiError };

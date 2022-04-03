@@ -1,11 +1,5 @@
 import React from "react";
-import {
-  BrowserRouter,
-  Navigate,
-  Routes,
-  Route,
-  Link,
-} from "react-router-dom";
+import { BrowserRouter, Navigate, Routes, Route, Link } from "react-router-dom";
 import { Box, Heading, Container } from "react-bulma-components";
 
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
@@ -47,7 +41,7 @@ type AppProps = {
   debugNode?: React.ReactNode;
 };
 
-const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
+export const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
   return (
     <AuthProvider>
       <BrowserRouter>
@@ -61,5 +55,3 @@ const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
     </AuthProvider>
   );
 };
-
-export { App };

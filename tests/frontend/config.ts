@@ -15,7 +15,7 @@ class FakeAccountApi implements IAccountApi {
     if (creds.password == "justincase") {
       let errMap = new Map();
       errMap.set("username", "Invalid username or password");
-      return err(errMap)
+      return err(errMap);
     }
     return ok({
       id: "123",

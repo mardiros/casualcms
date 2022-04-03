@@ -2,7 +2,7 @@ import React from "react";
 import { IApi } from "casualcms/service/api";
 import { IUnitOfWork } from "casualcms/service/uow";
 
-class AppConfig {
+export class AppConfig {
   api: IApi;
   uow: IUnitOfWork;
 
@@ -13,10 +13,8 @@ class AppConfig {
 }
 
 // The context as to be initialized first before use the app, right!
-const AppContext = React.createContext<AppConfig | null>(null);
+export const AppContext = React.createContext<AppConfig | null>(null);
 
-function useConfig() {
+export function useConfig() {
   return React.useContext(AppContext);
 }
-
-export { AppContext, AppConfig, useConfig };

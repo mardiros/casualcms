@@ -14,9 +14,9 @@ interface AppDBSchema extends DBSchema {
   };
 }
 
-type Database = IDBPDatabase<AppDBSchema>;
+export type Database = IDBPDatabase<AppDBSchema>;
 
-const initDB = async (): Promise<Database> => {
+export const initDB = async (): Promise<Database> => {
   const db = await openDB<AppDBSchema>("casualcms", 1, {
     upgrade(db) {
       db.createObjectStore("default");
@@ -33,7 +33,7 @@ class IndexDBRepository {
   }
 }
 
-class IndexDBAccountRepository
+export class IndexDBAccountRepository
   extends IndexDBRepository
   implements IAccountRepository
 {
@@ -50,6 +50,3 @@ class IndexDBAccountRepository
     return ok(account as Account);
   }
 }
-
-export type { Database };
-export { initDB, IndexDBAccountRepository };

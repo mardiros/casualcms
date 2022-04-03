@@ -18,4 +18,3 @@ export const waitForPath = async (path: string): Promise<string> => {
   });
   return resp;
 };
-

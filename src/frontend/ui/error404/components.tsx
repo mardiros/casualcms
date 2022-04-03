@@ -1,7 +1,7 @@
 import { Heading } from "react-bulma-components";
 import * as React from "react";
 
-const PageNotFound: React.FunctionComponent<{}> = () => {
+export const PageNotFound: React.FunctionComponent<{}> = () => {
   return (
     <>
       <Heading>Page Not Found</Heading>
@@ -9,5 +9,3 @@ const PageNotFound: React.FunctionComponent<{}> = () => {
     </>
   );
 };
-
-export { PageNotFound };

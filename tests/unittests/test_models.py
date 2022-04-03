@@ -1,7 +1,10 @@
 from datetime import datetime
-import pytest
+from typing import Any
 
-from casualcms.api.domain.models import Account
+import pytest
+from datetime import timedelta, datetime
+
+from casualcms.api.domain.models import Account, AuthnToken
 
 
 def test_account_password_match():
@@ -15,3 +18,20 @@ def test_account_password_match():
     )
     assert account.match_password("Alice") is False
     assert account.match_password("alice") is True
+
+
+@pytest.mark.parametrize(
+    "params",
+    [{"timedelta": 15, "expected": False}, {"timedelta": -15, "expected": True}],
+)
+def test_authn_token_has_expired(params: dict[str, Any]):
+    tok = AuthnToken(
+        id="",
+        account_id="",
+        created_at=datetime.utcnow(),
+        token="",
+        expires_at=datetime.utcnow() + timedelta(seconds=params["timedelta"]),
+        client_addr="",
+        user_agent="",
+    )
+    assert tok.has_expired() == params["expected"]

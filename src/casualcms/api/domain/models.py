@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from enum import Enum
 from datetime import datetime
 
@@ -40,3 +40,20 @@ class Account(AbstractModel):
     def match_password(self, password: str) -> bool:
         encoded_pwd = self.password.encode("utf-8")
         return bcrypt.checkpw(password.encode("utf-8"), encoded_pwd)
+
+
+class AuthnToken(AbstractModel):
+    """Authentication tokens"""
+
+    id: str  # UUID
+    token: str
+    account_id: str  # UUID
+    created_at: datetime
+    expires_at: Optional[datetime]
+    client_addr: str
+    user_agent: str
+
+    def has_expired(self):
+        if not self.expires_at:
+            return False
+        return self.expires_at < datetime.utcnow()

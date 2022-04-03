@@ -1,4 +1,5 @@
 from typing import Any
+
 from fastapi import Body, HTTPException
 
 from .base import router

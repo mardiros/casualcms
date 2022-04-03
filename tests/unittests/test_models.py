@@ -1,10 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 import pytest
-from datetime import timedelta, datetime
 
-from casualcms.api.domain.models import Account, AuthnToken
+from casualcms.api.domain.model import Account, AuthnToken
 
 
 def test_account_password_match():

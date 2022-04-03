@@ -1,16 +1,15 @@
-from typing import Any, List, Optional
-from enum import Enum
+from dataclasses import dataclass, field
 from datetime import datetime
+from enum import Enum
+from typing import Optional
 
 import bcrypt
-from pydantic import BaseModel, Field
+
+from casualcms.api.domain.messages import Event
 
 
-class AbstractModel(BaseModel):
+class AbstractModel:
     """Type Marker for domain model class."""
-
-    id: str  # UUID
-    created_at: datetime
 
 
 class AccountStatus(Enum):
@@ -18,6 +17,7 @@ class AccountStatus(Enum):
     locked = "locked"
 
 
+@dataclass
 class Account(AbstractModel):
 
     id: str  # UUID
@@ -29,19 +29,22 @@ class Account(AbstractModel):
     lang: str
 
     status: AccountStatus = AccountStatus.active
-    events: List[Any] = Field(default_factory=list)
+    events: list[Event] = field(default_factory=list)
 
-    def __init__(self, **data: Any):
-        data["password"] = bcrypt.hashpw(
-            data["password"].encode("utf-8"), bcrypt.gensalt()
+    def __hash__(self) -> int:
+        return hash(self.id)
+
+    def __post_init__(self):
+        self.password = bcrypt.hashpw(
+            self.password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
-        super().__init__(**data)
 
     def match_password(self, password: str) -> bool:
         encoded_pwd = self.password.encode("utf-8")
         return bcrypt.checkpw(password.encode("utf-8"), encoded_pwd)
 
 
+@dataclass
 class AuthnToken(AbstractModel):
     """Authentication tokens"""
 
@@ -49,11 +52,9 @@ class AuthnToken(AbstractModel):
     token: str
     account_id: str  # UUID
     created_at: datetime
-    expires_at: Optional[datetime]
+    expires_at: datetime
     client_addr: str
     user_agent: str
 
     def has_expired(self):
-        if not self.expires_at:
-            return False
         return self.expires_at < datetime.utcnow()

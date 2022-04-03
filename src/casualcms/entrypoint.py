@@ -4,6 +4,7 @@ from fastapi import FastAPI, Response
 from fastapi.staticfiles import StaticFiles
 from starlette.responses import FileResponse
 from starlette.types import Receive, Scope, Send
+
 from . import api
 
 admin_ui_dir = Path(__file__).parent / "admin"

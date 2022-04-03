@@ -5,7 +5,6 @@ import {
   Routes,
   Route,
   Link,
-  useLocation,
 } from "react-router-dom";
 import { Box, Heading, Container } from "react-bulma-components";
 
@@ -26,7 +25,7 @@ const Layout: React.FunctionComponent<{}> = () => {
       </Box>
       <Container>
         <Routes>
-          <Route path="login" element={<Login />} /> {/* Fix the layout */}
+          <Route path="login" element={<Login />} />
           <Route
             path="*"
             element={
@@ -54,7 +53,7 @@ const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
       <BrowserRouter>
         <Routes>
           <Route path="admin/*" element={<Layout />} />
-          {/* Just in case, those route are not served */}
+          {/* Required in tests */}
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>
         {props.debugNode}

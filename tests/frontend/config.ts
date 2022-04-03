@@ -12,6 +12,11 @@ import { IAccountRepository } from "../../src/frontend/casualcms/domain/reposito
 
 class FakeAccountApi implements IAccountApi {
   async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
+    if (creds.password == "justincase") {
+      let errMap = new Map();
+      errMap.set("username", "Invalid username or password");
+      return err(errMap)
+    }
     return ok({
       id: "123",
       token: "abc123",

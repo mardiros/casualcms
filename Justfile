@@ -17,10 +17,13 @@ prettier:
 lint:
     poetry run flake8 && echo "$(tput setaf 10)Success: no lint issue$(tput setaf 7)"
 
-test: lint mypy unittest functest
+test: lint mypy unittest jstest functest
 
 unittest test_suite=default_test_suite:
     poetry run pytest -sxv {{test_suite}}
+
+jstest:
+    npm run test
 
 lf:
     poetry run pytest -sxvvv --lf

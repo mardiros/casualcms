@@ -6,7 +6,7 @@ import logging
 from collections import defaultdict
 from typing import Any, Callable, Coroutine, Dict, List, Type, TypeVar, Union, cast
 
-from casualcms.api.domain.messages.base import Command, Event, Message
+from casualcms.domain.messages.base import Command, Event, Message
 
 from .unit_of_work import AbstractUnitOfWork
 

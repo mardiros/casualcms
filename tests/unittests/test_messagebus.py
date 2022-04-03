@@ -3,11 +3,10 @@ from typing import Iterable
 
 import pytest
 
-from casualcms.api.domain.messages import Command, Event
-from casualcms.api.service.messagebus import ConfigurationError, MessageRegistry
-from casualcms.api.service.unit_of_work import AbstractUnitOfWork
-
-from .fixtures import InMemoryUnitOfWork
+from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
+from casualcms.domain.messages import Command, Event
+from casualcms.service.messagebus import ConfigurationError, MessageRegistry
+from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 class DummyModel:

@@ -1,3 +1,10 @@
-from .views.base import router
+from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 
-__all__ = ["router"]
+from .base import router
+from . import authntoken
+
+
+@configure
+def includeme(app: FastAPIConfigurator) -> None:
+    router.add_api_route("/authntokens", authntoken.authenticate, methods=["POST"])
+    app.include_router(router, prefix="/api")

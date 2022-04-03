@@ -1,9 +1,9 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from casualcms.api.service.messagebus import MessageRegistry
+from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.entrypoint import app
-from tests.unittests.fixtures import InMemoryUnitOfWork
+from casualcms.service.messagebus import MessageRegistry
 
 
 @pytest.fixture

@@ -5,7 +5,7 @@ from typing import Optional
 
 import bcrypt
 
-from casualcms.api.domain.messages import Event
+from casualcms.domain.messages import Event
 
 
 class AbstractModel:

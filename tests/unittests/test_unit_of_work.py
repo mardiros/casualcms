@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from casualcms.api.domain.messages import Event
-from casualcms.api.domain.model import Account
-from casualcms.api.service.unit_of_work import AbstractUnitOfWork
+from casualcms.domain.messages import Event
+from casualcms.domain.model import Account
+from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 class DummyEvent(Event):
@@ -50,3 +50,11 @@ async def test_rollback(uow: AbstractUnitOfWork):
     except Exception:
         pass
     assert uow.committed is False  # type: ignore
+
+
+async def test_no_autocommit(uow: AbstractUnitOfWork):
+    async with uow:
+        pass
+    assert uow.committed is None  # type: ignore
+    await uow.commit()
+    assert uow.committed is True  # type: ignore

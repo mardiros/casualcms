@@ -5,7 +5,7 @@ Propagate commands and events to every registered handles.
 import logging
 from typing import Any, Callable, Coroutine, TypeVar, Union
 
-from casualcms.api.domain.messages.base import Command, Event
+from casualcms.domain.messages.base import Command, Event
 
 from .unit_of_work import AbstractUnitOfWork
 

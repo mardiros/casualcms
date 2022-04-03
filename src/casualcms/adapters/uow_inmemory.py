@@ -1,14 +1,12 @@
-import abc
-
 from result import Err, Ok
 
-from casualcms.api.domain.model import Account
-from casualcms.api.domain.repositories import AbstractAccountRepository
-from casualcms.api.domain.repositories.user import (
+from casualcms.domain.model import Account
+from casualcms.domain.repositories import AbstractAccountRepository
+from casualcms.domain.repositories.user import (
     AccountRepositoryError,
     AccountRepositoryResult,
 )
-from casualcms.api.service.unit_of_work import AbstractUnitOfWork
+from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 class AccountInMemoryRepository(AbstractAccountRepository):

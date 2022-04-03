@@ -1,38 +1,21 @@
-from pathlib import Path
+from typing import Any
 
-from fastapi import FastAPI, Response
-from fastapi.staticfiles import StaticFiles
-from starlette.responses import FileResponse
-from starlette.types import Receive, Scope, Send
+import casualcms.api
+import casualcms.ui
+from casualcms.adapters.fastapi import FastAPIConfigurator
 
-from . import api
+settings: dict[str, Any] = {
+    "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
+}
 
-admin_ui_dir = Path(__file__).parent / "admin"
-template_dir = Path(__file__).parent / "templates"
-favicon_path = Path(__file__).parent / "favicon.ico"
+with FastAPIConfigurator(settings) as configurator:
+    # configure message bus
 
+    # inject routes
+    configurator.scan(casualcms.api, categories=["fastapi"])
+    configurator.scan(casualcms.ui, categories=["fastapi"])
 
-app = FastAPI()
-app.include_router(api.router, prefix="/api")
+    # import casualcms.service.handlers
+    # self.scan(casualcms.service.handlers, categories=["messagebus"])
 
-react_app = StaticFiles(directory=str(admin_ui_dir.resolve()), html=True)
-
-
-@app.get("/favicon.ico")
-async def favicon() -> Response:
-    return FileResponse(favicon_path)
-
-
-async def serve_admin_ui(scope: Scope, receive: Receive, send: Send) -> None:
-    """
-    Serve the react app and its static assets.
-
-    Routes in the react app cannot contains `.`.
-    """
-    if "." not in scope["path"]:
-        scope["path"] = "index.html"
-    resp = await react_app(scope, receive, send)
-    return resp
-
-
-app.mount("/admin", serve_admin_ui, name="ui")
+    app = configurator.app

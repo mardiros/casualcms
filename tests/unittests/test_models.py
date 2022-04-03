@@ -3,7 +3,7 @@ from typing import Any
 
 import pytest
 
-from casualcms.api.domain.model import Account, AuthnToken
+from casualcms.domain.model import Account, AuthnToken
 
 
 def test_account_password_match():

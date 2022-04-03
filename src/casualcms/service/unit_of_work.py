@@ -5,8 +5,8 @@ import abc
 from types import TracebackType
 from typing import Iterable, Optional, Type
 
-from casualcms.api.domain.messages import Event
-from casualcms.api.domain.repositories import AbstractAccountRepository
+from casualcms.domain.messages import Event
+from casualcms.domain.repositories import AbstractAccountRepository
 
 
 class AbstractUnitOfWork(abc.ABC):

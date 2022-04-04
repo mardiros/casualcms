@@ -26,8 +26,14 @@ class AppConfig:
 
     def __init__(self, settings: MutableMapping[str, Any]):
         self.settings = settings
-        self.uow = resolve(self.settings["unit_of_work"])
-        self.bus = MessageRegistry()
+
+
+        if isinstance(self.settings["unit_of_work"], str):
+            self.uow = resolve(self.settings["unit_of_work"])
+        else:
+            self.uow = self.settings["unit_of_work"]
+
+        self.bus = self.settings.get("messagebus") or MessageRegistry()
 
 
 class FastAPIConfigurator(venusian.Scanner):

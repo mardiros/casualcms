@@ -1,7 +1,7 @@
 from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 
-from .base import router
 from . import authntoken
+from .base import router
 
 
 @configure

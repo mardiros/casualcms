@@ -2,9 +2,13 @@
 Propagate commands and events to every registered handles.
 
 """
+
 import logging
+import inspect
 from collections import defaultdict
 from typing import Any, Callable, Coroutine, Dict, List, Type, TypeVar, Union, cast
+
+import venusian  # type: ignore
 
 from casualcms.domain.messages.base import Command, Event, Message
 
@@ -22,6 +26,31 @@ MessageHandler = Union[CommandHandler[TCommand], EventHandler[TEvent]]
 
 class ConfigurationError(RuntimeError):
     """Prevents bad usage of the add_listener."""
+
+
+def listen(wrapped: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]]):
+    """
+    Decorator to listen for a message.
+    """
+
+    def callback(
+        scanner: venusian.Scanner,
+        name: str,
+        ob: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]],
+    ):
+        if not hasattr(scanner, "messagebus"):
+            return
+        argsspec = inspect.getfullargspec(ob)
+        msg_type = argsspec.annotations[argsspec.args[0]]
+        log.info(
+            "Attaching %s for %s",
+            wrapped.__name__,
+            msg_type,
+        )
+        scanner.messagebus.add_listener(msg_type, wrapped)  # type: ignore
+
+    venusian.attach(wrapped, callback, category="messagebus")
+    return wrapped
 
 
 class MessageRegistry:

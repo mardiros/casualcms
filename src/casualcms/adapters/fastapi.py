@@ -13,6 +13,22 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 log = logging.getLogger(__name__)
 
 
+
+def configure(
+    wrapped: Callable[["FastAPIConfigurator"], None]
+) -> Callable[["FastAPIConfigurator"], None]:
+    """Decorator used to attach route in a submodule while using the confirator.scan"""
+    def callback(
+        scanner: venusian.Scanner, name: str, ob: Callable[[venusian.Scanner], None]
+    ) -> None:
+        if not isinstance(scanner, FastAPIConfigurator):
+            return  # coverage: ignore
+        ob(scanner)
+
+    venusian.attach(wrapped, callback, category="fastapi")
+    return wrapped
+
+
 def resolve(value: str) -> AbstractUnitOfWork:
     """return the attr from the syntax: package.module:attr."""
     ep = pkg_resources.EntryPoint.parse(f"x={value}")
@@ -79,17 +95,3 @@ class FastAPIConfigurator(venusian.Scanner):
 
     def mount(self, path: str, app: ASGIApp, name: str):
         self.app.mount(path, app, name)
-
-
-def configure(
-    wrapped: Callable[[FastAPIConfigurator], None]
-) -> Callable[[FastAPIConfigurator], None]:
-    def callback(
-        scanner: venusian.Scanner, name: str, ob: Callable[[venusian.Scanner], None]
-    ) -> None:
-        if not isinstance(scanner, FastAPIConfigurator):
-            return  # coverage: ignore
-        ob(scanner)
-
-    venusian.attach(wrapped, callback, category="fastapi")
-    return wrapped

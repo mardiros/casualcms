@@ -2,10 +2,11 @@ import time
 from multiprocessing import Process
 from typing import Any, Callable
 
-import uvicorn  # type: ignore
 from behave import fixture  # type: ignore
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
+
+from casualcms.entrypoint import main
 
 
 class Browser:
@@ -40,7 +41,11 @@ class Browser:
 
 
 def run_server(port: int, **kwargs: Any):
-    uvicorn.run("casualcms.entrypoint:app", port=port, **kwargs)
+    settings = {
+        "server_host": f"localhost:{port}",
+        "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
+    }
+    main(settings)
 
 
 @fixture

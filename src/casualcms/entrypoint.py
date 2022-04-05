@@ -10,11 +10,15 @@ import casualcms.api
 import casualcms.ui
 import casualcms.service.handlers
 from casualcms.adapters.fastapi import FastAPIConfigurator
-
+from casualcms.domain.messages.commands import CreateAccount
 
 SETTINGS: dict[str, str] = {
     "server_host": "0.0.0.0:8000",
     "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
+    # create an account on startup
+    "admin_password": "",  # set it to create an account
+    "admin_username": "admin",
+    "admin_email": "root@localhost",
 }
 
 
@@ -32,6 +36,21 @@ async def bootstrap(settings: dict[str, Any]) -> FastAPI:
         configure(configurator)
 
     app = configurator.app
+
+    if settings["admin_password"]:
+        admin = CreateAccount(
+            username=settings["admin_username"],
+            password=settings["admin_password"],
+            email=settings.get("admin_email", "root@localhost"),
+            lang="en",
+        )
+        async with configurator.config.uow as uow:
+            await configurator.config.bus.handle(
+                admin,
+                uow,
+            )
+            await uow.commit()
+
     return app
 
 

@@ -44,6 +44,8 @@ def run_server(port: int, **kwargs: Any):
     settings = {
         "server_host": f"localhost:{port}",
         "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
+        "admin_username": "alice",
+        "admin_password": "secret",
     }
     main(settings)
 

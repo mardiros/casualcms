@@ -31,7 +31,7 @@
   },
   "scripts": {
     "test": "mocha -r ts-node/register -r global-jsdom/register tests/frontend/**/*.test.ts*",
-    "watch": "parcel watch src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/admin --log-level info",
+    "watch": "parcel watch src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/admin  --no-optimize --log-level info",
     "build_dev": "parcel build src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/admin --no-optimize --log-level info",
     "build": "parcel build src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/admin"
   },

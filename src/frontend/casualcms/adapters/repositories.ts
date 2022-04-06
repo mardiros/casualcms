@@ -49,4 +49,9 @@ export class IndexDBAccountRepository
     }
     return ok(account as Account);
   }
+  async set(account: Account): Promise<boolean> {
+    await this.db.put("account", account, account.username);
+    await this.db.put("default", account.username as string, "account");
+    return true;
+  }
 }

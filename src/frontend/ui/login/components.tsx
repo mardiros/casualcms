@@ -7,14 +7,13 @@ import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
 import { ApiError } from "../../casualcms/domain/ports";
 
-interface AuthContextType {
+interface IAuthContext {
   authenticatedUser: Account | null;
-  loadAuthenticatedUser: (callback: any) => Promise<void>;
   remember: (account: Account, callback: any) => void;
   forget: (callback: any) => void;
 }
 
-let AuthContext = React.createContext<AuthContextType>(null!);
+let AuthContext = React.createContext<IAuthContext>(null!);
 
 export function useAuth() {
   return React.useContext(AuthContext);
@@ -26,17 +25,6 @@ export function AuthProvider({
   children: React.ReactNode;
 }): React.ReactElement {
   let [authenticatedUser, setUser] = React.useState<Account | null>(null);
-  const config = React.useContext(AppContext);
-  const loadAuthenticatedUser = async (callback: any) => {
-    if (config == null) {
-      throw new Error("Fatal Error: Unconfigured application");
-    }
-    const accountResult = await config.uow.account.getCurrent();
-    accountResult
-      .map((account) => setUser(account))
-      .mapErr((err) => setUser(null));
-    callback();
-  };
   let remember = (account: Account, callback: any) => {
     setUser(account);
     callback();
@@ -47,7 +35,7 @@ export function AuthProvider({
     callback();
   };
 
-  let value = { authenticatedUser, loadAuthenticatedUser, remember, forget };
+  let value = { authenticatedUser, remember, forget };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
@@ -57,25 +45,28 @@ export function RequireAuth({
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
+  const config = React.useContext(AppContext);
   let auth = useAuth();
   let navigate = useNavigate();
-  const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     async function loadAuthenticatedUser() {
-      console.log("XXX");
-      auth.loadAuthenticatedUser(() => {
-        if (!auth.authenticatedUser) {
-          navigate("/admin/login", { replace: true });
-        } else {
-          setLoading(false);
-        }
-      });
+      if (!auth.authenticatedUser) {
+        const accountResult = await config.uow.account.getCurrent();
+        accountResult
+          .map((account: Account) => {
+            auth.remember(account, () => {})
+          })
+          .mapErr((err: any) => {
+            navigate("/admin/login", { replace: true })
+          });
+      }
     }
     loadAuthenticatedUser();
-    return function cleanup() {};
+    return function cleanup() { };
   }, []);
-  if (loading || !auth.authenticatedUser) {
+
+  if (!auth.authenticatedUser) {
     return <>Loading...</>;
   }
 
@@ -90,9 +81,6 @@ export const Login: React.FunctionComponent<{}> = () => {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (config == null) {
-      throw new Error("Fatal Error: Unconfigured application");
-    }
 
     let formData = new FormData(event.currentTarget);
     let username = formData.get("username") as string;
@@ -106,7 +94,8 @@ export const Login: React.FunctionComponent<{}> = () => {
 
     accountResult
       .map(async (account) => {
-        // const result = await config.uow.account.add(account);
+        // XXX save the set here
+        const result = await config.uow.account.set(account);
         auth.remember(account, () => {
           navigate(from, { replace: true });
         });

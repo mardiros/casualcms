@@ -23,7 +23,7 @@ unittest test_suite=default_test_suite:
     poetry run pytest -sxv {{test_suite}}
 
 jstest:
-    npm run test
+    NODE_ENV=dev npm run test
 
 lf:
     poetry run pytest -sxvvv --lf
@@ -35,7 +35,7 @@ cov test_suite=default_test_suite:
     xdg-open htmlcov/index.html
 
 functest: build_dev_frontend
-    poetry run behave tests/functionals/
+    poetry run behave --no-capture tests/functionals/
 
 servetest:
     poetry run python tests/functionals/fixtures.py
@@ -52,7 +52,7 @@ install:
     poetry install
 
 build_dev_frontend:
-    npm run build_dev
+    NODE_ENV=dev npm run build_dev
 
 build_frontend:
     npm run build_frontend

@@ -13,7 +13,7 @@ export class AppConfig {
 }
 
 // The context as to be initialized first before use the app, right!
-export const AppContext = React.createContext<AppConfig | null>(null);
+export const AppContext = React.createContext<AppConfig>(null!);
 
 export function useConfig() {
   return React.useContext(AppContext);

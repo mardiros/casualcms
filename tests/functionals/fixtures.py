@@ -42,10 +42,11 @@ class Browser:
 
 def run_server(port: int, **kwargs: Any):
     settings = {
-        "server_host": f"localhost:{port}",
+        "bind": f"localhost:{port}",
         "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
         "admin_username": "alice",
         "admin_password": "secret",
+        **kwargs
     }
     main(settings)
 
@@ -66,4 +67,4 @@ def browser(context: Any, port: int, **kwargs: Any):
 
 
 if __name__ == "__main__":
-    run_server(8000, reload=True)
+    run_server(8000, use_reloader=True)

@@ -4,6 +4,7 @@ import { Account } from "./model";
 
 interface IAccountRepository {
   getCurrent(): Promise<Result<Account, string>>;
+  set(account: Account): Promise<boolean>;
 }
 
 export type { IAccountRepository };

@@ -13,7 +13,7 @@ from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.domain.messages.commands import CreateAccount
 
 SETTINGS: dict[str, str] = {
-    "server_host": "0.0.0.0:8000",
+    "bind": "0.0.0.0:8000",
     "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
     # create an account on startup
     "admin_password": "",  # set it to create an account
@@ -54,18 +54,21 @@ async def bootstrap(settings: dict[str, Any]) -> FastAPI:
     return app
 
 
-async def asyncmain(settings: dict[str, str] = SETTINGS) -> None:
+async def asyncmain(settings: dict[str, Any] = SETTINGS) -> None:
     config = Config()
-    complete_settings: dict[str, str] = settings
+    complete_settings: dict[str, Any] = settings
     if settings is not SETTINGS:
         complete_settings = SETTINGS.copy()
         complete_settings.update(settings)
-    config.bind = complete_settings["server_host"].split(",")
+    config.bind = complete_settings["bind"].split(",")
+    config.use_reloader = complete_settings.get("use_reloader", False)
     app = await bootstrap(complete_settings)
     await serve(app, config)  # type: ignore
 
-def main(settings: dict[str, str] = SETTINGS):
+
+def main(settings: dict[str, Any] = SETTINGS):
     asyncio.run(asyncmain(settings))
+
 
 if __name__ == "__main__":
     main()

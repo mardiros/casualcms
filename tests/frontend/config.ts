@@ -43,7 +43,7 @@ class FakeAccountRepository implements IAccountRepository {
   async getCurrent(): Promise<Result<Account, string>> {
     return this.account;
   }
-  async add(model: Account): Promise<boolean> {
+  async set(model: Account): Promise<boolean> {
     this.account = ok(model);
     return true;
   }

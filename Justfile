@@ -8,8 +8,8 @@ doc:
 cleandoc:
     cd docs && poetry run make clean
 
-cleanjs:
-    rm -rf src/casualcms/admin/*
+clean_frontend:
+    rm -rf src/casualcms/admin/*.*
 
 prettier:
     npx prettier --write src/frontend  tests
@@ -51,11 +51,11 @@ install:
     npm ci
     poetry install
 
-build_dev_frontend:
+build_dev_frontend: clean_frontend
     NODE_ENV=dev npm run build_dev
 
-build_frontend:
-    npm run build_frontend
+build_frontend: clean_frontend
+    npm run build
 
 release major_minor_patch: test && changelog
     poetry version {{major_minor_patch}}

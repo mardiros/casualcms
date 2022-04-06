@@ -13,13 +13,13 @@ async def authenticate(
     password: str = Body(...),
     user_agent: str = Header(None),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> Any:
+) -> dict[str, Any]:
 
     authenticated_user: Account | None = None
     async with app.uow as uow:
-        user = await uow.accounts.by_username(username)
-        if user.is_ok():
-            user = user.unwrap()
+        stored_user = await uow.accounts.by_username(username)
+        if stored_user.is_ok():
+            user = stored_user.unwrap()
             if user.status == AccountStatus.active and user.match_password(password):
                 authenticated_user = user
 

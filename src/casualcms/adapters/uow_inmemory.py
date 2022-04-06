@@ -27,7 +27,7 @@ class AccountInMemoryRepository(AbstractAccountRepository):
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
         self.accounts = AccountInMemoryRepository()
-        self.committed = None
+        self.committed: bool | None = None
 
     async def commit(self) -> None:
         self.committed = True

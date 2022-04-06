@@ -2,16 +2,15 @@ import secrets
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from typing import Optional
 
 from .base import Command, Metadata
 
 
-def generate_id():
+def generate_id() -> str:
     return str(uuid.uuid1())
 
 
-def generate_secret():
+def generate_secret() -> str:
     return secrets.token_urlsafe(64)
 
 

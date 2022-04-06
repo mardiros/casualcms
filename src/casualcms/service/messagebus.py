@@ -3,8 +3,8 @@ Propagate commands and events to every registered handles.
 
 """
 
-import logging
 import inspect
+import logging
 from collections import defaultdict
 from typing import Any, Callable, Coroutine, Dict, List, Type, TypeVar, Union, cast
 
@@ -28,7 +28,9 @@ class ConfigurationError(RuntimeError):
     """Prevents bad usage of the add_listener."""
 
 
-def listen(wrapped: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]]):
+def listen(
+    wrapped: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]]
+) -> Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]]:
     """
     Decorator to listen for a message.
     """
@@ -37,7 +39,7 @@ def listen(wrapped: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, Non
         scanner: venusian.Scanner,
         name: str,
         ob: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]],
-    ):
+    ) -> None:
         if not hasattr(scanner, "messagebus"):
             return
         argsspec = inspect.getfullargspec(ob)

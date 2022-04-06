@@ -1,7 +1,7 @@
 from casualcms.domain.messages.commands import CreateAccount
 from casualcms.domain.model import Account
-from casualcms.service.unit_of_work import AbstractUnitOfWork
 from casualcms.service.messagebus import listen
+from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 @listen

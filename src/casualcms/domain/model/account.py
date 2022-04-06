@@ -1,15 +1,12 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Optional
 
 import bcrypt
 
 from casualcms.domain.messages import Event
 
-
-class AbstractModel:
-    """Type Marker for domain model class."""
+from .base import AbstractModel
 
 
 class AccountStatus(Enum):
@@ -34,7 +31,7 @@ class Account(AbstractModel):
     def __hash__(self) -> int:
         return hash(self.id)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         self.password = bcrypt.hashpw(
             self.password.encode("utf-8"), bcrypt.gensalt()
         ).decode("utf-8")
@@ -56,5 +53,5 @@ class AuthnToken(AbstractModel):
     client_addr: str
     user_agent: str
 
-    def has_expired(self):
+    def has_expired(self) -> bool:
         return self.expires_at < datetime.utcnow()

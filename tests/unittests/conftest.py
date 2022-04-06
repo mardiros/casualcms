@@ -1,14 +1,16 @@
 from typing import Any, Iterator
-from fastapi import FastAPI
+
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 import casualcms.api
-import casualcms.ui
 import casualcms.service.handlers
+import casualcms.ui
 from casualcms.adapters.fastapi import FastAPIConfigurator
+from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 
 
 @pytest.fixture

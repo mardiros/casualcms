@@ -13,11 +13,11 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 log = logging.getLogger(__name__)
 
 
-
 def configure(
     wrapped: Callable[["FastAPIConfigurator"], None]
 ) -> Callable[["FastAPIConfigurator"], None]:
     """Decorator used to attach route in a submodule while using the confirator.scan"""
+
     def callback(
         scanner: venusian.Scanner, name: str, ob: Callable[[venusian.Scanner], None]
     ) -> None:
@@ -42,7 +42,6 @@ class AppConfig:
 
     def __init__(self, settings: MutableMapping[str, Any]):
         self.settings = settings
-
 
         if isinstance(self.settings["unit_of_work"], str):
             self.uow = resolve(self.settings["unit_of_work"])
@@ -73,7 +72,7 @@ class FastAPIConfigurator(venusian.Scanner):
         exception_type: Type[Exception],
         exception_value: Exception,
         exception_traceback: Any,
-    ):
+    ) -> None:
         log.warning("Exiting")
         if exception_value:
             log.error(  # coverage: ignore
@@ -87,11 +86,11 @@ class FastAPIConfigurator(venusian.Scanner):
         endpoint: Callable[..., Coroutine[Any, Any, Response]],
         *args: Any,
         **kwargs: Any,
-    ):
+    ) -> None:
         self.app.add_api_route(path, endpoint, *args, **kwargs)
 
-    def include_router(self, router: APIRouter, *args: Any, **kwargs: Any):
+    def include_router(self, router: APIRouter, *args: Any, **kwargs: Any) -> None:
         self.app.include_router(router, *args, **kwargs)
 
-    def mount(self, path: str, app: ASGIApp, name: str):
+    def mount(self, path: str, app: ASGIApp, name: str) -> None:
         self.app.mount(path, app, name)

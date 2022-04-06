@@ -32,9 +32,9 @@ reportUnknownMemberType = false
 reportUntypedFunctionDecorator = false
 
 [[tool.mypy.overrides]]
+module = "casualcms.*"
 disallow_any_generics = true
 disallow_untyped_defs = true
-module = "casualcms.*"
 
 [tool.isort]
 profile = "black"

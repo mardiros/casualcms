@@ -2,13 +2,12 @@ import asyncio
 from typing import Any
 
 from fastapi import FastAPI
-
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
 
 import casualcms.api
-import casualcms.ui
 import casualcms.service.handlers
+import casualcms.ui
 from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.domain.messages.commands import CreateAccount
 
@@ -22,7 +21,7 @@ SETTINGS: dict[str, str] = {
 }
 
 
-def configure(configurator: FastAPIConfigurator):
+def configure(configurator: FastAPIConfigurator) -> None:
     # inject routes
     configurator.scan(casualcms.api, categories=["fastapi"])
     configurator.scan(casualcms.ui, categories=["fastapi"])
@@ -66,7 +65,7 @@ async def asyncmain(settings: dict[str, Any] = SETTINGS) -> None:
     await serve(app, config)  # type: ignore
 
 
-def main(settings: dict[str, Any] = SETTINGS):
+def main(settings: dict[str, Any] = SETTINGS) -> None:
     asyncio.run(asyncmain(settings))
 
 

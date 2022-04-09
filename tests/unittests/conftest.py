@@ -17,11 +17,11 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 @pytest.fixture
-def app_settings() -> Iterator[None]:
+def app_settings() -> Iterator[Settings]:
     os.environ["casualcms_template_search_path"] = str(
         (Path(__file__).parent / "templates").resolve()
     )
-    yield None
+    yield Settings()  # type" ignore
     del os.environ["casualcms_template_search_path"]
 
 
@@ -39,7 +39,7 @@ def messagebus() -> MessageRegistry:
 
 @pytest.fixture
 def app(
-    app_settings: None, uow: AbstractUnitOfWork, messagebus: MessageRegistry
+    app_settings: Settings, uow: AbstractUnitOfWork, messagebus: MessageRegistry
 ) -> FastAPI:
     settings = Settings(unit_of_work=uow, messagebus=messagebus)  # type: ignore
     with FastAPIConfigurator(settings) as configurator:

@@ -1,10 +1,9 @@
 from pydantic import BaseSettings, Field
 
-from casualcms.service.messagebus import MessageRegistry
-from casualcms.service.unit_of_work import AbstractUnitOfWork
-
 
 class Settings(BaseSettings):
+    from casualcms.service.messagebus import MessageRegistry
+    from casualcms.service.unit_of_work import AbstractUnitOfWork
 
     # Jinja2 config
     template_search_path: str = Field(...)

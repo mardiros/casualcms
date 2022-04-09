@@ -41,7 +41,7 @@ def listen(
         ob: Callable[[TCommand, AbstractUnitOfWork], Coroutine[None, None, Any]],
     ) -> None:
         if not hasattr(scanner, "messagebus"):
-            return
+            return  # coverage: ignore
         argsspec = inspect.getfullargspec(ob)
         msg_type = argsspec.annotations[argsspec.args[0]]
         log.info(

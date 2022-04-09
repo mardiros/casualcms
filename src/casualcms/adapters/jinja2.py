@@ -1,12 +1,12 @@
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
-from casualcms.config import Settings
-
 
 def build_searchpath() -> list[str]:
     searchpath: list[str] = []
-    settings = Settings()
+    from casualcms.config import Settings  # circular import for typing purpose
+
+    settings = Settings()  # type: ignore
     paths = settings.template_search_path.split(",")
     for path in paths:
         if ":" in path:

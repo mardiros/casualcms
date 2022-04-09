@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Iterator
 
 import pytest
 from fastapi import FastAPI
@@ -11,6 +11,7 @@ import casualcms.service.handlers
 import casualcms.ui
 from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
+from casualcms.config import Settings
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -37,11 +38,10 @@ def messagebus() -> MessageRegistry:
 
 
 @pytest.fixture
-def app(uow: AbstractUnitOfWork, messagebus: MessageRegistry) -> FastAPI:
-    settings: dict[str, Any] = {
-        "unit_of_work": uow,
-        "messagebus": messagebus,
-    }
+def app(
+    app_settings: None, uow: AbstractUnitOfWork, messagebus: MessageRegistry
+) -> FastAPI:
+    settings = Settings(unit_of_work=uow, messagebus=messagebus)  # type: ignore
     with FastAPIConfigurator(settings) as configurator:
         configurator.scan(casualcms.api, categories=["fastapi"])
         configurator.scan(casualcms.ui, categories=["fastapi"])

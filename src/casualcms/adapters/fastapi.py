@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Coroutine, MutableMapping, Type
+from typing import Any, Callable, Coroutine, Type
 
 import pkg_resources
 import venusian  # type: ignore
@@ -7,6 +7,7 @@ from fastapi import Depends, FastAPI, Response
 from fastapi.routing import APIRouter
 from starlette.types import ASGIApp
 
+from casualcms.config import Settings
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -40,15 +41,15 @@ class AppConfig:
     uow: AbstractUnitOfWork
     bus: MessageRegistry
 
-    def __init__(self, settings: MutableMapping[str, Any]):
+    def __init__(self, settings: Settings):
         self.settings = settings
 
-        if isinstance(self.settings["unit_of_work"], str):
-            self.uow = resolve(self.settings["unit_of_work"])
+        if isinstance(self.settings.unit_of_work, str):
+            self.uow = resolve(self.settings.unit_of_work)
         else:
-            self.uow = self.settings["unit_of_work"]
+            self.uow = self.settings.unit_of_work
 
-        self.bus = self.settings.get("messagebus") or MessageRegistry()
+        self.bus = self.settings.messagebus or MessageRegistry()
 
 
 class FastAPIConfigurator(venusian.Scanner):
@@ -57,7 +58,7 @@ class FastAPIConfigurator(venusian.Scanner):
     config: AppConfig
     depends = Depends(lambda: FastAPIConfigurator.config)
 
-    def __init__(self, settings: MutableMapping[str, Any]):
+    def __init__(self, settings: Settings):
         FastAPIConfigurator.config = AppConfig(settings)
         super().__init__(
             app=FastAPI(),

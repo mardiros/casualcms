@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 import time
 from multiprocessing import Process
 from typing import Any, Callable
@@ -41,14 +43,16 @@ class Browser:
 
 
 def run_server(port: int, **kwargs: Any):
-    settings = {
+    settings: dict[str, Any] = {
         "bind": f"localhost:{port}",
         "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
         "admin_username": "alice",
         "admin_password": "secret",
+        "template_search_path": str((Path(__file__).parent / "templates").resolve()),
         **kwargs,
     }
-    main(settings)
+    os.environ.update({f"casualcms_{k}": v for k, v in settings.items()})
+    main()
 
 
 @fixture

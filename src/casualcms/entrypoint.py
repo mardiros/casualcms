@@ -1,5 +1,4 @@
 import asyncio
-from typing import Any
 
 from fastapi import FastAPI
 from hypercorn.asyncio import serve
@@ -9,16 +8,8 @@ import casualcms.api
 import casualcms.service.handlers
 import casualcms.ui
 from casualcms.adapters.fastapi import FastAPIConfigurator
+from casualcms.config import Settings
 from casualcms.domain.messages.commands import CreateAccount
-
-SETTINGS: dict[str, str] = {
-    "bind": "0.0.0.0:8000",
-    "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
-    # create an account on startup
-    "admin_password": "",  # set it to create an account
-    "admin_username": "admin",
-    "admin_email": "root@localhost",
-}
 
 
 def configure(configurator: FastAPIConfigurator) -> None:
@@ -30,17 +21,17 @@ def configure(configurator: FastAPIConfigurator) -> None:
     configurator.scan(casualcms.service.handlers, categories=["messagebus"])
 
 
-async def bootstrap(settings: dict[str, Any]) -> FastAPI:
+async def bootstrap(settings: Settings) -> FastAPI:
     with FastAPIConfigurator(settings) as configurator:
         configure(configurator)
 
     app = configurator.app
 
-    if settings["admin_password"]:
+    if settings.admin_password:
         admin = CreateAccount(
-            username=settings["admin_username"],
-            password=settings["admin_password"],
-            email=settings.get("admin_email", "root@localhost"),
+            username=settings.admin_username,
+            password=settings.admin_password,
+            email=settings.admin_email,
             lang="en",
         )
         async with configurator.config.uow as uow:
@@ -53,20 +44,16 @@ async def bootstrap(settings: dict[str, Any]) -> FastAPI:
     return app
 
 
-async def asyncmain(settings: dict[str, Any] = SETTINGS) -> None:
+async def asyncmain(settings: Settings) -> None:
     config = Config()
-    complete_settings: dict[str, Any] = settings
-    if settings is not SETTINGS:
-        complete_settings = SETTINGS.copy()
-        complete_settings.update(settings)
-    config.bind = complete_settings["bind"].split(",")
-    config.use_reloader = complete_settings.get("use_reloader", False)
-    app = await bootstrap(complete_settings)
+    config.bind = settings.bind.split(",")
+    config.use_reloader = settings.use_reloader
+    app = await bootstrap(settings)
     await serve(app, config)  # type: ignore
 
 
-def main(settings: dict[str, Any] = SETTINGS) -> None:
-    asyncio.run(asyncmain(settings))
+def main() -> None:
+    asyncio.run(asyncmain(Settings()))  # type: ignore
 
 
 if __name__ == "__main__":

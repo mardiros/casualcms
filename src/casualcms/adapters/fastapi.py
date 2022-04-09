@@ -1,12 +1,12 @@
 import logging
 from typing import Any, Callable, Coroutine, Type
 
-import pkg_resources
 import venusian  # type: ignore
 from fastapi import Depends, FastAPI, Response
 from fastapi.routing import APIRouter
 from starlette.types import ASGIApp
 
+from casualcms.adapters import resolver
 from casualcms.config import Settings
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -31,9 +31,7 @@ def configure(
 
 
 def resolve(value: str) -> AbstractUnitOfWork:
-    """return the attr from the syntax: package.module:attr."""
-    ep = pkg_resources.EntryPoint.parse(f"x={value}")
-    cls = ep.resolve()
+    cls = resolver.resolve(value)
     return cls()
 
 

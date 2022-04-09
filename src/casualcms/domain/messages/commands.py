@@ -1,6 +1,7 @@
 import secrets
 import uuid
 from datetime import datetime, timedelta
+from typing import Any
 
 from pydantic import Field
 
@@ -26,8 +27,8 @@ class CreateAccount(Command):
 
 
 class CreateAuthnToken(Command):
-    user_id: str  # UUID
-    user_agent: str
+    user_id: str = Field(...)  # UUID
+    user_agent: str = Field(...)
     expires_at: datetime = Field(
         default_factory=lambda: datetime.now() + timedelta(minutes=30)
     )
@@ -35,3 +36,11 @@ class CreateAuthnToken(Command):
     id: str = Field(default_factory=generate_id)
     token: str = Field(default_factory=generate_secret)
     metadata: Metadata = Metadata(category="user", name="authenticate", schemaVersion=1)
+
+
+class CreatePage(Command):
+    type: str = Field(...)
+    payload: dict[str, Any] = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(category="page", name="create_page", schemaVersion=1)

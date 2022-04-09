@@ -1,23 +1,42 @@
-from typing import Any, ClassVar, MutableMapping, Optional, Type
+from dataclasses import field
+from datetime import datetime
+from re import template
+from typing import Any, MutableMapping, Optional
 
 from pydantic import BaseModel, Field
-from pydantic.config import BaseConfig
+from pydantic.main import ModelMetaclass
+from pydantic.dataclasses import dataclass
 
 from casualcms.domain.messages import Event
 
 from .base import AbstractModel
 
 
-class BasePageConfig(BaseConfig):
-    template: str = ""
+class PageMeta(BaseModel):
+    template: str = Field(...)
 
 
-class AbstractPage(AbstractModel, BaseModel):
-    Config = BasePageConfig
-    __config__: ClassVar[Type[BasePageConfig]] = BasePageConfig
+class PageMetaclass(ModelMetaclass):
+    def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
+        new_namespace = {
+            **namespace
+        }
+        if "Meta" in namespace:
+            page_meta = PageMeta(
+                template = getattr(namespace["Meta"], "template", "")
+            )
+            new_namespace['__meta__'] = page_meta
+        return super().__new__(mcls, name, bases, new_namespace, **kwargs)
+
+
+class AbstractPage(AbstractModel, BaseModel, metaclass=PageMetaclass):
+    __meta__: PageMeta
 
     def get_context(self) -> MutableMapping[str, Any]:
-        return self.dict(exclude={"events"})
+        return self.dict(exclude={"events", "created_at"})
+
+    def get_template(self):
+        return self.__meta__.template
 
 
 class Page(AbstractPage):
@@ -27,14 +46,18 @@ class Page(AbstractPage):
     title: str = Field(...)
     description: str = Field(...)
 
-    parent: Optional["Page"] = None
-    events: list[Event] = Field(default_factory=list)
+    parent: Optional["Page"] = Field(default_factory=list, exclude=True)
+    events: list[Event] = Field(default_factory=list, exclude=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)
 
     @property
-    def path(self):
+    def path(self) -> str:
         slugs = []
-        page = self
+        page: Optional["Page"] = self
         while page:
             slugs.append(page.slug)
             page = page.parent
         return "/".join(reversed(slugs)) or "/"
+
+    def __hash__(self) -> int:  # type: ignore
+        return hash(self.id)

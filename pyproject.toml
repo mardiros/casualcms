@@ -32,6 +32,11 @@ typeCheckingMode = "strict"
 reportUnknownMemberType = false
 reportUntypedFunctionDecorator = false
 
+[tool.mypy]
+plugins = [
+  "pydantic.mypy"
+]
+
 [[tool.mypy.overrides]]
 module = "casualcms.*"
 disallow_any_generics = true

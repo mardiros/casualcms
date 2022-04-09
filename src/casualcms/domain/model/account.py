@@ -1,8 +1,10 @@
-from dataclasses import dataclass, field
+from dataclasses import field
 from datetime import datetime
 from enum import Enum
 
 import bcrypt
+from pydantic import Field
+from pydantic.dataclasses import dataclass
 
 from casualcms.domain.messages import Event
 
@@ -17,15 +19,15 @@ class AccountStatus(Enum):
 @dataclass
 class Account(AbstractModel):
 
-    id: str  # UUID
-    created_at: datetime
-    username: str
-    password: str
+    id: str = field()  # UUID
+    created_at: datetime = field()
+    username: str = field()
+    password: str = field()
 
-    email: str
-    lang: str
+    email: str = field()
+    lang: str = field()
 
-    status: AccountStatus = AccountStatus.active
+    status: AccountStatus = field(default=AccountStatus.active)
     events: list[Event] = field(default_factory=list)
 
     def __hash__(self) -> int:
@@ -45,13 +47,13 @@ class Account(AbstractModel):
 class AuthnToken(AbstractModel):
     """Authentication tokens"""
 
-    id: str  # UUID
-    token: str
-    account_id: str  # UUID
-    created_at: datetime
-    expires_at: datetime
-    client_addr: str
-    user_agent: str
+    id: str = field()  # UUID
+    token: str = field()
+    account_id: str = field()  # UUID
+    created_at: datetime = field()
+    expires_at: datetime = field()
+    client_addr: str = field()
+    user_agent: str = field()
 
     def has_expired(self) -> bool:
         return self.expires_at < datetime.utcnow()

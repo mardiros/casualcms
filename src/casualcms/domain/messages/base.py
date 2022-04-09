@@ -5,20 +5,20 @@ Message base classes.
 
 """
 
-from dataclasses import dataclass
 from typing import Optional
 
+from pydantic import BaseModel, Field
 
-@dataclass()
-class Metadata:
-    category: str
-    name: str
-    schemaVersion: int
+
+class Metadata(BaseModel):
+    category: str = Field(...)
+    name: str = Field(...)
+    schemaVersion: int = Field(...)
     clientAddr: Optional[str] = None
     userId: Optional[str] = None
 
 
-class Message:
+class Message(BaseModel):
     """Base class for messaging."""
 
 

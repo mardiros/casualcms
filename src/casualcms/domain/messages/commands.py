@@ -1,7 +1,8 @@
 import secrets
 import uuid
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+
+from pydantic import Field
 
 from .base import Command, Metadata
 
@@ -14,25 +15,23 @@ def generate_secret() -> str:
     return secrets.token_urlsafe(64)
 
 
-@dataclass(frozen=True)
 class CreateAccount(Command):
-    username: str
-    password: str
-    email: str
-    lang: str
-    created_at: datetime = field(default_factory=datetime.now)
-    id: str = field(default_factory=generate_id)
-    metadata: Metadata = Metadata("user", "create_user", 1)
+    username: str = Field(...)
+    password: str = Field(...)
+    email: str = Field(...)
+    lang: str = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(category="user", name="create_user", schemaVersion=1)
 
 
-@dataclass(frozen=True)
 class CreateAuthnToken(Command):
     user_id: str  # UUID
     user_agent: str
-    expires_at: datetime = field(
+    expires_at: datetime = Field(
         default_factory=lambda: datetime.now() + timedelta(minutes=30)
     )
-    created_at: datetime = field(default_factory=datetime.now)
-    id: str = field(default_factory=generate_id)
-    token: str = field(default_factory=generate_secret)
-    metadata: Metadata = Metadata("user", "authenticate", 1)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    token: str = Field(default_factory=generate_secret)
+    metadata: Metadata = Metadata(category="user", name="authenticate", schemaVersion=1)

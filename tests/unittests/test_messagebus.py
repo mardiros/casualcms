@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from typing import Iterable
 
 import pytest
@@ -15,12 +14,10 @@ class DummyModel:
     counter = 0
 
 
-@dataclass
 class DummyCommand(Command):
     id: str
 
 
-@dataclass
 class DummyEvent(Event):
     id: str
     increment: int

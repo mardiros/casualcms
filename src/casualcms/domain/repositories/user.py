@@ -14,7 +14,7 @@ AccountRepositoryResult = RepositoryResult[Account, AccountRepositoryError]
 
 
 class AbstractAccountRepository(AbstractRepository):
-    seen: set[Account] = set()
+    seen: set[Account]
 
     @abc.abstractmethod
     async def by_username(self, username: str) -> AccountRepositoryResult:

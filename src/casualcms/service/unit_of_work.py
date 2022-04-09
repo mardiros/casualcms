@@ -7,15 +7,21 @@ from typing import Iterable, Optional, Type
 
 from casualcms.domain.messages import Event
 from casualcms.domain.repositories import AbstractAccountRepository
+from casualcms.domain.repositories.page import AbstractPageRepository
 
 
 class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
+    pages: AbstractPageRepository
 
     def collect_new_events(self) -> Iterable[Event]:
         for account in self.accounts.seen:
             while account.events:
                 yield account.events.pop(0)
+
+        for page in self.pages.seen:
+            while page.events:
+                yield page.events.pop(0)
 
     async def initialize(self) -> None:
         """Override to initialize  repositories."""

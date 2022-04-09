@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from typing import Any, Iterator
 
 import pytest
@@ -11,6 +13,15 @@ from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
+
+
+@pytest.fixture
+def app_settings() -> Iterator[None]:
+    os.environ["casualcms_template_search_path"] = str(
+        (Path(__file__).parent / "templates").resolve()
+    )
+    yield None
+    del os.environ["casualcms_template_search_path"]
 
 
 @pytest.fixture

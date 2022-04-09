@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Any, Mapping
+
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 

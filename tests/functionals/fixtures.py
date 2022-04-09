@@ -1,7 +1,7 @@
 import os
-from pathlib import Path
 import time
 from multiprocessing import Process
+from pathlib import Path
 from typing import Any, Callable
 
 from behave import fixture  # type: ignore

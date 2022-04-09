@@ -1,17 +1,14 @@
 from pathlib import Path
 
-from casualcms.config import Settings
 from casualcms.adapters.jinja2 import Jinja2TemplateRender, build_searchpath
+from casualcms.config import Settings
 
 
 def test_build_searchpath():
     path_list = build_searchpath("casualcms:templates,/tmp")
     path = str(
         (
-            Path(__file__).parent.parent.parent
-            / "src"
-            / "casualcms"
-            / "templates"
+            Path(__file__).parent.parent.parent / "src" / "casualcms" / "templates"
         ).resolve()
     )
 

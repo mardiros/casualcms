@@ -1,4 +1,5 @@
-from typing import Any, ClassVar, MutableMapping, Type
+from types import NoneType
+from typing import Any, ClassVar, MutableMapping, Optional, Type
 
 from pydantic import BaseModel, Field
 from pydantic.config import BaseConfig
@@ -24,3 +25,14 @@ class Page(AbstractPage):
     slug: str = Field(...)
     title: str = Field(...)
     description: str = Field(...)
+
+    parent: Optional["Page"] = None
+
+    @property
+    def path(self):
+        slugs = []
+        page = self
+        while page:
+            slugs.append(page.slug)
+            page = page.parent
+        return "/".join(reversed(slugs)) or "/"

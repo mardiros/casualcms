@@ -25,7 +25,7 @@ async def create_page(
             parent_page = await uow.pages.by_path(parent)
             if parent_page.is_err():
                 raise HTTPException(
-                    status_code=401,
+                    status_code=422,
                     detail=[{"loc": ["body", "parent"], "msg": "Unknown page"}],
                 )
             params["parent"] = parent_page.unwrap()

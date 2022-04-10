@@ -47,14 +47,26 @@ async def app(
 
 
 @pytest.fixture()
+async def admin_account(
+    app_settings: Settings,
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+):
+    async with uow as uow:
+        account = (await uow.accounts.by_username(app_settings.admin_username)).unwrap()
+        yield account
+
+
+@pytest.fixture()
 async def authntoken(
     app_settings: Settings, uow: AbstractUnitOfWork, messagebus: MessageRegistry
 ):
     async with uow as uow:
-        user = (await uow.accounts.by_username(app_settings.admin_username)).unwrap()
+        account = (await uow.accounts.by_username(app_settings.admin_username)).unwrap()
         token = await messagebus.handle(
             CreateAuthnToken(
-                account_id=user.id,
+                account_id=account.id,
                 user_agent="Bot/2.0",
                 client_addr="1.2.3.4",
             ),

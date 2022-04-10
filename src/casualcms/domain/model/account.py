@@ -1,9 +1,8 @@
-from dataclasses import field
 from datetime import datetime
 from enum import Enum
 
 import bcrypt
-from pydantic.dataclasses import dataclass
+from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
 
@@ -17,44 +16,37 @@ class AccountStatus(Enum):
     locked = "locked"
 
 
-@dataclass
-class Account(AbstractModel):
+class Account(AbstractModel, BaseModel):
 
-    id: uuid = field()
-    created_at: datetime = field()
-    username: str = field()
-    password: str = field()
+    id: uuid = Field(...)
+    created_at: datetime = Field(...)
+    username: str = Field(...)
+    password: str = Field(...)
 
-    email: str = field()
-    lang: str = field()
+    email: str = Field(...)
+    lang: str = Field(...)
 
-    status: AccountStatus = field(default=AccountStatus.active)
-    events: list[Event] = field(default_factory=list)
+    status: AccountStatus = Field(default=AccountStatus.active)
+    events: list[Event] = Field(default_factory=list, exclude=True)
 
     def __hash__(self) -> int:
-        return hash(self.id)
-
-    def __post_init__(self) -> None:
-        self.password = bcrypt.hashpw(
-            self.password.encode("utf-8"), bcrypt.gensalt()
-        ).decode("utf-8")
+        return hash(self.id)  # type: ignore
 
     def match_password(self, password: str) -> bool:
         encoded_pwd = self.password.encode("utf-8")
         return bcrypt.checkpw(password.encode("utf-8"), encoded_pwd)
 
 
-@dataclass
-class AuthnToken(AbstractModel):
+class AuthnToken(AbstractModel, BaseModel):
     """Authentication tokens"""
 
-    id: uuid = field()  # UUID
-    token: str = field()
-    account_id: uuid = field()  # UUID
-    created_at: datetime = field()
-    expires_at: datetime = field()
-    client_addr: str = field()
-    user_agent: str = field()
+    id: uuid = Field(...)  # UUID
+    token: str = Field(...)
+    account_id: uuid = Field(...)  # UUID
+    created_at: datetime = Field(...)
+    expires_at: datetime = Field(...)
+    client_addr: str = Field(...)
+    user_agent: str = Field(...)
 
     def has_expired(self) -> bool:
         return self.expires_at < datetime.utcnow()

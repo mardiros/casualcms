@@ -17,7 +17,13 @@ class PageMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
         if "Meta" in namespace:
-            page_meta = PageMeta(template=getattr(namespace["Meta"], "template", ""))
+            page_meta = PageMeta(
+                template=getattr(
+                    namespace["Meta"],  # type: ignore
+                    "template",
+                    "",  # TODO: a default template for users
+                )
+            )
             new_namespace["__meta__"] = page_meta
         return super().__new__(mcls, name, bases, new_namespace, **kwargs)
 

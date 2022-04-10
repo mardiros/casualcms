@@ -6,17 +6,9 @@ import pytest
 from casualcms.domain.model import Account, AuthnToken
 
 
-def test_account_password_match():
-    account = Account(
-        id="1",
-        created_at=datetime.now(),
-        username="bob",
-        password="alice",
-        email="",
-        lang="fr",
-    )
-    assert account.match_password("Alice") is False
-    assert account.match_password("alice") is True
+def test_account_password_match(admin_account: Account):
+    assert admin_account.match_password("SuperSecret") is False
+    assert admin_account.match_password("supersecret") is True
 
 
 @pytest.mark.parametrize(

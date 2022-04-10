@@ -23,7 +23,21 @@ class CreateAccount(Command):
     lang: str = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
-    metadata: Metadata = Metadata(category="user", name="create_user", schemaVersion=1)
+    metadata: Metadata = Metadata(
+        category="user", name="create_account", schemaVersion=1
+    )
+
+
+class CreateAccountCipheredPassword(Command):
+    username: str = Field(...)
+    password: str = Field(...)
+    email: str = Field(...)
+    lang: str = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(
+        category="user", name="create_account", schemaVersion=1
+    )
 
 
 class CreateAuthnToken(Command):

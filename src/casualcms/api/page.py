@@ -50,7 +50,7 @@ async def create_page(
 
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = "FIXME"
+    cmd.metadata.userId = token.account_id
 
     async with app.uow as uow:
         page = await app.bus.handle(cmd, uow)

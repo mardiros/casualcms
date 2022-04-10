@@ -6,8 +6,6 @@ from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
 
-from .base import AbstractModel
-
 uuid = str
 
 
@@ -16,7 +14,7 @@ class AccountStatus(Enum):
     locked = "locked"
 
 
-class Account(AbstractModel, BaseModel):
+class Account(BaseModel):
 
     id: uuid = Field(...)
     created_at: datetime = Field(...)
@@ -37,7 +35,7 @@ class Account(AbstractModel, BaseModel):
         return bcrypt.checkpw(password.encode("utf-8"), encoded_pwd)
 
 
-class AuthnToken(AbstractModel, BaseModel):
+class AuthnToken(BaseModel):
     """Authentication tokens"""
 
     id: uuid = Field(...)  # UUID

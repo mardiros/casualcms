@@ -6,8 +6,6 @@ from pydantic.main import ModelMetaclass
 
 from casualcms.domain.messages import Event
 
-from .base import AbstractModel
-
 
 class PageMeta(BaseModel):
     template: str = Field(...)
@@ -28,7 +26,7 @@ class PageMetaclass(ModelMetaclass):
         return super().__new__(mcls, name, bases, new_namespace, **kwargs)
 
 
-class AbstractPage(AbstractModel, BaseModel, metaclass=PageMetaclass):
+class AbstractPage(BaseModel, metaclass=PageMetaclass):
     __meta__: PageMeta
 
     def get_context(self) -> MutableMapping[str, Any]:

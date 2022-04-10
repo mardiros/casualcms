@@ -5,7 +5,6 @@ from typing import Any, Iterable, MutableMapping, Optional, Set, Type, cast
 from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
 
-from casualcms.adapters.resolver import resolve
 from casualcms.domain.messages import Event
 
 
@@ -14,32 +13,32 @@ class AbstractPageError(Exception):
 
 
 PageType = Type["Page"]
-
-
-def resolve_page(value: str | PageType) -> "Page":
-    if isinstance(value, str):
-        value = resolve(value)
-    return cast(Page, value)
+LazyPageType = str | PageType
 
 
 class TypeTree:
-    data: dict[Optional[PageType], Set[PageType]] = defaultdict(set)
+    _roots: Set[PageType] = set()
+    _childs: dict[str, Set[PageType]] = defaultdict(set)
 
-    def register(self, typ: PageType, parents: Optional[Iterable[PageType]]):
+    def register(
+        self, typ: PageType, parents: Optional[Iterable[LazyPageType]]
+    ) -> None:
         if parents:
             for parent in parents:
-                self.data[parent].add(typ)
+                parent_typ = parent if isinstance(parent, str) else parent.__meta__.type
+                self._childs[parent_typ].add(typ)
         else:
-            self.data[None].add(typ)
+            self._roots.add(typ)
 
     def roots(self) -> Set[PageType]:
-        return self.data.get(None) or set()
+        return self._roots
 
-    def get_childs(self, parent: PageType) -> Set[PageType]:
-        return self.data.get(parent) or set()
+    def get_childs(self, parent: LazyPageType) -> Set[PageType]:
+        parent_typ = parent if isinstance(parent, str) else parent.__meta__.type
+        return self._childs.get(parent_typ) or set()
 
 
-def get_available_subtypes(parent: PageType | None) -> Set[PageType]:
+def get_available_subtypes(parent: PageType | str | None) -> Set[PageType]:
     """Get the parent page for given type."""
     if parent is None:
         return TypeTree().roots()
@@ -50,7 +49,7 @@ class PageMeta(BaseModel):
     template: str = Field(...)
     parent_types: Optional[Iterable[PageType]] = Field(...)
     abstract: bool = Field(...)
-    type:str = Field(...)
+    type: str = Field(...)
 
 
 class PageMetaclass(ModelMetaclass):
@@ -80,7 +79,7 @@ class PageMetaclass(ModelMetaclass):
 class AbstractPage(BaseModel, metaclass=PageMetaclass):
     __meta__: PageMeta
 
-    def __init__(self, **kwargs: Any):
+    def __init__(self, **kwargs: Any) -> None:  # type: ignore
         if self.__meta__.abstract is True:
             raise AbstractPageError(f"Page {self.__class__.__name__} is abstract")
         super().__init__(**kwargs)

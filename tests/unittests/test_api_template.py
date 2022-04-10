@@ -27,5 +27,5 @@ async def test_list_template_for_childs(client: TestClient, authntoken: AuthnTok
     # assert resp.status_code == 200
     assert resp.json() == [
         {"type": "tests.unittests.fixtures:CategoryPage"},
-        {"type": "tests.unittests.fixtures:SectionPage"}
+        {"type": "tests.unittests.fixtures:SectionPage"},
     ]

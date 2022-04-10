@@ -1,15 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import HTTPAuthorizationCredentials
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
-from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 
+from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.model.account import AuthnToken
 
 router = APIRouter()
-
-
 bearer = HTTPBearer()
-
 
 
 async def get_token_info(

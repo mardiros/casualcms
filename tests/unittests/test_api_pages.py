@@ -1,13 +1,7 @@
 from fastapi.testclient import TestClient
-from pydantic import Field
 
-from casualcms.domain.model import Page
 from casualcms.domain.model.account import AuthnToken
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-
-
-class DummiesPage(Page):
-    body: str = Field(...)
 
 
 async def test_api_create_page_unauthenticated(
@@ -16,16 +10,7 @@ async def test_api_create_page_unauthenticated(
     resp = client.post(
         "/api/pages",
         headers={},
-        json={
-            "type": "tests.unittests.test_api_pages:DummiesPage",
-            "payload": {
-                "id": "abc",
-                "slug": "/",
-                "title": "Root Page",
-                "description": "The home page",
-                "body": "lorem ipsum",
-            },
-        },
+        json={"type": "tests.unittests.fixtures:RootPage", "payload": {}},
     )
     # XXX Fast api is raising a 403, should be a 401 to me
     assert resp.status_code == 403
@@ -41,15 +26,26 @@ async def test_api_create_page(
             "Authorization": f"Bearer {authntoken.token}",
         },
         json={
-            "type": "tests.unittests.test_api_pages:DummiesPage",
+            "type": "tests.unittests.fixtures:RootPage",
             "payload": {
                 "id": "abc",
                 "slug": "/",
                 "title": "Root Page",
                 "description": "The home page",
+                "hero_title": "You are awesome",
                 "body": "lorem ipsum",
             },
         },
     )
     assert resp.status_code == 200
     assert resp.json() == {"href": "/"}
+    async with uow as uow:
+        page = (await uow.pages.by_path("/")).unwrap()
+        assert page.dict() == {
+            "id": "abc",
+            "slug": "/",
+            "title": "Root Page",
+            "description": "The home page",
+            "hero_title": "You are awesome",
+            "body": "lorem ipsum",
+        }

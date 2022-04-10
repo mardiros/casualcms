@@ -54,7 +54,7 @@ class FastAPIConfigurator(venusian.Scanner):
 
     app: FastAPI
     config: AppConfig
-    depends = Depends(lambda: FastAPIConfigurator.config)
+    depends: Any = Depends(lambda: FastAPIConfigurator.config)
 
     def __init__(self, settings: Settings):
         FastAPIConfigurator.config = AppConfig(settings)

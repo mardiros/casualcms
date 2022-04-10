@@ -31,6 +31,7 @@ include = ["src", "tests"]
 typeCheckingMode = "strict"
 reportUnknownMemberType = false
 reportUntypedFunctionDecorator = false
+reportIncompatibleVariableOverride = false
 
 [tool.mypy]
 plugins = [

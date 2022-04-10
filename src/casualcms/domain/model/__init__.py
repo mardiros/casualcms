@@ -1,4 +1,13 @@
 from .account import Account, AccountStatus, AuthnToken
-from .page import Page
+from .page import AbstractPageError, Page, get_available_subtypes
 
-__all__ = ["Account", "AccountStatus", "AuthnToken", "Page"]
+__all__ = [
+    # User account
+    "Account",
+    "AccountStatus",
+    "AuthnToken",
+    # Pages
+    "AbstractPageError",
+    "Page",
+    "get_available_subtypes",
+]

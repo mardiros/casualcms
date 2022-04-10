@@ -1,30 +1,13 @@
 from typing import Any
 
-from fastapi import Body, Depends, HTTPException, Request, status
-from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Body, Depends, HTTPException, Request
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.adapters.resolver import resolve
 from casualcms.domain.messages.commands import CreatePage
 from casualcms.domain.model.account import AuthnToken
 
-bearer = HTTPBearer()
-
-
-async def get_token_info(
-    token: HTTPAuthorizationCredentials = Depends(bearer),
-    app: AppConfig = FastAPIConfigurator.depends,
-) -> AuthnToken:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    async with app.uow as uow:
-        authntoken = await uow.authn_tokens.by_token(token.credentials)
-        if authntoken.is_err():
-            raise credentials_exception
-    return authntoken.unwrap()
+from .base import get_token_info
 
 
 async def create_page(

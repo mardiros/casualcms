@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 
 from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.config import Settings
+from casualcms.domain.messages.commands import CreateAuthnToken
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -18,6 +19,7 @@ def app_settings() -> Iterator[Settings]:
     os.environ["casualcms_template_search_path"] = str(
         (Path(__file__).parent / "templates").resolve()
     )
+    os.environ["casualcms_admin_password"] = "supersecret"
     yield Settings()  # type: ignore
     del os.environ["casualcms_template_search_path"]
 
@@ -42,6 +44,23 @@ async def app(
     settings = Settings(unit_of_work=uow, messagebus=messagebus)  # type: ignore
     app = await bootstrap(settings)
     return app
+
+
+@pytest.fixture()
+async def authntoken(
+    app_settings: Settings, uow: AbstractUnitOfWork, messagebus: MessageRegistry
+):
+    async with uow as uow:
+        user = (await uow.accounts.by_username(app_settings.admin_username)).unwrap()
+        token = await messagebus.handle(
+            CreateAuthnToken(
+                account_id=user.id,
+                user_agent="Bot/2.0",
+                client_addr="1.2.3.4",
+            ),
+            uow,
+        )
+    yield token
 
 
 @pytest.fixture

@@ -31,11 +31,13 @@ async def authenticate(
             ],
         )
 
+    client_addr: str = request.client.host
     cmd = CreateAuthnToken(
-        user_id=authenticated_user.id,
+        account_id=authenticated_user.id,
         user_agent=user_agent,
+        client_addr=client_addr,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = client_addr
     cmd.metadata.userId = authenticated_user.id
 
     async with app.uow as uow:

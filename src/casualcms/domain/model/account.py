@@ -9,6 +9,8 @@ from casualcms.domain.messages import Event
 
 from .base import AbstractModel
 
+uuid = str
+
 
 class AccountStatus(Enum):
     active = "active"
@@ -18,7 +20,7 @@ class AccountStatus(Enum):
 @dataclass
 class Account(AbstractModel):
 
-    id: str = field()  # UUID
+    id: uuid = field()
     created_at: datetime = field()
     username: str = field()
     password: str = field()
@@ -46,9 +48,9 @@ class Account(AbstractModel):
 class AuthnToken(AbstractModel):
     """Authentication tokens"""
 
-    id: str = field()  # UUID
+    id: uuid = field()  # UUID
     token: str = field()
-    account_id: str = field()  # UUID
+    account_id: uuid = field()  # UUID
     created_at: datetime = field()
     expires_at: datetime = field()
     client_addr: str = field()

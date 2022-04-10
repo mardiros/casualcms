@@ -1,11 +1,8 @@
-from dataclasses import field
 from datetime import datetime
-from re import template
 from typing import Any, MutableMapping, Optional
 
 from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
-from pydantic.dataclasses import dataclass
 
 from casualcms.domain.messages import Event
 
@@ -18,14 +15,10 @@ class PageMeta(BaseModel):
 
 class PageMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
-        new_namespace = {
-            **namespace
-        }
+        new_namespace = {**namespace}
         if "Meta" in namespace:
-            page_meta = PageMeta(
-                template = getattr(namespace["Meta"], "template", "")
-            )
-            new_namespace['__meta__'] = page_meta
+            page_meta = PageMeta(template=getattr(namespace["Meta"], "template", ""))
+            new_namespace["__meta__"] = page_meta
         return super().__new__(mcls, name, bases, new_namespace, **kwargs)
 
 
@@ -35,7 +28,7 @@ class AbstractPage(AbstractModel, BaseModel, metaclass=PageMetaclass):
     def get_context(self) -> MutableMapping[str, Any]:
         return self.dict(exclude={"events", "created_at"})
 
-    def get_template(self):
+    def get_template(self) -> str:
         return self.__meta__.template
 
 

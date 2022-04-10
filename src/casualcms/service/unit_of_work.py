@@ -7,12 +7,14 @@ from typing import Iterable, Optional, Type
 
 from casualcms.domain.messages import Event
 from casualcms.domain.repositories import AbstractAccountRepository
+from casualcms.domain.repositories.authntoken import AbstractAuthnRepository
 from casualcms.domain.repositories.page import AbstractPageRepository
 
 
 class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
     pages: AbstractPageRepository
+    authn_tokens: AbstractAuthnRepository
 
     def collect_new_events(self) -> Iterable[Event]:
         for account in self.accounts.seen:

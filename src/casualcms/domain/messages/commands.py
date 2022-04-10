@@ -27,8 +27,9 @@ class CreateAccount(Command):
 
 
 class CreateAuthnToken(Command):
-    user_id: str = Field(...)  # UUID
+    account_id: str = Field(...)  # UUID
     user_agent: str = Field(...)
+    client_addr: str = Field(...)
     expires_at: datetime = Field(
         default_factory=lambda: datetime.now() + timedelta(minutes=30)
     )

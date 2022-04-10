@@ -1,10 +1,16 @@
 from result import Err, Ok
 
 from casualcms.domain.model import Account
+from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
+    AbstractAuthnRepository,
     AbstractPageRepository,
+)
+from casualcms.domain.repositories.authntoken import (
+    AuthnTokenRepositoryError,
+    AuthnTokenRepositoryResult,
 )
 from casualcms.domain.repositories.page import PageRepositoryError, PageRepositoryResult
 from casualcms.domain.repositories.user import (
@@ -29,7 +35,7 @@ class AccountInMemoryRepository(AbstractAccountRepository):
     async def add(self, model: Account) -> None:
         """Append a new model to the repository."""
         self.seen.add(model)
-        self.accounts[model.username] = model
+        self.accounts[model.username] = model  # type: ignore
 
 
 class PageInMemoryRepository(AbstractPageRepository):
@@ -50,10 +56,25 @@ class PageInMemoryRepository(AbstractPageRepository):
         self.pages[model.path] = model
 
 
+class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
+    tokens: dict[str, AuthnToken] = {}
+
+    async def by_token(self, token: str) -> AuthnTokenRepositoryResult:
+        """Fetch one user account by its unique username."""
+        if token in self.tokens:
+            return Ok(self.tokens[token])
+        return Err(AuthnTokenRepositoryError.token_not_found)
+
+    async def add(self, model: AuthnToken) -> None:
+        """Append a new model to the repository."""
+        self.tokens[model.token] = model  # type: ignore
+
+
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:
         self.accounts = AccountInMemoryRepository()
         self.pages = PageInMemoryRepository()
+        self.authn_tokens = AuthnTokenInMemoryRepository()
         self.committed: bool | None = None
 
     async def commit(self) -> None:

@@ -21,13 +21,15 @@ class RootPage(AbstractPage):
 class CategoryPage(Page):
     class Meta:
         parent_types = [RootPage]
+        type = "casual:CategoryPage"
 
 
 class SectionPage(Page):
     class Meta:
         parent_types = [RootPage]
+        type = "casual:SectionPage"
 
 
 class BlogPage(Page):
     class Meta:
-        parent_types = [CategoryPage, SectionPage]
+        parent_types = [CategoryPage, "casual:SectionPage"]

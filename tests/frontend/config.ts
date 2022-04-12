@@ -1,9 +1,13 @@
 import { err, ok, Result } from "neverthrow";
-import { Account } from "../../src/frontend/casualcms/domain/model";
+import {
+  Account,
+  PartialPageTemplate,
+} from "../../src/frontend/casualcms/domain/model";
 import {
   ApiError,
   IAccountApi,
   Credentials,
+  ITemplateApi,
 } from "../../src/frontend/casualcms/domain/ports";
 import { IApi } from "../../src/frontend/casualcms/service/api";
 import { AppConfig } from "../../src/frontend/config";
@@ -26,11 +30,25 @@ class FakeAccountApi implements IAccountApi {
   }
 }
 
+class FakeTemplateApi implements ITemplateApi {
+  async listRoots(
+    authntoken: string
+  ): Promise<Result<Array<PartialPageTemplate>, Map<string, string>>> {
+    return ok([
+      {
+        type: "casual:Home",
+      },
+    ]);
+  }
+}
+
 class FakeApi implements IApi {
   account: IAccountApi;
+  template: ITemplateApi;
 
   constructor() {
     this.account = new FakeAccountApi();
+    this.template = new FakeTemplateApi();
   }
 }
 

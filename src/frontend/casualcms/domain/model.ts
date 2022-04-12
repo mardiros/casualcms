@@ -4,3 +4,8 @@ export type Account = {
   token: string;
   lang: string;
 };
+
+
+export type PartialPageTemplate = {
+  type: string;
+}

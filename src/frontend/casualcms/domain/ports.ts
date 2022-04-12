@@ -1,5 +1,5 @@
 import { Result } from "neverthrow";
-import { Account } from "./model";
+import { Account, PartialPageTemplate } from "./model";
 
 export type ApiError = Map<string, string> | null;
 
@@ -10,4 +10,10 @@ export type Credentials = {
 
 export interface IAccountApi {
   byCredentials(creds: Credentials): Promise<Result<Account, ApiError>>;
+}
+
+export interface ITemplateApi {
+  listRoots(
+    authntoken: string
+  ): Promise<Result<Array<PartialPageTemplate>, ApiError>>;
 }

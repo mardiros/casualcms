@@ -13,7 +13,7 @@ interface IAuthContext {
   forget: (callback: any) => void;
 }
 
-let AuthContext = React.createContext<IAuthContext>(null!);
+export const AuthContext = React.createContext<IAuthContext>(null!);
 
 export function useAuth() {
   return React.useContext(AuthContext);

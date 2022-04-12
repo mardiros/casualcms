@@ -5,10 +5,38 @@ from pathlib import Path
 from typing import Any, Callable
 
 from behave import fixture  # type: ignore
+from pydantic import Field
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 from casualcms.entrypoint import main
+from casualcms.domain.model import Page
+
+
+class HomePage(Page):
+    body: str = Field()
+
+    class Meta:
+        parent_types = None
+        template = "homepage.jinja2"
+        type = "blog:HomePage"
+
+
+class CategoryPage(Page):
+    class Meta:
+        parent_types = [HomePage]
+        type = "blog:CategoryPage"
+
+
+class SectionPage(Page):
+    class Meta:
+        parent_types = [HomePage]
+        type = "blog:SectionPage"
+
+
+class BlogPage(Page):
+    class Meta:
+        parent_types = [CategoryPage, "blog:BlogPage"]
 
 
 class Browser:
@@ -71,4 +99,4 @@ def browser(context: Any, port: int, **kwargs: Any):
 
 
 if __name__ == "__main__":
-    run_server(8000, use_reloader=True)
+    run_server(8000, use_reloader="true")

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { TemplateList } from "../../src/frontend/ui/page_template/component";
+import { TemplateList } from "../../src/frontend/ui/page_template/components";
 import { AppContext } from "../../src/frontend/config";
 import config from "./config";
 import { FakeAuth, waitForTitle } from "./helpers";

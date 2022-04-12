@@ -14,4 +14,4 @@ Feature: As a user, I can login
     When I fill the field "username" with "alice"
     And I fill the field "password" with "secret"
     And I click on the "Sign In" button
-    Then I see the text "Welcome alice"
+    Then I see the text "Welcome alice!"

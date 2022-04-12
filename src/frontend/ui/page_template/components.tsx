@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Heading } from "react-bulma-components";
 import { PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
-import { AppContext, useConfig } from "../../config";
+import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
 export const TemplateList: React.FunctionComponent<{}> = () => {

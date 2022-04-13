@@ -12,6 +12,11 @@ class AbstractPageError(Exception):
     ...
 
 
+class UnregisterType(Exception):
+    def __init__(self, typ: str) -> None:
+        super().__init__(f"Unregistered type {typ}")
+
+
 PageType = Type["Page"]
 LazyPageType = str | PageType
 
@@ -19,10 +24,12 @@ LazyPageType = str | PageType
 class TypeTree:
     _roots: Set[PageType] = set()
     _childs: dict[str, Set[PageType]] = defaultdict(set)
+    _types: dict[str, PageType] = {}
 
     def register(
         self, typ: PageType, parents: Optional[Iterable[LazyPageType]]
     ) -> None:
+        self._types[typ.__meta__.type] = typ
         if parents:
             for parent in parents:
                 parent_typ = parent if isinstance(parent, str) else parent.__meta__.type
@@ -32,6 +39,12 @@ class TypeTree:
 
     def roots(self) -> Set[PageType]:
         return self._roots
+
+    def resolve_type(self, typ: str) -> PageType:
+        try:
+            return self._types[typ]
+        except KeyError:
+            raise UnregisterType(typ)
 
     def get_childs(self, parent: LazyPageType) -> Set[PageType]:
         parent_typ = parent if isinstance(parent, str) else parent.__meta__.type
@@ -43,6 +56,10 @@ def get_available_subtypes(parent: PageType | str | None) -> Set[PageType]:
     if parent is None:
         return TypeTree().roots()
     return TypeTree().get_childs(parent)
+
+
+def resolve_type(typ: str) -> PageType:
+    return TypeTree().resolve_type(typ)
 
 
 class PageMeta(BaseModel):

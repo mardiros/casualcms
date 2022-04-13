@@ -1,6 +1,8 @@
+from typing import Any, Dict
 import pytest
 
 from casualcms.domain.model import AbstractPageError, get_available_subtypes
+from casualcms.domain.model.page import UnregisterType, resolve_type
 
 from .fixtures import AbstractPage, BlogPage, CategoryPage, RootPage, SectionPage
 
@@ -72,3 +74,21 @@ def test_page_types():
 
     pages = get_available_subtypes(RootPage)
     assert pages == {CategoryPage, SectionPage}
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"name": "tests.unittests.fixtures:RootPage", "class": RootPage},
+        {"name": "casual:SectionPage", "class": SectionPage},
+    ],
+)
+def test_resolve_type(params: Dict[str, Any]):
+    page = resolve_type(params["name"])
+    assert page is params["class"]
+
+
+def test_resolve_type_error():
+    with pytest.raises(UnregisterType) as ctx:
+        resolve_type("casual:sectionpage")
+    assert str(ctx.value) == "Unregistered type casual:sectionpage"

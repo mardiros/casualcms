@@ -14,7 +14,7 @@ def test_page_metadata():
         title="awesome",
         description="",
         hero_title="You are awesome",
-        body="Hello!",
+        body=[{"body": "Hello!"}],
     )
     assert page.get_template() == "page.jinja2"
     assert page.__meta__.abstract is False
@@ -29,7 +29,7 @@ def test_page_abstract_raise():
             title="awesome",
             description="",
             hero_title="You are awesome",
-            body="Hello!",
+            body=[{"body": "Hello!"}],
         )
     assert str(context.value) == "Page AbstractPage is abstract"
 
@@ -41,7 +41,7 @@ def test_page_tree():
         title="awesome",
         hero_title="awesome",
         description="",
-        body="Hello!",
+        body=[{"body": "Hello!"}],
     )
     assert page.path == "/"
 
@@ -52,7 +52,7 @@ def test_page_tree():
         description="",
         hero_title="awesome",
         parent=page,
-        body="Hello!",
+        body=[{"body": "Hello!"}],
     )
     assert page2.path == "/sub"
 
@@ -63,7 +63,7 @@ def test_page_tree():
         description="",
         hero_title="awesome",
         parent=page2,
-        body="Hello!",
+        body=[{"body": "Hello!"}],
     )
     assert page3.path == "/sub/sum"
 

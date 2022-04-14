@@ -33,7 +33,7 @@ async def test_api_create_page(
                 "title": "Root Page",
                 "description": "The home page",
                 "hero_title": "You are awesome",
-                "body": "lorem ipsum",
+                "body": [{"body": "lorem ipsum"}],
             },
         },
     )
@@ -47,5 +47,5 @@ async def test_api_create_page(
             "title": "Root Page",
             "description": "The home page",
             "hero_title": "You are awesome",
-            "body": "lorem ipsum",
+            "body": [{"title": None, "body": "lorem ipsum"}],
         }

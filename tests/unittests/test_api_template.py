@@ -60,11 +60,6 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                     "default": [],
                     "items": {"$ref": "#/definitions/Paragraph"},
                 },
-                "created_at": {
-                    "format": "date-time",
-                    "title": "Created At",
-                    "type": "string",
-                },
                 "description": {"title": "Description", "type": "string"},
                 "hero_title": {
                     "title": "Hero Title",

@@ -25,6 +25,9 @@ unittest test_suite=default_test_suite:
 jstest:
     NODE_ENV=dev npm run test
 
+watch:
+    NODE_ENV=dev npm run watch
+
 lf:
     poetry run pytest -sxvvv --lf
 

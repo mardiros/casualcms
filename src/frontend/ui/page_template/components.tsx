@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading } from "react-bulma-components";
+import { Box, Heading } from "@chakra-ui/react";
 import { PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -27,7 +27,9 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
       {
         templates.length &&
         <>
-          <Heading>Available Templates</Heading>
+          <Heading>
+            Available Templates
+          </Heading>
           <ul id="page-templates">
             {templates.map((tpl, i) => <li key={i}>{tpl.type}</li>)}
           </ul>

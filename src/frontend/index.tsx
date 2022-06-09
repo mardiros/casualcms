@@ -1,5 +1,5 @@
 import React from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from 'react-dom/client';
 import { App } from "./App";
 import { AppContext, AppConfig } from "./config";
 import { initDB } from "./casualcms/adapters/repositories";
@@ -15,12 +15,10 @@ const init = async (): Promise<AppConfig> => {
 };
 
 init().then(async (config: AppConfig) => {
-  ReactDOM.render(
-    <React.StrictMode>
-      <AppContext.Provider value={config}>
-        <App />
-      </AppContext.Provider>
-    </React.StrictMode>,
-    document.getElementById("root")
+  const root = createRoot(document.getElementById("root"));
+  root.render(
+    <AppContext.Provider value={config}>
+      <App />
+    </AppContext.Provider>
   );
 });

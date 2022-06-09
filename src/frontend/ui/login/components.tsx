@@ -1,6 +1,5 @@
 import React from "react";
-import { Box, Heading, Form, Button } from "react-bulma-components";
-const { Control, Field, Label, Input } = Form;
+import { Box, Button, Container, FormControl, FormHelperText, FormLabel, Heading, Input } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 import { Account } from "../../casualcms/domain/model";
@@ -55,7 +54,7 @@ export function RequireAuth({
         const accountResult = await config.uow.account.getCurrent();
         accountResult
           .map((account: Account) => {
-            auth.remember(account, () => {})
+            auth.remember(account, () => { })
           })
           .mapErr((err: any) => {
             navigate("/admin/login", { replace: true })
@@ -81,7 +80,6 @@ export const Login: React.FunctionComponent<{}> = () => {
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     let formData = new FormData(event.currentTarget);
     let username = formData.get("username") as string;
     let password = formData.get("password") as string;
@@ -106,32 +104,28 @@ export const Login: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <Box>
-      <Heading>Sign In To Casual CMS</Heading>
-      <form onSubmit={handleSubmit} method="POST">
-        <Field>
-          <Label>
-            Username:
-            <Control>
-              <Input name="username" placeholder="username" />
-              {error && error.has("username") && (
-                <p className="help is-danger">{error.get("username")}</p>
-              )}
-            </Control>
-          </Label>
-        </Field>
-        <Field>
-          <Label>
-            Password:
-            <Control>
-              <Input name="password" placeholder="password" type="password" />
-            </Control>
-          </Label>
-        </Field>
-        <Button type="submit" color="primary">
-          Sign In
-        </Button>
-      </form>
-    </Box>
+    <Container>
+      <Heading>
+        Sign In To Casual CMS
+      </Heading>
+      <Box>
+        <form onSubmit={handleSubmit}>
+          <FormControl>
+            <FormLabel htmlFor="username">Username:</FormLabel>
+            <Input id="username" name="username" placeholder="username" />
+            {error?.get("username") ? (
+              <FormHelperText>
+                {error.get("username")}
+              </FormHelperText>
+            ) : <></>}
+          </FormControl>
+          <FormControl>
+            <FormLabel htmlFor="password">Password:</FormLabel>
+            <Input id="password" name="password" placeholder="password" type="password" />
+          </FormControl>
+          <Button type="submit">Sign In</Button>
+        </form>
+      </Box>
+    </Container>
   );
 };

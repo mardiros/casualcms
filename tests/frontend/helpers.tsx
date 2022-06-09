@@ -58,3 +58,15 @@ export const waitForTitle = async (title: string): Promise<HTMLElement> => {
   });
   return resp;
 };
+
+export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
+  const resp = await waitFor((): HTMLElement => {
+    let loc = screen.getByLabelText(label, {exact: false});
+
+    if (loc == undefined) {
+      throw Error(`Not ready: ${loc}`);
+    }
+    return loc;
+  });
+  return resp;
+};

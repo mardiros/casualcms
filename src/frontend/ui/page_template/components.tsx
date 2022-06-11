@@ -5,6 +5,7 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
+import { Link } from "react-router-dom";
 export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
@@ -31,7 +32,13 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
             Available Templates
           </Heading>
           <ul id="page-templates">
-            {templates.map((tpl, i) => <li key={i}>{tpl.type}</li>)}
+            {
+              templates.map(
+                (tpl, i) =>
+                  <li key={i}>
+                    <Link to={`/admin/page/edit/${tpl.type}`}>{tpl.type}</Link>
+                  </li>
+              )}
           </ul>
         </>
       }

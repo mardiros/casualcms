@@ -1,5 +1,5 @@
 import { Result } from "neverthrow";
-import { Account, PartialPageTemplate } from "./model";
+import { Account, PartialPageTemplate, PageTemplate } from "./model";
 
 export type ApiError = Map<string, string> | null;
 
@@ -16,4 +16,8 @@ export interface ITemplateApi {
   listRoots(
     authntoken: string
   ): Promise<Result<Array<PartialPageTemplate>, ApiError>>;
+  showTemplate(
+    authntoken: string,
+    tpltype: string
+  ): Promise<Result<PageTemplate, ApiError>>;
 }

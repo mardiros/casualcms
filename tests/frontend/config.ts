@@ -2,6 +2,7 @@ import { err, ok, Result } from "neverthrow";
 import {
   Account,
   PartialPageTemplate,
+  PageTemplate,
 } from "../../src/frontend/casualcms/domain/model";
 import {
   ApiError,
@@ -39,6 +40,46 @@ class FakeTemplateApi implements ITemplateApi {
         type: "casual:Home",
       },
     ]);
+  }
+  async showTemplate(
+    authntoken: string,
+    tpltype: string
+  ): Promise<Result<PageTemplate, ApiError>> {
+    return ok({
+      schema: {
+        definitions: {
+          Paragraph: {
+            properties: {
+              body: { title: "Body", type: "string" },
+              title: { title: "Title", type: "string" },
+            },
+            required: ["body"],
+            title: "Paragraph",
+            type: "object",
+          },
+        },
+        properties: {
+          body: {
+            title: "Body",
+            type: "array",
+            default: [],
+            items: { $ref: "#/definitions/Paragraph" },
+          },
+          description: { title: "Description", type: "string" },
+          hero_title: {
+            title: "Hero Title",
+            type: "string",
+            description: "Title of the hero section",
+          },
+          id: { title: "Id", type: "string" },
+          slug: { title: "Slug", type: "string" },
+          title: { title: "Title", type: "string" },
+        },
+        required: ["id", "slug", "title", "description", "hero_title"],
+        title: "RootPage",
+        type: "object",
+      },
+    });
   }
 }
 

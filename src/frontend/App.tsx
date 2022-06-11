@@ -11,8 +11,12 @@ const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   if (auth.authenticatedUser != null) {
     return <>
-      <p><Link to="/admin">Welcome {auth.authenticatedUser.username}!</Link></p>
-      <p><Link to="/admin/page/new">Create my first page</Link>.</p>
+      <Heading>
+        Welcome {auth.authenticatedUser.username}!
+      </Heading>
+      <Box>
+        <Link to="/admin/page/new">Create my first page</Link>.
+      </Box>
     </>
   }
   else {
@@ -39,7 +43,7 @@ const Layout: React.FunctionComponent<{}> = () => {
           <Header />
         </Heading>
       </Box>
-      <Box w='100%' p={4} bg='teal.50' h='calc(100vh - 90px)'>
+      <Box w='100%' p={4} bg='teal.50' minH='calc(100vh - 90px)'>
         <Routes>
           <Route path="login" element={<Login />} />
           <Route
@@ -49,7 +53,7 @@ const Layout: React.FunctionComponent<{}> = () => {
                 <Routes>
                   <Route path="" element={<Body />} />
                   <Route path="page/new" element={<TemplateList />} />
-                  <Route path="page/edit/:tpltype" element={<PageEdit />} />
+                  <Route path="page/new/:tpltype" element={<PageEdit />} />
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </RequireAuth>

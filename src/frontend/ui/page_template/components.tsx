@@ -31,15 +31,17 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
           <Heading>
             Available Templates
           </Heading>
-          <ul id="page-templates">
-            {
-              templates.map(
-                (tpl, i) =>
-                  <li key={i}>
-                    <Link to={`/admin/page/edit/${tpl.type}`}>{tpl.type}</Link>
-                  </li>
-              )}
-          </ul>
+          <Box paddingLeft={15}>
+            <ul id="page-templates">
+              {
+                templates.map(
+                  (tpl, i) =>
+                    <li key={i}>
+                      <Link to={`/admin/page/new/${tpl.type}`}>{tpl.type}</Link>
+                    </li>
+                )}
+            </ul>
+          </Box>
         </>
       }
       {/* TODO display error properly, just in cases */}

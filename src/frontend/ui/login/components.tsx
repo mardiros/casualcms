@@ -110,7 +110,7 @@ export const Login: React.FunctionComponent<{}> = () => {
       </Heading>
       <Box>
         <form onSubmit={handleSubmit}>
-          <FormControl>
+          <FormControl paddingTop={5}>
             <FormLabel htmlFor="username">Username:</FormLabel>
             <Input id="username" name="username" placeholder="username" />
             {error?.get("username") ? (
@@ -119,11 +119,13 @@ export const Login: React.FunctionComponent<{}> = () => {
               </FormHelperText>
             ) : <></>}
           </FormControl>
-          <FormControl>
+          <FormControl paddingTop={5}>
             <FormLabel htmlFor="password">Password:</FormLabel>
             <Input id="password" name="password" placeholder="password" type="password" />
           </FormControl>
-          <Button type="submit">Sign In</Button>
+          <FormControl paddingTop={5}>
+            <Button type="submit">Sign In</Button>
+          </FormControl>
         </form>
       </Box>
     </Container>

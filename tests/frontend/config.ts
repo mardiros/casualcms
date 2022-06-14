@@ -14,6 +14,7 @@ import { IApi } from "../../src/frontend/casualcms/service/api";
 import { AppConfig } from "../../src/frontend/config";
 import { IUnitOfWork } from "../../src/frontend/casualcms/service/uow";
 import { IAccountRepository } from "../../src/frontend/casualcms/domain/repositories";
+import { m } from "framer-motion";
 
 class FakeAccountApi implements IAccountApi {
   async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
@@ -45,39 +46,24 @@ class FakeTemplateApi implements ITemplateApi {
     authntoken: string,
     tpltype: string
   ): Promise<Result<PageTemplate, ApiError>> {
+    if (tpltype != "blog:HomePage") {
+      let m = new Map();
+      m.set("detail", `${tpltype} is undefined`);
+      return err(m);
+    }
     return ok({
       schema: {
-        definitions: {
-          Paragraph: {
-            properties: {
-              body: { title: "Body", type: "string" },
-              title: { title: "Title", type: "string" },
-            },
-            required: ["body"],
-            title: "Paragraph",
-            type: "object",
-          },
-        },
+        title: "HomePage",
+        type: "object",
         properties: {
-          body: {
-            title: "Body",
-            type: "array",
-            default: [],
-            items: { $ref: "#/definitions/Paragraph" },
-          },
-          description: { title: "Description", type: "string" },
-          hero_title: {
-            title: "Hero Title",
-            type: "string",
-            description: "Title of the hero section",
-          },
           id: { title: "Id", type: "string" },
           slug: { title: "Slug", type: "string" },
           title: { title: "Title", type: "string" },
+          description: { title: "Description", type: "string" },
+          body: { title: "Body", type: "string" },
         },
-        required: ["id", "slug", "title", "description", "hero_title"],
-        title: "RootPage",
-        type: "object",
+        required: ["id", "slug", "title", "description", "body"],
+        definitions: {},
       },
     });
   }

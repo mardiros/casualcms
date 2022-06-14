@@ -1,23 +1,29 @@
 import React from "react";
 import { Box } from "@chakra-ui/react";
-import Form from "@rjsf/chakra-ui";
+import { withTheme } from "@rjsf/core";
+import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useParams } from 'react-router-dom';
 import { useAuth } from "../login/components";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 import { PageTemplate } from "../../casualcms/domain/model";
 
+
+const Form = withTheme(ChakraUITheme);
+
 export const PageEdit: React.FunctionComponent<{}> = () => {
-  let { tpltype } = useParams();
+  let { tpltype } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
-  const [template, setTemplate] = React.useState<PageTemplate>(null);
+  const [template, setTemplate] = React.useState<PageTemplate | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
 
   React.useEffect(() => {
     async function loadTemplate() {
-      const template = await config.api.template.showTemplate(token, tpltype);
+      const template = await config.api.template.showTemplate(
+        token, tpltype || ""
+      );
       template.
         map((tpl) => setTemplate(tpl)).
         mapErr((err) => setError(err));
@@ -26,14 +32,34 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     return function cleanup() { };
   }, []);
 
-  console.log(tpltype)
-  console.log("#")
+  // console.log(ChakraUITheme)
+
+  const uiSchema = {
+
+    id: {
+      'ui:widget': 'hidden',
+    },
+    slug: {
+      'ui:widget': 'text',
+    },
+    title: {
+      'ui:widget': 'text',
+    },
+    description: {
+      'ui:widget': 'text',
+    },
+    body: {
+      'ui:widget': 'textarea',
+    }
+  }
   return <Box maxW="720px">
     {template &&
       <Form schema={template.schema}
-        onChange={() => console.log("changed")}
-        onSubmit={() => console.log("submitted")}
-        onError={() => console.log("errors")} />
+        uiSchema={uiSchema}
+        // onChange={() => console.log("changed")}
+        // onSubmit={() => console.log("submitted")}
+        // onError={() => console.log("errors")}
+        />
     }
     {/* TODO display error properly, just in cases */}
     {

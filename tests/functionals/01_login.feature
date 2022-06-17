@@ -15,3 +15,5 @@ Feature: As a user, I can login
     And I fill the field "password" with "secret"
     And I click on the "Sign In" button
     Then I see the text "Welcome alice!"
+    And I have "account" "alice" saved with keys "username,token,expires_at,user_id,lang"
+    And I have the default "account" set to "alice"

@@ -14,7 +14,7 @@ interface AppDBSchema extends DBSchema {
   };
 }
 
-export type Database = IDBPDatabase<AppDBSchema>;
+export type Database = PDatabase<AppDBSchema>;
 
 export const initDB = async (): Promise<Database> => {
   const db = await openDB<AppDBSchema>("casualcms", 1, {

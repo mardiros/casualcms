@@ -1,8 +1,9 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Iterable, MutableMapping, Optional, Set, Type, cast
+from typing import Any, Iterable, Mapping, MutableMapping, Optional, Set, Type, cast
 
 from pydantic import BaseModel, Field
+from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
 from casualcms.domain.messages import Event
@@ -110,7 +111,7 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
 
 class Page(AbstractPage):
 
-    id: str = Field(...)
+    id: str = Field(widget="hidden")
     slug: str = Field(...)
     title: str = Field(...)
     description: str = Field(...)
@@ -130,3 +131,31 @@ class Page(AbstractPage):
 
     def __hash__(self) -> int:  # type: ignore
         return hash(self.id)
+
+    @classmethod
+    def ui_schema(cls) -> Mapping[str, Any]:
+        ret: dict[str, Any] = {}
+        for key, val in cls.__fields__.items():
+            if key == "parent":
+                continue
+            if key == "events":
+                continue
+            if key == "created_at":
+                continue
+            ret[key] = cls.get_widget(val)
+        return ret
+
+    @classmethod
+    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
+        if "widget" in field.field_info.extra:
+            return {"ui:widget": field.field_info.extra["widget"]}
+
+        if field.is_complex():
+
+            if isinstance(field.get_default(), list):
+                items = {}
+                for key, val in field.type_.__fields__.items():
+                    items[key] = cls.get_widget(val)
+                ret: Mapping[str, Any] = {"items": items}
+                return ret
+        return {"ui:widget": "text"}

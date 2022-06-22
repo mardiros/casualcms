@@ -8,6 +8,20 @@ def start_fastcms(context: Any):
     context.browser.get("/admin")
 
 
+@given("user on the admin page")
+def start_fastcms_with_login(context: Any):
+    # we use the api and fillout the indexeddb using javascript here.
+    # we don't test the login form again and again
+
+    api = context.apicli("casualcms")
+    token = api.authntoken.post({"username": "alice", "password": "secret"})
+    authn = token.response.dict()
+    context.browser.get("/admin/login")
+    context.browser.add_index_db_value("account", "alice", authn)
+    context.browser.add_index_db_value("default", "account", "alice")
+    context.browser.get("/admin")
+
+
 @then("I see the login page")
 def assert_user_see_page(context: Any):
     username = context.browser.find_element_by_xpath("//input[@placeholder='username']")
@@ -27,4 +41,3 @@ def account_saved(context: Any, table: str, key: str, keys: str):
     expected = {k.strip() for k in keys.split(",")}
     current_keys = set(current_value.keys())
     assert current_keys == expected, f"{current_keys} != {expected}"
-

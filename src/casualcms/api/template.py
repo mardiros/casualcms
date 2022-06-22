@@ -1,4 +1,5 @@
 from typing import Any
+
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
@@ -33,4 +34,7 @@ async def show_template(
     jsonschema["properties"].pop("events", None)
     jsonschema["properties"].pop("parent", None)
     jsonschema["properties"].pop("created_at", None)
-    return {"schema": jsonschema}
+    return {
+        "schema": jsonschema,
+        "uiSchema": ptype.ui_schema(),
+    }

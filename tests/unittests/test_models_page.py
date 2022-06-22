@@ -1,4 +1,5 @@
 from typing import Any, Dict
+
 import pytest
 
 from casualcms.domain.model import AbstractPageError, get_available_subtypes

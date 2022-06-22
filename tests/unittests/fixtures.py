@@ -1,12 +1,13 @@
 from typing import Optional
-from pydantic import Field, BaseModel
+
+from pydantic import BaseModel, Field
 
 from casualcms.domain.model import Page
 
 
 class Paragraph(BaseModel):
     title: Optional[str] = Field()
-    body: str = Field()
+    body: str = Field(widget="textarea")
 
 
 class AbstractPage(Page):

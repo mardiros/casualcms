@@ -4,15 +4,16 @@ import time
 import uuid
 from multiprocessing import Process
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Iterator, Optional
 
 from behave import fixture  # type: ignore
+from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
 from pydantic import Field
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-from casualcms.entrypoint import main
 from casualcms.domain.model import Page
+from casualcms.entrypoint import main
 
 
 class HomePage(Page):
@@ -78,31 +79,37 @@ class Browser:
         log_id = uuid.uuid1().hex
         self.browser.execute_script(
             """
-                var [ dbName, dbVersion, tableName, searchKey, logId ] = [ arguments[0], arguments[1], arguments[2], arguments[3], arguments[4] ];
+            var [
+                dbName, dbVersion, tableName, searchKey, logId
+            ] = [
+                arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]
+            ];
 
-                var request = window.indexedDB.open(dbName, dbVersion);
-                request.onsuccess = function(event) {
-                    var db = event.target.result;
-                    var req = db.transaction(tableName, 'readwrite').objectStore(tableName).get(searchKey)
-                    req.onsuccess = function(event) {
-                        debugNode = document.createElement("code");
-                        debugNode.id = logId;
-                        debugNode.innerText = JSON.stringify(event.target.result);
-                        document.body.appendChild(debugNode);
-                    };
-                    req.onerror = function(event) {
-                        console.log(event);
-                    };
+            var request = window.indexedDB.open(dbName, dbVersion);
+            request.onsuccess = function(event) {
+                var db = event.target.result;
+                var req = db.transaction(
+                    tableName, 'readwrite'
+                ).objectStore(tableName).get(searchKey)
+                req.onsuccess = function(event) {
+                    debugNode = document.createElement("code");
+                    debugNode.id = logId;
+                    debugNode.innerText = JSON.stringify(event.target.result);
+                    document.body.appendChild(debugNode);
                 };
-                request.onerror = function(event) {
+                req.onerror = function(event) {
                     console.log(event);
                 };
+            };
+            request.onerror = function(event) {
+                console.log(event);
+            };
             """,
             self.db_name,
             self.db_version,
             table_name,
             key,
-            log_id
+            log_id,
         )
         ret = self.wait_for(self.browser.find_element_by_id, log_id)  # type: ignore
         data = json.loads(ret.text)
@@ -114,9 +121,37 @@ class Browser:
                 debugNode = document.getElementById(logId);
                 document.body.removeChild(debugNode)
             """,
-            log_id
+            log_id,
         )
         return data
+
+    def add_index_db_value(self, table_name: str, key: str, value: Any) -> None:
+        self.browser.execute_script(
+            """
+            var [
+                dbName, dbVersion, tableName, searchKey, targetValue
+            ] = [
+                arguments[0], arguments[1], arguments[2], arguments[3], arguments[4]
+            ];
+            var request = window.indexedDB.open(dbName, dbVersion);
+            request.onsuccess = function(event) {
+                var db = event.target.result;
+                var objectStore = db.transaction(
+                    tableName, 'readwrite'
+                ).objectStore(tableName);
+                var requestUpdate = objectStore.add(targetValue, searchKey);
+                requestUpdate.onsuccess = function(event) {
+                    db.commit;
+                };
+            };
+            """,
+            self.db_name,
+            self.db_version,
+            table_name,
+            key,
+            value,
+        )
+
 
 def run_server(port: int, **kwargs: Any):
     settings: dict[str, Any] = {
@@ -132,7 +167,7 @@ def run_server(port: int, **kwargs: Any):
 
 
 @fixture
-def casualcms(context: Any, port: int, **kwargs: Any):
+def casualcms(context: Any, port: int, **kwargs: Any) -> Iterator[None]:
     proc = Process(target=run_server, args=(port,), daemon=True)
     proc.start()
     yield
@@ -140,10 +175,18 @@ def casualcms(context: Any, port: int, **kwargs: Any):
 
 
 @fixture
-def browser(context: Any, port: int, **kwargs: Any):
+def browser(context: Any, port: int, **kwargs: Any) -> Iterator[None]:
     context.browser = Browser(f"http://localhost:{port}")
     yield
     context.browser.quit()
+
+
+@fixture
+def apicli(context: Any, port: int, **kwargs: Any) -> Iterator[None]:
+    scan("tests.functionals.resources")
+    sd = SyncStaticDiscovery({("casualcms", None): f"http://localhost:{port}/api"})
+    context.apicli = SyncClientFactory(sd=sd)
+    yield
 
 
 if __name__ == "__main__":

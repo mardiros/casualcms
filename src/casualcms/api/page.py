@@ -6,6 +6,7 @@ from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.adapters.resolver import resolve
 from casualcms.domain.messages.commands import CreatePage
 from casualcms.domain.model.account import AuthnToken
+from casualcms.domain.model.page import resolve_type
 
 from .base import get_token_info
 
@@ -18,7 +19,7 @@ async def create_page(
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
-    page_type = resolve(type)  # raise !
+    page_type = resolve_type(type)
     async with app.uow as uow:
         params = {**payload}
         if parent:

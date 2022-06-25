@@ -32,7 +32,9 @@ def configure(
 
 def resolve(value: str) -> AbstractUnitOfWork:
     cls = resolver.resolve(value)
-    return cls()
+    if cls.is_err():
+        raise ValueError(f"Invalid configuration: {cls.err()}")
+    return cls.unwrap()()
 
 
 class AppConfig:

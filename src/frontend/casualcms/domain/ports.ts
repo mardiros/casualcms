@@ -21,3 +21,12 @@ export interface ITemplateApi {
     tpltype: string
   ): Promise<Result<PageTemplate, ApiError>>;
 }
+
+
+export interface IPageApi {
+  createRootPage(
+    authntoken: string,
+    type: string,
+    payload: any,
+  ): Promise<Result<boolean, ApiError>>;
+}

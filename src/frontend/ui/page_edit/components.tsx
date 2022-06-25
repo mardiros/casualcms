@@ -33,25 +33,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     return function cleanup() { };
   }, []);
 
-  // console.log(ChakraUITheme)
-
-  const uiSchema = {
-
-    id: {
-      'ui:widget': 'hidden',
-    },
-    slug: {
-      'ui:widget': 'text',
-    },
-    title: {
-      'ui:widget': 'text',
-    },
-    description: {
-      'ui:widget': 'text',
-    },
-    body: {
-      'ui:widget': 'textarea',
-    }
+  const onsubmit = async (data: any) => {
+    const page = data.formData;
+    console.log(page);
+    await config.api.page.createRootPage(token, tpltype || "", page);
   }
 
   const data = {"id": uuidv1()};
@@ -61,7 +46,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
         uiSchema={template.uiSchema}
         formData={data}
         // onChange={() => console.log("changed")}
-        // onSubmit={() => console.log("submitted")}
+        onSubmit={onsubmit}
         // onError={() => console.log("errors")}
         />
     }

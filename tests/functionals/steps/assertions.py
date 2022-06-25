@@ -19,3 +19,5 @@ def assert_text(context: Any, text: str):
     context.browser.find_element_by_xpath(
         f"//*[contains(text(), '{text}') or .='{text}']"
     )
+
+

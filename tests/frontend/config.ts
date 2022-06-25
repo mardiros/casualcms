@@ -9,6 +9,7 @@ import {
   IAccountApi,
   Credentials,
   ITemplateApi,
+  IPageApi,
 } from "../../src/frontend/casualcms/domain/ports";
 import { IApi } from "../../src/frontend/casualcms/service/api";
 import { AppConfig } from "../../src/frontend/config";
@@ -77,13 +78,25 @@ class FakeTemplateApi implements ITemplateApi {
   }
 }
 
+class FakePageApi implements IPageApi {
+  async createRootPage(
+    authntoken: string,
+    type: string,
+    payload: any
+  ): Promise<Result<boolean, Map<string, string>>> {
+      return ok(true);
+  }
+}
+
 class FakeApi implements IApi {
   account: IAccountApi;
   template: ITemplateApi;
+  page: IPageApi;
 
   constructor() {
     this.account = new FakeAccountApi();
     this.template = new FakeTemplateApi();
+    this.page = new FakePageApi();
   }
 }
 

@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterator, Optional
 
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
-from pydantic import Field
+from pydantic import BaseModel, Field
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
@@ -16,8 +16,13 @@ from casualcms.domain.model import Page
 from casualcms.entrypoint import main
 
 
+class Paragraph(BaseModel):
+    title: Optional[str] = Field()
+    body: str = Field(widget="textarea")
+
+
 class HomePage(Page):
-    body: str = Field()
+    body: list[Paragraph] = []
 
     class Meta:
         parent_types = None
@@ -68,6 +73,9 @@ class Browser:
 
     def find_element_by_xpath(self, path: str):
         return self.wait_for(self.browser.find_element_by_xpath, path)  # type: ignore
+
+    def find_elements_by_xpath(self, path: str):
+        return self.wait_for(self.browser.find_elements_by_xpath, path)  # type: ignore
 
     def get(self, path: str):
         self.browser.get(f"{self.web_root}{path}")

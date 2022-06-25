@@ -15,4 +15,5 @@ export type PartialPageTemplate = {
 export type PageTemplate = {
   // type:string;
   schema:JSONSchema7;
+  uiSchema: any;
 }

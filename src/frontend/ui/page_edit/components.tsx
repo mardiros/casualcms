@@ -1,3 +1,4 @@
+import { v1 as uuidv1 } from 'uuid';
 import React from "react";
 import { Box } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
@@ -52,10 +53,13 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       'ui:widget': 'textarea',
     }
   }
+
+  const data = {"id": uuidv1()};
   return <Box maxW="720px">
     {template &&
       <Form schema={template.schema}
-        uiSchema={uiSchema}
+        uiSchema={template.uiSchema}
+        formData={data}
         // onChange={() => console.log("changed")}
         // onSubmit={() => console.log("submitted")}
         // onError={() => console.log("errors")}

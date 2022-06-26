@@ -15,7 +15,6 @@ Feature: As a user, I can create and publish new pages
     Given user on the admin page
     When I click on the "Create my first page" link
     And I click on the "blog:HomePage" link
-    And I fill the field "slug" with "/"
     And I fill the field "title" with "welcome home"
     And I fill the field "description" with "there is not place like home"
 
@@ -27,6 +26,7 @@ Feature: As a user, I can create and publish new pages
     And I fill the "third" field "title" with "Outro"
     And I fill the "second" textarea field "body" with "<p>Rich text widget not implemented yet</p>"
 
+    And I wait
     And I click on the "Submit" button
     And I visit "/"
     And I wait

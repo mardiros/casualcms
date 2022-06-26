@@ -85,7 +85,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
         },
         "uiSchema": {
             "id": {"ui:widget": "hidden"},
-            "slug": {"ui:widget": "text", "ui:placeholder": "slug"},
+            "slug": {"ui:widget": "hidden"},
             "hero_title": {"ui:widget": "text", "ui:placeholder": "hero_title"},
             "title": {"ui:widget": "text", "ui:placeholder": "title"},
             "description": {"ui:widget": "text", "ui:placeholder": "description"},

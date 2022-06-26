@@ -147,8 +147,10 @@ class Page(AbstractPage):
 
     @classmethod
     def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
-        if "widget" in field.field_info.extra:
+        if field.name == "slug" and cls in TypeTree().roots():
+            return {"ui:widget": "hidden"}
 
+        if "widget" in field.field_info.extra:
             widget = {"ui:widget": field.field_info.extra["widget"]}
             if field.field_info.extra["widget"] != "hidden":
                 widget["ui:placeholder"] = field.field_info.extra.get(

@@ -39,7 +39,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     await config.api.page.createRootPage(token, tpltype || "", page);
   }
 
-  const data = {"id": uuidv1()};
+  const data = {"id": uuidv1(), "slug": "/"};
   return <Box maxW="720px">
     {template &&
       <Form schema={template.schema}

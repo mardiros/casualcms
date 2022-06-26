@@ -8,13 +8,14 @@ async def serve_pages(
     path: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Response:
+    path = path or "/"
     async with app.uow as uow:
         if path == "admin":
             raise HTTPException(
                 status_code=302,
                 headers={"location": "/admin/"},
             )
-        page = await uow.pages.by_path(path or "/")
+        page = await uow.pages.by_path(path)
         if page.is_err():
             raise HTTPException(
                 status_code=404,

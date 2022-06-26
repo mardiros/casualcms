@@ -15,7 +15,7 @@ Feature: As a user, I can create and publish new pages
     Given user on the admin page
     When I click on the "Create my first page" link
     And I click on the "blog:HomePage" link
-    And I fill the field "slug" with "root"
+    And I fill the field "slug" with "/"
     And I fill the field "title" with "welcome home"
     And I fill the field "description" with "there is not place like home"
     And I click on the "Add Item" button

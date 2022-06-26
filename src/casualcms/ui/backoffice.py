@@ -34,4 +34,4 @@ async def serve_admin_ui(scope: Scope, receive: Receive, send: Send) -> None:
 @configure
 def includeme(app: FastAPIConfigurator) -> None:
     app.add_api_route("/favicon.ico", favicon, methods=["GET"])
-    app.mount("/admin", serve_admin_ui, name="ui")
+    app.mount("/admin", serve_admin_ui, name="backoffice")

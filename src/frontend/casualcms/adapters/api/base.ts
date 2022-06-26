@@ -1,4 +1,4 @@
-import { ApiError } from "../../domain/ports";
+import { ApiError } from "casualcms/domain/ports";
 
 type ApiErrorItem = {
   loc: String[];

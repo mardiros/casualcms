@@ -11,6 +11,8 @@ from casualcms.config import Settings
 from casualcms.domain.messages.commands import (
     CreateAccountCipheredPassword,
     CreateAuthnToken,
+    CreatePage,
+    generate_id,
 )
 from casualcms.domain.model.account import Account
 from casualcms.entrypoint import bootstrap
@@ -87,6 +89,28 @@ async def authntoken(
         )
     yield token
 
+
+@pytest.fixture
+async def home_page(
+    app_settings: Settings,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+):
+    async with uow as uow:
+        page = await messagebus.handle(
+            CreatePage(
+                type="tests.unittests.fixtures:RootPage",
+                payload={
+                    "id": generate_id(),
+                    "slug": "/",
+                    "title": "hello world - casualcms",
+                    "description": "I am so glad to be there",
+                    "hero_title": "Welcome aboard!",
+                },
+            ),
+            uow,
+        )
+    yield page
 
 @pytest.fixture
 def client(app: FastAPI):

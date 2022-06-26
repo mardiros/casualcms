@@ -6,7 +6,8 @@ from hypercorn.config import Config
 
 import casualcms.api
 import casualcms.service.handlers
-import casualcms.ui
+import casualcms.ui.backoffice
+import casualcms.ui.frontend
 from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import CreateAccount
@@ -15,7 +16,9 @@ from casualcms.domain.messages.commands import CreateAccount
 def configure(configurator: FastAPIConfigurator) -> None:
     # inject routes
     configurator.scan(casualcms.api, categories=["fastapi"])
-    configurator.scan(casualcms.ui, categories=["fastapi"])
+    # last routes that catch all must ending
+    configurator.scan(casualcms.ui.backoffice, categories=["fastapi"])
+    configurator.scan(casualcms.ui.frontend, categories=["fastapi"])
 
     # configure message bus
     configurator.scan(casualcms.service.handlers, categories=["messagebus"])

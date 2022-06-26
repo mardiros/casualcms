@@ -55,11 +55,11 @@ class FakeTemplateApi implements ITemplateApi {
     return ok({
       uiSchema: {
         id: { "ui:widget": "hidden" },
-        slug: { "ui:widget": "text" },
-        hero_title: { "ui:widget": "text" },
-        title: { "ui:widget": "text" },
-        description: { "ui:widget": "text" },
-        body: { "ui:widget": "text" },
+        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
+        hero_title: { "ui:widget": "text", "ui:placeholder": "hero_title" },
+        title: { "ui:widget": "text", "ui:placeholder": "title" },
+        description: { "ui:widget": "text", "ui:placeholder": "description" },
+        body: { "ui:widget": "text", "ui:placeholder": "body" },
       },
       schema: {
         title: "HomePage",

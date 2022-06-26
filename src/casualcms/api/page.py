@@ -20,6 +20,13 @@ async def create_page(
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
     page_type = resolve_type(type)
+    # rtype = resolve(type)
+    # if rtype.is_err():
+    #     raise HTTPException(
+    #         status_code=422,
+    #         detail=[{"loc": ["body", "type"], "msg": f"Invalid page type {type}"}],
+    #     )
+    # page_type = rtype.unwrap()
     async with app.uow as uow:
         params = {**payload}
         if parent:

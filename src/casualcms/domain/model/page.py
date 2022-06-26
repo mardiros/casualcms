@@ -148,7 +148,13 @@ class Page(AbstractPage):
     @classmethod
     def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
         if "widget" in field.field_info.extra:
-            return {"ui:widget": field.field_info.extra["widget"]}
+
+            widget = {"ui:widget": field.field_info.extra["widget"]}
+            if field.field_info.extra["widget"] != "hidden":
+                widget["ui:placeholder"] = field.field_info.extra.get(
+                    "placeholder", field.name
+                )
+            return widget
 
         if field.is_complex():
 
@@ -158,4 +164,8 @@ class Page(AbstractPage):
                     items[key] = cls.get_widget(val)
                 ret: Mapping[str, Any] = {"items": items}
                 return ret
-        return {"ui:widget": "text"}
+
+        return {
+            "ui:widget": "text",
+            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
+        }

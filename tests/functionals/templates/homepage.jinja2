@@ -8,5 +8,9 @@
   </head>
   <body>
     <h1>{{title}}</h1>
+    {% for p in body %}
+      <h2>{{p.title}}</h2>
+      {{ p.body | safe }}
+    {% endfor %}
   </body>
 </html>

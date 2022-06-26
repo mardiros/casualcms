@@ -8,43 +8,10 @@ from typing import Any, Callable, Iterator, Optional
 
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
-from pydantic import BaseModel, Field
 from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
-from casualcms.domain.model import Page
 from casualcms.entrypoint import main
-
-
-class Paragraph(BaseModel):
-    title: Optional[str] = Field()
-    body: str = Field(widget="textarea")
-
-
-class HomePage(Page):
-    body: list[Paragraph] = []
-
-    class Meta:
-        parent_types = None
-        template = "homepage.jinja2"
-        type = "blog:HomePage"
-
-
-class CategoryPage(Page):
-    class Meta:
-        parent_types = [HomePage]
-        type = "blog:CategoryPage"
-
-
-class SectionPage(Page):
-    class Meta:
-        parent_types = [HomePage]
-        type = "blog:SectionPage"
-
-
-class BlogPage(Page):
-    class Meta:
-        parent_types = [CategoryPage, "blog:BlogPage"]
 
 
 class Browser:
@@ -171,6 +138,7 @@ def run_server(port: int, **kwargs: Any):
         **kwargs,
     }
     os.environ.update({f"casualcms_{k}": v for k, v in settings.items()})
+    import tests.functionals.casualblog.models  # type: ignore
     main()
 
 

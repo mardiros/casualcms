@@ -18,9 +18,15 @@ Feature: As a user, I can create and publish new pages
     And I fill the field "slug" with "/"
     And I fill the field "title" with "welcome home"
     And I fill the field "description" with "there is not place like home"
+
     And I click on the "Add Item" button
-    And I fill the "second" field "title" with "Outro"
-    And I fill the textarea field "body" with "<p>Rich text widget not implemented yet</p>"
+    And I fill the "second" field "title" with "Intro"
+    And I fill the textarea field "body" with "<p>Welcome aboard!</p>"
+
+    And I click on the "Add Item" button
+    And I fill the "third" field "title" with "Outro"
+    And I fill the "second" textarea field "body" with "<p>Rich text widget not implemented yet</p>"
+
     And I click on the "Submit" button
     And I visit "/"
     And I wait

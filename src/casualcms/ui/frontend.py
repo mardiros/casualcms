@@ -9,11 +9,16 @@ async def serve_pages(
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Response:
     async with app.uow as uow:
+        if path == "admin":
+            raise HTTPException(
+                status_code=302,
+                headers={"location": "/admin/"},
+            )
         page = await uow.pages.by_path(path or "/")
         if page.is_err():
             raise HTTPException(
                 status_code=404,
-                detail=[{"msg": "Page not found"}],
+                detail=[{"msg": f"Page {path} not found"}],
             )
     page = page.unwrap()
     renderer = Jinja2TemplateRender(app.settings.template_search_path)

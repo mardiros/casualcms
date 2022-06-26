@@ -38,10 +38,10 @@
     "typescript": "^4.7.3"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register -r global-jsdom/register tests/frontend/**/*.test.ts*",
-    "watch": "parcel watch src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/admin  --log-level info",
-    "build_dev": "parcel build src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/admin --no-optimize --log-level info",
-    "build": "parcel build src/frontend/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/admin"
+    "test": "mocha -r ts-node/register -r global-jsdom/register tests/webapp/**/*.test.ts*",
+    "watch": "parcel watch src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled  --log-level info",
+    "build_dev": "parcel build src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled --no-optimize --log-level info",
+    "build": "parcel build src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled"
   },
   "eslintConfig": {
     "extends": [

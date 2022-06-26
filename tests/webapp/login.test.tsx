@@ -7,8 +7,8 @@ import {
   AuthProvider,
   RequireAuth,
   Login,
-} from "../../src/frontend/ui/login/components";
-import { AppContext } from "../../src/frontend/config";
+} from "../../src/webapp/ui/login/components";
+import { AppContext } from "../../src/webapp/config";
 import config from "./config";
 import { waitForPath, LocationDisplay } from "./helpers";
 

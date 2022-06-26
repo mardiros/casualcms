@@ -3,18 +3,18 @@ import {
   Account,
   PartialPageTemplate,
   PageTemplate,
-} from "../../src/frontend/casualcms/domain/model";
+} from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
   IAccountApi,
   Credentials,
   ITemplateApi,
   IPageApi,
-} from "../../src/frontend/casualcms/domain/ports";
-import { IApi } from "../../src/frontend/casualcms/service/api";
-import { AppConfig } from "../../src/frontend/config";
-import { IUnitOfWork } from "../../src/frontend/casualcms/service/uow";
-import { IAccountRepository } from "../../src/frontend/casualcms/domain/repositories";
+} from "../../src/webapp/casualcms/domain/ports";
+import { IApi } from "../../src/webapp/casualcms/service/api";
+import { AppConfig } from "../../src/webapp/config";
+import { IUnitOfWork } from "../../src/webapp/casualcms/service/uow";
+import { IAccountRepository } from "../../src/webapp/casualcms/domain/repositories";
 import { m } from "framer-motion";
 
 class FakeAccountApi implements IAccountApi {

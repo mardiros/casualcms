@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { App } from "../../src/frontend/App";
-import { AppContext } from "../../src/frontend/config";
+import { App } from "../../src/webapp/App";
+import { AppContext } from "../../src/webapp/config";
 import config from "./config";
 import { waitForPath, LocationDisplay } from "./helpers";
 

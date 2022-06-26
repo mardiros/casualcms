@@ -7,7 +7,7 @@ from starlette.types import Receive, Scope, Send
 
 from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 
-admin_ui_dir = Path(__file__).parent / "admin"
+admin_ui_dir = Path(__file__).parent / "webapp_compiled"
 template_dir = Path(__file__).parent / "templates"
 favicon_path = Path(__file__).parent / "favicon.ico"
 

@@ -9,7 +9,7 @@ cleandoc:
     cd docs && poetry run make clean
 
 clean_frontend:
-    rm -rf src/casualcms/admin/*.*
+    rm -rf src/casualcms/ui/webapp_compiled/*.*
 
 prettier:
     npx prettier --write src/frontend  tests

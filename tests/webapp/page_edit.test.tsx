@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import React from "react";
 import { screen, fireEvent, waitFor, getDefaultNormalizer } from "@testing-library/react";
-import { PageEdit } from "../../src/frontend/ui/page_edit/components";
+import { PageEdit } from "../../src/webapp/ui/page_edit/components";
 import { renderWithRouter, waitForTitle } from "./helpers";
 
 describe("As a user, I can create the root template", () => {

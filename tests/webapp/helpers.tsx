@@ -6,9 +6,9 @@ import { render } from "@testing-library/react";
 
 import config from "./config";
 
-import { AuthContext } from "../../src/frontend/ui/login/components";
-import { Account } from "../../src/frontend/casualcms/domain/model";
-import { AppContext } from "../../src/frontend/config";
+import { AuthContext } from "../../src/webapp/ui/login/components";
+import { Account } from "../../src/webapp/casualcms/domain/model";
+import { AppContext } from "../../src/webapp/config";
 
 
 

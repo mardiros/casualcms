@@ -1,5 +1,6 @@
+import { ArrayFieldTemplateProps } from "@rjsf/core";
 import { Result } from "neverthrow";
-import { Account, PartialPageTemplate, PageTemplate } from "./model";
+import { Account, PartialPageTemplate, PageTemplate, PartialPage } from "./model";
 
 export type ApiError = Map<string, string> | null;
 
@@ -29,4 +30,7 @@ export interface IPageApi {
     type: string,
     payload: any,
   ): Promise<Result<boolean, ApiError>>;
-}
+  listRoots(
+    authntoken: string,
+    ): Promise<Result<Array<PartialPage>, ApiError>>;
+  }

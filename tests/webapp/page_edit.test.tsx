@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import React from "react";
-import { screen, fireEvent, waitFor, getDefaultNormalizer } from "@testing-library/react";
+import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/page_edit/components";
-import { renderWithRouter, waitForTitle } from "./helpers";
+import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
 
 describe("As a user, I can create the root template", () => {
   it("redirect to the login form", async () => {
@@ -13,17 +13,17 @@ describe("As a user, I can create the root template", () => {
     );
     await waitForTitle("HomePage");
 
-    let input = screen.getByLabelText("Slug", {exact: false});
+    let input = screen.getByLabelText("Title", {exact: false});
     expect(input).not.equal(null);
-
-    input = screen.getByLabelText("Title", {exact: false});
-    expect(input).not.equal(null);
+    fireEvent.change(input, { target: { value: "Welcome Home" } });
 
     input = screen.getByLabelText("Description", {exact: false});
     expect(input).not.equal(null);
+    fireEvent.change(input, { target: { value: "My home page" } });
 
     input = screen.getByLabelText("Body", {exact: false});
     expect(input).not.equal(null);
+    fireEvent.change(input, { target: { value: "lorem ipsum" } });
 
     // does now work like that, it raise
     // input = screen.getByLabelText("Id", {exact: false});
@@ -31,14 +31,16 @@ describe("As a user, I can create the root template", () => {
 
     let button = screen.getByText("Submit");
     expect(button).not.equal(null);
-    // fireEvent.click(button);
-    // await waitFor(
-    //   async () => {
-    //     let errMess = screen.getByText("bla bla");
-    //     expect(errMess).not.equal(null);
-    //   },
-    //   { interval: 25, timeout: 100 }
-    // );
+    fireEvent.click(button);
+    await waitForPath("/admin/pages");
+
+    let title = screen.getByLabelText("Pages", {exact: false});
+    expect(title).not.equal(null);
+
+    let page = screen.getByLabelText("Welcome Home", {exact: false});
+    expect(page).not.equal(null);
+    expect(page.getAttribute("href")).equal("/admin/pages/");
+
 
   });
 });

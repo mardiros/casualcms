@@ -17,3 +17,8 @@ export type PageTemplate = {
   schema:JSONSchema7;
   uiSchema: any;
 }
+
+export type PartialPage = {
+  slug: string;
+  title: string;
+}

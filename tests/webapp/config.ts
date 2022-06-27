@@ -3,6 +3,7 @@ import {
   Account,
   PartialPageTemplate,
   PageTemplate,
+  PartialPage,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -79,12 +80,28 @@ class FakeTemplateApi implements ITemplateApi {
 }
 
 class FakePageApi implements IPageApi {
+  pages: Array<any>;
+
+  constructor() {
+    this.pages = [];
+  }
   async createRootPage(
     authntoken: string,
     type: string,
     payload: any
   ): Promise<Result<boolean, Map<string, string>>> {
-      return ok(true);
+    this.pages.push(payload);
+    return ok(true);
+  }
+
+  async listRoots(
+    authntoken: string
+  ): Promise<Result<PartialPage[], Map<string, string>>> {
+    let roots: PartialPage[] = [];
+    const result = this.pages
+      .filter((page) => page.slug == "/")
+      .map((page) => roots.push({ slug: page.slug, title: page.title }));
+    return ok(roots);
   }
 }
 

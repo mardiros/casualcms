@@ -3,7 +3,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from "../login/components";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -19,6 +19,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
   const [template, setTemplate] = React.useState<PageTemplate | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
+  let navigate = useNavigate();
 
   React.useEffect(() => {
     async function loadTemplate() {
@@ -26,8 +27,8 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
         token, tpltype || ""
       );
       template.
-        map((tpl) => setTemplate(tpl)).
-        mapErr((err) => setError(err));
+        map((tpl: PageTemplate) => setTemplate(tpl)).
+        mapErr((err: ApiError) => setError(err));
     }
     loadTemplate();
     return function cleanup() { };
@@ -37,6 +38,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     const page = data.formData;
     console.log(page);
     await config.api.page.createRootPage(token, tpltype || "", page);
+    navigate("/admin/pages", { replace: true });
   }
 
   const data = {"id": uuidv1(), "slug": "/"};

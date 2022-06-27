@@ -1,3 +1,4 @@
+from typing import Optional
 from result import Err, Ok
 
 from casualcms.domain.model import Account
@@ -12,7 +13,11 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryError,
     AuthnTokenRepositoryResult,
 )
-from casualcms.domain.repositories.page import PageRepositoryError, PageRepositoryResult
+from casualcms.domain.repositories.page import (
+    PageRepositoryError,
+    PageRepositoryResult,
+    PageSequenceRepositoryResult,
+)
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
     AccountRepositoryResult,
@@ -49,6 +54,19 @@ class PageInMemoryRepository(AbstractPageRepository):
         if path in self.pages:
             return Ok(self.pages[path])
         return Err(PageRepositoryError.page_not_found)
+
+    async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
+        """Fetch one page by its unique path."""
+        if not path and "/" in self.pages:
+            return Ok([self.pages["/"]])
+        ret: list[Page] = []
+        if path:
+            cnt = len(path.split("/")) + 1
+            for key, page in self.pages.items():
+                if key.startswith(path) and len(key.split("/")) == cnt:
+                    ret.append(page)
+
+        return Ok(ret)
 
     async def add(self, model: Page) -> None:
         """Append a new model to the repository."""

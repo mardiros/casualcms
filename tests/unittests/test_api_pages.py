@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
+from casualcms.domain.model.page import Page
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
@@ -49,3 +50,21 @@ async def test_api_create_page(
             "hero_title": "You are awesome",
             "body": [{"title": None, "body": "lorem ipsum"}],
         }
+
+
+async def test_api_list_root_page(
+    client: TestClient, authntoken: AuthnToken, home_page: Page
+):
+    resp = client.get(
+        "/api/pages",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == [
+        {
+            "slug": home_page.slug,
+            "title": home_page.title,
+        }
+    ]

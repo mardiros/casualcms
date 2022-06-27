@@ -1,14 +1,19 @@
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import Body, Depends, HTTPException, Request
+from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.adapters.resolver import resolve
 from casualcms.domain.messages.commands import CreatePage
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import resolve_type
 
 from .base import get_token_info
+
+
+class PartialPage(BaseModel):
+    slug: str = Field(...)
+    title: str = Field(...)
 
 
 async def create_page(
@@ -47,3 +52,21 @@ async def create_page(
         page = await app.bus.handle(cmd, uow)
 
     return {"href": page.path}
+
+
+async def list_pages(
+    request: Request,
+    parent: Optional[str] = None,
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> list[PartialPage]:
+
+    async with app.uow as uow:
+        pages = await uow.pages.by_parent(parent)
+
+    if pages.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["querystring", "parent"], "msg": "Unknown parent"}],
+        )
+    ps = pages.unwrap()
+    return [PartialPage(slug=p.slug, title=p.title) for p in ps]

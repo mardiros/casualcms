@@ -44,10 +44,10 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
     let loc = screen.getByTestId("location-display");
 
     if (loc.innerHTML != path) {
-      throw Error(`Not ready: ${loc.innerHTML}`);
+      throw Error(`Path not ready: ${loc.innerHTML} (expected ${path})`);
     }
     return loc;
-  });
+  }, { interval: 25, timeout: 2000 });
   return resp;
 };
 
@@ -58,7 +58,7 @@ export const waitForTitle = async (title: string): Promise<HTMLElement> => {
     let loc = screen.getByText(title);
 
     if (loc == undefined) {
-      throw Error(`Not ready: ${loc}`);
+      throw Error(`Title not ready: ${loc}`);
     }
     return loc;
   });
@@ -70,7 +70,7 @@ export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
     let loc = screen.getByLabelText(label, { exact: false });
 
     if (loc == undefined) {
-      throw Error(`Not ready: ${loc}`);
+      throw Error(`Location not ready: ${loc}`);
     }
     return loc;
   });
@@ -82,6 +82,8 @@ export const renderWithRouter = async(
   ui: React.ReactNode,
   pattern: string,
   path: string,
+  next_node?: React.ReactNode,
+  next_pattern?: string,
 ):  Promise<RenderResult> => {
   let ret = render(
     <AppContext.Provider value={config}>
@@ -90,6 +92,11 @@ export const renderWithRouter = async(
           <Routes>
             <Route path={pattern} element={ui}>
             </Route>
+            {
+              next_node &&
+              <Route path={next_pattern} element={next_node}>
+              </Route>
+              }
             <Route path="*" element={<Navigate to={path} replace={true} />}>
             </Route>
           </Routes>

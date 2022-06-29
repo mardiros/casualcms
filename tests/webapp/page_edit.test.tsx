@@ -2,24 +2,23 @@ import { expect } from "chai";
 import React from "react";
 import { screen, fireEvent, waitFor } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/page_edit/components";
+import { PageList } from "../../src/webapp/ui/page_list/components";
 import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
 
 describe("As a user, I can create the root template", () => {
-  it("redirect to the login form", async () => {
+  it("Create the root page from the web form", async () => {
     renderWithRouter(
           <PageEdit />,
-          "/page/new/:tpltype",
-          "/page/new/blog:HomePage",
+          "/admin/page/new/:tpltype",
+          "/admin/page/new/blog:HomePage",
+          <PageList />,
+          "/admin/pages",
     );
     await waitForTitle("HomePage");
 
     let input = screen.getByLabelText("Title", {exact: false});
     expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "Welcome Home" } });
-
-    input = screen.getByLabelText("Description", {exact: false});
-    expect(input).not.equal(null);
-    fireEvent.change(input, { target: { value: "My home page" } });
 
     input = screen.getByLabelText("Body", {exact: false});
     expect(input).not.equal(null);
@@ -33,14 +32,11 @@ describe("As a user, I can create the root template", () => {
     expect(button).not.equal(null);
     fireEvent.click(button);
     await waitForPath("/admin/pages");
+    await waitForTitle("Pages");
 
-    let title = screen.getByLabelText("Pages", {exact: false});
-    expect(title).not.equal(null);
-
-    let page = screen.getByLabelText("Welcome Home", {exact: false});
-    expect(page).not.equal(null);
-    expect(page.getAttribute("href")).equal("/admin/pages/");
-
+    let link = screen.getByText("Welcome Home", {exact: false});
+    expect(link).not.equal(null);
+    expect(link.getAttribute("href")).equal("/admin/page/edit/root/");
 
   });
 });

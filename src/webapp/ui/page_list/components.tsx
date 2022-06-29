@@ -5,24 +5,32 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 export const PageList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
-  const [pages, setPages] = React.useState<Array<PartialPage>>([]);
+  const [pages, setPages] = React.useState<PartialPage[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
 
   React.useEffect(() => {
     async function loadRoots() {
-      const rootTemplates = await config.api.page.listRoots(token);
-      rootTemplates.
-        map((tpls) => setPages(tpls)).
-        mapErr((err) => setError(err));
+      const rootPages = await config.api.page.listRoots(token);
+      rootPages.
+        map((pages: PartialPage[]) => setPages(pages)).
+        mapErr((err: ApiError) => setError(err));
+      setIsLoading(false);
     }
     loadRoots();
     return function cleanup() { };
   }, []);
+
+
+  if (isLoading) {
+    return <>Loading...</>
+  }
+
   return (
     <Box>
       {
@@ -37,7 +45,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
                 pages.map(
                   (page, i) =>
                     <li key={i}>
-                      <Link to={`/admin/page/edit/${page.slug}`}>{page.title}</Link>
+                      <Link to={`/admin/page/edit/root${page.slug}`}>{page.title}</Link>
                     </li>
                 )}
             </ul>

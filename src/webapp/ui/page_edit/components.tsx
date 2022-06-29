@@ -36,7 +36,6 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    console.log(page);
     await config.api.page.createRootPage(token, tpltype || "", page);
     navigate("/admin/pages", { replace: true });
   }

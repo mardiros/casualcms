@@ -56,10 +56,8 @@ class FakeTemplateApi implements ITemplateApi {
     return ok({
       uiSchema: {
         id: { "ui:widget": "hidden" },
-        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
-        hero_title: { "ui:widget": "text", "ui:placeholder": "hero_title" },
+        slug: { "ui:widget": "hidden" },
         title: { "ui:widget": "text", "ui:placeholder": "title" },
-        description: { "ui:widget": "text", "ui:placeholder": "description" },
         body: { "ui:widget": "text", "ui:placeholder": "body" },
       },
       schema: {
@@ -69,10 +67,9 @@ class FakeTemplateApi implements ITemplateApi {
           id: { title: "Id", type: "string" },
           slug: { title: "Slug", type: "string" },
           title: { title: "Title", type: "string" },
-          description: { title: "Description", type: "string" },
           body: { title: "Body", type: "string" },
         },
-        required: ["id", "slug", "title", "description", "body"],
+        required: ["id", "slug", "title", "body"],
         definitions: {},
       },
     });
@@ -98,7 +95,7 @@ class FakePageApi implements IPageApi {
     authntoken: string
   ): Promise<Result<PartialPage[], Map<string, string>>> {
     let roots: PartialPage[] = [];
-    const result = this.pages
+    this.pages
       .filter((page) => page.slug == "/")
       .map((page) => roots.push({ slug: page.slug, title: page.title }));
     return ok(roots);

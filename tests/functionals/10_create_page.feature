@@ -28,7 +28,8 @@ Feature: As a user, I can create and publish new pages
     And I click on the "Submit" button
     # List pages
     Then I see the text "welcome home"
+    And I see the text "Edit"
     # Visit published site
-    When I visit "/"
+    When I click on the "View" link
     Then I see the text "welcome home"
     And I see the text "Welcome aboard!"

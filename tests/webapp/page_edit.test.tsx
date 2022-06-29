@@ -34,9 +34,12 @@ describe("As a user, I can create the root template", () => {
     await waitForPath("/admin/pages");
     await waitForTitle("Pages");
 
-    let link = screen.getByText("Welcome Home", {exact: false});
+    let link = screen.getAllByText("Edit", {exact: false})[1];
     expect(link).not.equal(null);
     expect(link.getAttribute("href")).equal("/admin/page/edit/root/");
 
+    link = screen.getAllByText("View", {exact: false})[1];
+    expect(link).not.equal(null);
+    expect(link.getAttribute("href")).equal("/");
   });
 });

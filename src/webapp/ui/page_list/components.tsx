@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -39,16 +39,35 @@ export const PageList: React.FunctionComponent<{}> = () => {
           <Heading>
             Pages
           </Heading>
+
           <Box paddingLeft={15}>
-            <ul id="page-templates">
-              {
-                pages.map(
-                  (page, i) =>
-                    <li key={i}>
-                      <Link to={`/admin/page/edit/root${page.slug}`}>{page.title}</Link>
-                    </li>
-                )}
-            </ul>
+            <TableContainer>
+              <Table variant='simple'>
+                <Thead>
+                  <Tr>
+                    <Th>Page</Th>
+                    <Th>Edit</Th>
+                    <Th>View</Th>
+                    <Th>Childs</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {
+                    pages.map(
+                      (page, i) =>
+                        <Tr key={i}>
+                          <Td>{page.title}</Td>
+                          <Td>
+                            <Link to={`/admin/page/edit/root${page.slug}`}>Edit</Link>
+                          </Td>
+                          <Td>
+                            <a href={`${page.slug}`}>View</a>
+                          </Td>
+                        </Tr>
+                    )}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </Box>
         </>
       }

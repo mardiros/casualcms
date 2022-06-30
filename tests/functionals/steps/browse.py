@@ -1,6 +1,6 @@
 from typing import Any
 
-from behave import given, when, then  # type: ignore
+from behave import when  # type: ignore
 
 
 @when('I visit "{path}"')

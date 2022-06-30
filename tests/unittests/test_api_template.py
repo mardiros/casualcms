@@ -92,7 +92,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
             "body": {
                 "items": {
                     "title": {"ui:widget": "text", "ui:placeholder": "title"},
-                    "body": {"ui:widget": "textarea", 'ui:placeholder': 'body'},
+                    "body": {"ui:widget": "textarea", "ui:placeholder": "body"},
                 }
             },
         },

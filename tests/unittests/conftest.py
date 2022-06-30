@@ -112,6 +112,7 @@ async def home_page(
         )
     yield page
 
+
 @pytest.fixture
 def client(app: FastAPI):
     return TestClient(app)

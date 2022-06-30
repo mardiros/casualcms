@@ -1,6 +1,6 @@
-from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from fastapi import HTTPException, Response
 
+from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
 
 
@@ -21,11 +21,11 @@ async def serve_pages(
                 status_code=404,
                 detail=[{"msg": f"Page {path} not found"}],
             )
-    page = page.unwrap()
+    rpage = page.unwrap()
     renderer = Jinja2TemplateRender(app.settings.template_search_path)
     data = renderer.render_template(
-        page.get_template(),
-        page.get_context(),
+        rpage.get_template(),
+        rpage.get_context(),
     )
     return Response(data)
 

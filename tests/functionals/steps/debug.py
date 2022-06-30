@@ -1,7 +1,7 @@
 import time
 from typing import Any
 
-from behave import given, when, then  # type: ignore
+from behave import given, then, when  # type: ignore
 
 
 @given("I wait")

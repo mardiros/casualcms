@@ -10,6 +10,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [templates, setTemplates] = React.useState<Array<PartialPageTemplate>>([]);
   const [error, setError] = React.useState<ApiError>(null);
 
@@ -21,8 +22,16 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
         mapErr((err) => setError(err));
     }
     loadRoots();
+    setIsLoading(false);
     return function cleanup() { };
   }, []);
+  if (isLoading) {
+    return (
+      <Box>
+        Loading...
+      </Box>
+    )
+  }
   return (
     <Box>
       {

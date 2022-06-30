@@ -1,4 +1,5 @@
 from typing import Optional
+
 from result import Err, Ok
 
 from casualcms.domain.model import Account

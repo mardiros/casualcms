@@ -21,4 +21,5 @@ export type PageTemplate = {
 export type PartialPage = {
   slug: string;
   title: string;
+  path: string;
 }

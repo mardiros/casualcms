@@ -66,5 +66,6 @@ async def test_api_list_root_page(
         {
             "slug": home_page.slug,
             "title": home_page.title,
+            "path": home_page.path,
         }
     ]

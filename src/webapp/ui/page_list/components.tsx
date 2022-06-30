@@ -1,11 +1,12 @@
 import React from "react";
-import { Box, Heading, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Heading, Icon, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
 import { Link, Navigate } from "react-router-dom";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 export const PageList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
@@ -34,7 +35,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   return (
     <Box>
       {
-        pages.length &&
+        !error &&
         <>
           <Heading>
             Pages
@@ -58,10 +59,15 @@ export const PageList: React.FunctionComponent<{}> = () => {
                         <Tr key={i}>
                           <Td>{page.title}</Td>
                           <Td>
-                            <Link to={`/admin/page/edit/root${page.slug}`}>Edit</Link>
+                            <Link to={`/admin/page/edit/root${page.path}`}>Edit</Link>
                           </Td>
                           <Td>
-                            <a href={`${page.slug}`}>View</a>
+                            <a href={`${page.path}`}>View</a>
+                          </Td>
+                          <Td>
+                            <a href={`${page.path}`}>
+                              <Icon as={ChevronRightIcon} w={6} h={6} />
+                            </a>
                           </Td>
                         </Tr>
                     )}

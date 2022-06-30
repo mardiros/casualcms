@@ -1,16 +1,14 @@
 import { expect } from "chai";
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { Route } from "react-router-dom";
+import { screen } from "@testing-library/react";
 import { TemplateList } from "../../src/webapp/ui/page_template/components";
-import { AppContext } from "../../src/webapp/config";
-import config from "./config";
 import { renderWithRouter, waitForTitle } from "./helpers";
 
 describe("As a user, I can list root templates", () => {
   it("redirect to the login form", async () => {
     renderWithRouter(
-      <TemplateList />,
-      "/page/new",
+      <Route path="/page/new" element={<TemplateList />} />,
       "/page/new",
     );
     await waitForTitle("Available Templates");

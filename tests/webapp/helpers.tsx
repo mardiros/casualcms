@@ -79,24 +79,15 @@ export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
 
 
 export const renderWithRouter = async(
-  ui: React.ReactNode,
-  pattern: string,
+  routes: React.ReactNode,
   path: string,
-  next_node?: React.ReactNode,
-  next_pattern?: string,
 ):  Promise<RenderResult> => {
   let ret = render(
     <AppContext.Provider value={config}>
       <FakeAuth>
         <BrowserRouter>
           <Routes>
-            <Route path={pattern} element={ui}>
-            </Route>
-            {
-              next_node &&
-              <Route path={next_pattern} element={next_node}>
-              </Route>
-              }
+            {routes}
             <Route path="*" element={<Navigate to={path} replace={true} />}>
             </Route>
           </Routes>

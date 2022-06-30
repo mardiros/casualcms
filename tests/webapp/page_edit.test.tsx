@@ -1,6 +1,7 @@
 import { expect } from "chai";
 import React from "react";
-import { screen, fireEvent, waitFor } from "@testing-library/react";
+import { Route } from "react-router-dom";
+import { screen, fireEvent } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/page_edit/components";
 import { PageList } from "../../src/webapp/ui/page_list/components";
 import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
@@ -8,19 +9,22 @@ import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
 describe("As a user, I can create the root template", () => {
   it("Create the root page from the web form", async () => {
     renderWithRouter(
-          <PageEdit />,
-          "/admin/page/new/:tpltype",
-          "/admin/page/new/blog:HomePage",
-          <PageList />,
-          "/admin/pages",
+      <>
+        <Route path="/admin/page/new/:tpltype" element={<PageEdit />}>
+        </Route>
+        <Route path="/admin/pages" element={<PageList />}>
+        </Route>
+      </>,
+      "/admin/page/new/blog:HomePage",
     );
+
     await waitForTitle("HomePage");
 
-    let input = screen.getByLabelText("Title", {exact: false});
+    let input = screen.getByLabelText("Title", { exact: false });
     expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "Welcome Home" } });
 
-    input = screen.getByLabelText("Body", {exact: false});
+    input = screen.getByLabelText("Body", { exact: false });
     expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "lorem ipsum" } });
 
@@ -34,11 +38,11 @@ describe("As a user, I can create the root template", () => {
     await waitForPath("/admin/pages");
     await waitForTitle("Pages");
 
-    let link = screen.getAllByText("Edit", {exact: false})[1];
+    let link = screen.getAllByText("Edit", { exact: false })[1];
     expect(link).not.equal(null);
     expect(link.getAttribute("href")).equal("/admin/page/edit/root/");
 
-    link = screen.getAllByText("View", {exact: false})[1];
+    link = screen.getAllByText("View", { exact: false })[1];
     expect(link).not.equal(null);
     expect(link.getAttribute("href")).equal("/");
   });

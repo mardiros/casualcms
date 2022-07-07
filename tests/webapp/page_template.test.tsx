@@ -11,7 +11,7 @@ describe("As a user, I can list root templates", () => {
       <Route path="/page/new" element={<TemplateList />} />,
       "/page/new",
     );
-    await waitForTitle("Available Templates");
+    await waitForTitle("Choose A Type Of Template");
     let tpl = screen.getByText("casual:Home");
     expect(tpl).not.equal(null);
   });

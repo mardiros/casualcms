@@ -38,7 +38,10 @@ cov test_suite=default_test_suite:
     xdg-open htmlcov/index.html
 
 functest: build_dev_frontend
-    poetry run behave --no-capture tests/functionals/
+    poetry run behave --tags=-dev --no-capture tests/functionals/
+
+funcdevtest: build_dev_frontend
+    poetry run behave --tags=dev --no-capture tests/functionals/
 
 servetest:
     poetry run python tests/functionals/fixtures.py

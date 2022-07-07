@@ -99,6 +99,20 @@ class FakePageApi implements IPageApi {
       );
     return ok(roots);
   }
+
+  async listPages(
+    authntoken: string,
+    parent: string
+  ): Promise<Result<PartialPage[], Map<string, string>>> {
+    let roots: PartialPage[] = [];
+    this.pages
+      .filter((page) => page.slug.startsWith(parent))  //  fixme count and compare /
+      .map((page) =>
+        roots.push({ slug: page.slug, title: page.title, path: page.path })
+      );
+    return ok(roots);
+  }
+
 }
 
 export class FakeApi implements IApi {

@@ -5,20 +5,35 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
-import { Link, Navigate } from "react-router-dom";
-import { ChevronRightIcon } from "@chakra-ui/icons";
-export const PageList: React.FunctionComponent<{}> = () => {
+import { Link, Navigate, useParams } from "react-router-dom";
+import { AddIcon, ChevronRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
+import { Result, ResultAsync } from "neverthrow";
+
+type PageListProps = {
+  root?: boolean
+}
+
+export const PageList: React.FunctionComponent<PageListProps> = (props: PageListProps) => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
+  const isRoot = props.root || false;
   const token = auth.authenticatedUser?.token || "";
   const [pages, setPages] = React.useState<PartialPage[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const { parentPath } = useParams();
 
   React.useEffect(() => {
     async function loadRoots() {
-      const rootPages = await config.api.page.listRoots(token);
-      rootPages.
+      let pages: Result<PartialPage[], ApiError>;
+      if (isRoot) {
+        pages = await config.api.page.listRoots(token);
+
+      }
+      else {
+        pages = await config.api.page.listPages(token, parentPath as string);
+      }
+      pages.
         map((pages: PartialPage[]) => setPages(pages)).
         mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
@@ -59,14 +74,20 @@ export const PageList: React.FunctionComponent<{}> = () => {
                         <Tr key={i}>
                           <Td>{page.title}</Td>
                           <Td>
-                            <Link to={`/admin/page/edit/root${page.path}`}>Edit</Link>
-                          </Td>
-                          <Td>
-                            <a href={`${page.path}`}>View</a>
+                            <Link to={`/admin/page/edit/root${page.path}`}>
+                              <Icon as={EditIcon} marginEnd={2}/>
+                              Edit
+                            </Link>
                           </Td>
                           <Td>
                             <a href={`${page.path}`}>
-                              <Icon as={ChevronRightIcon} w={6} h={6} />
+                              <Icon as={ViewIcon} marginEnd={2}/>
+                              View
+                            </a>
+                          </Td>
+                          <Td>
+                            <a href="#">
+                              <Icon as={AddIcon} marginEnd={2} />
                             </a>
                           </Td>
                         </Tr>

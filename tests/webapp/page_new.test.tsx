@@ -2,7 +2,7 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { PageEdit } from "../../src/webapp/ui/page_edit/components";
+import { PageNew } from "../../src/webapp/ui/page_new/components";
 import { PageList } from "../../src/webapp/ui/page_list/components";
 import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
 
@@ -10,9 +10,9 @@ describe("As a user, I can create the root template", () => {
   it("Create the root page from the web form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/page/new/:tpltype" element={<PageEdit />}>
+        <Route path="/admin/page/new/:tpltype" element={<PageNew />}>
         </Route>
-        <Route path="/admin/pages" element={<PageList />}>
+        <Route path="/admin/pages" element={<PageList root={true} />}>
         </Route>
       </>,
       "/admin/page/new/blog:HomePage",

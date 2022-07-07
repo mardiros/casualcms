@@ -12,7 +12,7 @@ import { PageTemplate } from "../../casualcms/domain/model";
 
 const Form = withTheme(ChakraUITheme);
 
-export const PageEdit: React.FunctionComponent<{}> = () => {
+export const PageNew: React.FunctionComponent<{}> = () => {
   let { tpltype } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
@@ -42,7 +42,6 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   const data = {"id": uuidv1(), "slug": "/"};
   return <Box maxW="720px">
-    lalala
     {template &&
       <Form schema={template.schema}
         uiSchema={template.uiSchema}

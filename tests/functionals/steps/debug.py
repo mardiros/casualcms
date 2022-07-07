@@ -8,4 +8,4 @@ from behave import given, then, when  # type: ignore
 @when("I wait")
 @then("I wait")
 def i_wait(context: Any):
-    time.sleep(60)
+    time.sleep(60 * 5)

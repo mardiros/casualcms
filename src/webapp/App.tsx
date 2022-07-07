@@ -7,6 +7,7 @@ import { PageNotFound } from "./ui/error404/components";
 import { TemplateList } from "./ui/page_template/components";
 import { PageEdit } from "./ui/page_edit/components";
 import { PageList } from "./ui/page_list/components";
+import { PageNew } from "./ui/page_new/components";
 
 const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -53,9 +54,12 @@ const Layout: React.FunctionComponent<{}> = () => {
               <RequireAuth>
                 <Routes>
                   <Route path="" element={<Body />} />
-                  <Route path="pages" element={<PageList />} />
+                  <Route path="pages" element={<PageList root={true}/>} />
+                  <Route path="pages/:parentPath*" element={<PageList />} />
                   <Route path="page/new" element={<TemplateList />} />
-                  <Route path="page/new/:tpltype" element={<PageEdit />} />
+                  <Route path="page/new/:tpltype" element={<PageNew />} />
+                  <Route path="page/edit/root/" element={<PageEdit />} />
+                  <Route path="page/edit/root/:parentPath*" element={<PageEdit />} />
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </RequireAuth>

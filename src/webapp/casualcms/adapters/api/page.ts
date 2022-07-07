@@ -9,7 +9,7 @@ export class PageApi extends BaseFetchApi implements IPageApi {
   async createRootPage(
     authntoken: string,
     type: string,
-    payload: any,
+    payload: any
   ): Promise<Result<boolean, ApiError>> {
     const response = await this.fetch("/api/pages", {
       method: "POST",
@@ -19,8 +19,8 @@ export class PageApi extends BaseFetchApi implements IPageApi {
       },
       body: JSON.stringify({
         type: type,
-        payload: payload
-      })
+        payload: payload,
+      }),
     });
     const jsonData = await (response.json() as unknown);
     if (!response.ok) {
@@ -28,7 +28,9 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(true);
   }
-  async listRoots(authntoken: string): Promise<Result<PartialPage[], ApiError>> {
+  async listRoots(
+    authntoken: string
+  ): Promise<Result<PartialPage[], ApiError>> {
     const response = await this.fetch("/api/pages", {
       method: "GET",
       headers: {
@@ -42,5 +44,22 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(jsonData as PartialPage[]);
   }
-
+  async listPages(
+    authntoken: string,
+    parent: string
+  ): Promise<Result<PartialPage[], ApiError>> {
+    const qs = new URLSearchParams({ parent: parent });
+    const response = await this.fetch(`/api/pages?${qs}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(jsonData as PartialPage[]);
+  }
 }

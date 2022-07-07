@@ -1,6 +1,11 @@
 import { ArrayFieldTemplateProps } from "@rjsf/core";
 import { Result } from "neverthrow";
-import { Account, PartialPageTemplate, PageTemplate, PartialPage } from "./model";
+import {
+  Account,
+  PartialPageTemplate,
+  PageTemplate,
+  PartialPage,
+} from "./model";
 
 export type ApiError = Map<string, string> | null;
 
@@ -23,14 +28,15 @@ export interface ITemplateApi {
   ): Promise<Result<PageTemplate, ApiError>>;
 }
 
-
 export interface IPageApi {
   createRootPage(
     authntoken: string,
     type: string,
-    payload: any,
+    payload: any
   ): Promise<Result<boolean, ApiError>>;
-  listRoots(
+  listRoots(authntoken: string): Promise<Result<Array<PartialPage>, ApiError>>;
+  listPages(
     authntoken: string,
-    ): Promise<Result<Array<PartialPage>, ApiError>>;
-  }
+    parent: string
+  ): Promise<Result<Array<PartialPage>, ApiError>>;
+}

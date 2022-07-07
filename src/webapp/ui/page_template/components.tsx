@@ -1,11 +1,12 @@
 import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, Icon, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
 import { Link } from "react-router-dom";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
@@ -38,18 +39,32 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
         templates.length &&
         <>
           <Heading>
-            Available Templates
+            Choose A Type Of Template
           </Heading>
           <Box paddingLeft={15}>
-            <ul id="page-templates">
-              {
-                templates.map(
-                  (tpl, i) =>
-                    <li key={i}>
-                      <Link to={`/admin/page/new/${tpl.type}`}>{tpl.type}</Link>
-                    </li>
-                )}
-            </ul>
+            <TableContainer>
+              <Table variant='simple'>
+                <Thead>
+                  <Tr>
+                    <Th>Template Type</Th>
+                  </Tr>
+                </Thead>
+                <Tbody>
+                  {
+                    templates.map(
+                      (tpl, i) =>
+                        <Tr key={i}>
+                          <Td>
+                            <Link to={`/admin/page/new/${tpl.type}`}>
+                              <Icon as={ChevronRightIcon} w={6} h={6} />
+                              {tpl.type}
+                            </Link>
+                          </Td>
+                        </Tr>
+                    )}
+                </Tbody>
+              </Table>
+            </TableContainer>
           </Box>
         </>
       }

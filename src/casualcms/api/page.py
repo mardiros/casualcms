@@ -15,6 +15,7 @@ class PartialPage(BaseModel):
     slug: str = Field(...)
     title: str = Field(...)
     path: str = Field(...)
+    type: str = Field(...)
 
 
 async def create_page(
@@ -70,4 +71,12 @@ async def list_pages(
             detail=[{"loc": ["querystring", "parent"], "msg": "Unknown parent"}],
         )
     ps = pages.unwrap()
-    return [PartialPage(slug=p.slug, title=p.title, path=p.path) for p in ps]
+    return [
+        PartialPage(
+            slug=p.slug,
+            title=p.title,
+            path=p.path,
+            type=p.__meta__.type,
+        )
+        for p in ps
+    ]

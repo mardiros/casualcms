@@ -42,7 +42,6 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   const data = {"id": uuidv1(), "slug": "/"};
   return <Box maxW="720px">
-    lalala
     {template &&
       <Form schema={template.schema}
         uiSchema={template.uiSchema}

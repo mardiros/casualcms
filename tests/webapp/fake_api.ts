@@ -31,12 +31,13 @@ class FakeAccountApi implements IAccountApi {
 }
 
 class FakeTemplateApi implements ITemplateApi {
-  async listRoots(
-    authntoken: string
-  ): Promise<Result<Array<PartialPageTemplate>, Map<string, string>>> {
+  async listTemplates(
+    authntoken: string,
+    parentType: string | null
+  ): Promise<Result<Array<PartialPageTemplate>, ApiError>> {
     return ok([
       {
-        type: "casual:Home",
+        type: parentType ? "casual:Page" : "casual:Home",
       },
     ]);
   }
@@ -88,31 +89,35 @@ class FakePageApi implements IPageApi {
     return ok(true);
   }
 
-  async listRoots(
-    authntoken: string
-  ): Promise<Result<PartialPage[], Map<string, string>>> {
-    let roots: PartialPage[] = [];
-    this.pages
-      .filter((page) => page.slug == "/")
-      .map((page) =>
-        roots.push({ slug: page.slug, title: page.title, path: page.path })
-      );
-    return ok(roots);
-  }
+  // async listRoots(
+  //   authntoken: string
+  // ): Promise<Result<PartialPage[], Map<string, string>>> {
+  //   let roots: PartialPage[] = [];
+  //   this.pages
+  //     .filter((page) => page.slug == "/")
+  //     .map((page) =>
+  //       roots.push({ slug: page.slug, title: page.title, path: page.path })
+  //     );
+  //   return ok(roots);
+  // }
 
   async listPages(
     authntoken: string,
-    parent: string
+    parent: string | null
   ): Promise<Result<PartialPage[], Map<string, string>>> {
-    let roots: PartialPage[] = [];
+    let pages: PartialPage[] = [];
     this.pages
-      .filter((page) => page.slug.startsWith(parent))  //  fixme count and compare /
+      .filter((page) => page.slug.startsWith(parent || "/")) //  fixme count and compare /
       .map((page) =>
-        roots.push({ slug: page.slug, title: page.title, path: page.path })
+        pages.push({
+          slug: page.slug,
+          title: page.title,
+          path: page.path,
+          type: "blog:Home",
+        })
       );
-    return ok(roots);
+      return ok(pages);
   }
-
 }
 
 export class FakeApi implements IApi {

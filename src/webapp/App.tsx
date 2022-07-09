@@ -54,8 +54,7 @@ const Layout: React.FunctionComponent<{}> = () => {
               <RequireAuth>
                 <Routes>
                   <Route path="" element={<Body />} />
-                  <Route path="pages" element={<PageList root={true}/>} />
-                  <Route path="pages/:parentPath*" element={<PageList />} />
+                  <Route path="pages" element={<PageList />} />
                   <Route path="page/new" element={<TemplateList />} />
                   <Route path="page/new/:tpltype" element={<PageNew />} />
                   <Route path="page/edit/root/" element={<PageEdit />} />

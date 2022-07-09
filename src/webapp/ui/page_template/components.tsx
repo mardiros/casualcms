@@ -5,24 +5,29 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+
+
 export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [templates, setTemplates] = React.useState<Array<PartialPageTemplate>>([]);
+  const [templates, setTemplates] = React.useState<PartialPageTemplate[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
+  const [params, setParams] = useSearchParams();
+  const parentType = params.get("type");
+  const parentPath = params.get("parent");
 
   React.useEffect(() => {
-    async function loadRoots() {
-      const rootTemplates = await config.api.template.listRoots(token);
+    async function loadTemplates() {
+      const rootTemplates = await config.api.template.listTemplates(token, parentType);
       rootTemplates.
-        map((tpls) => setTemplates(tpls)).
-        mapErr((err) => setError(err));
+        map((tpls: PartialPageTemplate[]) => setTemplates(tpls)).
+        mapErr((err: ApiError) => setError(err));
     }
-    loadRoots();
+    loadTemplates();
     setIsLoading(false);
     return function cleanup() { };
   }, []);
@@ -55,7 +60,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
                       (tpl, i) =>
                         <Tr key={i}>
                           <Td>
-                            <Link to={`/admin/page/new/${tpl.type}`}>
+                            <Link to={`/admin/page/new/${tpl.type}?parent=${parentPath}`}>
                               <Icon as={ChevronRightIcon} w={6} h={6} />
                               {tpl.type}
                             </Link>

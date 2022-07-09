@@ -19,9 +19,10 @@ export interface IAccountApi {
 }
 
 export interface ITemplateApi {
-  listRoots(
-    authntoken: string
-  ): Promise<Result<Array<PartialPageTemplate>, ApiError>>;
+  listTemplates(
+    authntoken: string,
+    parentType: string | null,
+  ): Promise<Result<PartialPageTemplate[], ApiError>>;
   showTemplate(
     authntoken: string,
     tpltype: string
@@ -34,9 +35,8 @@ export interface IPageApi {
     type: string,
     payload: any
   ): Promise<Result<boolean, ApiError>>;
-  listRoots(authntoken: string): Promise<Result<Array<PartialPage>, ApiError>>;
   listPages(
     authntoken: string,
-    parent: string
-  ): Promise<Result<Array<PartialPage>, ApiError>>;
+    parent: string | null
+  ): Promise<Result<PartialPage[], ApiError>>;
 }

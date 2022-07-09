@@ -12,7 +12,7 @@ describe("As a user, I can create the root template", () => {
       <>
         <Route path="/admin/page/new/:tpltype" element={<PageNew />}>
         </Route>
-        <Route path="/admin/pages" element={<PageList root={true} />}>
+        <Route path="/admin/pages" element={<PageList />}>
         </Route>
       </>,
       "/admin/page/new/blog:HomePage",
@@ -38,7 +38,9 @@ describe("As a user, I can create the root template", () => {
     await waitForPath("/admin/pages");
     await waitForTitle("Pages");
 
-    let link = screen.getAllByText("Edit", { exact: false })[1];
+    let links = screen.getAllByText("Edit", { exact: false });
+    console.log(links)
+    let link = links[1];
     expect(link).not.equal(null);
     expect(link.getAttribute("href")).equal("/admin/page/edit/root/");
 

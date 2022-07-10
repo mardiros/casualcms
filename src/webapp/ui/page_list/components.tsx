@@ -65,7 +65,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
                         <Tr key={i}>
                           <Td>{page.title}</Td>
                           <Td>
-                            <Link to={`/admin/page/edit/root${page.path}`}>
+                            <Link to={`/admin/page/edit${page.path}`}>
                               <Icon as={EditIcon} marginEnd={2} />
                               Edit
                             </Link>

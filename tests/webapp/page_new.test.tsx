@@ -20,7 +20,11 @@ describe("As a user, I can create the root template", () => {
 
     await waitForTitle("HomePage");
 
-    let input = screen.getByLabelText("Title", { exact: false });
+    let input = screen.getByLabelText("Slug", { exact: false });
+    expect(input).not.equal(null);
+    fireEvent.change(input, { target: { value: "home" } });
+
+    input = screen.getByLabelText("Title", { exact: false });
     expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "Welcome Home" } });
 
@@ -38,14 +42,12 @@ describe("As a user, I can create the root template", () => {
     await waitForPath("/admin/pages");
     await waitForTitle("Pages");
 
-    let links = screen.getAllByText("Edit", { exact: false });
-    console.log(links)
-    let link = links[1];
-    expect(link).not.equal(null);
-    expect(link.getAttribute("href")).equal("/admin/page/edit/root/");
+    let link = screen.getAllByText("Edit", { exact: false })[1];
+    expect(link).not.equal(undefined);
+    expect(link.getAttribute("href")).equal("/admin/page/edit/home");
 
     link = screen.getAllByText("View", { exact: false })[1];
-    expect(link).not.equal(null);
-    expect(link.getAttribute("href")).equal("/");
+    expect(link).not.equal(undefined);
+    expect(link.getAttribute("href")).equal("/home");
   });
 });

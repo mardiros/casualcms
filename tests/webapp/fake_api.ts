@@ -53,7 +53,7 @@ class FakeTemplateApi implements ITemplateApi {
     return ok({
       uiSchema: {
         id: { "ui:widget": "hidden" },
-        slug: { "ui:widget": "hidden" },
+        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
         title: { "ui:widget": "text", "ui:placeholder": "title" },
         body: { "ui:widget": "text", "ui:placeholder": "body" },
       },
@@ -79,35 +79,37 @@ class FakePageApi implements IPageApi {
   constructor() {
     this.pages = [];
   }
-  async createRootPage(
+  async createPage(
     authntoken: string,
     type: string,
-    payload: any
+    payload: any,
+    parent: string | null
   ): Promise<Result<boolean, Map<string, string>>> {
-    payload["path"] = "/";
+    if (parent) {
+      let errs = new Map();
+      errs.set("FIXME", "FIXME");
+      return err(errs);
+    }
+    payload["path"] = "/home";
     this.pages.push(payload);
     return ok(true);
   }
-
-  // async listRoots(
-  //   authntoken: string
-  // ): Promise<Result<PartialPage[], Map<string, string>>> {
-  //   let roots: PartialPage[] = [];
-  //   this.pages
-  //     .filter((page) => page.slug == "/")
-  //     .map((page) =>
-  //       roots.push({ slug: page.slug, title: page.title, path: page.path })
-  //     );
-  //   return ok(roots);
-  // }
 
   async listPages(
     authntoken: string,
     parent: string | null
   ): Promise<Result<PartialPage[], Map<string, string>>> {
     let pages: PartialPage[] = [];
+    console.log(this.pages);
+    console.log(parent);
     this.pages
-      .filter((page) => page.slug.startsWith(parent || "/")) //  fixme count and compare /
+      .filter((page) => {
+        let starter = parent || "";
+        starter = starter.replace(/\\(.)/mg, "$1");
+        const startLen = starter.split("/").length
+        const pathLen = page.path.split("/").length
+        return page.path.startsWith(starter) && pathLen == startLen + 1;
+      })
       .map((page) =>
         pages.push({
           slug: page.slug,
@@ -116,6 +118,7 @@ class FakePageApi implements IPageApi {
           type: "blog:Home",
         })
       );
+      console.log(pages);
       return ok(pages);
   }
 }

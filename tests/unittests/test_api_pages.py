@@ -30,7 +30,7 @@ async def test_api_create_page(
             "type": "tests.unittests.fixtures:RootPage",
             "payload": {
                 "id": "abc",
-                "slug": "/",
+                "slug": "index",
                 "title": "Root Page",
                 "description": "The home page",
                 "hero_title": "You are awesome",
@@ -39,12 +39,12 @@ async def test_api_create_page(
         },
     )
     assert resp.status_code == 200
-    assert resp.json() == {"href": "/"}
+    assert resp.json() == {"href": "/index"}
     async with uow as uow:
-        page = (await uow.pages.by_path("/")).unwrap()
+        page = (await uow.pages.by_path("/index")).unwrap()
         assert page.dict() == {
             "id": "abc",
-            "slug": "/",
+            "slug": "index",
             "title": "Root Page",
             "description": "The home page",
             "hero_title": "You are awesome",
@@ -70,3 +70,47 @@ async def test_api_list_root_page(
             "type": home_page.__meta__.type,
         }
     ]
+
+
+async def test_create_subpage(
+    client: TestClient,
+    authntoken: AuthnToken,
+    home_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.post(
+        "/api/pages",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json={
+            "type": "casual:CategoryPage",
+            "parent": "/home",
+            "payload": {
+                "id": "abcd",
+                "slug": "test",
+                "title": "sub Page",
+                "description": "A sub page",
+            },
+        },
+    )
+    assert resp.json() == {"href": "/home/test"}
+    assert resp.status_code == 200
+    async with uow as uow:
+        page = (await uow.pages.by_path("/home/test")).unwrap()
+        assert page.dict() == {
+            "id": "abcd",
+            "slug": "test",
+            "title": "sub Page",
+            "description": "A sub page",
+        }
+
+    async with uow as uow:
+        pages = (await uow.pages.by_parent("/home")).unwrap()
+        pages_dict = [page.dict() for page in pages]
+        assert pages_dict == [{
+            "id": "abcd",
+            "slug": "test",
+            "title": "sub Page",
+            "description": "A sub page",
+        }]

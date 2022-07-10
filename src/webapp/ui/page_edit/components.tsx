@@ -35,12 +35,13 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   }, []);
 
   const onsubmit = async (data: any) => {
+    const parent = null;
     const page = data.formData;
-    await config.api.page.createRootPage(token, tpltype || "", page);
+    await config.api.page.createPage(token, tpltype || "", page, parent);
     navigate("/admin/pages", { replace: true });
   }
 
-  const data = {"id": uuidv1(), "slug": "/"};
+  const data = {"id": uuidv1()};
   return <Box maxW="720px">
     {template &&
       <Form schema={template.schema}

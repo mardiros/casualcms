@@ -38,6 +38,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
       </Box>
     )
   }
+  const qs = parentPath ? new URLSearchParams({ "parent": parentPath }) : "";
   return (
     <Box>
       {
@@ -60,7 +61,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
                       (tpl, i) =>
                         <Tr key={i}>
                           <Td>
-                            <Link to={`/admin/page/new/${tpl.type}?parent=${parentPath}`}>
+                            <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
                               <Icon as={ChevronRightIcon} w={6} h={6} />
                               {tpl.type}
                             </Link>

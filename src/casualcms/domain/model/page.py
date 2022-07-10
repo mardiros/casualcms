@@ -116,7 +116,7 @@ class Page(AbstractPage):
     title: str = Field(...)
     description: str = Field(...)
 
-    parent: Optional["Page"] = Field(default_factory=list, exclude=True)
+    parent: Optional["Page"] = Field(None, exclude=True)
     events: list[Event] = Field(default_factory=list, exclude=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)
 
@@ -127,7 +127,7 @@ class Page(AbstractPage):
         while page:
             slugs.append(page.slug)
             page = page.parent
-        return "/".join(reversed(slugs)) or "/"
+        return "/" + "/".join(reversed(slugs))
 
     def __hash__(self) -> int:  # type: ignore
         return hash(self.id)
@@ -147,8 +147,6 @@ class Page(AbstractPage):
 
     @classmethod
     def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
-        if field.name == "slug" and cls in TypeTree().roots():
-            return {"ui:widget": "hidden"}
 
         if "widget" in field.field_info.extra:
             widget = {"ui:widget": field.field_info.extra["widget"]}

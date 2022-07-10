@@ -6,7 +6,7 @@ import { TemplateList } from "../../src/webapp/ui/page_template/components";
 import { renderWithRouter, waitForTitle } from "./helpers";
 
 describe("As a user, I can list root templates", () => {
-  it("redirect to the login form", async () => {
+  it("list root templates", async () => {
     renderWithRouter(
       <Route path="/page/new" element={<TemplateList />} />,
       "/page/new",

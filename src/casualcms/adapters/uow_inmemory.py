@@ -58,14 +58,14 @@ class PageInMemoryRepository(AbstractPageRepository):
 
     async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
         """Fetch one page by its unique path."""
-        if not path and "/" in self.pages:
-            return Ok([self.pages["/"]])
         ret: list[Page] = []
         if path:
-            cnt = len(path.split("/")) + 1
-            for key, page in self.pages.items():
-                if key.startswith(path) and len(key.split("/")) == cnt:
-                    ret.append(page)
+            cnt = len(path.strip("/").split("/")) + 1
+        else:
+            cnt = 1
+        for key, page in self.pages.items():
+            if key.startswith(path or "") and len(key.strip("/").split("/")) == cnt:
+                ret.append(page)
 
         return Ok(ret)
 

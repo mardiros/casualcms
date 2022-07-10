@@ -34,6 +34,7 @@ def uow() -> Iterator[AbstractUnitOfWork]:
     uow = InMemoryUnitOfWork()
     yield uow
     uow.accounts.accounts.clear()  # type: ignore
+    uow.pages.pages.clear()  # type: ignore
 
 
 @pytest.fixture()
@@ -102,7 +103,7 @@ async def home_page(
                 type="tests.unittests.fixtures:RootPage",
                 payload={
                     "id": generate_id(),
-                    "slug": "/",
+                    "slug": "home",
                     "title": "hello world - casualcms",
                     "description": "I am so glad to be there",
                     "hero_title": "Welcome aboard!",

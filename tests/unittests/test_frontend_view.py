@@ -5,6 +5,6 @@ from .fixtures import RootPage
 
 async def test_get_home_page(client: TestClient, home_page: RootPage):
 
-    resp = client.get("/")
+    resp = client.get("/home")  # FIXME
     assert resp.status_code == 200
     assert "<h1>Welcome aboard!</h1>" in resp.text

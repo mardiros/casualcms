@@ -83,8 +83,8 @@ export const Login: React.FunctionComponent<{}> = () => {
     let formData = new FormData(event.currentTarget);
     let username = formData.get("username") as string;
     let password = formData.get("password") as string;
-    // let from = location.state?.from?.pathname || "/";
-    let from = "/admin";
+    // let from = location.state?.from?.pathname || "/admin/";
+    let from = "/admin/";  // keep last / to avoid one redirection
     let accountResult = await config.api.account.byCredentials({
       username,
       password,

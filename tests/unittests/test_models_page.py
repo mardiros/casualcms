@@ -38,13 +38,13 @@ def test_page_abstract_raise():
 def test_page_tree():
     page = RootPage(
         id="a",
-        slug="",
+        slug="index",
         title="awesome",
         hero_title="awesome",
         description="",
         body=[{"body": "Hello!"}],
     )
-    assert page.path == "/"
+    assert page.path == "/index"
 
     page2 = CategoryPage(
         id="b",
@@ -55,7 +55,7 @@ def test_page_tree():
         parent=page,
         body=[{"body": "Hello!"}],
     )
-    assert page2.path == "/sub"
+    assert page2.path == "/index/sub"
 
     page3 = BlogPage(
         id="b",
@@ -66,7 +66,7 @@ def test_page_tree():
         parent=page2,
         body=[{"body": "Hello!"}],
     )
-    assert page3.path == "/sub/sum"
+    assert page3.path == "/index/sub/sum"
 
 
 def test_page_types():

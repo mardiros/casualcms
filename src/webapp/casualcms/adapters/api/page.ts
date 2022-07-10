@@ -6,21 +6,26 @@ import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialPage } from "casualcms/domain/model";
 
 export class PageApi extends BaseFetchApi implements IPageApi {
-  async createRootPage(
+  async createPage(
     authntoken: string,
     type: string,
-    payload: any
+    payload: any,
+    parent: string | null,
   ): Promise<Result<boolean, ApiError>> {
+    let postBody: any = {
+      type: type,
+      payload: payload,
+    }
+    if (parent) {
+      postBody.parent = parent
+    }
     const response = await this.fetch("/api/pages", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        type: type,
-        payload: payload,
-      }),
+      body: JSON.stringify(postBody),
     });
     const jsonData = await (response.json() as unknown);
     if (!response.ok) {

@@ -3,7 +3,7 @@ import React from "react";
 import { Box } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useAuth } from "../login/components";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -20,6 +20,8 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const [template, setTemplate] = React.useState<PageTemplate | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
+  const [params, setParams] = useSearchParams();
+  const parent = params.get("parent");
 
   React.useEffect(() => {
     async function loadTemplate() {
@@ -36,11 +38,11 @@ export const PageNew: React.FunctionComponent<{}> = () => {
 
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    await config.api.page.createRootPage(token, tpltype || "", page);
+    await config.api.page.createPage(token, tpltype || "", page, parent);
     navigate("/admin/pages", { replace: true });
   }
 
-  const data = {"id": uuidv1(), "slug": "/"};
+  const data = {"id": uuidv1()};
   return <Box maxW="720px">
     {template &&
       <Form schema={template.schema}

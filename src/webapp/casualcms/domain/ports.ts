@@ -30,10 +30,11 @@ export interface ITemplateApi {
 }
 
 export interface IPageApi {
-  createRootPage(
+  createPage(
     authntoken: string,
     type: string,
-    payload: any
+    payload: any,
+    parent: string | null,
   ): Promise<Result<boolean, ApiError>>;
   listPages(
     authntoken: string,

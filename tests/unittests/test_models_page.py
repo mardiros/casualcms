@@ -71,7 +71,8 @@ def test_page_tree():
 
 def test_page_types():
     pages = get_available_subtypes(None)
-    assert pages == {RootPage}
+    from tests.functionals.casualblog.models import HomePage  # FIXME shoud not leak
+    assert pages == {HomePage, RootPage}
 
     pages = get_available_subtypes(RootPage)
     assert pages == {CategoryPage, SectionPage}

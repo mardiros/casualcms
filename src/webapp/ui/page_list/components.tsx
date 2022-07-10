@@ -1,11 +1,11 @@
 import React from "react";
-import { Box, Heading, Icon, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 
@@ -19,6 +19,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [params, setParams] = useSearchParams();
   const parentPath = params.get("parent");
+  let navigate = useNavigate();
 
   React.useEffect(() => {
     async function loadPages() {
@@ -92,6 +93,12 @@ export const PageList: React.FunctionComponent<{}> = () => {
                 </Tbody>
               </Table>
             </TableContainer>
+            <Stack spacing={4} direction='row' align='right'>
+              <Button onClick={() => navigate("/admin/page/new", { "replace": true })}>
+                <Icon as={AddIcon} marginEnd={2} />
+                Add
+              </Button>
+            </Stack>
           </Box>
         </>
       }

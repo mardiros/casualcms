@@ -11,7 +11,5 @@ async def create_page(
 ) -> Page:
     tpage = resolve_type(cmd.type)
     page = tpage(created_at=cmd.created_at, **cmd.payload)
-    await uow.pages.add(
-        page,
-    )
+    await uow.pages.add(page)
     return page

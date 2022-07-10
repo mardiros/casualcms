@@ -9,6 +9,7 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route("/authntokens", authntoken.authenticate, methods=["POST"])
     router.add_api_route("/pages", page.create_page, methods=["POST"])
     router.add_api_route("/pages", page.list_pages, methods=["GET"])
+    router.add_api_route("/pages/{path:path}", page.get_page, methods=["GET"])
 
     router.add_api_route("/templates", template.list_templates, methods=["GET"])
     router.add_api_route("/templates/{type}", template.show_template, methods=["GET"])

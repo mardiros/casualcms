@@ -14,7 +14,10 @@ async def test_list_template(client: TestClient, authntoken: AuthnToken):
         },
     )
     # assert resp.status_code == 200
-    assert resp.json() == [{"type": "tests.unittests.fixtures:RootPage"}]
+    assert resp.json() == [
+        {"type": "blog:HomePage"},  # FIXME: functiona tests should not leak here
+        {"type": "tests.unittests.fixtures:RootPage"},
+    ]
 
 
 async def test_list_template_for_childs(client: TestClient, authntoken: AuthnToken):

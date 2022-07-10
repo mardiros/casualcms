@@ -1,3 +1,6 @@
+from typing import Any, Mapping
+
+import pytest
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
@@ -108,9 +111,51 @@ async def test_create_subpage(
     async with uow as uow:
         pages = (await uow.pages.by_parent("/home")).unwrap()
         pages_dict = [page.dict() for page in pages]
-        assert pages_dict == [{
-            "id": "abcd",
-            "slug": "test",
-            "title": "sub Page",
-            "description": "A sub page",
-        }]
+        assert pages_dict == [
+            {
+                "id": "abcd",
+                "slug": "test",
+                "title": "sub Page",
+                "description": "A sub page",
+            }
+        ]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "path": "/api/pages/home",
+            "response": {
+                "path": "/home",
+                "slug": "home",
+                "title": "hello world - casualcms",
+                "type": "tests.unittests.fixtures:RootPage",
+            },
+        },
+        {
+            "path": "/api/pages/home/sub",
+            "response": {
+                "path": "/home/sub",
+                "slug": "sub",
+                "title": "a sub page",
+                "type": "casual:CategoryPage",
+            },
+        },
+    ],
+)
+async def test_get_page(
+    params: Mapping[str, Any],
+    client: TestClient,
+    authntoken: AuthnToken,
+    home_page: Page,
+    sub_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get(
+        params["path"],
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.json() == params["response"]

@@ -80,3 +80,26 @@ async def list_pages(
         )
         for p in ps
     ]
+
+
+async def get_page(
+    request: Request,
+    path: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> PartialPage:
+
+    async with app.uow as uow:
+        path = path.strip("/")
+        page = await uow.pages.by_path(f"/{path}")
+    if page.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
+        )
+    p = page.unwrap()
+    return PartialPage(
+        slug=p.slug,
+        title=p.title,
+        path=p.path,
+        type=p.__meta__.type,
+    )

@@ -18,6 +18,7 @@ from casualcms.domain.model.account import Account
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
+from tests.functionals.casualblog.models import HomePage
 
 
 @pytest.fixture()
@@ -107,6 +108,30 @@ async def home_page(
                     "title": "hello world - casualcms",
                     "description": "I am so glad to be there",
                     "hero_title": "Welcome aboard!",
+                },
+            ),
+            uow,
+        )
+    yield page
+
+
+@pytest.fixture
+async def sub_page(
+    app_settings: Settings,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    home_page: HomePage,
+):
+    async with uow as uow:
+        page = await messagebus.handle(
+            CreatePage(
+                type="casual:CategoryPage",
+                payload={
+                    "id": generate_id(),
+                    "parent": home_page,
+                    "slug": "sub",
+                    "title": "a sub page",
+                    "description": "I am so glad to be a sub page",
                 },
             ),
             uow,

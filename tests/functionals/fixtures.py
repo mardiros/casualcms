@@ -139,10 +139,12 @@ def run_server(port: int, **kwargs: Any):
     }
     os.environ.update({f"casualcms_{k}": v for k, v in settings.items()})
     import sys
+
     p = (Path(__file__).parent / "casualblog").resolve()
     sys.path.append(str(p))
     # Add a settings for that
     import casualblog.models  # type: ignore # noqa
+
     main()
 
 

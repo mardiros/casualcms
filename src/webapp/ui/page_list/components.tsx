@@ -8,6 +8,7 @@ import { useAuth } from "../login/components";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
+import { Loader } from "../loader/components";
 
 
 export const PageList: React.FunctionComponent<{}> = () => {
@@ -24,22 +25,18 @@ export const PageList: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPages() {
       let pages: Result<PartialPage[], ApiError>;
-      console.log("loading pages")
       pages = await config.api.page.listPages(token, parentPath);
-      console.log("pages loaded")
       pages.
         map((pages: PartialPage[]) => setPages(pages)).
         mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
-      console.log("setIsLoading false done")
     }
     loadPages();
     return function cleanup() { };
   }, []);
 
-  console.log(`Render page list ${isLoading}`)
   if (isLoading) {
-    return <>list loading...</>
+    return <Loader label="Loading page list"/>
   }
 
   return (

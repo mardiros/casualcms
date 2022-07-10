@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
 import { ApiError } from "../../casualcms/domain/ports";
+import { Loader } from "../loader/components";
 
 interface IAuthContext {
   authenticatedUser: Account | null;
@@ -66,7 +67,7 @@ export function RequireAuth({
   }, []);
 
   if (!auth.authenticatedUser) {
-    return <>Loading...</>;
+    return <Loader label="Authenticating..."/>;
   }
 
   return <>{children}</>;

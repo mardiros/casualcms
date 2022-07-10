@@ -7,6 +7,7 @@ import { AppContext } from "../../config";
 import { useAuth } from "../login/components";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
+import { Loader } from "../loader/components";
 
 
 export const TemplateList: React.FunctionComponent<{}> = () => {
@@ -33,9 +34,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
   }, []);
   if (isLoading) {
     return (
-      <Box>
-        Page template Loading...
-      </Box>
+      <Loader label="loading page template..."/>
     )
   }
   const qs = parentPath ? new URLSearchParams({ "parent": parentPath }) : "";

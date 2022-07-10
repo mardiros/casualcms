@@ -7,6 +7,7 @@ import { AppContext } from "../../config";
 import { useAuth } from "../login/components";
 import { Link, Navigate } from "react-router-dom";
 import { Result } from "neverthrow";
+import { Loader } from "../loader/components";
 
 
 export const HomePage: React.FunctionComponent<{}> = () => {
@@ -32,7 +33,7 @@ export const HomePage: React.FunctionComponent<{}> = () => {
 
 
   if (isLoading) {
-    return <>Home Loading...</>
+    return <Loader label="preparing data..." />
   }
 
   if (!error && pages.length) {

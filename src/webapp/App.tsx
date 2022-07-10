@@ -8,18 +8,12 @@ import { TemplateList } from "./ui/page_template/components";
 import { PageEdit } from "./ui/page_edit/components";
 import { PageList } from "./ui/page_list/components";
 import { PageNew } from "./ui/page_new/components";
+import { HomePage } from "./ui/home/components";
 
 const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   if (auth.authenticatedUser != null) {
-    return <>
-      <Heading>
-        Welcome {auth.authenticatedUser.username}!
-      </Heading>
-      <Box>
-        <Link to="/admin/page/new">Create my first page</Link>.
-      </Box>
-    </>
+    return <HomePage/>
   }
   else {
     return <Link to="/admin/login">Sign In</Link>

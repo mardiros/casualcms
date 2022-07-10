@@ -37,7 +37,7 @@ class FakeTemplateApi implements ITemplateApi {
   ): Promise<Result<Array<PartialPageTemplate>, ApiError>> {
     return ok([
       {
-        type: parentType ? "casual:Page" : "casual:Home",
+        type: parentType ? "casual:Page" : "casual:HomePage",
       },
     ]);
   }
@@ -45,7 +45,7 @@ class FakeTemplateApi implements ITemplateApi {
     authntoken: string,
     tpltype: string
   ): Promise<Result<PageTemplate, ApiError>> {
-    if (tpltype != "blog:HomePage") {
+    if (tpltype != "casual:HomePage") {
       let m = new Map();
       m.set("detail", `${tpltype} is undefined`);
       return err(m);
@@ -90,7 +90,7 @@ class FakePageApi implements IPageApi {
       errs.set("FIXME", "FIXME");
       return err(errs);
     }
-    payload["path"] = "/home";
+    payload["path"] = `${parent || ""}/${payload.slug}`;
     this.pages.push(payload);
     return ok(true);
   }
@@ -100,8 +100,6 @@ class FakePageApi implements IPageApi {
     parent: string | null
   ): Promise<Result<PartialPage[], Map<string, string>>> {
     let pages: PartialPage[] = [];
-    console.log(this.pages);
-    console.log(parent);
     this.pages
       .filter((page) => {
         let starter = parent || "";
@@ -115,11 +113,21 @@ class FakePageApi implements IPageApi {
           slug: page.slug,
           title: page.title,
           path: page.path,
-          type: "blog:Home",
+          type: "casual:HomePage",
         })
       );
-      console.log(pages);
       return ok(pages);
+  }
+  async deletePage(
+    authntoken: string,
+    path: string
+  ): Promise<Result<boolean, ApiError>> {
+    const pages = this.pages
+      .filter((page) => {
+        return page.path != path;
+      })
+    this.pages = pages
+    return ok(true)
   }
 }
 

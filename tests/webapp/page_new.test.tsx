@@ -15,7 +15,7 @@ describe("As a user, I can create the root template", () => {
         <Route path="/admin/pages" element={<PageList />}>
         </Route>
       </>,
-      "/admin/page/new/blog:HomePage",
+      "/admin/page/new/casual:HomePage",
     );
 
     await waitForTitle("HomePage");
@@ -39,6 +39,7 @@ describe("As a user, I can create the root template", () => {
     let button = screen.getByText("Submit");
     expect(button).not.equal(null);
     fireEvent.click(button);
+
     await waitForPath("/admin/pages");
     await waitForTitle("Pages");
 

@@ -21,7 +21,7 @@ export interface IAccountApi {
 export interface ITemplateApi {
   listTemplates(
     authntoken: string,
-    parentType: string | null,
+    parentType: string | null
   ): Promise<Result<PartialPageTemplate[], ApiError>>;
   showTemplate(
     authntoken: string,
@@ -34,10 +34,14 @@ export interface IPageApi {
     authntoken: string,
     type: string,
     payload: any,
-    parent: string | null,
+    parent: string | null
   ): Promise<Result<boolean, ApiError>>;
   listPages(
     authntoken: string,
     parent: string | null
   ): Promise<Result<PartialPage[], ApiError>>;
+  deletePage(
+    authntoken: string,
+    path: string
+  ): Promise<Result<boolean, ApiError>>;
 }

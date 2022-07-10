@@ -10,14 +10,14 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     authntoken: string,
     type: string,
     payload: any,
-    parent: string | null,
+    parent: string | null
   ): Promise<Result<boolean, ApiError>> {
     let postBody: any = {
       type: type,
       payload: payload,
-    }
+    };
     if (parent) {
-      postBody.parent = parent
+      postBody.parent = parent;
     }
     const response = await this.fetch("/api/pages", {
       method: "POST",
@@ -35,9 +35,9 @@ export class PageApi extends BaseFetchApi implements IPageApi {
   }
   async listPages(
     authntoken: string,
-    parent: string | null,
+    parent: string | null
   ): Promise<Result<PartialPage[], ApiError>> {
-    const qs = parent ? new URLSearchParams({ parent: parent }): "";
+    const qs = parent ? new URLSearchParams({ parent: parent }) : "";
     const response = await this.fetch(`/api/pages?${qs}`, {
       method: "GET",
       headers: {
@@ -50,5 +50,15 @@ export class PageApi extends BaseFetchApi implements IPageApi {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
     return ok(jsonData as PartialPage[]);
+  }
+  async deletePage(
+    authntoken: string,
+    path: string
+  ): Promise<Result<boolean, ApiError>> {
+    return err(
+      castError({
+        detail: [{ loc: [], msg: "Not Implemented" }],
+      }) as ApiError
+    );
   }
 }

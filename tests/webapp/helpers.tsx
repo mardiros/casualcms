@@ -53,7 +53,7 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
 
 
 
-export const waitForTitle = async (title: string): Promise<HTMLElement> => {
+export const  waitForTitle = async (title: string): Promise<HTMLElement> => {
   const resp = await waitFor((): HTMLElement => {
     let loc = screen.getByText(title);
 
@@ -61,7 +61,8 @@ export const waitForTitle = async (title: string): Promise<HTMLElement> => {
       throw Error(`Title not ready: ${loc}`);
     }
     return loc;
-  });
+  },
+    { timeout: 5000 });
   return resp;
 };
 
@@ -78,10 +79,10 @@ export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
 };
 
 
-export const renderWithRouter = async(
+export const renderWithRouter = async (
   routes: React.ReactNode,
   path: string,
-):  Promise<RenderResult> => {
+): Promise<RenderResult> => {
   let ret = render(
     <AppContext.Provider value={config}>
       <FakeAuth>

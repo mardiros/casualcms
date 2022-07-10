@@ -34,7 +34,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
   if (isLoading) {
     return (
       <Box>
-        Loading...
+        Page template Loading...
       </Box>
     )
   }

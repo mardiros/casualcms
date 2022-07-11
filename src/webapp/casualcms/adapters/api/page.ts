@@ -33,6 +33,23 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(true);
   }
+  async showPage(
+    authntoken: string,
+    path: string,
+  ): Promise<Result<PartialPage, ApiError>> {
+    const response = await this.fetch(`/api/pages/${path}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(jsonData as PartialPage);
+  }
   async listPages(
     authntoken: string,
     parent: string | null

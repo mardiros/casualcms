@@ -34,14 +34,13 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
   }, []);
   if (isLoading) {
     return (
-      <Loader label="loading page template..."/>
+      <Loader label="loading page template..." />
     )
   }
   const qs = parentPath ? new URLSearchParams({ "parent": parentPath }) : "";
   return (
     <Box>
       {
-        templates.length &&
         <>
           <Heading>
             Choose A Type Of Template

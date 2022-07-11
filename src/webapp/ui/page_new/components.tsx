@@ -39,7 +39,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const onsubmit = async (data: any) => {
     const page = data.formData;
     await config.api.page.createPage(token, tpltype || "", page, parent);
-    navigate("/admin/pages", { replace: true });
+    navigate(`/admin/pages?${params}`, { replace: true });
   }
 
   const data = {"id": uuidv1()};

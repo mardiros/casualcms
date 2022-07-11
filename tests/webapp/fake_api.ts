@@ -95,6 +95,31 @@ class FakePageApi implements IPageApi {
     return ok(true);
   }
 
+  async showPage(
+    authntoken: string,
+    path: string | null
+  ): Promise<Result<PartialPage, Map<string, string>>> {
+    let pages: PartialPage[] = [];
+    this.pages
+      .filter((page) => {
+        return page.path == path;
+      })
+      .map((page) =>
+        pages.push({
+          slug: page.slug,
+          title: page.title,
+          path: page.path,
+          type: "casual:HomePage",
+        })
+      );
+      if (pages.length) {
+        return ok(pages[0]);
+      }
+      else {
+        // FIXME
+        return err(new Map())
+      }
+  }
   async listPages(
     authntoken: string,
     parent: string | null

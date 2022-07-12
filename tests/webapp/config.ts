@@ -5,7 +5,6 @@ import { IUnitOfWork } from "../../src/webapp/casualcms/service/uow";
 import { IAccountRepository } from "../../src/webapp/casualcms/domain/repositories";
 import { FakeApi } from "./fake_api";
 
-
 class FakeAccountRepository implements IAccountRepository {
   account: Result<Account, string>;
 

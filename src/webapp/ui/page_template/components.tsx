@@ -1,5 +1,16 @@
 import React from "react";
-import { Box, Heading, Icon, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
+import {
+  Box,
+  Heading,
+  Icon,
+  Table,
+  TableContainer,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from "@chakra-ui/react";
 import { PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -8,7 +19,6 @@ import { useAuth } from "../login/components";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../loader/components";
-
 
 export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
@@ -23,49 +33,46 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplates() {
-      const rootTemplates = await config.api.template.listTemplates(token, parentType);
-      rootTemplates.
-        map((tpls: PartialPageTemplate[]) => setTemplates(tpls)).
-        mapErr((err: ApiError) => setError(err));
+      const rootTemplates = await config.api.template.listTemplates(
+        token,
+        parentType
+      );
+      rootTemplates
+        .map((tpls: PartialPageTemplate[]) => setTemplates(tpls))
+        .mapErr((err: ApiError) => setError(err));
     }
     loadTemplates();
     setIsLoading(false);
-    return function cleanup() { };
+    return function cleanup() {};
   }, []);
   if (isLoading) {
-    return (
-      <Loader label="loading page template..." />
-    )
+    return <Loader label="loading page template..." />;
   }
-  const qs = parentPath ? new URLSearchParams({ "parent": parentPath }) : "";
+  const qs = parentPath ? new URLSearchParams({ parent: parentPath }) : "";
   return (
     <Box>
       {
         <>
-          <Heading>
-            Choose A Type Of Template
-          </Heading>
+          <Heading>Choose A Type Of Template</Heading>
           <Box paddingLeft={15}>
             <TableContainer>
-              <Table variant='simple'>
+              <Table variant="simple">
                 <Thead>
                   <Tr>
                     <Th>Template Type</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {
-                    templates.map(
-                      (tpl, i) =>
-                        <Tr key={i}>
-                          <Td>
-                            <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
-                              <Icon as={ChevronRightIcon} w={6} h={6} />
-                              {tpl.type}
-                            </Link>
-                          </Td>
-                        </Tr>
-                    )}
+                  {templates.map((tpl, i) => (
+                    <Tr key={i}>
+                      <Td>
+                        <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
+                          <Icon as={ChevronRightIcon} w={6} h={6} />
+                          {tpl.type}
+                        </Link>
+                      </Td>
+                    </Tr>
+                  ))}
                 </Tbody>
               </Table>
             </TableContainer>
@@ -73,14 +80,13 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
         </>
       }
       {/* TODO display error properly, just in cases */}
-      {
-        error &&
+      {error && (
         <ul>
-          {
-            [...error.keys()].map((k) => <li> {error.get(k)} </li>)
-          }
+          {[...error.keys()].map((k) => (
+            <li> {error.get(k)} </li>
+          ))}
         </ul>
-      }
+      )}
     </Box>
   );
-}
+};

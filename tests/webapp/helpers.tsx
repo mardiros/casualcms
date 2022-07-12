@@ -10,13 +10,10 @@ import { AuthContext } from "../../src/webapp/ui/login/components";
 import { Account } from "../../src/webapp/casualcms/domain/model";
 import { AppContext } from "../../src/webapp/config";
 
-
-
 export const LocationDisplay = () => {
   const location = useLocation();
   return <div data-testid="location-display">{location.pathname}</div>;
 };
-
 
 export function FakeAuth({
   children,
@@ -31,38 +28,40 @@ export function FakeAuth({
   };
 
   let [authenticatedUser, setUser] = React.useState<Account | null>(bob);
-  let remember = (account: Account, callback: any) => { };
-  let forget = (callback: any) => { };
+  let remember = (account: Account, callback: any) => {};
+  let forget = (callback: any) => {};
 
   let value = { authenticatedUser, remember, forget };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-
 }
 
 export const waitForPath = async (path: string): Promise<HTMLElement> => {
-  const resp = await waitFor((): HTMLElement => {
-    let loc = screen.getByTestId("location-display");
+  const resp = await waitFor(
+    (): HTMLElement => {
+      let loc = screen.getByTestId("location-display");
 
-    if (loc.innerHTML != path) {
-      throw Error(`Path not ready: ${loc.innerHTML} (expected ${path})`);
-    }
-    return loc;
-  }, { interval: 25, timeout: 2000 });
+      if (loc.innerHTML != path) {
+        throw Error(`Path not ready: ${loc.innerHTML} (expected ${path})`);
+      }
+      return loc;
+    },
+    { interval: 25, timeout: 2000 }
+  );
   return resp;
 };
 
+export const waitForTitle = async (title: string): Promise<HTMLElement> => {
+  const resp = await waitFor(
+    (): HTMLElement => {
+      let loc = screen.getByText(title);
 
-
-export const  waitForTitle = async (title: string): Promise<HTMLElement> => {
-  const resp = await waitFor((): HTMLElement => {
-    let loc = screen.getByText(title);
-
-    if (loc == undefined) {
-      throw Error(`Title not ready: ${loc}`);
-    }
-    return loc;
-  },
-    { timeout: 5000 });
+      if (loc == undefined) {
+        throw Error(`Title not ready: ${loc}`);
+      }
+      return loc;
+    },
+    { timeout: 5000 }
+  );
   return resp;
 };
 
@@ -78,10 +77,9 @@ export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
   return resp;
 };
 
-
 export const renderWithRouter = async (
   routes: React.ReactNode,
-  path: string,
+  path: string
 ): Promise<RenderResult> => {
   let ret = render(
     <AppContext.Provider value={config}>
@@ -89,14 +87,16 @@ export const renderWithRouter = async (
         <BrowserRouter>
           <Routes>
             {routes}
-            <Route path="*" element={<Navigate to={path} replace={true} />}>
-            </Route>
+            <Route
+              path="*"
+              element={<Navigate to={path} replace={true} />}
+            ></Route>
           </Routes>
           <LocationDisplay />
         </BrowserRouter>
       </FakeAuth>
     </AppContext.Provider>
   );
-  await waitForPath(path)
-  return ret
-}
+  await waitForPath(path);
+  return ret;
+};

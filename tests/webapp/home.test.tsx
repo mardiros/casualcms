@@ -10,15 +10,11 @@ import { PageList } from "../../src/webapp/ui/page_list/components";
 
 describe("As a user, I have to create a first root template", () => {
   it("display onboarding message", async () => {
-    renderWithRouter(
-      <Route path="/" element={<HomePage />} />,
-      "/",
-    );
+    renderWithRouter(<Route path="/" element={<HomePage />} />, "/");
     await waitForTitle("Welcome bob!");
     let link = screen.getByText("Create my first page");
     expect(link).not.equal(undefined);
     expect(link.getAttribute("href")).equal("/admin/page/new");
-
   });
 });
 
@@ -28,17 +24,21 @@ describe("As a user, I am redirected to the root list if one exists", () => {
       "",
       "casual:HomePage",
       {
-        "slug": "root",
-        "title": "dummy home",
-        "description": "describe the dummy home",
+        slug: "root",
+        title: "dummy home",
+        description: "describe the dummy home",
       },
-      null,
+      null
     );
-    resp.mapErr((err: ApiError) => { throw err });
+    resp.mapErr((err: ApiError) => {
+      throw err;
+    });
   });
   after(async function () {
     const resp = await config.api.page.deletePage("", "/root");
-    resp.mapErr((err: ApiError) => { throw err });
+    resp.mapErr((err: ApiError) => {
+      throw err;
+    });
   });
   it("redirect to root pages list if exists", async () => {
     renderWithRouter(
@@ -46,7 +46,7 @@ describe("As a user, I am redirected to the root list if one exists", () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/pages" element={<PageList />} />
       </>,
-      "/",
+      "/"
     );
     await waitForTitle("Pages");
     let tpl = screen.getByText("dummy home");

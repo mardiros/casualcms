@@ -7,20 +7,19 @@ export type Account = {
   lang: string;
 };
 
-
 export type PartialPageTemplate = {
   type: string;
-}
+};
 
 export type PageTemplate = {
   // type:string;
-  schema:JSONSchema7;
+  schema: JSONSchema7;
   uiSchema: any;
-}
+};
 
 export type PartialPage = {
   slug: string;
   title: string;
   path: string;
   type: string;
-}
+};

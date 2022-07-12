@@ -1,5 +1,14 @@
 import React from "react";
-import { Box, Button, Container, FormControl, FormHelperText, FormLabel, Heading, Input } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Container,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Heading,
+  Input,
+} from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 import { Account } from "../../casualcms/domain/model";
@@ -55,19 +64,19 @@ export function RequireAuth({
         const accountResult = await config.uow.account.getCurrent();
         accountResult
           .map((account: Account) => {
-            auth.remember(account, () => { })
+            auth.remember(account, () => {});
           })
           .mapErr((err: any) => {
-            navigate("/admin/login", { replace: true })
+            navigate("/admin/login", { replace: true });
           });
       }
     }
     loadAuthenticatedUser();
-    return function cleanup() { };
+    return function cleanup() {};
   }, []);
 
   if (!auth.authenticatedUser) {
-    return <Loader label="Authenticating..."/>;
+    return <Loader label="Authenticating..." />;
   }
 
   return <>{children}</>;
@@ -85,7 +94,7 @@ export const Login: React.FunctionComponent<{}> = () => {
     let username = formData.get("username") as string;
     let password = formData.get("password") as string;
     // let from = location.state?.from?.pathname || "/admin/";
-    let from = "/admin/";  // keep last / to avoid one redirection
+    let from = "/admin/"; // keep last / to avoid one redirection
     let accountResult = await config.api.account.byCredentials({
       username,
       password,
@@ -106,23 +115,26 @@ export const Login: React.FunctionComponent<{}> = () => {
 
   return (
     <Container>
-      <Heading>
-        Sign In To Casual CMS
-      </Heading>
+      <Heading>Sign In To Casual CMS</Heading>
       <Box>
         <form onSubmit={handleSubmit}>
           <FormControl paddingTop={5}>
             <FormLabel htmlFor="username">Username:</FormLabel>
             <Input id="username" name="username" placeholder="username" />
             {error?.get("username") ? (
-              <FormHelperText>
-                {error.get("username")}
-              </FormHelperText>
-            ) : <></>}
+              <FormHelperText>{error.get("username")}</FormHelperText>
+            ) : (
+              <></>
+            )}
           </FormControl>
           <FormControl paddingTop={5}>
             <FormLabel htmlFor="password">Password:</FormLabel>
-            <Input id="password" name="password" placeholder="password" type="password" />
+            <Input
+              id="password"
+              name="password"
+              placeholder="password"
+              type="password"
+            />
           </FormControl>
           <FormControl paddingTop={5}>
             <Button type="submit">Sign In</Button>

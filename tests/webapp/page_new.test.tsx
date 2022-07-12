@@ -10,12 +10,10 @@ describe("As a user, I can create the root template", () => {
   it("Create the root page from the web form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/page/new/:tpltype" element={<PageNew />}>
-        </Route>
-        <Route path="/admin/pages" element={<PageList />}>
-        </Route>
+        <Route path="/admin/page/new/:tpltype" element={<PageNew />}></Route>
+        <Route path="/admin/pages" element={<PageList />}></Route>
       </>,
-      "/admin/page/new/casual:HomePage",
+      "/admin/page/new/casual:HomePage"
     );
 
     await waitForTitle("HomePage");

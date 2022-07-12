@@ -1,5 +1,5 @@
 import React from "react";
-import { createRoot } from 'react-dom/client';
+import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { AppContext, AppConfig } from "./config";
 import { initDB } from "./casualcms/adapters/repositories";

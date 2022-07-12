@@ -35,7 +35,7 @@ export class PageApi extends BaseFetchApi implements IPageApi {
   }
   async showPage(
     authntoken: string,
-    path: string,
+    path: string
   ): Promise<Result<PartialPage, ApiError>> {
     const response = await this.fetch(`/api/pages/${path}`, {
       method: "GET",

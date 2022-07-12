@@ -112,13 +112,12 @@ class FakePageApi implements IPageApi {
           type: "casual:HomePage",
         })
       );
-      if (pages.length) {
-        return ok(pages[0]);
-      }
-      else {
-        // FIXME
-        return err(new Map())
-      }
+    if (pages.length) {
+      return ok(pages[0]);
+    } else {
+      // FIXME
+      return err(new Map());
+    }
   }
   async listPages(
     authntoken: string,
@@ -128,9 +127,9 @@ class FakePageApi implements IPageApi {
     this.pages
       .filter((page) => {
         let starter = parent || "";
-        starter = starter.replace(/\\(.)/mg, "$1");
-        const startLen = starter.split("/").length
-        const pathLen = page.path.split("/").length
+        starter = starter.replace(/\\(.)/gm, "$1");
+        const startLen = starter.split("/").length;
+        const pathLen = page.path.split("/").length;
         return page.path.startsWith(starter) && pathLen == startLen + 1;
       })
       .map((page) =>
@@ -141,18 +140,17 @@ class FakePageApi implements IPageApi {
           type: "casual:HomePage",
         })
       );
-      return ok(pages);
+    return ok(pages);
   }
   async deletePage(
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>> {
-    const pages = this.pages
-      .filter((page) => {
-        return page.path != path;
-      })
-    this.pages = pages
-    return ok(true)
+    const pages = this.pages.filter((page) => {
+      return page.path != path;
+    });
+    this.pages = pages;
+    return ok(true);
   }
 }
 

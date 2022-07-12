@@ -12,7 +12,7 @@ clean_frontend:
     rm -rf src/casualcms/ui/webapp_compiled/*.*
 
 prettier:
-    npx prettier --write src/frontend  tests
+    ./node_modules/.bin/prettier --write src/webapp/ tests/webapp/
 
 lint:
     poetry run flake8 && echo "$(tput setaf 10)Success: no lint issue$(tput setaf 7)"

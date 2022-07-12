@@ -33,7 +33,7 @@ type PageListTableProps = {
   token: string;
 };
 
-const PageRow: React.FunctionComponent<PageRowProps> = (
+export const PageRow: React.FunctionComponent<PageRowProps> = (
   props: PageRowProps
 ) => {
   const page = props.page;
@@ -54,14 +54,14 @@ const PageRow: React.FunctionComponent<PageRowProps> = (
       </Td>
       <Td>
         <a href={`/admin/pages/?${new URLSearchParams({ parent: page.path })}`}>
-          <Icon as={ArrowRightIcon} marginEnd={2} />
+          <Icon as={ArrowRightIcon} marginEnd={2} displayName="view child pages"/>
         </a>
       </Td>
     </Tr>
   );
 };
 
-const PageListTable: React.FunctionComponent<PageListTableProps> = (
+export const PageListTable: React.FunctionComponent<PageListTableProps> = (
   props: PageListTableProps
 ) => {
   const parentPath = props.parentPath;
@@ -122,7 +122,7 @@ type PageListButtonsProps = {
   curPage: PartialPage | null;
 };
 
-const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
+export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
   props: PageListButtonsProps
 ) => {
   const curPage = props.curPage;

@@ -53,9 +53,12 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
         </a>
       </Td>
       <Td>
-        <a href={`/admin/pages/?${new URLSearchParams({ parent: page.path })}`}>
-          <Icon as={ArrowRightIcon} marginEnd={2} displayName="view child pages"/>
-        </a>
+        <Link
+          to={`/admin/pages/?${new URLSearchParams({ parent: page.path })}`}
+          data-testid="View child pages"
+        >
+          <Icon as={ArrowRightIcon} marginEnd={2} />
+        </Link>
       </Td>
     </Tr>
   );
@@ -73,7 +76,6 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
 
   React.useEffect(() => {
     async function loadSubPages() {
-      let page: Result<PartialPage, ApiError>;
       let pages: Result<PartialPage[], ApiError>;
       pages = await config.api.page.listPages(token, parentPath);
       pages
@@ -86,7 +88,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
   }, [parentPath]);
 
   if (isLoading) {
-    return <Loader label="Loading page list" />;
+    return <Loader label="Loading pages list" />;
   }
   if (error) {
     return (
@@ -143,6 +145,8 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
 };
 
 export const PageList: React.FunctionComponent<{}> = () => {
+  // console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+  // console.log("# Rendering page list")
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
@@ -176,7 +180,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   }, [parentPath]);
 
   if (isLoading) {
-    return <Loader label="Loading page list" />;
+    return <Loader label="Loading page" />;
   }
   return (
     <Box>

@@ -1,7 +1,7 @@
 import React from "react";
 import { RenderResult, screen, waitFor } from "@testing-library/react";
-import { useLocation } from "react-router-dom";
-import { BrowserRouter, Navigate, Routes, Route } from "react-router-dom";
+import { MemoryRouter, useLocation } from "react-router-dom";
+import { Routes } from "react-router-dom";
 import { render } from "@testing-library/react";
 
 import config from "./config";
@@ -50,18 +50,29 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
   return resp;
 };
 
-export const waitForTitle = async (title: string): Promise<HTMLElement> => {
-  const resp = await waitFor(
-    (): HTMLElement => {
-      let loc = screen.getByText(title);
+export const waitForLoadingLabel = async (
+  spinner_label: string
+): Promise<boolean> => {
+  const resp = await waitFor((): boolean => {
+    try {
+      let loc = screen.getByText(spinner_label);
+    } catch (e) {
+      return true;
+    }
+    throw Error(`Spinner ${spinner_label} here`);
+  });
+  return resp;
+};
 
-      if (loc == undefined) {
-        throw Error(`Title not ready: ${loc}`);
-      }
-      return loc;
-    },
-    { timeout: 5000 }
-  );
+export const waitForTitle = async (title: string): Promise<HTMLElement> => {
+  const resp = await waitFor((): HTMLElement => {
+    let loc = screen.getByText(title);
+
+    if (loc == undefined) {
+      throw Error(`Title not ready: ${loc}`);
+    }
+    return loc;
+  });
   return resp;
 };
 
@@ -84,19 +95,14 @@ export const renderWithRouter = async (
   let ret = render(
     <AppContext.Provider value={config}>
       <FakeAuth>
-        <BrowserRouter>
+        <MemoryRouter initialEntries={[path]}>
           <Routes>
             {routes}
-            <Route
-              path="*"
-              element={<Navigate to={path} replace={true} />}
-            ></Route>
           </Routes>
           <LocationDisplay />
-        </BrowserRouter>
+        </MemoryRouter>
       </FakeAuth>
     </AppContext.Provider>
   );
-  await waitForPath(path);
   return ret;
 };

@@ -20,6 +20,47 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../loader/components";
 
+type TemplateTableProps = {
+  isLoading: boolean;
+  parentPath: string | null;
+  templates: PartialPageTemplate[];
+};
+export const TemplateTable: React.FunctionComponent<TemplateTableProps> = (
+  props: TemplateTableProps
+) => {
+  if (props.isLoading) {
+    return <Loader label="loading page templates..." />;
+  }
+
+  const templates = props.templates;
+  const qs = props.parentPath
+    ? new URLSearchParams({ parent: props.parentPath })
+    : "";
+  return (
+    <TableContainer>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Template Type</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {templates.map((tpl, i) => (
+            <Tr key={i}>
+              <Td>
+                <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
+                  <Icon as={ChevronRightIcon} w={6} h={6} />
+                  {tpl.type}
+                </Link>
+              </Td>
+            </Tr>
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  );
+};
+
 export const TemplateList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
@@ -33,49 +74,29 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplates() {
-      const rootTemplates = await config.api.template.listTemplates(
+      const pageTemplates = await config.api.template.listTemplates(
         token,
         parentType
       );
-      rootTemplates
+      pageTemplates
         .map((tpls: PartialPageTemplate[]) => setTemplates(tpls))
         .mapErr((err: ApiError) => setError(err));
+      setIsLoading(false);
     }
     loadTemplates();
-    setIsLoading(false);
     return function cleanup() {};
   }, []);
-  if (isLoading) {
-    return <Loader label="loading page template..." />;
-  }
-  const qs = parentPath ? new URLSearchParams({ parent: parentPath }) : "";
   return (
     <Box>
       {
         <>
           <Heading>Choose A Type Of Template</Heading>
           <Box paddingLeft={15}>
-            <TableContainer>
-              <Table variant="simple">
-                <Thead>
-                  <Tr>
-                    <Th>Template Type</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {templates.map((tpl, i) => (
-                    <Tr key={i}>
-                      <Td>
-                        <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
-                          <Icon as={ChevronRightIcon} w={6} h={6} />
-                          {tpl.type}
-                        </Link>
-                      </Td>
-                    </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+            <TemplateTable
+              templates={templates}
+              parentPath={parentPath}
+              isLoading={isLoading}
+            />
           </Box>
         </>
       }

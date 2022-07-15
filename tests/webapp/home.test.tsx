@@ -2,7 +2,12 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
-import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
+import {
+  renderWithRouter,
+  waitForPath,
+  waitForTitle,
+  waitForLoadingLabel,
+} from "./helpers";
 import config from "./config";
 import { HomePage } from "../../src/webapp/ui/home/components";
 import { ApiError } from "../../src/webapp/casualcms/domain/ports";
@@ -48,7 +53,9 @@ describe("As a user, I am redirected to the root list if one exists", () => {
       </>,
       "/"
     );
-    await waitForTitle("Pages");
+    await waitForLoadingLabel("preparing data...");
+    await waitForLoadingLabel("Loading page");
+    await waitForLoadingLabel("Loading pages list");
     let tpl = screen.getByText("dummy home");
     expect(tpl).not.equal(null);
   });

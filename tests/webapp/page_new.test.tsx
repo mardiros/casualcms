@@ -4,7 +4,12 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageNew } from "../../src/webapp/ui/page_new/components";
 import { PageList } from "../../src/webapp/ui/page_list/components";
-import { renderWithRouter, waitForPath, waitForTitle } from "./helpers";
+import {
+  renderWithRouter,
+  waitForLoadingLabel,
+  waitForPath,
+} from "./helpers";
+import config from "./config";
 
 describe("As a user, I can create the root template", () => {
   it("Create the root page from the web form", async () => {
@@ -16,7 +21,9 @@ describe("As a user, I can create the root template", () => {
       "/admin/page/new/casual:HomePage"
     );
 
-    await waitForTitle("HomePage");
+    let loc = screen.getByTestId("location-display");
+    await waitForLoadingLabel("Loading pages list");
+    await waitForLoadingLabel("Loading form...");
 
     let input = screen.getByLabelText("Slug", { exact: false });
     expect(input).not.equal(null);
@@ -39,14 +46,14 @@ describe("As a user, I can create the root template", () => {
     fireEvent.click(button);
 
     await waitForPath("/admin/pages");
-    await waitForTitle("Pages");
+    await waitForLoadingLabel("preparing data...");
+    await waitForLoadingLabel("Loading pages list");
 
-    let link = screen.getAllByText("Edit", { exact: false })[1];
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/page/edit/home");
+    const edits = screen.getAllByText("Edit", { exact: false });
+    expect(edits.length).equal(2);
+    expect(edits[1].getAttribute("href")).equal("/admin/page/edit/home");
 
-    link = screen.getAllByText("View", { exact: false })[1];
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/home");
+    await config.api.page.deletePage("", "/home");
+
   });
 });

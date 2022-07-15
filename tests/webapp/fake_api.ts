@@ -85,11 +85,6 @@ class FakePageApi implements IPageApi {
     payload: any,
     parent: string | null
   ): Promise<Result<boolean, Map<string, string>>> {
-    if (parent) {
-      let errs = new Map();
-      errs.set("FIXME", "FIXME");
-      return err(errs);
-    }
     payload["path"] = `${parent || ""}/${payload.slug}`;
     this.pages.push(payload);
     return ok(true);

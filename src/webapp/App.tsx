@@ -50,18 +50,18 @@ const Layout: React.FunctionComponent<{}> = () => {
       </Box>
       <Box w="100%" p={4} bg="teal.50" minH="calc(100vh - 90px)">
         <Routes>
-          <Route path="login" element={<Login />} />
+          <Route path="login" element={<Login />} caseSensitive />
           <Route
             path="*"
             element={
               <RequireAuth>
                 <Routes>
-                  <Route path="" element={<Body />} />
-                  <Route path="pages" element={<PageList />} />
-                  <Route path="page/new" element={<TemplateList />} />
-                  <Route path="page/new/:tpltype" element={<PageNew />} />
-                  <Route path="page/edit/" element={<PageEdit />} />
-                  <Route path="page/edit/:parentPath*" element={<PageEdit />} />
+                  <Route path="" element={<Body />} caseSensitive />
+                  <Route path="pages" element={<PageList />} caseSensitive />
+                  <Route path="page/new" element={<TemplateList />} caseSensitive />
+                  <Route path="page/new/:tpltype" element={<PageNew />} caseSensitive />
+                  <Route path="page/edit/" element={<PageEdit />} caseSensitive />
+                  <Route path="page/edit/:parentPath*" element={<PageEdit />} caseSensitive />
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </RequireAuth>
@@ -95,7 +95,7 @@ export const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="admin/*" element={<ThemedLayout />} />
+          <Route path="admin/*" element={<ThemedLayout />} caseSensitive />
           {/* Required in tests */}
           <Route path="*" element={<Navigate to="/admin" replace />} />
         </Routes>

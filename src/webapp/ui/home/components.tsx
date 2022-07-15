@@ -2,14 +2,6 @@ import React from "react";
 import {
   Box,
   Heading,
-  Icon,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
 } from "@chakra-ui/react";
 import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";

@@ -3,6 +3,7 @@
 *.swp
 .coverage
 htmlcov/
+.nyc_output/
 *.csv
 *.log
 .vscode

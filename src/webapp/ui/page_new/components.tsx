@@ -9,6 +9,7 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 import { PageTemplate } from "../../casualcms/domain/model";
 import { Loader } from "../loader/components";
+import { ApiErrorUI } from "../errorApi/components";
 
 const Form = withTheme(ChakraUITheme);
 
@@ -52,6 +53,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const data = { id: uuidv1() };
   return (
     <Box maxW="720px">
+      <ApiErrorUI error={error} />
       {template && (
         <Form
           schema={template.schema}
@@ -61,14 +63,6 @@ export const PageNew: React.FunctionComponent<{}> = () => {
           onSubmit={onsubmit}
           // onError={() => console.log("errors")}
         />
-      )}
-      {/* TODO display error properly, just in cases */}
-      {error && (
-        <ul>
-          {[...error.keys()].map((k) => (
-            <li> {error.get(k)} </li>
-          ))}
-        </ul>
       )}
     </Box>
   );

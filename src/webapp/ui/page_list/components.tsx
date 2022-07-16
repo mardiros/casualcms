@@ -18,10 +18,11 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 
 import { useAuth } from "../login/components";
-import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../loader/components";
+import { ApiErrorUI } from "../errorApi/components";
 
 type PageRowProps = {
   page: PartialPage;
@@ -84,7 +85,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() {};
+    return function cleanup() { };
   }, [parentPath]);
 
   if (isLoading) {
@@ -161,7 +162,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadCurPage();
-    return function cleanup() {};
+    return function cleanup() { };
   }, [parentPath]);
 
   React.useEffect(() => {
@@ -176,7 +177,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() {};
+    return function cleanup() { };
   }, [parentPath]);
 
   if (isLoading) {
@@ -185,24 +186,15 @@ export const PageList: React.FunctionComponent<{}> = () => {
   return (
     <Box>
       <Heading>Pages</Heading>
-      {!error && (
-        <Box>
-          <PageListTable
-            config={config}
-            token={token}
-            parentPath={parentPath}
-          />
-          <PageListButtons curPage={curPage} />
-        </Box>
-      )}
-      {/* TODO display error properly, just in cases */}
-      {error && (
-        <ul>
-          {[...error.keys()].map((k) => (
-            <li> {error.get(k)} </li>
-          ))}
-        </ul>
-      )}
+      <Box>
+        <ApiErrorUI error={error} />
+        <PageListTable
+          config={config}
+          token={token}
+          parentPath={parentPath}
+        />
+        <PageListButtons curPage={curPage} />
+      </Box>
     </Box>
   );
 };

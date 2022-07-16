@@ -19,6 +19,7 @@ import { useAuth } from "../login/components";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../loader/components";
+import { ApiErrorUI } from "../errorApi/components";
 
 type TemplateTableProps = {
   isLoading: boolean;
@@ -92,6 +93,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
         <>
           <Heading>Choose A Type Of Template</Heading>
           <Box paddingLeft={15}>
+            <ApiErrorUI error={error} />
             <TemplateTable
               templates={templates}
               parentPath={parentPath}
@@ -100,14 +102,6 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
           </Box>
         </>
       }
-      {/* TODO display error properly, just in cases */}
-      {error && (
-        <ul>
-          {[...error.keys()].map((k) => (
-            <li> {error.get(k)} </li>
-          ))}
-        </ul>
-      )}
     </Box>
   );
 };

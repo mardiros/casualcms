@@ -113,9 +113,7 @@ describe("As a user, I can list pages", () => {
     renderWithRouter(
       <Route
         path="/admin/pages"
-        element={
-          <PageListTable parentPath="/home" config={config} token="" />
-        }
+        element={<PageListTable parentPath="/home" config={config} token="" />}
       />,
       "/admin/pages?parent=/home"
     );

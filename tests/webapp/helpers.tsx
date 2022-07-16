@@ -96,9 +96,7 @@ export const renderWithRouter = async (
     <AppContext.Provider value={config}>
       <FakeAuth>
         <MemoryRouter initialEntries={[path]}>
-          <Routes>
-            {routes}
-          </Routes>
+          <Routes>{routes}</Routes>
           <LocationDisplay />
         </MemoryRouter>
       </FakeAuth>

@@ -4,11 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageNew } from "../../src/webapp/ui/page_new/components";
 import { PageList } from "../../src/webapp/ui/page_list/components";
-import {
-  renderWithRouter,
-  waitForLoadingLabel,
-  waitForPath,
-} from "./helpers";
+import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 
 describe("As a user, I can create the root template", () => {
@@ -54,6 +50,5 @@ describe("As a user, I can create the root template", () => {
     expect(edits[1].getAttribute("href")).equal("/admin/page/edit/home");
 
     await config.api.page.deletePage("", "/home");
-
   });
 });

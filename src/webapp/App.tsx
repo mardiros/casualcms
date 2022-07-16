@@ -58,10 +58,26 @@ const Layout: React.FunctionComponent<{}> = () => {
                 <Routes>
                   <Route path="" element={<Body />} caseSensitive />
                   <Route path="pages" element={<PageList />} caseSensitive />
-                  <Route path="page/new" element={<TemplateList />} caseSensitive />
-                  <Route path="page/new/:tpltype" element={<PageNew />} caseSensitive />
-                  <Route path="page/edit/" element={<PageEdit />} caseSensitive />
-                  <Route path="page/edit/:parentPath*" element={<PageEdit />} caseSensitive />
+                  <Route
+                    path="page/new"
+                    element={<TemplateList />}
+                    caseSensitive
+                  />
+                  <Route
+                    path="page/new/:tpltype"
+                    element={<PageNew />}
+                    caseSensitive
+                  />
+                  <Route
+                    path="page/edit/"
+                    element={<PageEdit />}
+                    caseSensitive
+                  />
+                  <Route
+                    path="page/edit/:parentPath*"
+                    element={<PageEdit />}
+                    caseSensitive
+                  />
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </RequireAuth>

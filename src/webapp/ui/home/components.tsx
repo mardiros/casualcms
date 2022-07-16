@@ -1,8 +1,5 @@
 import React from "react";
-import {
-  Box,
-  Heading,
-} from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";

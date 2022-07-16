@@ -14,9 +14,9 @@ describe("As a user, I have beautiful 404 error", () => {
     renderWithRouter(
       <Route path="/errs" element={<ApiErrorUI error={error} />} />,
       "/errs"
-    )
+    );
     await waitForTitle("Errors encountered");
     const msg = screen.getByText("Bad username of password");
     expect(msg).not.equal(undefined);
-  })
-})
+  });
+});

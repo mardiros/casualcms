@@ -11,10 +11,9 @@ describe("As a user, I have beautiful 404 error", () => {
     renderWithRouter(
       <Route path="/e404" element={<PageNotFound />} />,
       "/e404"
-    )
+    );
     await waitForTitle("Page Not Found");
     const msg = screen.getByText("This is probably not a problem with npm.");
     expect(msg).not.equal(undefined);
-
-  })
-})
+  });
+});

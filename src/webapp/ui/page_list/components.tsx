@@ -85,7 +85,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   if (isLoading) {
@@ -162,7 +162,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadCurPage();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   React.useEffect(() => {
@@ -177,7 +177,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   if (isLoading) {
@@ -188,11 +188,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
       <Heading>Pages</Heading>
       <Box>
         <ApiErrorUI error={error} />
-        <PageListTable
-          config={config}
-          token={token}
-          parentPath={parentPath}
-        />
+        <PageListTable config={config} token={token} parentPath={parentPath} />
         <PageListButtons curPage={curPage} />
       </Box>
     </Box>

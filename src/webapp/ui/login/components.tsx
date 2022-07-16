@@ -9,7 +9,7 @@ import {
   Heading,
   Input,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
@@ -56,7 +56,7 @@ export function RequireAuth({
 }): React.ReactElement {
   const config = React.useContext(AppContext);
   let auth = useAuth();
-  let navigate = useNavigate();
+  const [authError, setAuthError] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     async function loadAuthenticatedUser() {
@@ -67,13 +67,17 @@ export function RequireAuth({
             auth.remember(account, () => {});
           })
           .mapErr((err: any) => {
-            navigate("/admin/login", { replace: true });
+            setAuthError(true);
           });
       }
     }
     loadAuthenticatedUser();
     return function cleanup() {};
-  }, []);
+  }, [authError]);
+
+  if (authError) {
+    return <Navigate to="/admin/login" replace />;
+  }
 
   if (!auth.authenticatedUser) {
     return <Loader label="Authenticating..." />;
@@ -84,33 +88,37 @@ export function RequireAuth({
 
 export const Login: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
-  let navigate = useNavigate();
   let config = useConfig();
   const [error, setError] = React.useState<ApiError>(null);
+  const [authSucceed, setAuthSuceed] = React.useState<boolean>(false);
+  // let from = location.state?.from?.pathname || "/admin/";
+  let from = "/admin/"; // keep last / to avoid one redirection
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     let formData = new FormData(event.currentTarget);
     let username = formData.get("username") as string;
     let password = formData.get("password") as string;
-    // let from = location.state?.from?.pathname || "/admin/";
-    let from = "/admin/"; // keep last / to avoid one redirection
     let accountResult = await config.api.account.byCredentials({
       username,
       password,
     });
 
     accountResult
-      .map(async (account) => {
+      .map(async (account: Account) => {
         // XXX save the set here
         const result = await config.uow.account.set(account);
         auth.remember(account, () => {
-          navigate(from, { replace: true });
+          setAuthSuceed(true);
         });
       })
       .mapErr((apiError) => {
         setError(apiError);
       });
+  }
+
+  if (authSucceed) {
+    return <Navigate to={from} replace />;
   }
 
   return (

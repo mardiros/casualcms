@@ -22,19 +22,19 @@ import { PageList } from "./ui/page_list/components";
 import { PageNew } from "./ui/page_new/components";
 import { HomePage } from "./ui/home/components";
 
-const Body: React.FunctionComponent<{}> = () => {
+export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   let auth = useAuth();
   if (auth.authenticatedUser != null) {
-    return <HomePage />;
+    return <Link to="/admin">👕 Casual CMS</Link>;
   } else {
     return <Link to="/admin/login">Sign In</Link>;
   }
 };
 
-const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
+export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   if (auth.authenticatedUser != null) {
-    return <Link to="/admin">👕 Casual CMS</Link>;
+    return <HomePage />;
   } else {
     return <Link to="/admin/login">Sign In</Link>;
   }

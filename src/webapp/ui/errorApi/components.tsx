@@ -16,7 +16,8 @@ export const ApiErrorUI: React.FunctionComponent<ApiErrorUIProps> = (
         <>
           <Heading>Errors encountered</Heading>
           <ul>
-            {error && [...error.keys()].map((k) => <li> {error.get(k)} </li>)}
+            {error &&
+              [...error.keys()].map((k) => <li key={k}> {error.get(k)} </li>)}
           </ul>
         </>
       )}

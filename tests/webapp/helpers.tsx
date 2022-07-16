@@ -15,19 +15,24 @@ export const LocationDisplay = () => {
   return <div data-testid="location-display">{location.pathname}</div>;
 };
 
-export function FakeAuth({
-  children,
-}: {
+type FakeAuthProps = {
   children: React.ReactNode;
-}): React.ReactElement {
-  const bob = {
-    id: "123",
-    username: "bob",
-    token: "abc",
-    lang: "en",
-  };
+  isAuthenticated: boolean;
+};
 
-  let [authenticatedUser, setUser] = React.useState<Account | null>(bob);
+export function FakeAuth(props: FakeAuthProps): React.ReactElement {
+  const children = props.children;
+  const account =
+    props.isAuthenticated === false
+      ? null
+      : {
+          id: "123",
+          username: "bob",
+          token: "abc",
+          lang: "en",
+        };
+
+  let [authenticatedUser, setUser] = React.useState<Account | null>(account);
   let remember = (account: Account, callback: any) => {};
   let forget = (callback: any) => {};
 
@@ -90,11 +95,14 @@ export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
 
 export const renderWithRouter = async (
   routes: React.ReactNode,
-  path: string
+  path: string,
+  options?: { isAuthenticated?: boolean }
 ): Promise<RenderResult> => {
+  const isAuthent =
+    options?.isAuthenticated === undefined ? true : options.isAuthenticated;
   let ret = render(
     <AppContext.Provider value={config}>
-      <FakeAuth>
+      <FakeAuth isAuthenticated={isAuthent}>
         <MemoryRouter initialEntries={[path]}>
           <Routes>{routes}</Routes>
           <LocationDisplay />

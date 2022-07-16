@@ -16,7 +16,7 @@ import { IApi } from "../../src/webapp/casualcms/service/api";
 
 class FakeAccountApi implements IAccountApi {
   async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
-    if (creds.password == "justincase") {
+    if (creds.password != "itsmysecret") {
       let errMap = new Map();
       errMap.set("username", "Invalid username or password");
       return err(errMap);

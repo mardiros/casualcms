@@ -37,7 +37,7 @@
     "prettier": "^2.7.1",
     "process": "^0.11.10",
     "prop-types": "^15.8.1",
-    "ts-node": "^10.8.1",
+    "ts-node": "^10.8.0",
     "typescript": "^4.7.3"
   },
   "scripts": {
@@ -48,30 +48,30 @@
     "build": "parcel build src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled"
   },
   "nyc": {
-      "cache": false,
-      "check-coverage": false,
-      "extension": [
-        ".ts",
-        ".tsx"
-      ],
-      "include": [
-        "src/**/*.ts",
-        "src/**/*.tsx"
-      ],
-      "exclude": [
-        "coverage/**",
-        "node_modules/**",
-        "**/*.d.ts",
-        "**/*.test.ts"
-       ],
-      "sourceMap": true,
-      "reporter": [
-        "html",
-        "text",
-        "text-summary"
-      ],
-      "all": true,
-      "instrument": true
+    "cache": false,
+    "check-coverage": false,
+    "extension": [
+      ".ts",
+      ".tsx"
+    ],
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
+    ],
+    "exclude": [
+      "coverage/**",
+      "node_modules/**",
+      "**/*.d.ts",
+      "**/*.test.ts"
+    ],
+    "sourceMap": true,
+    "reporter": [
+      "html",
+      "text",
+      "text-summary"
+    ],
+    "all": true,
+    "instrument": true
   },
   "eslintConfig": {
     "extends": [

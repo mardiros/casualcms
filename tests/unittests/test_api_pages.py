@@ -128,10 +128,13 @@ async def test_create_subpage(
         {
             "path": "/api/pages/home",
             "response": {
+                "type": "tests.unittests.fixtures:RootPage",
                 "path": "/home",
                 "slug": "home",
                 "title": "hello world - casualcms",
-                "type": "tests.unittests.fixtures:RootPage",
+                "description": "I am so glad to be there",
+                "hero_title": "Welcome aboard!",
+                "body": [],
             },
         },
         {
@@ -141,6 +144,7 @@ async def test_create_subpage(
                 "slug": "sub",
                 "title": "a sub page",
                 "type": "casual:CategoryPage",
+                "description": "I am so glad to be a sub page",
             },
         },
     ],

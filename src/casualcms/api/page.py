@@ -88,7 +88,7 @@ async def get_page(
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
-) -> PartialPage:
+) -> Any:
 
     async with app.uow as uow:
         path = path.strip("/")
@@ -99,12 +99,9 @@ async def get_page(
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
         )
     p = page.unwrap()
-    return PartialPage(
-        slug=p.slug,
-        title=p.title,
-        path=p.path,
-        type=p.__meta__.type,
-    )
+    resp = {"type": p.__meta__.type, "path": p.path, **p.dict()}
+    resp.pop("id")
+    return resp
 
 
 async def update_page(

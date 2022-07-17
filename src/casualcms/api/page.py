@@ -99,9 +99,7 @@ async def get_page(
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
         )
     p = page.unwrap()
-    resp = {"type": p.__meta__.type, "path": p.path, **p.dict()}
-    resp.pop("id")
-    return resp
+    return p.get_data_context()
 
 
 async def update_page(
@@ -132,9 +130,4 @@ async def update_page(
     async with app.uow as uow:
         page = await app.bus.handle(cmd, uow)
 
-    return PartialPage(
-        slug=p.slug,
-        title=p.title,
-        path=p.path,
-        type=p.__meta__.type,
-    )
+    return page.get_data_context()

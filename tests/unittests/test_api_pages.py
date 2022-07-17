@@ -191,6 +191,9 @@ async def test_update_home_page_content(
         "type": "tests.unittests.fixtures:RootPage",
         "slug": "new-home",
         "title": "new title",
+        "body": [{"body": "my new body"}],
+        "description": "new description",
+        "hero_title": "New hero title",
     }
     async with uow as uow:
         saved_home = cast(
@@ -226,6 +229,7 @@ async def test_update_sub_page_content(
         "type": "casual:CategoryPage",
         "slug": "new-slug",
         "title": "new title",
+        "description": "I am so glad to be a sub page",
     }
     async with uow as uow:
         saved_home = cast(

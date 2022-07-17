@@ -102,9 +102,6 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
             raise AbstractPageError(f"Page {self.__class__.__name__} is abstract")
         super().__init__(**kwargs)
 
-    def get_context(self) -> MutableMapping[str, Any]:
-        return self.dict(exclude={"events", "created_at"})
-
     def get_template(self) -> str:
         return self.__meta__.template
 
@@ -131,6 +128,16 @@ class Page(AbstractPage):
 
     def __hash__(self) -> int:  # type: ignore
         return hash(self.id)
+
+    def get_data_context(self) -> MutableMapping[str, Any]:
+        return {
+            "type": self.__meta__.type,
+            "path": self.path,
+            **self.dict(exclude={"events", "created_at", "id"}),
+        }
+
+    def get_context(self) -> MutableMapping[str, Any]:
+        return self.get_data_context()
 
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:

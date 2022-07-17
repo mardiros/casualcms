@@ -4,7 +4,7 @@ from fastapi import Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreatePage
+from casualcms.domain.messages.commands import CreatePage, UpdatePage
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import resolve_type
 
@@ -60,6 +60,7 @@ async def list_pages(
     request: Request,
     parent: Optional[str] = None,
     app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
@@ -86,6 +87,7 @@ async def get_page(
     request: Request,
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
 ) -> PartialPage:
 
     async with app.uow as uow:
@@ -97,6 +99,42 @@ async def get_page(
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
         )
     p = page.unwrap()
+    return PartialPage(
+        slug=p.slug,
+        title=p.title,
+        path=p.path,
+        type=p.__meta__.type,
+    )
+
+
+async def update_page(
+    request: Request,
+    path: str = Field(...),
+    payload: dict[str, Any] = Body(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> PartialPage:
+
+    async with app.uow as uow:
+        path = path.strip("/")
+        page = await uow.pages.by_path(f"/{path}")
+
+    if page.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
+        )
+    p = page.unwrap()
+
+    cmd = UpdatePage(
+        id=p.id,
+        payload=payload,
+    )
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+    async with app.uow as uow:
+        page = await app.bus.handle(cmd, uow)
+
     return PartialPage(
         slug=p.slug,
         title=p.title,

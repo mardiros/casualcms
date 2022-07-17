@@ -1,4 +1,4 @@
-from typing import Any, Mapping
+from typing import Any, Mapping, cast
 
 import pytest
 from fastapi.testclient import TestClient
@@ -6,6 +6,7 @@ from fastapi.testclient import TestClient
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
 from casualcms.service.unit_of_work import AbstractUnitOfWork
+from tests.unittests.fixtures import RootPage
 
 
 async def test_api_create_page_unauthenticated(
@@ -159,3 +160,73 @@ async def test_get_page(
         },
     )
     assert resp.json() == params["response"]
+
+
+async def test_update_home_page_content(
+    client: TestClient,
+    authntoken: AuthnToken,
+    home_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    payload = {
+        "slug": "new-home",
+        "title": "new title",
+        "description": "new description",
+        "hero_title": "New hero title",
+        "body": [{"body": "my new body"}],
+    }
+    resp = client.patch(
+        f"/api/pages/{home_page.path}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=payload,
+    )
+    assert resp.json() == {
+        "path": "/new-home",
+        "type": "tests.unittests.fixtures:RootPage",
+        "slug": "new-home",
+        "title": "new title",
+    }
+    async with uow as uow:
+        saved_home = cast(
+            RootPage,
+            (await uow.pages.by_path("/new-home")).unwrap(),
+        )
+    assert saved_home.slug == "new-home"
+    assert saved_home.title == payload["title"]
+    assert saved_home.description == payload["description"]
+    assert saved_home.hero_title == payload["hero_title"]
+    assert saved_home.body == payload["body"]
+
+
+async def test_update_sub_page_content(
+    client: TestClient,
+    authntoken: AuthnToken,
+    sub_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    payload = {
+        "slug": "new-slug",
+        "title": "new title",
+    }
+    resp = client.patch(
+        f"/api/pages/{sub_page.path}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=payload,
+    )
+    assert resp.json() == {
+        "path": "/home/new-slug",
+        "type": "casual:CategoryPage",
+        "slug": "new-slug",
+        "title": "new title",
+    }
+    async with uow as uow:
+        saved_home = cast(
+            RootPage,
+            (await uow.pages.by_path("/home/new-slug")).unwrap(),
+        )
+    assert saved_home.slug == "new-slug"
+    assert saved_home.title == payload["title"]

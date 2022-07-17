@@ -19,13 +19,21 @@ class AbstractPageRepository(AbstractRepository):
     seen: set[Page]
 
     @abc.abstractmethod
+    async def by_id(self, id: str) -> PageRepositoryResult:
+        """Fetch one page by its unique id."""
+
+    @abc.abstractmethod
     async def by_path(self, path: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""
 
     @abc.abstractmethod
     async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
-        """Fetch one page by its unique path."""
+        """Fetch child pages of a page identified by its path."""
 
     @abc.abstractmethod
     async def add(self, model: Page) -> None:
+        """Append a new model to the repository."""
+
+    @abc.abstractmethod
+    async def update(self, model: Page) -> None:
         """Append a new model to the repository."""

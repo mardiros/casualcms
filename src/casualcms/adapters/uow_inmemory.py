@@ -50,6 +50,14 @@ class PageInMemoryRepository(AbstractPageRepository):
     def __init__(self) -> None:
         self.seen = set()
 
+    async def by_id(self, id: str) -> PageRepositoryResult:
+        """Fetch one page by its unique path."""
+        for page in self.pages.values():
+            if page.id == id:
+                return Ok(page)
+
+        return Err(PageRepositoryError.page_not_found)
+
     async def by_path(self, path: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""
         if path in self.pages:
@@ -70,6 +78,11 @@ class PageInMemoryRepository(AbstractPageRepository):
         return Ok(ret)
 
     async def add(self, model: Page) -> None:
+        """Append a new model to the repository."""
+        self.seen.add(model)
+        self.pages[model.path] = model
+
+    async def update(self, model: Page) -> None:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model

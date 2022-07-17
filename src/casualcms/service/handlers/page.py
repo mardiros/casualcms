@@ -1,4 +1,4 @@
-from casualcms.domain.messages.commands import CreatePage
+from casualcms.domain.messages.commands import CreatePage, UpdatePage
 from casualcms.domain.model.page import Page, resolve_type
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -13,3 +13,18 @@ async def create_page(
     page = tpage(created_at=cmd.created_at, **cmd.payload)
     await uow.pages.add(page)
     return page
+
+
+@listen
+async def update_page(
+    cmd: UpdatePage,
+    uow: AbstractUnitOfWork,
+) -> Page:
+
+    async with uow as uow:
+        page = await uow.pages.by_id(cmd.id)
+    p = page.unwrap()
+    for key, val in cmd.payload.items():
+        setattr(p, key, val)
+    await uow.pages.update(p)
+    return p

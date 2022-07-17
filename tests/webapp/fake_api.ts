@@ -4,6 +4,7 @@ import {
   PartialPageTemplate,
   PageTemplate,
   PartialPage,
+  Page,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -93,20 +94,13 @@ class FakePageApi implements IPageApi {
   async showPage(
     authntoken: string,
     path: string | null
-  ): Promise<Result<PartialPage, Map<string, string>>> {
-    let pages: PartialPage[] = [];
+  ): Promise<Result<Page, Map<string, string>>> {
+    let pages: Page[] = [];
     this.pages
       .filter((page) => {
         return page.path == path;
       })
-      .map((page) =>
-        pages.push({
-          slug: page.slug,
-          title: page.title,
-          path: page.path,
-          type: "casual:HomePage",
-        })
-      );
+      .map((page) => pages.push(page));
     if (pages.length) {
       return ok(pages[0]);
     } else {

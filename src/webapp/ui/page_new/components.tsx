@@ -39,7 +39,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
     }
     loadTemplate();
     return function cleanup() {};
-  }, []);
+  }, [tpltype]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;

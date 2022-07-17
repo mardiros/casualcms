@@ -3,7 +3,7 @@ import { Result, ok, err } from "neverthrow";
 import { ApiError, IPageApi } from "casualcms/domain/ports";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
-import { PartialPage } from "casualcms/domain/model";
+import { PartialPage, Page } from "casualcms/domain/model";
 
 export class PageApi extends BaseFetchApi implements IPageApi {
   async createPage(
@@ -36,7 +36,7 @@ export class PageApi extends BaseFetchApi implements IPageApi {
   async showPage(
     authntoken: string,
     path: string
-  ): Promise<Result<PartialPage, ApiError>> {
+  ): Promise<Result<Page, ApiError>> {
     const response = await this.fetch(`/api/pages/${path}`, {
       method: "GET",
       headers: {
@@ -48,7 +48,7 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     if (!response.ok) {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
-    return ok(jsonData as PartialPage);
+    return ok(jsonData as Page);
   }
   async listPages(
     authntoken: string,

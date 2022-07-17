@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { PartialPage } from "../../casualcms/domain/model";
+import { Page, PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 
@@ -85,14 +85,14 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   if (isLoading) {
     return <Loader label="Loading pages list" />;
   }
   if (error) {
-    return <ApiErrorUI error={error} />
+    return <ApiErrorUI error={error} />;
   }
   return (
     <TableContainer>
@@ -116,7 +116,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
 };
 
 type PageListButtonsProps = {
-  curPage: PartialPage | null;
+  curPage: Page | null;
 };
 
 export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
@@ -145,7 +145,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
-  const [curPage, setCurPage] = React.useState<PartialPage | null>(null);
+  const [curPage, setCurPage] = React.useState<Page | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [params, setParams] = useSearchParams();
@@ -156,22 +156,22 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadCurPage();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   React.useEffect(() => {
     async function loadSubPages() {
-      let page: Result<PartialPage, ApiError>;
+      let page: Result<Page, ApiError>;
       if (parentPath) {
         page = await config.api.page.showPage(token, parentPath);
         page
-          .map((page: PartialPage) => setCurPage(page))
+          .map((page: Page) => setCurPage(page))
           .mapErr((err: ApiError) => setError(err));
       }
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() { };
+    return function cleanup() {};
   }, [parentPath]);
 
   if (isLoading) {

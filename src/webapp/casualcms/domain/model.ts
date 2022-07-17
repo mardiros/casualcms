@@ -23,3 +23,7 @@ export type PartialPage = {
   path: string;
   type: string;
 };
+
+export type Page = {
+  readonly [k: string]: any;
+};

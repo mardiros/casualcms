@@ -58,14 +58,17 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
 export const waitForLoadingLabel = async (
   spinner_label: string
 ): Promise<boolean> => {
-  const resp = await waitFor((): boolean => {
-    try {
-      let loc = screen.getByText(spinner_label);
-    } catch (e) {
-      return true;
+  const resp = await waitFor(
+    (): boolean => {
+      try {
+        let loc = screen.getByText(spinner_label);
+      } catch (e) {
+        return true;
+      }
+      throw Error(`Spinner ${spinner_label} here`);
     }
-    throw Error(`Spinner ${spinner_label} here`);
-  });
+    // { interval: 25, timeout: 2000 }
+  );
   return resp;
 };
 

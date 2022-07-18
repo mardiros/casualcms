@@ -68,6 +68,30 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(jsonData as PartialPage[]);
   }
+  async updatePage(
+    authntoken: string,
+    path: string,
+    page: Page
+  ): Promise<Result<Page, ApiError>> {
+    console.log(page);
+    const payload = { ...page };
+    delete payload.type;
+    delete payload.path;
+    console.log(payload);
+    const response = await this.fetch(`/api/pages${path}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(jsonData as Page);
+  }
   async deletePage(
     authntoken: string,
     path: string

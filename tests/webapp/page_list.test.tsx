@@ -14,7 +14,7 @@ describe("As a user, I can list pages", () => {
   before(async () => {
     await config.api.page.createPage(
       "",
-      "cacual:HomePage",
+      "casual:HomePage",
       {
         slug: "root",
         title: "Root Page",
@@ -24,7 +24,7 @@ describe("As a user, I can list pages", () => {
     );
     await config.api.page.createPage(
       "",
-      "cacual:HomePage",
+      "casual:HomePage",
       {
         slug: "home",
         title: "Home Page",
@@ -34,7 +34,7 @@ describe("As a user, I can list pages", () => {
     );
     await config.api.page.createPage(
       "",
-      "cacual:SectionPage",
+      "casual:SectionPage",
       {
         slug: "sub0",
         title: "Section Page",
@@ -44,7 +44,7 @@ describe("As a user, I can list pages", () => {
     );
     await config.api.page.createPage(
       "",
-      "cacual:SectionPage",
+      "casual:SectionPage",
       {
         slug: "sub1",
         title: "Another Section Page",
@@ -84,7 +84,7 @@ describe("As a user, I can list pages", () => {
 
     let link = screen.getByText("Edit", { exact: false });
     expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/page/edit/home");
+    expect(link.getAttribute("href")).equal("/admin/page/edit?page=%2Fhome");
 
     link = screen.getByText("View", { exact: false });
     expect(link).not.equal(undefined);

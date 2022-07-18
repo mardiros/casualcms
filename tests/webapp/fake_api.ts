@@ -46,31 +46,55 @@ class FakeTemplateApi implements ITemplateApi {
     authntoken: string,
     tpltype: string
   ): Promise<Result<PageTemplate, ApiError>> {
-    if (tpltype != "casual:HomePage") {
-      let m = new Map();
-      m.set("detail", `${tpltype} is undefined`);
-      return err(m);
-    }
-    return ok({
-      uiSchema: {
-        id: { "ui:widget": "hidden" },
-        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
-        title: { "ui:widget": "text", "ui:placeholder": "title" },
-        body: { "ui:widget": "text", "ui:placeholder": "body" },
-      },
-      schema: {
-        title: "HomePage",
-        type: "object",
-        properties: {
-          id: { title: "Id", type: "string" },
-          slug: { title: "Slug", type: "string" },
-          title: { title: "Title", type: "string" },
-          body: { title: "Body", type: "string" },
+    if (tpltype == "casual:HomePage") {
+      return ok({
+        uiSchema: {
+          id: { "ui:widget": "hidden" },
+          slug: { "ui:widget": "text", "ui:placeholder": "slug" },
+          title: { "ui:widget": "text", "ui:placeholder": "title" },
+          body: { "ui:widget": "text", "ui:placeholder": "body" },
         },
-        required: ["id", "slug", "title", "body"],
-        definitions: {},
-      },
-    });
+        schema: {
+          title: "HomePage",
+          type: "object",
+          properties: {
+            id: { title: "Id", type: "string" },
+            slug: { title: "Slug", type: "string" },
+            title: { title: "Title", type: "string" },
+            body: { title: "Body", type: "string" },
+          },
+          required: ["id", "slug", "title", "body"],
+          definitions: {},
+        },
+      });
+    }
+
+    if (tpltype == "casual:SectionPage") {
+      return ok({
+        uiSchema: {
+          id: { "ui:widget": "hidden" },
+          slug: { "ui:widget": "text", "ui:placeholder": "slug" },
+          title: { "ui:widget": "text", "ui:placeholder": "title" },
+          description: { "ui:widget": "text", "ui:placeholder": "description" },
+        },
+        schema: {
+          title: "HomePage",
+          type: "object",
+          properties: {
+            id: { title: "Id", type: "string" },
+            slug: { title: "Slug", type: "string" },
+            title: { title: "Title", type: "string" },
+            description: { title: "Description", type: "string" },
+          },
+          required: ["id", "slug", "title"],
+          definitions: {},
+        },
+      });
+    }
+
+    let m = new Map();
+    m.set("detail", `${tpltype} is undefined`);
+    return err(m);
   }
 }
 
@@ -86,6 +110,7 @@ class FakePageApi implements IPageApi {
     payload: any,
     parent: string | null
   ): Promise<Result<boolean, Map<string, string>>> {
+    payload["type"] = type;
     payload["path"] = `${parent || ""}/${payload.slug}`;
     this.pages.push(payload);
     return ok(true);
@@ -105,7 +130,9 @@ class FakePageApi implements IPageApi {
       return ok(pages[0]);
     } else {
       // FIXME
-      return err(new Map());
+      const errors = new Map();
+      errors.set("page", "Page does not exists");
+      return err(errors);
     }
   }
   async listPages(
@@ -130,6 +157,29 @@ class FakePageApi implements IPageApi {
         })
       );
     return ok(pages);
+  }
+  async updatePage(
+    authntoken: string,
+    path: string,
+    page: Page
+  ): Promise<Result<Page, ApiError>> {
+    let oldPage: any | null = null;
+    const pages: any[] = [];
+    this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
+    if (pages.length) {
+      const newPage = { ...oldPage, ...page };
+      const newPath: string[] = newPage.path.split("/");
+      newPath[newPath.length - 1] = page.slug;
+      newPage.path = newPath.join("/");
+      pages.push(newPage);
+      this.pages = pages;
+      return ok(newPage);
+    } else {
+      // FIXME
+      return err(new Map());
+    }
+
+    return ok(page);
   }
   async deletePage(
     authntoken: string,

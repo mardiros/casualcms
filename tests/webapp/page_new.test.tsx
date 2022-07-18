@@ -7,7 +7,7 @@ import { PageList } from "../../src/webapp/ui/page_list/components";
 import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 
-describe("As a user, I can create the root template", () => {
+describe("As a user, I can create the root page", () => {
   it("Create the root page from the web form", async () => {
     renderWithRouter(
       <>
@@ -47,7 +47,7 @@ describe("As a user, I can create the root template", () => {
 
     const edits = screen.getAllByText("Edit", { exact: false });
     expect(edits.length).equal(2);
-    expect(edits[1].getAttribute("href")).equal("/admin/page/edit/home");
+    expect(edits[1].getAttribute("href")).equal("/admin/page/edit?page=%2Fhome");
 
     await config.api.page.deletePage("", "/home");
   });

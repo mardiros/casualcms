@@ -21,6 +21,7 @@ import { TemplateList } from "./ui/page_template/components";
 import { PageList } from "./ui/page_list/components";
 import { PageNew } from "./ui/page_new/components";
 import { HomePage } from "./ui/home/components";
+import { PageEdit } from "./ui/page_edit/components";
 
 export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   let auth = useAuth();
@@ -68,16 +69,11 @@ const Layout: React.FunctionComponent<{}> = () => {
                     element={<PageNew />}
                     caseSensitive
                   />
-                  {/* <Route
-                    path="page/edit/"
+                  <Route
+                    path="page/edit"
                     element={<PageEdit />}
                     caseSensitive
-                  /> */}
-                  {/* <Route
-                    path="page/edit/:parentPath*"
-                    element={<PageEdit />}
-                    caseSensitive
-                  /> */}
+                  />
                   <Route path="*" element={<PageNotFound />} />
                 </Routes>
               </RequireAuth>

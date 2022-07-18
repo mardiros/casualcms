@@ -42,7 +42,9 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
     <Tr>
       <Td>{page.title}</Td>
       <Td>
-        <Link to={`/admin/page/edit${page.path}`}>
+        <Link
+          to={`/admin/page/edit?${new URLSearchParams({ page: page.path })}`}
+        >
           <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Link>
@@ -175,7 +177,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   }, [parentPath]);
 
   if (isLoading) {
-    return <Loader label="Loading page" />;
+    return <Loader label="Loading pages" />;
   }
   return (
     <Box>

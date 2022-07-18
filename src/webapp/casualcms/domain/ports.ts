@@ -41,6 +41,11 @@ export interface IPageApi {
     parent: string | null
   ): Promise<Result<PartialPage[], ApiError>>;
   showPage(authntoken: string, path: string): Promise<Result<Page, ApiError>>;
+  updatePage(
+    authntoken: string,
+    path: string,
+    page: Page
+  ): Promise<Result<Page, ApiError>>;
   deletePage(
     authntoken: string,
     path: string

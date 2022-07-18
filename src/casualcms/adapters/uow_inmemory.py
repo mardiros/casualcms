@@ -85,6 +85,13 @@ class PageInMemoryRepository(AbstractPageRepository):
     async def update(self, model: Page) -> None:
         """Append a new model to the repository."""
         self.seen.add(model)
+        k = None
+        for key, page in self.pages.items():
+            if page.id == model.id:
+                k = key
+                break
+        if k:
+            del self.pages[k]
         self.pages[model.path] = model
 
 

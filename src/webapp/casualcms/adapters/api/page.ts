@@ -73,11 +73,11 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     path: string,
     page: Page
   ): Promise<Result<Page, ApiError>> {
-    console.log(page);
+    // console.log(page);
     const payload = { ...page };
     delete payload.type;
     delete payload.path;
-    console.log(payload);
+    // console.log(payload);
     const response = await this.fetch(`/api/pages${path}`, {
       method: "PATCH",
       headers: {

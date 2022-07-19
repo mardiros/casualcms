@@ -40,11 +40,11 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
         return;
       }
       const template = await config.api.template.showTemplate(token, page.type);
-      console.log(template);
+      // console.log(template);
       template
         .map((tpl: PageTemplate) => setTemplate(tpl))
         .mapErr((err: ApiError) => setError(err));
-      console.log("setIsLoading");
+      // console.log("setIsLoading");
       setIsLoading(false);
     }
     if (page) {

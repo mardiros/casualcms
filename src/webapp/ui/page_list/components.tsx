@@ -153,7 +153,6 @@ export const PageList: React.FunctionComponent<{}> = () => {
   const [params, setParams] = useSearchParams();
   const parentPath = params.get("parent");
 
-
   React.useEffect(() => {
     async function loadCurPage() {
       let page: Result<Page, ApiError>;
@@ -166,7 +165,11 @@ export const PageList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadCurPage();
-    return () => { setCurPage(null); setError(null); setIsLoading(true); };
+    return () => {
+      setCurPage(null);
+      setError(null);
+      setIsLoading(true);
+    };
   }, [parentPath]);
 
   if (isLoading) {

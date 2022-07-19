@@ -47,7 +47,9 @@ describe("As a user, I can create the root page", () => {
 
     const edits = screen.getAllByText("Edit", { exact: false });
     expect(edits.length).equal(2);
-    expect(edits[1].getAttribute("href")).equal("/admin/page/edit?page=%2Fhome");
+    expect(edits[1].getAttribute("href")).equal(
+      "/admin/page/edit?page=%2Fhome"
+    );
 
     await config.api.page.deletePage("", "/home");
   });

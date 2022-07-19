@@ -50,7 +50,11 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     if (page) {
       loadTemplate();
     }
-    return () => { setTemplate(null); setError(null); setIsLoading(true) };
+    return () => {
+      setTemplate(null);
+      setError(null);
+      setIsLoading(true);
+    };
   }, [page]);
 
   React.useEffect(() => {
@@ -62,7 +66,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
     }
     loadPage();
-    return () => { setPage(null); setError(null); };
+    return () => {
+      setPage(null);
+      setError(null);
+    };
   }, [pagePath]);
 
   const onsubmit = async (data: any) => {

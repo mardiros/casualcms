@@ -38,7 +38,11 @@ export const PageNew: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadTemplate();
-    return () => { setIsLoading(true); setError(null); setTemplate(null) };
+    return () => {
+      setIsLoading(true);
+      setError(null);
+      setTemplate(null);
+    };
   }, [tpltype]);
 
   if (isLoading) {

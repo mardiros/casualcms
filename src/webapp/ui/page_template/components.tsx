@@ -85,7 +85,11 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadTemplates();
-    return () => { setIsLoading(true); setError(null); setTemplates([]) };
+    return () => {
+      setIsLoading(true);
+      setError(null);
+      setTemplates([]);
+    };
   }, []);
   return (
     <Box>

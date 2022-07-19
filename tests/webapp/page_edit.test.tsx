@@ -79,9 +79,7 @@ describe("As a user, I can edit existing pages", () => {
 
     input = screen.getByLabelText("Description", { exact: false });
     expect(input.getAttribute("value")).equal("first section");
-
   });
-
 
   it("Load the root page in an edition form", async () => {
     renderWithRouter(
@@ -108,9 +106,6 @@ describe("As a user, I can edit existing pages", () => {
 
     const page = await config.api.page.showPage("", "/home");
     expect(page.isOk()).equal(true);
-    expect(page.unwrapOr({"title": ""}).title).equal("New Value");
-
+    expect(page.unwrapOr({ title: "" }).title).equal("New Value");
   });
-
-
 });

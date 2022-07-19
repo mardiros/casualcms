@@ -153,16 +153,9 @@ export const PageList: React.FunctionComponent<{}> = () => {
   const [params, setParams] = useSearchParams();
   const parentPath = params.get("parent");
 
-  React.useEffect(() => {
-    async function loadCurPage() {
-      setIsLoading(false);
-    }
-    loadCurPage();
-    return function cleanup() {};
-  }, [parentPath]);
 
   React.useEffect(() => {
-    async function loadSubPages() {
+    async function loadCurPage() {
       let page: Result<Page, ApiError>;
       if (parentPath) {
         page = await config.api.page.showPage(token, parentPath);
@@ -172,8 +165,8 @@ export const PageList: React.FunctionComponent<{}> = () => {
       }
       setIsLoading(false);
     }
-    loadSubPages();
-    return function cleanup() {};
+    loadCurPage();
+    return () => { setCurPage(null); setError(null); setIsLoading(true); };
   }, [parentPath]);
 
   if (isLoading) {

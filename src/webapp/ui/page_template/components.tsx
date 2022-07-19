@@ -85,7 +85,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
       setIsLoading(false);
     }
     loadTemplates();
-    return function cleanup() {};
+    return () => { setIsLoading(true); setError(null); setTemplates([]) };
   }, []);
   return (
     <Box>

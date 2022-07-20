@@ -6,7 +6,7 @@ from fastapi.testclient import TestClient
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.unittests.fixtures import RootPage
+from tests.casualblog.models import HomePage
 
 
 async def test_api_create_page_unauthenticated(
@@ -15,7 +15,7 @@ async def test_api_create_page_unauthenticated(
     resp = client.post(
         "/api/pages",
         headers={},
-        json={"type": "tests.unittests.fixtures:RootPage", "payload": {}},
+        json={"type": "blog:HomePage", "payload": {}},
     )
     # XXX Fast api is raising a 403, should be a 401 to me
     assert resp.status_code == 403
@@ -31,7 +31,7 @@ async def test_api_create_page(
             "Authorization": f"Bearer {authntoken.token}",
         },
         json={
-            "type": "tests.unittests.fixtures:RootPage",
+            "type": "blog:HomePage",
             "payload": {
                 "id": "abc",
                 "slug": "index",
@@ -88,13 +88,14 @@ async def test_create_subpage(
             "Authorization": f"Bearer {authntoken.token}",
         },
         json={
-            "type": "casual:CategoryPage",
+            "type": "blog:CategoryPage",
             "parent": "/home",
             "payload": {
                 "id": "abcd",
                 "slug": "test",
                 "title": "sub Page",
                 "description": "A sub page",
+                "hero_title": "A sub page",
             },
         },
     )
@@ -107,6 +108,8 @@ async def test_create_subpage(
             "slug": "test",
             "title": "sub Page",
             "description": "A sub page",
+            "hero_title": "A sub page",
+            "intro": None,
         }
 
     async with uow as uow:
@@ -118,6 +121,8 @@ async def test_create_subpage(
                 "slug": "test",
                 "title": "sub Page",
                 "description": "A sub page",
+                "hero_title": "A sub page",
+                "intro": None,
             }
         ]
 
@@ -128,7 +133,7 @@ async def test_create_subpage(
         {
             "path": "/api/pages/home",
             "response": {
-                "type": "tests.unittests.fixtures:RootPage",
+                "type": "blog:HomePage",
                 "path": "/home",
                 "slug": "home",
                 "title": "hello world - casualcms",
@@ -143,8 +148,10 @@ async def test_create_subpage(
                 "path": "/home/sub",
                 "slug": "sub",
                 "title": "a sub page",
-                "type": "casual:CategoryPage",
+                "type": "blog:CategoryPage",
                 "description": "I am so glad to be a sub page",
+                "hero_title": "a sub page",
+                "intro": None,
             },
         },
     ],
@@ -191,7 +198,7 @@ async def test_update_home_page_content(
     )
     assert resp.json() == {
         "path": "/new-home",
-        "type": "tests.unittests.fixtures:RootPage",
+        "type": "blog:HomePage",
         "id": home_page.id,
         "slug": "new-home",
         "title": "new title",
@@ -201,7 +208,7 @@ async def test_update_home_page_content(
     }
     async with uow as uow:
         saved_home = cast(
-            RootPage,
+            HomePage,
             (await uow.pages.by_path("/new-home")).unwrap(),
         )
     assert saved_home.slug == "new-home"
@@ -231,14 +238,16 @@ async def test_update_sub_page_content(
     assert resp.json() == {
         "path": "/home/new-slug",
         "id": sub_page.id,
-        "type": "casual:CategoryPage",
+        "type": "blog:CategoryPage",
         "slug": "new-slug",
         "title": "new title",
         "description": "I am so glad to be a sub page",
+        "hero_title": "a sub page",
+        "intro": None,
     }
     async with uow as uow:
         saved_home = cast(
-            RootPage,
+            HomePage,
             (await uow.pages.by_path("/home/new-slug")).unwrap(),
         )
     assert saved_home.slug == "new-slug"

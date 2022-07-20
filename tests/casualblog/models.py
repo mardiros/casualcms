@@ -10,7 +10,14 @@ class Paragraph(BaseModel):
     body: str = Field(widget="textarea")
 
 
-class HomePage(Page):
+class AbstractPage(Page):
+    hero_title: str = Field(description="Title of the hero section")
+
+    class Meta:
+        abstract = True
+
+
+class HomePage(AbstractPage):
     body: list[Paragraph] = []
 
     class Meta:
@@ -19,9 +26,9 @@ class HomePage(Page):
         type = "blog:HomePage"
 
 
-class CategoryPage(Page):
+class CategoryPage(AbstractPage):
 
-    intro: Paragraph = Field()
+    intro: Optional[Paragraph] = Field()
 
     class Meta:
         parent_types = [HomePage]
@@ -29,9 +36,9 @@ class CategoryPage(Page):
         template = "category.jinja2"
 
 
-class SectionPage(Page):
+class SectionPage(AbstractPage):
 
-    intro: Paragraph = Field()
+    intro: Optional[Paragraph] = Field()
 
     class Meta:
         parent_types = [HomePage]
@@ -39,7 +46,7 @@ class SectionPage(Page):
         template = "section.jinja2"
 
 
-class BlogPage(Page):
+class BlogPage(AbstractPage):
 
     body: list[Paragraph] = []
 

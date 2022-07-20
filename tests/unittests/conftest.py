@@ -18,7 +18,7 @@ from casualcms.domain.model.account import Account
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.functionals.casualblog.models import HomePage
+from tests.casualblog.models import HomePage
 
 
 @pytest.fixture()
@@ -101,7 +101,7 @@ async def home_page(
     async with uow as uow:
         page = await messagebus.handle(
             CreatePage(
-                type="tests.unittests.fixtures:RootPage",
+                type="blog:HomePage",
                 payload={
                     "id": generate_id(),
                     "slug": "home",
@@ -125,13 +125,14 @@ async def sub_page(
     async with uow as uow:
         page = await messagebus.handle(
             CreatePage(
-                type="casual:CategoryPage",
+                type="blog:CategoryPage",
                 payload={
                     "id": generate_id(),
                     "parent": home_page,
                     "slug": "sub",
                     "title": "a sub page",
                     "description": "I am so glad to be a sub page",
+                    "hero_title": "a sub page",
                 },
             ),
             uow,

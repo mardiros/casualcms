@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
 
-from .fixtures import RootPage
+from ..casualblog.models import HomePage
 
 
 async def test_list_template(client: TestClient, authntoken: AuthnToken):
@@ -15,8 +15,7 @@ async def test_list_template(client: TestClient, authntoken: AuthnToken):
     )
     # assert resp.status_code == 200
     assert resp.json() == [
-        {"type": "blog:HomePage"},  # FIXME: functiona tests should not leak here
-        {"type": "tests.unittests.fixtures:RootPage"},
+        {"type": "blog:HomePage"},
     ]
 
 
@@ -24,21 +23,21 @@ async def test_list_template_for_childs(client: TestClient, authntoken: AuthnTok
 
     resp = client.get(
         "/api/templates",
-        params={"type": "tests.unittests.fixtures:RootPage"},
+        params={"type": "blog:HomePage"},
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
     # assert resp.status_code == 200
     assert resp.json() == [
-        {"type": "casual:CategoryPage"},
-        {"type": "casual:SectionPage"},
+        {"type": "blog:CategoryPage"},
+        {"type": "blog:SectionPage"},
     ]
 
 
 async def test_show_template(client: TestClient, authntoken: AuthnToken):
     resp = client.get(
-        f"/api/templates/{RootPage.__meta__.type}",
+        f"/api/templates/{HomePage.__meta__.type}",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
@@ -83,7 +82,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["id", "slug", "title", "description", "hero_title"],
-            "title": "RootPage",
+            "title": "HomePage",
             "type": "object",
         },
         "uiSchema": {

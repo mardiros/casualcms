@@ -5,11 +5,17 @@ import pytest
 from casualcms.domain.model import AbstractPageError, get_available_subtypes
 from casualcms.domain.model.page import UnregisterType, resolve_type
 
-from .fixtures import AbstractPage, BlogPage, CategoryPage, RootPage, SectionPage
+from ..casualblog.models import (
+    AbstractPage,
+    BlogPage,
+    CategoryPage,
+    HomePage,
+    SectionPage,
+)
 
 
 def test_page_metadata():
-    page = RootPage(
+    page = HomePage(
         id="a",
         slug="",
         title="awesome",
@@ -17,9 +23,9 @@ def test_page_metadata():
         hero_title="You are awesome",
         body=[{"body": "Hello!"}],
     )
-    assert page.get_template() == "page.jinja2"
+    assert page.get_template() == "homepage.jinja2"
     assert page.__meta__.abstract is False
-    assert page.__meta__.type == "tests.unittests.fixtures:RootPage"
+    assert page.__meta__.type == "blog:HomePage"
 
 
 def test_page_abstract_raise():
@@ -30,13 +36,12 @@ def test_page_abstract_raise():
             title="awesome",
             description="",
             hero_title="You are awesome",
-            body=[{"body": "Hello!"}],
         )
     assert str(context.value) == "Page AbstractPage is abstract"
 
 
 def test_page_tree():
-    page = RootPage(
+    page = HomePage(
         id="a",
         slug="index",
         title="awesome",
@@ -71,19 +76,18 @@ def test_page_tree():
 
 def test_page_types():
     pages = get_available_subtypes(None)
-    from tests.functionals.casualblog.models import HomePage  # FIXME shoud not leak
 
-    assert pages == {HomePage, RootPage}
+    assert pages == {HomePage}
 
-    pages = get_available_subtypes(RootPage)
+    pages = get_available_subtypes(HomePage)
     assert pages == {CategoryPage, SectionPage}
 
 
 @pytest.mark.parametrize(
     "params",
     [
-        {"name": "tests.unittests.fixtures:RootPage", "class": RootPage},
-        {"name": "casual:SectionPage", "class": SectionPage},
+        {"name": "blog:HomePage", "class": HomePage},
+        {"name": "blog:SectionPage", "class": SectionPage},
     ],
 )
 def test_resolve_type(params: Dict[str, Any]):
@@ -93,5 +97,5 @@ def test_resolve_type(params: Dict[str, Any]):
 
 def test_resolve_type_error():
     with pytest.raises(UnregisterType) as ctx:
-        resolve_type("casual:sectionpage")
-    assert str(ctx.value) == "Unregistered type casual:sectionpage"
+        resolve_type("blog:sectionpage")
+    assert str(ctx.value) == "Unregistered type blog:sectionpage"

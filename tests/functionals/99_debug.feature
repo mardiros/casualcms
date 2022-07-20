@@ -7,6 +7,7 @@ Feature: As a developper, I want a browser open with a session
     And I click on the "blog:HomePage" link
     And I fill the field "slug" with "home"
     And I fill the field "title" with "welcome home"
+    And I fill the field "hero_title" with "welcome home bro!"
     And I fill the field "description" with "there is not place like home"
     # First paragraph
     And I click on the "Add Item" button

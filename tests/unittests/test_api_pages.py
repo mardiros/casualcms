@@ -163,6 +163,9 @@ async def test_get_page(
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
+    params["response"]["id"] = (
+        home_page.id if params["response"]["slug"] == "home" else sub_page.id
+    )
     assert resp.json() == params["response"]
 
 
@@ -189,6 +192,7 @@ async def test_update_home_page_content(
     assert resp.json() == {
         "path": "/new-home",
         "type": "tests.unittests.fixtures:RootPage",
+        "id": home_page.id,
         "slug": "new-home",
         "title": "new title",
         "body": [{"body": "my new body"}],
@@ -226,6 +230,7 @@ async def test_update_sub_page_content(
     )
     assert resp.json() == {
         "path": "/home/new-slug",
+        "id": sub_page.id,
         "type": "casual:CategoryPage",
         "slug": "new-slug",
         "title": "new title",

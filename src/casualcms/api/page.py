@@ -108,7 +108,7 @@ async def update_page(
     payload: dict[str, Any] = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
-) -> PartialPage:
+) -> Any:
 
     async with app.uow as uow:
         path = path.strip("/")
@@ -128,6 +128,6 @@ async def update_page(
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.account_id
     async with app.uow as uow:
-        page = await app.bus.handle(cmd, uow)
+        upage = await app.bus.handle(cmd, uow)
 
-    return page.get_data_context()
+    return upage.get_data_context()

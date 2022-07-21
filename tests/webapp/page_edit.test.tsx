@@ -8,7 +8,6 @@ import {
   renderWithRouter,
   waitForLoadingLabel,
   waitForPath,
-  waitForTitle,
 } from "./helpers";
 import config from "./config";
 

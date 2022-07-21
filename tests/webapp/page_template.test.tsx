@@ -6,7 +6,7 @@ import {
   TemplateList,
   TemplateTable,
 } from "../../src/webapp/ui/page_template/components";
-import { renderWithRouter, waitForLoadingLabel, waitForTitle } from "./helpers";
+import { renderWithRouter, waitForLoadingLabel } from "./helpers";
 
 describe("As a user, I can choose a root templates type", () => {
   it("render a spinner while loading", async () => {

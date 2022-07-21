@@ -4,8 +4,6 @@ import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
 import {
   renderWithRouter,
-  waitForPath,
-  waitForTitle,
   waitForLoadingLabel,
 } from "./helpers";
 import config from "./config";
@@ -16,7 +14,7 @@ import { PageList } from "../../src/webapp/ui/page_list/components";
 describe("As a user, I have to create a first root template", () => {
   it("display onboarding message", async () => {
     renderWithRouter(<Route path="/" element={<HomePage />} />, "/");
-    await waitForTitle("Welcome bob!");
+    await screen.findByText("Welcome bob!");
     let link = screen.getByText("Create my first page");
     expect(link).not.equal(undefined);
     expect(link.getAttribute("href")).equal("/admin/page/new");

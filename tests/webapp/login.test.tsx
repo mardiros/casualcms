@@ -18,10 +18,7 @@ import config from "./config";
 import {
   waitForPath,
   LocationDisplay,
-  waitForTitle,
-  renderWithRouter,
 } from "./helpers";
-import { HomePage } from "../../src/webapp/ui/home/components";
 
 export const renderLogin = async (): Promise<RenderResult> => {
   let ret = render(
@@ -74,7 +71,7 @@ describe("As a user, I can login to the app", () => {
     let button = screen.getByText("Sign In");
     expect(button).not.equal(null);
     fireEvent.click(button);
-    const title = await waitForTitle("Invalid username or password");
+    const title = await screen.findByText("Invalid username or password");
     expect(title.nodeName).equal("DIV");
   });
 
@@ -94,7 +91,7 @@ describe("As a user, I can login to the app", () => {
     expect(button).not.equal(null);
     fireEvent.click(button);
 
-    const title = await waitForTitle("Welcome bob");
+    const title = await screen.findByText("Welcome bob");
     expect(title.nodeName).equal("DIV");
   });
 
@@ -109,7 +106,7 @@ describe("As a user, I can login to the app", () => {
     await renderLogin();
     await waitForPath("/admin");
 
-    const title = await waitForTitle("Welcome bob");
+    const title = await screen.findByText("Welcome bob");
     expect(title.nodeName).equal("DIV");
   });
 });

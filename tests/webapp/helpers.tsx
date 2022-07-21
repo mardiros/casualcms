@@ -61,38 +61,13 @@ export const waitForLoadingLabel = async (
   const resp = await waitFor(
     (): boolean => {
       try {
-        let loc = screen.getByText(spinner_label);
+        screen.getByText(spinner_label);
       } catch (e) {
         return true;
       }
       throw Error(`Spinner ${spinner_label} here`);
     }
-    // { interval: 25, timeout: 2000 }
   );
-  return resp;
-};
-
-export const waitForTitle = async (title: string): Promise<HTMLElement> => {
-  const resp = await waitFor((): HTMLElement => {
-    let loc = screen.getByText(title);
-
-    if (loc == undefined) {
-      throw Error(`Title not ready: ${loc}`);
-    }
-    return loc;
-  });
-  return resp;
-};
-
-export const waitForLabelText = async (label: string): Promise<HTMLElement> => {
-  const resp = await waitFor((): HTMLElement => {
-    let loc = screen.getByLabelText(label, { exact: false });
-
-    if (loc == undefined) {
-      throw Error(`Location not ready: ${loc}`);
-    }
-    return loc;
-  });
   return resp;
 };
 

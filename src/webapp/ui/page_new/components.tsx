@@ -4,7 +4,7 @@ import { Box } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useAuth } from "../login/components";
+import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 import { PageTemplate } from "../../casualcms/domain/model";

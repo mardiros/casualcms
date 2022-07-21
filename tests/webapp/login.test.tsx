@@ -15,10 +15,7 @@ import {
 } from "../../src/webapp/ui/login/components";
 import { AppContext } from "../../src/webapp/config";
 import config from "./config";
-import {
-  waitForPath,
-  LocationDisplay,
-} from "./helpers";
+import { waitForPath, LocationDisplay } from "./helpers";
 
 export const renderLogin = async (): Promise<RenderResult> => {
   let ret = render(

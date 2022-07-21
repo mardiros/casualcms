@@ -6,7 +6,7 @@ import { render } from "@testing-library/react";
 
 import config from "./config";
 
-import { AuthContext } from "../../src/webapp/ui/login/components";
+import { AuthContext } from "../../src/webapp/ui/login/hooks";
 import { Account } from "../../src/webapp/casualcms/domain/model";
 import { AppContext } from "../../src/webapp/config";
 
@@ -58,16 +58,14 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
 export const waitForLoadingLabel = async (
   spinner_label: string
 ): Promise<boolean> => {
-  const resp = await waitFor(
-    (): boolean => {
-      try {
-        screen.getByText(spinner_label);
-      } catch (e) {
-        return true;
-      }
-      throw Error(`Spinner ${spinner_label} here`);
+  const resp = await waitFor((): boolean => {
+    try {
+      screen.getByText(spinner_label);
+    } catch (e) {
+      return true;
     }
-  );
+    throw Error(`Spinner ${spinner_label} here`);
+  });
   return resp;
 };
 

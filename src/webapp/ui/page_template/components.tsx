@@ -15,7 +15,7 @@ import { PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
-import { useAuth } from "../login/components";
+import { useAuth } from "../login/hooks";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../loader/components";

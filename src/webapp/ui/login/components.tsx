@@ -9,24 +9,13 @@ import {
   Heading,
   Input,
 } from "@chakra-ui/react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
 import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
 import { ApiError } from "../../casualcms/domain/ports";
 import { Loader } from "../loader/components";
-
-interface IAuthContext {
-  authenticatedUser: Account | null;
-  remember: (account: Account, callback: any) => void;
-  forget: (callback: any) => void;
-}
-
-export const AuthContext = React.createContext<IAuthContext>(null!);
-
-export function useAuth() {
-  return React.useContext(AuthContext);
-}
+import { useAuth, AuthContext } from "./hooks";
 
 export function AuthProvider({
   children,

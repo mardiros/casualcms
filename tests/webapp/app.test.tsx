@@ -4,11 +4,7 @@ import { render, screen } from "@testing-library/react";
 import { App, Body, Header } from "../../src/webapp/App";
 import { AppContext } from "../../src/webapp/config";
 import config from "./config";
-import {
-  waitForPath,
-  LocationDisplay,
-  renderWithRouter,
-} from "./helpers";
+import { waitForPath, LocationDisplay, renderWithRouter } from "./helpers";
 import { Route } from "react-router-dom";
 
 describe("As a user, I view a different homepage when I am authenticated or not", () => {

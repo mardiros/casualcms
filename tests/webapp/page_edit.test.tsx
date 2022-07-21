@@ -4,11 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/page_edit/components";
 import { PageList } from "../../src/webapp/ui/page_list/components";
-import {
-  renderWithRouter,
-  waitForLoadingLabel,
-  waitForPath,
-} from "./helpers";
+import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 
 describe("As a user, I can edit existing pages", () => {

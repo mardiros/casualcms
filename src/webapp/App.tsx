@@ -9,15 +9,10 @@ import {
   Heading,
 } from "@chakra-ui/react";
 import { theme } from "@chakra-ui/theme";
-import {
-  AuthProvider,
-  Login,
-  RequireAuth,
-  useAuth,
-} from "./ui/login/components";
+import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
+import { useAuth } from "./ui/login/hooks";
 import { PageNotFound } from "./ui/error404/components";
 import { TemplateList } from "./ui/page_template/components";
-// import { PageEdit } from "./ui/page_edit/components";
 import { PageList } from "./ui/page_list/components";
 import { PageNew } from "./ui/page_new/components";
 import { HomePage } from "./ui/home/components";

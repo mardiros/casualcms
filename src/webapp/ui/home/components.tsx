@@ -4,7 +4,7 @@ import { PartialPage } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
-import { useAuth } from "../login/components";
+import { useAuth } from "../login/hooks";
 import { Link, Navigate } from "react-router-dom";
 import { Result } from "neverthrow";
 import { Loader } from "../loader/components";

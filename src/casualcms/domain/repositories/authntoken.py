@@ -20,3 +20,7 @@ class AbstractAuthnRepository(AbstractRepository):
     @abc.abstractmethod
     async def add(self, model: AuthnToken) -> None:
         """Append a new model to the repository."""
+
+    @abc.abstractmethod
+    async def remove(self, token: str) -> None:
+        """Delete a new model to the repository."""

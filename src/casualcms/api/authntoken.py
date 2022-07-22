@@ -1,10 +1,12 @@
 from typing import Any
 
-from fastapi import Body, Header, HTTPException, Request
+from fastapi import Body, Depends, Header, HTTPException, Request, Response, status
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreateAuthnToken
+from casualcms.api.base import get_token_info
+from casualcms.domain.messages.commands import CreateAuthnToken, DeleteAuthnToken
 from casualcms.domain.model import Account, AccountStatus
+from casualcms.domain.model.account import AuthnToken
 
 
 async def authenticate(
@@ -50,3 +52,28 @@ async def authenticate(
         "expires_at": cmd.expires_at,
         "lang": authenticated_user.lang,
     }
+
+
+async def logout(
+    request: Request,
+    token: AuthnToken = Depends(get_token_info),
+    user_agent: str = Header(None),
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> Response:
+    client_addr: str = request.client.host
+    cmd = DeleteAuthnToken(
+        token=token.token,
+        account_id=token.account_id,
+        user_agent=user_agent,
+        client_addr=client_addr,
+    )
+    cmd.metadata.clientAddr = client_addr
+    cmd.metadata.userId = token.account_id
+
+    async with app.uow as uow:
+        await app.bus.handle(cmd, uow)
+
+    return Response(
+        "",
+        status_code=status.HTTP_204_NO_CONTENT,
+    )

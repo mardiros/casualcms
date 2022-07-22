@@ -108,6 +108,10 @@ class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
         """Append a new model to the repository."""
         self.tokens[model.token] = model  # type: ignore
 
+    async def remove(self, token: str) -> None:
+        """Delete a new model to the repository."""
+        del self.tokens[token]
+
 
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self) -> None:

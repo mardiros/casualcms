@@ -21,3 +21,12 @@ async def create_authn_token(
     )
     await uow.authn_tokens.add(token)
     return token
+
+
+@listen
+async def delete_authn_token(
+    cmd: commands.DeleteAuthnToken,
+    uow: unit_of_work.AbstractUnitOfWork,
+) -> None:
+    await uow.authn_tokens.remove(cmd.token)
+    return

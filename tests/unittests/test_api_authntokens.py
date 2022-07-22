@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from casualcms.domain.messages.commands import CreateAccount
+from casualcms.domain.model.account import AuthnToken
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -54,3 +55,20 @@ async def test_api_authenticate_success(
         "/api/authntokens", json={"username": "bob", "password": "othersecret"}
     )
     assert resp.status_code == 401
+
+
+def test_api_logout(
+    client: TestClient,
+    authntoken: AuthnToken,
+    uow: AbstractUnitOfWork,
+):
+    assert authntoken.token in uow.authn_tokens.tokens  # type: ignore
+    resp = client.delete(
+        "/api/authntokens",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 204
+    assert resp.text == ""
+    assert authntoken.token not in uow.authn_tokens.tokens  # type: ignore

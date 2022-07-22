@@ -53,6 +53,16 @@ class CreateAuthnToken(Command):
     metadata: Metadata = Metadata(category="user", name="authenticate", schemaVersion=1)
 
 
+class DeleteAuthnToken(Command):
+    token: str = Field(default_factory=generate_secret)
+    account_id: str = Field(...)  # UUID
+    user_agent: str = Field(...)
+    client_addr: str = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(category="user", name="logout", schemaVersion=1)
+
+
 class CreatePage(Command):
     type: str = Field(...)
     payload: dict[str, Any] = Field(...)

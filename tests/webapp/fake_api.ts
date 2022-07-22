@@ -29,6 +29,9 @@ class FakeAccountApi implements IAccountApi {
       username: creds.username,
     });
   }
+  async logout(authntoken: string): Promise<boolean> {
+    return true
+  }
 }
 
 class FakeTemplateApi implements ITemplateApi {

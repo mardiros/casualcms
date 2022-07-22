@@ -21,4 +21,13 @@ export class FetchAccountApi extends BaseFetchApi implements IAccountApi {
     }
     return ok(jsonData as Account);
   }
+  async logout(authntoken: string): Promise<boolean> {
+    await this.fetch("/api/authntokens", {
+      method: "DELETE",
+      headers: {
+        "Authorization": `Bearer ${authntoken}`,
+      },
+    });
+    return true
+  }
 }

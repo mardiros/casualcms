@@ -20,10 +20,12 @@ export const AccountMenu: React.FunctionComponent<AccountMenuProps> = (
 ): React.ReactElement => {
   const config = useConfig();
   const auth = useAuth();
+  const token = auth.authenticatedUser?.token || "";
   const navigate = useNavigate();
   const onClick = () => {
     auth.forget(async () => {
       await config.uow.account.removeCurrent();
+      await config.api.account.logout(token);
       navigate("/admin/login");
     });
   };

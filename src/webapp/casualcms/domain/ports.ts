@@ -16,6 +16,7 @@ export type Credentials = {
 
 export interface IAccountApi {
   byCredentials(creds: Credentials): Promise<Result<Account, ApiError>>;
+  logout(authntoken: string): Promise<boolean>;
 }
 
 export interface ITemplateApi {

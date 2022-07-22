@@ -28,9 +28,9 @@ export function AuthProvider({
     callback();
   };
 
-  let forget = (callback: any) => {
+  let forget = async (callback: () => Promise<boolean>) => {
     setUser(null);
-    callback();
+    await callback();
   };
 
   let value = { authenticatedUser, remember, forget };

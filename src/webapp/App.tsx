@@ -1,12 +1,14 @@
 import React from "react";
-import { BrowserRouter, Navigate, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import {
-  Container,
   Box,
-  ThemeProvider,
+  ButtonGroup,
   ColorModeProvider,
   CSSReset,
+  Flex,
   Heading,
+  Spacer,
+  ThemeProvider,
 } from "@chakra-ui/react";
 import { theme } from "@chakra-ui/theme";
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
@@ -17,14 +19,38 @@ import { PageList } from "./ui/page_list/components";
 import { PageNew } from "./ui/page_new/components";
 import { HomePage } from "./ui/home/components";
 import { PageEdit } from "./ui/page_edit/components";
+import { AccountMenu } from "./ui/account/components";
 
 export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   let auth = useAuth();
-  if (auth.authenticatedUser != null) {
-    return <Link to="/admin">👕 Casual CMS</Link>;
-  } else {
-    return <Link to="/admin/login">Sign In</Link>;
-  }
+  return (
+    <Flex minWidth="max-content" alignItems="center" gap="2">
+      <Box p="2">
+        <Heading size="lg" color="teal.800">
+          <Link to="/admin">👕 Casual CMS</Link>
+        </Heading>
+      </Box>
+      <Spacer />
+      <Box gap="2">
+        {auth.authenticatedUser ? (
+          <AccountMenu username={auth.authenticatedUser.username} />
+        ) : (
+          <Box
+            as="button"
+            borderRadius="md"
+            bg="teal"
+            color="white"
+            px={8}
+            h={8}
+          >
+            <Link to="/admin/login" color="white">
+              Sign In
+            </Link>
+          </Box>
+        )}
+      </Box>
+    </Flex>
+  );
 };
 
 export const Body: React.FunctionComponent<{}> = () => {
@@ -40,11 +66,15 @@ const Layout: React.FunctionComponent<{}> = () => {
   return (
     <>
       <Box w="100%" p={4} bg="teal.300" h="90px">
-        <Heading>
-          <Header />
-        </Heading>
+        <Header />
       </Box>
-      <Box w="100%" p={4} bg="teal.50" minH="calc(100vh - 90px)">
+      <Box
+        w="100%"
+        p={4}
+        bg="teal.50"
+        minH="calc(100vh - 90px)"
+        color="teal.900"
+      >
         <Routes>
           <Route path="login" element={<Login />} caseSensitive />
           <Route

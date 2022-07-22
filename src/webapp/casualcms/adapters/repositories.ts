@@ -54,4 +54,14 @@ export class IndexDBAccountRepository
     await this.db.put("default", account.username as string, "account");
     return true;
   }
+  async removeCurrent(): Promise<boolean> {
+    const account = await this.getCurrent();
+    let ret = false;
+    account.map(async (a: Account) => {
+      await this.db.delete("account", a.username);
+      await this.db.delete("default", "account");
+      ret = true;
+    });
+    return ret;
+  }
 }

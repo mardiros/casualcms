@@ -17,7 +17,6 @@ describe("As a user, I can create the root page", () => {
       "/admin/page/new/casual:HomePage"
     );
 
-    let loc = screen.getByTestId("location-display");
     await waitForLoadingLabel("Loading pages list");
     await waitForLoadingLabel("Loading form...");
 

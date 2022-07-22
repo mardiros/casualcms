@@ -18,6 +18,11 @@ class FakeAccountRepository implements IAccountRepository {
     this.account = ok(model);
     return true;
   }
+
+  async removeCurrent(): Promise<boolean> {
+    this.account = err("Gone");
+    return true;
+  }
 }
 
 class FakeUnitOfWork implements IUnitOfWork {

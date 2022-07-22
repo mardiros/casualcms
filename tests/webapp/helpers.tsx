@@ -34,7 +34,10 @@ export function FakeAuth(props: FakeAuthProps): React.ReactElement {
 
   let [authenticatedUser, setUser] = React.useState<Account | null>(account);
   let remember = (account: Account, callback: any) => {};
-  let forget = (callback: any) => {};
+  let forget = async (callback: () => Promise<boolean>) => {
+    setUser(null);
+    await callback();
+  };
 
   let value = { authenticatedUser, remember, forget };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

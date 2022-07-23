@@ -1,50 +1,10 @@
 import asyncio
 
-from fastapi import FastAPI
 from hypercorn.asyncio import serve
 from hypercorn.config import Config
 
-import casualcms.api
-import casualcms.service.handlers
-import casualcms.ui.backoffice
-import casualcms.ui.frontend
-from casualcms.adapters.fastapi import FastAPIConfigurator
+from casualcms.bootstrap import bootstrap
 from casualcms.config import Settings
-from casualcms.domain.messages.commands import CreateAccount
-
-
-def configure(configurator: FastAPIConfigurator) -> None:
-    # inject routes
-    configurator.scan(casualcms.api, categories=["fastapi"])
-    # last routes that catch all must ending
-    configurator.scan(casualcms.ui.backoffice, categories=["fastapi"])
-    configurator.scan(casualcms.ui.frontend, categories=["fastapi"])
-
-    # configure message bus
-    configurator.scan(casualcms.service.handlers, categories=["messagebus"])
-
-
-async def bootstrap(settings: Settings) -> FastAPI:
-    with FastAPIConfigurator(settings) as configurator:
-        configure(configurator)
-
-    app = configurator.app
-
-    if settings.admin_password:
-        admin = CreateAccount(
-            username=settings.admin_username,
-            password=settings.admin_password,
-            email=settings.admin_email,
-            lang="en",
-        )
-        async with configurator.config.uow as uow:
-            await configurator.config.bus.handle(
-                admin,
-                uow,
-            )
-            await uow.commit()
-
-    return app
 
 
 async def asyncmain(settings: Settings) -> None:

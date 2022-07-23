@@ -4,28 +4,31 @@ version = "0.1.0"
 description = ""
 authors = ["Guillaume Gauvrit <guillaume@gauvr.it>"]
 
+[tool.poetry.scripts]
+casualcms = "casualcms.entrypoint:main"
+
 [tool.poetry.dependencies]
 python = "^3.10"
+bcrypt = "^3.2.0"
 fastapi = "^0.75.0"
-result = "^0.7.0"
-pytest-asyncio = "^0.18.3"
-venusian = "^3.0.0"
 hypercorn = "^0.13.2"
 Jinja2 = "^3.1.1"
-blacksmith = "^1.0.2"
+pytest-asyncio = "^0.18.3"
+result = "^0.7.0"
+venusian = "^3.0.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7"
-mypy = "^0.942"
-flake8 = "^4.0.1"
-black = "^22.1.0"
-isort = "^5.10.1"
-pytest-cov = "^3.0.0"
-types-setuptools = "^57.4.11"
 behave = "^1.2.6"
-selenium = "^4.2.0"
+black = "^22.1.0"
+blacksmith = "^1.0.2"
+flake8 = "^4.0.1"
+isort = "^5.10.1"
+mypy = "^0.942"
+pytest = "^7"
+pytest-cov = "^3.0.0"
 requests = "^2.27.1"
-bcrypt = "^3.2.0"
+selenium = "^4.2.0"
+types-setuptools = "^57.4.11"
 
 [tool.pyright]
 include = ["src", "tests"]

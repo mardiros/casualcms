@@ -12,6 +12,7 @@ from .orm_types import (
     ForeignKey,
     Index,
     Integer,
+    IpAddress,
     MetaData,
     String,
     Table,
@@ -32,4 +33,26 @@ accounts = Table(
     Index("idx_users_username", "username", unique=True),
     Index("idx_users_email", "email", unique=True),
     Index("idx_users_created_at", "created_at", unique=False),
+)
+
+
+authn_tokens = Table(
+    "authn_tokens",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("created_at", DateTime(), nullable=False),
+    Column("token", String(86), nullable=False),
+    Column(
+        "account_id",
+        UUID,
+        ForeignKey("accounts.id", name="fk_authn_tokens_account_id"),
+    ),
+    Column("expires_at", DateTime(), nullable=False),
+    Column("client_addr", IpAddress(), nullable=False),
+    Column("user_agent", CIText, nullable=False),
+    Index("idx_authn_tokens_token", "token", unique=True),
+    Index("idx_authn_tokens_account_id", "account_id", unique=False),
+    Index("idx_authn_tokens_client_addr", "client_addr", unique=False),
+    Index("idx_authn_tokens_expires_at", "expires_at", unique=False),
+    Index("idx_authn_tokens_created_at", "created_at", unique=False),
 )

@@ -1,6 +1,7 @@
 from typing import Optional
 
 from result import Err, Ok
+from sqlalchemy import delete  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 
@@ -27,7 +28,7 @@ from casualcms.domain.repositories.user import (
 )
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from .orm import accounts
+from .orm import accounts, authn_tokens
 
 
 class AccountSQLRepository(AbstractAccountRepository):
@@ -115,27 +116,46 @@ class PageSQLRepository(AbstractPageRepository):
 
 
 class AuthnTokenSQLRepository(AbstractAuthnRepository):
-    tokens: dict[str, AuthnToken] = {}
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
 
     async def by_token(self, token: str) -> AuthnTokenRepositoryResult:
-        """Fetch one user account by its unique username."""
-        if token in self.tokens:
-            return Ok(self.tokens[token])
+        """Fetch given token informations from the given token."""
+        tokens_ = await self.session.execute(  # type: ignore
+            select(authn_tokens).filter_by(token=token).limit(1)
+        )
+        token_: AuthnToken = tokens_.first()  # its a Row actually
+        if token_:
+            return Ok(
+                AuthnToken(
+                    id=token_.id,
+                    token=token_.token,
+                    account_id=token_.account_id,
+                    created_at=token_.created_at,
+                    expires_at=token_.expires_at,
+                    client_addr=token_.client_addr,
+                    user_agent=token_.user_agent,
+                )
+            )
         return Err(AuthnTokenRepositoryError.token_not_found)
 
     async def add(self, model: AuthnToken) -> None:
         """Append a new model to the repository."""
-        self.tokens[model.token] = model  # type: ignore
+        await self.session.execute(  # type: ignore
+            authn_tokens.insert().values(model.dict())  # type: ignore
+        )
 
     async def remove(self, token: str) -> None:
         """Delete a new model to the repository."""
-        del self.tokens[token]
+        await self.session.execute(  # type: ignore
+            delete(authn_tokens).where(authn_tokens.c.token == token),
+        )
 
 
 class SQLUnitOfWork(AbstractUnitOfWork):
     def __init__(self, session: AsyncSession) -> None:
         self.accounts = AccountSQLRepository(session)
-        self.authn_tokens = AuthnTokenSQLRepository()
+        self.authn_tokens = AuthnTokenSQLRepository(session)
         self.pages = PageSQLRepository()
         self.committed: bool | None = None
 

@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.adapters.uow_sqla import orm
-from casualcms.domain.model.account import Account
+from casualcms.domain.model.account import Account, AuthnToken
 
 DATABASE_URL = "sqlite+aiosqlite:///"
 
@@ -56,6 +56,29 @@ async def accounts(
     await sqla_session.execute(  # type: ignore
         delete(orm.accounts).where(
             orm.accounts.c.username.in_([a.email for a in accounts])
+        ),
+    )
+    await sqla_session.commit()
+
+
+@pytest_asyncio.fixture()
+async def authn_tokens(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+) -> AsyncGenerator[None, None]:
+
+    authn_tokens: Sequence[AuthnToken] = params["authn_tokens"]
+    await sqla_session.execute(  # type: ignore
+        orm.authn_tokens.insert(),  # type: ignore
+        [t.dict() for t in authn_tokens],
+    )
+    await sqla_session.commit()
+
+    yield None
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.authn_tokens).where(
+            orm.authn_tokens.c.token.in_([t.token for t in authn_tokens])
         ),
     )
     await sqla_session.commit()

@@ -20,8 +20,12 @@ from sqlalchemy import (  # type: ignore
     TypeDecorator,
     event,
 )
-from sqlalchemy.dialects.postgresql import JSONB as PgJSONB  # type: ignore
-from sqlalchemy.dialects.postgresql import UUID as PgUUID  # type: ignore
+from sqlalchemy.dialects.postgresql import (
+    INET as PgINET,
+    JSONB as PgJSONB,
+    UUID as PgUUID,
+)
+
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
 
@@ -42,6 +46,7 @@ __all__ = [
     # Defined type
     "UUID",
     "JSON",
+    "IpAddress",
 ]
 
 
@@ -103,3 +108,31 @@ class JSON(TypeDecorator):
             return value
         else:
             return json.loads(value)
+
+
+class IpAddress(TypeDecorator):
+
+    impl = CHAR
+
+    # bind/result is idempotent for this type
+    cache_ok = True
+
+    def load_dialect_impl(self, dialect: Dialect) -> Any:  # FIXME: type
+        if dialect.name == "postgresql":
+            return dialect.type_descriptor(PgINET())
+        else:
+            return dialect.type_descriptor(String(45))
+
+    def process_bind_param(self, value: TypeEngine, dialect: Dialect) -> Any:
+        if value is None:
+            return value
+        elif dialect.name == "postgresql":
+            return str(value)
+        return value
+
+    def process_result_value(  # type: ignore
+        self,
+        value: Any,
+        dialect: Dialect,
+    ) -> TypeEngine:
+        return value

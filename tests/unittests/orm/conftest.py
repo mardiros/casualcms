@@ -2,7 +2,7 @@ from typing import Any, AsyncGenerator, Dict, Iterator, Mapping, Sequence
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import delete  # type: ignore
+from sqlalchemy import delete, text  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
@@ -121,9 +121,40 @@ async def pages(
         ],
     )
 
+    for page in pages:
+        # process parents
+        if page.parent:
+            page.parent.id
+            await sqla_session.execute(
+                text(
+                    """
+                    INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
+                    SELECT
+                        pages_treepath.ancestor_id,
+                        :page_id,
+                        pages_treepath.length + 1
+                    FROM pages_treepath
+                    WHERE pages_treepath.descendant_id = :parent_id
+                    """
+                ),
+                {"page_id": page.id, "parent_id": page.parent.id},
+            )
+
     await sqla_session.commit()
 
     yield None
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages_treepath).where(
+            orm.pages_treepath.c.descendant_id.in_([p.id for p in pages])
+        ),
+    )
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages_treepath).where(
+            orm.pages_treepath.c.ancestor_id.in_([p.id for p in pages])
+        ),
+    )
 
     await sqla_session.execute(  # type: ignore
         delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),

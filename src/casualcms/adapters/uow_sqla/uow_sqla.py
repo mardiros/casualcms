@@ -95,15 +95,19 @@ class PageSQLRepository(AbstractPageRepository):
         qry = select(orm.pages)
         for idx, slug in slugs:
             parent = alias(orm.pages)
-            select(orm.pages_treepath).join(
-                parent,
-                and_(
-                    parent.c.id == orm.pages_treepath.c.ancestor_id,
-                    parent.c.slug == slug,
-                ),
-            ).filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id).filter(
-                orm.pages_treepath.c.length == idx
+            sub = (
+                select(orm.pages_treepath)
+                .join(
+                    parent,
+                    and_(
+                        parent.c.id == orm.pages_treepath.c.ancestor_id,
+                        parent.c.slug == slug,
+                    ),
+                )
+                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
+                .filter(orm.pages_treepath.c.length == idx)
             )
+            qry = qry.filter(sub.exists())
 
         page = await self.session.execute(qry)  # type: ignore
         p: Any = page.first()

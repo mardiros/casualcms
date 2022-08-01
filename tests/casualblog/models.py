@@ -52,4 +52,5 @@ class BlogPage(AbstractPage):
 
     class Meta:
         parent_types = [CategoryPage, "blog:BlogPage"]
+        type = "blog:BlogPage"
         template = "blogpage.jinja2"

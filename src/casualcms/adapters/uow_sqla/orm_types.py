@@ -20,12 +20,9 @@ from sqlalchemy import (  # type: ignore
     TypeDecorator,
     event,
 )
-from sqlalchemy.dialects.postgresql import (
-    INET as PgINET,
-    JSONB as PgJSONB,
-    UUID as PgUUID,
-)
-
+from sqlalchemy.dialects.postgresql import INET as PgINET
+from sqlalchemy.dialects.postgresql import JSONB as PgJSONB
+from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
 

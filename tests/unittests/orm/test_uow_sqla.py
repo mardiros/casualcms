@@ -2,21 +2,21 @@ from types import NoneType
 from typing import Any, Sequence
 
 import pytest
+from sqlalchemy import delete  # type: ignore
 from sqlalchemy import text  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
-from sqlalchemy import delete  # type: ignore
-from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.sql.expression import func  # type: ignore
 
+from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
     PageSQLRepository,
 )
-from casualcms.adapters.uow_sqla import orm
 from casualcms.domain.model.page import Page
-from .fixtures import fake_account, fake_page, fake_authn_tokens
+
+from .fixtures import fake_account, fake_authn_tokens, fake_page
 
 alice = fake_account(username="alice")
 bob = fake_account(username="bob")
@@ -156,18 +156,59 @@ async def test_authntoken_delete(
     assert tokens_count.first() == (0,)
 
 
+home_page = fake_page(
+    type="blog:HomePage",
+    slug="root",
+    hero_title="lorem atchoum",
+)
+
+
+cat_page = fake_page(
+    type="blog:CategoryPage",
+    slug="tech",
+    parent=home_page,
+    hero_title="Technologies",
+    intro={"title": "tech", "body": "loli pop"},
+)
+
+
+cat2_page = fake_page(
+    type="blog:CategoryPage",
+    slug="seo",
+    parent=home_page,
+    hero_title="SEO",
+    intro={"title": "SEO", "body": "You bot"},
+)
+
+blog_page = fake_page(
+    type="blog:BlogPage",
+    slug="seo",
+    parent=cat_page,
+    hero_title="SEO In Tech",
+    body=[{"title": "SEO In Tech", "body": "U robot.txt"}],
+)
+
+
 @pytest.mark.parametrize(
     "params",
     [
         {
             "path": "/root",
-            "pages": [
-                fake_page(
-                    type="blog:HomePage",
-                    slug="root",
-                    hero_title="lorem atchoum",
-                )
-            ],  # type: ignore
+            "pages": [home_page, cat_page],  # type: ignore
+            "expected_slug": "root",
+            "expected_id": home_page.id,
+        },
+        {
+            "path": "/root/tech",
+            "pages": [home_page, cat_page, cat2_page],  # type: ignore
+            "expected_slug": "tech",
+            "expected_id": cat_page.id,
+        },
+        {
+            "path": "/root/tech/seo",
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slug": "seo",
+            "expected_id": blog_page.id,
         },
     ],
 )
@@ -178,4 +219,25 @@ async def test_page_by_path(
     root_page = await repo.by_path(params["path"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
-    assert rok.id == params["pages"][0].id
+    assert rok.slug == params["expected_slug"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "path": "/root",
+            "pages": [home_page, cat_page],  # type: ignore
+            "expected_slug": "root",
+            "expected_id": home_page.id,
+        }
+    ],
+)
+async def test_page_by_path_err(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    root_page = await repo.by_path("/e404")
+    assert root_page.is_err()
+    rok = root_page.unwrap_err()
+    assert rok.name == "page_not_found"

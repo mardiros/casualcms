@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
 from faker import Faker
-from casualcms.domain.messages.commands import generate_secret
 
+from casualcms.domain.messages.commands import generate_secret
 from casualcms.domain.model import Account, AuthnToken, Page
 
 fake = Faker()
@@ -46,6 +46,7 @@ def fake_page(type: str, **kwargs: Any) -> Page:
         "parent": None,
     }
     from casualcms.domain.model.page import resolve_type
+
     typ = resolve_type(type)
     page.update(kwargs)
     return typ(**page)

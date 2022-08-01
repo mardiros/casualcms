@@ -1,13 +1,14 @@
-from typing import Optional
+from operator import and_
+from typing import Any, Optional
 
 from result import Err, Ok
-from sqlalchemy import delete  # type: ignore
+from sqlalchemy import alias, delete  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 
 from casualcms.domain.model import Account
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.page import Page, resolve_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -28,7 +29,7 @@ from casualcms.domain.repositories.user import (
 )
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from .orm import accounts, authn_tokens
+from . import orm
 
 
 class AccountSQLRepository(AbstractAccountRepository):
@@ -39,7 +40,7 @@ class AccountSQLRepository(AbstractAccountRepository):
     async def by_username(self, username: str) -> AccountRepositoryResult:
         """Fetch one user account by its unique username."""
         accounts_ = await self.session.execute(  # type: ignore
-            select(accounts).filter_by(username=username).limit(1)
+            select(orm.accounts).filter_by(username=username).limit(1)
         )
         account: Account = accounts_.first()  # its a Row actually
         if account:
@@ -59,60 +60,78 @@ class AccountSQLRepository(AbstractAccountRepository):
     async def add(self, model: Account) -> None:
         """Append a new model to the repository."""
         await self.session.execute(  # type: ignore
-            accounts.insert().values(model.dict())  # type: ignore
+            orm.accounts.insert().values(model.dict())  # type: ignore
         )
         self.seen.add(model)
 
 
 class PageSQLRepository(AbstractPageRepository):
-    pages: dict[str, Page] = {}
-
-    def __init__(self) -> None:
+    def __init__(self, session: AsyncSession) -> None:
         self.seen = set()
+        self.session = session
 
     async def by_id(self, id: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""
-        for page in self.pages.values():
-            if page.id == id:
-                return Ok(page)
-
+        pages = await self.session.execute(  # type: ignore
+            select(orm.pages).filter_by(id=id).limit(1)
+        )
+        page: Page = pages.first()  # its a Row actually
+        parent_page = None  # FIXME
+        if page:
+            return Ok(
+                Page(
+                    id=page.id,
+                    slug=page.slug,
+                    title=page.title,
+                    description=page.description,
+                    parent=parent_page,
+                )
+            )
         return Err(PageRepositoryError.page_not_found)
 
     async def by_path(self, path: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""
-        if path in self.pages:
-            return Ok(self.pages[path])
+        slugs = enumerate(reversed(path.strip("/").split("/")))
+        qry = select(orm.pages)
+        for idx, slug in slugs:
+            parent = alias(orm.pages)
+            select(orm.pages_treepath).join(
+                parent,
+                and_(
+                    parent.c.id == orm.pages_treepath.c.ancestor_id,
+                    parent.c.slug == slug,
+                ),
+            ).filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id).filter(
+                orm.pages_treepath.c.length == idx
+            )
+
+        page = await self.session.execute(qry)  # type: ignore
+        p: Any = page.first()
+        if p:
+            typ = resolve_type(p.type)
+            return Ok(
+                typ(
+                    id=p.id,
+                    slug=p.slug,
+                    title=p.title,
+                    description=p.description,
+                    **p.body,
+                )
+            )
         return Err(PageRepositoryError.page_not_found)
 
     async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
         """Fetch one page by its unique path."""
         ret: list[Page] = []
-        if path:
-            cnt = len(path.strip("/").split("/")) + 1
-        else:
-            cnt = 1
-        for key, page in self.pages.items():
-            if key.startswith(path or "") and len(key.strip("/").split("/")) == cnt:
-                ret.append(page)
-
         return Ok(ret)
 
     async def add(self, model: Page) -> None:
         """Append a new model to the repository."""
         self.seen.add(model)
-        self.pages[model.path] = model
 
     async def update(self, model: Page) -> None:
-        """Append a new model to the repository."""
+        """Update model in the repository."""
         self.seen.add(model)
-        k = None
-        for key, page in self.pages.items():
-            if page.id == model.id:
-                k = key
-                break
-        if k:
-            del self.pages[k]
-        self.pages[model.path] = model
 
 
 class AuthnTokenSQLRepository(AbstractAuthnRepository):
@@ -122,7 +141,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
     async def by_token(self, token: str) -> AuthnTokenRepositoryResult:
         """Fetch given token informations from the given token."""
         tokens_ = await self.session.execute(  # type: ignore
-            select(authn_tokens).filter_by(token=token).limit(1)
+            select(orm.authn_tokens).filter_by(token=token).limit(1)
         )
         token_: AuthnToken = tokens_.first()  # its a Row actually
         if token_:
@@ -142,13 +161,13 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
     async def add(self, model: AuthnToken) -> None:
         """Append a new model to the repository."""
         await self.session.execute(  # type: ignore
-            authn_tokens.insert().values(model.dict())  # type: ignore
+            orm.authn_tokens.insert().values(model.dict())  # type: ignore
         )
 
     async def remove(self, token: str) -> None:
         """Delete a new model to the repository."""
         await self.session.execute(  # type: ignore
-            delete(authn_tokens).where(authn_tokens.c.token == token),
+            delete(orm.authn_tokens).where(orm.authn_tokens.c.token == token),
         )
 
 
@@ -156,7 +175,7 @@ class SQLUnitOfWork(AbstractUnitOfWork):
     def __init__(self, session: AsyncSession) -> None:
         self.accounts = AccountSQLRepository(session)
         self.authn_tokens = AuthnTokenSQLRepository(session)
-        self.pages = PageSQLRepository()
+        self.pages = PageSQLRepository(session)
         self.committed: bool | None = None
 
     async def commit(self) -> None:

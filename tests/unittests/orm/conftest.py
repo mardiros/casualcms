@@ -1,4 +1,4 @@
-from typing import Any, AsyncGenerator, Iterator, Mapping, Sequence
+from typing import Any, AsyncGenerator, Dict, Iterator, Mapping, Sequence
 
 import pytest
 import pytest_asyncio
@@ -9,13 +9,14 @@ from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.adapters.uow_sqla import orm
 from casualcms.domain.model.account import Account, AuthnToken
+from casualcms.domain.model.page import Page
 
 DATABASE_URL = "sqlite+aiosqlite:///"
 
 
 @pytest.fixture()
 def bared_sqla_engine() -> Iterator[AsyncEngine]:
-    engine = create_async_engine(DATABASE_URL, future=True, echo=True)
+    engine = create_async_engine(DATABASE_URL, future=True, echo=False)
     yield engine
 
 
@@ -80,5 +81,51 @@ async def authn_tokens(
         delete(orm.authn_tokens).where(
             orm.authn_tokens.c.token.in_([t.token for t in authn_tokens])
         ),
+    )
+    await sqla_session.commit()
+
+
+@pytest_asyncio.fixture()
+async def pages(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+) -> AsyncGenerator[None, None]:
+    def format_page(page: Page) -> Dict[str, Any]:
+        p: Dict[str, Any] = page.dict()
+        formated_page: Dict[str, Any] = {
+            "id": p.pop("id"),
+            "type": page.__meta__.type,
+            "created_at": page.created_at,
+            "slug": p.pop("slug"),
+            "title": p.pop("title"),
+            "description": p.pop("description"),
+        }
+        formated_page["body"] = p
+        return formated_page
+
+    pages: Sequence[Page] = params["pages"]
+    await sqla_session.execute(  # type: ignore
+        orm.pages.insert(),  # type: ignore
+        [format_page(p) for p in pages],
+    )
+
+    await sqla_session.execute(  # type: ignore
+        orm.pages_treepath.insert(),  # type: ignore
+        [
+            {
+                "ancestor_id": p.id,
+                "descendant_id": p.id,
+                "length": 0,
+            }
+            for p in pages
+        ],
+    )
+
+    await sqla_session.commit()
+
+    yield None
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),
     )
     await sqla_session.commit()

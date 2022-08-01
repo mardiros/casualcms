@@ -1,9 +1,9 @@
-from typing import Any
+from typing import Any, Dict
 
 from faker import Faker
 from casualcms.domain.messages.commands import generate_secret
 
-from casualcms.domain.model import Account, AuthnToken
+from casualcms.domain.model import Account, AuthnToken, Page
 
 fake = Faker()
 
@@ -21,7 +21,6 @@ def fake_account(**kwargs: Any) -> Account:
     return Account(**account)
 
 
-
 def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
     token = {
         "id": fake.uuid4(),
@@ -35,3 +34,18 @@ def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
     }
     token.update(kwargs)
     return AuthnToken(**token)
+
+
+def fake_page(type: str, **kwargs: Any) -> Page:
+    page: Dict[str, Any] = {
+        "id": fake.uuid4(),
+        "created_at": fake.past_datetime(),
+        "slug": fake.slug(),
+        "title": fake.name(),
+        "description": fake.paragraph(nb_sentences=1),
+        "parent": None,
+    }
+    from casualcms.domain.model.page import resolve_type
+    typ = resolve_type(type)
+    page.update(kwargs)
+    return typ(**page)

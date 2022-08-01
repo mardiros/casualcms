@@ -56,3 +56,38 @@ authn_tokens = Table(
     Index("idx_authn_tokens_expires_at", "expires_at", unique=False),
     Index("idx_authn_tokens_created_at", "created_at", unique=False),
 )
+
+
+pages = Table(
+    "pages",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("created_at", DateTime(), nullable=False),
+    Column("type", String(72), nullable=False),
+    Column("slug", CIText, nullable=False),
+    Column("title", CIText, nullable=False),
+    Column("description", CIText, nullable=False),
+    Column("body", JSON, nullable=False),
+    Index("idx_pages_type", "type", unique=False),
+    Index("idx_pages_slug", "slug", unique=False),
+    Index("idx_pages_created_at", "created_at", unique=False),
+)
+
+pages_treepath = Table(
+    "pages_treepath",
+    metadata,
+    Column(
+        "ancestor_id",
+        UUID,
+        ForeignKey("pages.id", name="fk_pages_ancestor_id"),
+        primary_key=True,
+    ),
+    Column(
+        "descendant_id",
+        UUID,
+        ForeignKey("pages.id", name="fk_pages_descendant_id"),
+        primary_key=True,
+    ),
+    Column("length", Integer),
+    Index("idx_pages_treepath_descendant_id", "descendant_id", unique=False),
+)

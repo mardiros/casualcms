@@ -117,6 +117,9 @@ class Page(AbstractPage):
     events: list[Event] = Field(default_factory=list, exclude=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)
 
+    class Meta:
+        abstract = True
+
     @property
     def path(self) -> str:
         slugs = []

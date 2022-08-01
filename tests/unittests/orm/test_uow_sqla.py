@@ -1,5 +1,5 @@
 from types import NoneType
-from typing import Any
+from typing import Any, Sequence
 
 import pytest
 from sqlalchemy import text  # type: ignore
@@ -12,9 +12,11 @@ from sqlalchemy.sql.expression import func  # type: ignore
 from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
+    PageSQLRepository,
 )
 from casualcms.adapters.uow_sqla import orm
-from .fixtures import fake_account, fake_authn_tokens
+from casualcms.domain.model.page import Page
+from .fixtures import fake_account, fake_page, fake_authn_tokens
 
 alice = fake_account(username="alice")
 bob = fake_account(username="bob")
@@ -136,7 +138,6 @@ async def test_authntoken_delete(
     authn_tokens: NoneType,
 ):
 
-
     tokens_count = await sqla_session.execute(  # type: ignore
         select(func.count(orm.authn_tokens.c.id)).filter_by(
             token=params["authn_tokens"][0].token
@@ -153,3 +154,28 @@ async def test_authntoken_delete(
         )
     )
     assert tokens_count.first() == (0,)
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "path": "/root",
+            "pages": [
+                fake_page(
+                    type="blog:HomePage",
+                    slug="root",
+                    hero_title="lorem atchoum",
+                )
+            ],  # type: ignore
+        },
+    ],
+)
+async def test_page_by_path(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    root_page = await repo.by_path(params["path"])
+    assert root_page.is_ok()
+    rok = root_page.unwrap()
+    assert rok.id == params["pages"][0].id

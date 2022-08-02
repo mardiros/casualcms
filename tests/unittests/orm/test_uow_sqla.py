@@ -325,3 +325,40 @@ async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence
 
     resp = await sqla_session.execute(qry)  # type: ignore
     assert list(resp) == [(params["page"].id, 0)]  # type: ignore
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "page": home_page,
+            "update_page": fake_page(
+                id=home_page.id,
+                type="blog:HomePage",
+                slug="home",
+                title="new title",
+                description="new desc",
+                hero_title="my new hero",
+            ),
+            "pages": [home_page, cat_page],  # type: ignore
+            "expected_slug": "home",
+            "expected_title": "new title",
+            "expected_description": "new desc",
+            "expected_body": {'body': [], 'hero_title': 'my new hero'},
+        },
+    ],
+)
+async def test_page_update(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    await repo.update(params["update_page"])
+
+    qry = select(orm.pages).filter(orm.pages.c.id == params["page"].id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    page: orm.pages = resp.first()  # type: ignore
+    assert page.slug == params["expected_slug"]
+    assert page.title == params["expected_title"]
+    assert page.description == params["expected_description"]
+    assert page.body == params["expected_body"]

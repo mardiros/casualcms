@@ -64,6 +64,19 @@ class AccountSQLRepository(AbstractAccountRepository):
         )
         self.seen.add(model)
 
+def format_page(page: Page) -> Dict[str, Any]:
+    """Format the page to a dict ready to be inserted in the orm.pages."""
+    p: Dict[str, Any] = page.dict()
+    formated_page: Dict[str, Any] = {
+        "id": p.pop("id"),
+        "type": page.__meta__.type,
+        "created_at": page.created_at,
+        "slug": p.pop("slug"),
+        "title": p.pop("title"),
+        "description": p.pop("description"),
+    }
+    formated_page["body"] = p
+    return formated_page
 
 class PageSQLRepository(AbstractPageRepository):
     def __init__(self, session: AsyncSession) -> None:
@@ -166,19 +179,6 @@ class PageSQLRepository(AbstractPageRepository):
     async def add(self, model: Page) -> None:
         """Append a new model to the repository."""
 
-        def format_page(page: Page) -> Dict[str, Any]:
-            p: Dict[str, Any] = page.dict()
-            formated_page: Dict[str, Any] = {
-                "id": p.pop("id"),
-                "type": page.__meta__.type,
-                "created_at": page.created_at,
-                "slug": p.pop("slug"),
-                "title": p.pop("title"),
-                "description": p.pop("description"),
-            }
-            formated_page["body"] = p
-            return formated_page
-
         await self.session.execute(  # type: ignore
             orm.pages.insert(),  # type: ignore
             [format_page(model)],
@@ -216,6 +216,11 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def update(self, model: Page) -> None:
         """Update model in the repository."""
+        page = format_page(model)
+        page.pop("id")
+        await self.session.execute(  # type: ignore
+            orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
+        )
         self.seen.add(model)
 
 

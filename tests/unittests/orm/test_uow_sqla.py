@@ -193,6 +193,48 @@ blog_page = fake_page(
     "params",
     [
         {
+            "id": home_page.id,
+            "pages": [home_page, cat_page],  # type: ignore
+            "expected_slug": "root",
+            "expected_path": "/root",
+        },
+        {
+            "id": cat_page.id,
+            "pages": [home_page, cat_page, cat2_page],  # type: ignore
+            "expected_slug": "tech",
+            "expected_path": "/root/tech",
+        },
+        {
+            "id": blog_page.id,
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slug": "seo",
+            "expected_path": "/root/tech/seo",
+        },
+    ],
+)
+async def test_page_by_id(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    root_page = await repo.by_id(params["id"])
+    assert root_page.is_ok()
+    rok = root_page.unwrap()
+    assert rok.slug == params["expected_slug"]
+    assert rok.path == params["expected_path"]
+
+
+async def test_page_by_id(sqla_session: AsyncSession):
+    repo = PageSQLRepository(sqla_session)
+    root_page = await repo.by_id(home_page.id)
+    assert root_page.is_err()
+    err = root_page.unwrap_err()
+    assert err.name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
             "path": "/root",
             "pages": [home_page, cat_page],  # type: ignore
             "expected_slug": "root",
@@ -220,6 +262,7 @@ async def test_page_by_path(
     assert root_page.is_ok()
     rok = root_page.unwrap()
     assert rok.slug == params["expected_slug"]
+    assert rok.path == params["path"]
 
 
 @pytest.mark.parametrize(
@@ -239,8 +282,8 @@ async def test_page_by_path_err(
     repo = PageSQLRepository(sqla_session)
     root_page = await repo.by_path("/e404")
     assert root_page.is_err()
-    rok = root_page.unwrap_err()
-    assert rok.name == "page_not_found"
+    err = root_page.unwrap_err()
+    assert err.name == "page_not_found"
 
 
 @pytest.mark.parametrize(
@@ -251,33 +294,38 @@ async def test_page_by_path_err(
             "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["root"],
             "expected_ids": [home_page.id],
+            "expected_paths": ["/root"],
         },
         {
             "parent": "/root",
             "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["seo", "tech"],
             "expected_ids": [cat2_page.id, cat_page.id],
+            "expected_paths": ["/root/seo", "/root/tech"],
         },
         {
             "parent": "/root/tech",
             "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["seo"],
             "expected_ids": [blog_page.id],
+            "expected_paths": ["/root/tech/seo"],
         },
         {
             "parent": "/root/seo",
             "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": [],
             "expected_ids": [],
+            "expected_paths": [],
         },
     ],
 )
-async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
+async def test_page_by_parent(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
     repo = PageSQLRepository(sqla_session)
     child_pages = await repo.by_parent(params["parent"])
     assert child_pages.is_ok()
     ps = child_pages.unwrap()
     assert [p.slug for p in ps] == params["expected_slugs"]
+    assert [p.path for p in ps] == params["expected_paths"]
 
 
 @pytest.mark.parametrize(
@@ -344,7 +392,7 @@ async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence
             "expected_slug": "home",
             "expected_title": "new title",
             "expected_description": "new desc",
-            "expected_body": {'body': [], 'hero_title': 'my new hero'},
+            "expected_body": {"body": [], "hero_title": "my new hero"},
         },
     ],
 )

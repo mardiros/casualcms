@@ -1,5 +1,5 @@
 from operator import and_
-from typing import Any, Dict, Optional, cast
+from typing import Any, Dict, Optional, Sequence, cast
 
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
@@ -64,6 +64,7 @@ class AccountSQLRepository(AbstractAccountRepository):
         )
         self.seen.add(model)
 
+
 def format_page(page: Page) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.pages."""
     p: Dict[str, Any] = page.dict()
@@ -78,6 +79,7 @@ def format_page(page: Page) -> Dict[str, Any]:
     formated_page["body"] = p
     return formated_page
 
+
 class PageSQLRepository(AbstractPageRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.seen = set()
@@ -85,21 +87,41 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def by_id(self, id: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""
-        pages = await self.session.execute(  # type: ignore
-            select(orm.pages).filter_by(id=id).limit(1)
-        )
-        page: Page = pages.first()  # its a Row actually
-        parent_page = None  # FIXME
-        if page:
-            return Ok(
-                Page(
-                    id=page.id,
-                    slug=page.slug,
-                    title=page.title,
-                    description=page.description,
-                    parent=parent_page,
-                )
+        qry = (
+            select(orm.pages)
+            .join(
+                orm.pages_treepath,
+                and_(
+                    orm.pages_treepath.c.ancestor_id == orm.pages.c.id,
+                    orm.pages_treepath.c.descendant_id == id,
+                ),
             )
+            .order_by(orm.pages_treepath.c.length.desc())
+        )
+        orm_pages = await self.session.execute(qry)  # type: ignore
+        page: Page | None = None
+        orm_page_iter = iter(orm_pages)  # type: ignore
+        try:
+            orm_page = next(orm_page_iter)  # type: ignore
+        except StopIteration:
+            return Err(PageRepositoryError.page_not_found)
+        while orm_page:
+            typ = resolve_type(orm_page.type)  # type: ignore
+            page = typ(
+                id=orm_page.id,
+                slug=orm_page.slug,
+                title=orm_page.title,
+                description=orm_page.description,
+                parent=page,
+                **orm_page.body,
+            )
+            try:
+                orm_page = next(orm_pages)  # type: ignore
+            except StopIteration:
+                break
+
+        if page:
+            return Ok(page)
         return Err(PageRepositoryError.page_not_found)
 
     async def by_path(self, path: str) -> PageRepositoryResult:
@@ -125,16 +147,7 @@ class PageSQLRepository(AbstractPageRepository):
         page = await self.session.execute(qry)  # type: ignore
         p: Any = page.first()
         if p:
-            typ = resolve_type(p.type)
-            return Ok(
-                typ(
-                    id=p.id,
-                    slug=p.slug,
-                    title=p.title,
-                    description=p.description,
-                    **p.body,
-                )
-            )
+            return await self.by_id(p.id)
         return Err(PageRepositoryError.page_not_found)
 
     async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
@@ -151,15 +164,17 @@ class PageSQLRepository(AbstractPageRepository):
                 .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
                 .filter(orm.pages_treepath.c.length > 0)
             ).exists()
+            parent = None
         else:
             parent = await self.by_path(path or "")
             if parent.is_err():
                 return cast(Err[PageRepositoryError], parent)
+            parent = parent.unwrap()
             sub = (
                 select(orm.pages_treepath.c.ancestor_id)
                 .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
                 .filter(orm.pages_treepath.c.length == 1)
-                .filter(orm.pages_treepath.c.ancestor_id == parent.unwrap().id)
+                .filter(orm.pages_treepath.c.ancestor_id == parent.id)
             ).exists()
         qry = select(orm.pages).filter(sub).order_by(orm.pages.c.slug)
         pages = await self.session.execute(qry)  # type: ignore
@@ -170,6 +185,7 @@ class PageSQLRepository(AbstractPageRepository):
                 slug=p.slug,
                 title=p.title,
                 description=p.description,
+                parent=parent,
                 **p.body,
             )
             for p in pages  # type:ignore

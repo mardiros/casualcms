@@ -241,3 +241,42 @@ async def test_page_by_path_err(
     assert root_page.is_err()
     rok = root_page.unwrap_err()
     assert rok.name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "parent": None,
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slugs": ["root"],
+            "expected_ids": [home_page.id],
+        },
+        {
+            "parent": "/root",
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slugs": ["seo", "tech"],
+            "expected_ids": [cat2_page.id, cat_page.id],
+        },
+        {
+            "parent": "/root/tech",
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slugs": ["seo"],
+            "expected_ids": [blog_page.id],
+        },
+        {
+            "parent": "/root/seo",
+            "pages": [home_page, cat_page, cat2_page, blog_page],  # type: ignore
+            "expected_slugs": [],
+            "expected_ids": [],
+        },
+    ],
+)
+async def test_page_by_path(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    child_pages = await repo.by_parent(params["parent"])
+    assert child_pages.is_ok()
+    ps = child_pages.unwrap()
+    assert [p.slug for p in ps] == params["expected_slugs"]

@@ -89,5 +89,10 @@ pages_treepath = Table(
         primary_key=True,
     ),
     Column("length", Integer),
-    Index("idx_pages_treepath_descendant_id", "descendant_id", unique=False),
+    Index(
+        "idx_pages_treepath_descendant_id",
+        "descendant_id",
+        "length",
+        unique=False,
+    ),
 )

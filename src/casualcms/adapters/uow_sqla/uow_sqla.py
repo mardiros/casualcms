@@ -1,5 +1,5 @@
 from operator import and_
-from typing import Any, Optional
+from typing import Any, Optional, cast
 
 from result import Err, Ok
 from sqlalchemy import alias, delete  # type: ignore
@@ -126,7 +126,41 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
         """Fetch one page by its unique path."""
-        ret: list[Page] = []
+
+        if not path:
+            # we want roots here
+            """
+            select *
+            from page
+            where not exists (select 1 from from tp where descendant_id = page.id and length > 0)"""
+            sub = ~(
+                select(orm.pages_treepath.c.ancestor_id)
+                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
+                .filter(orm.pages_treepath.c.length > 0)
+            ).exists()
+        else:
+            parent = await self.by_path(path or "")
+            if parent.is_err():
+                return cast(Err[PageRepositoryError], parent)
+            sub = (
+                select(orm.pages_treepath.c.ancestor_id)
+                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
+                .filter(orm.pages_treepath.c.length == 1)
+                .filter(orm.pages_treepath.c.ancestor_id == parent.unwrap().id)
+            ).exists()
+        qry = select(orm.pages).filter(sub).order_by(orm.pages.c.slug)
+        pages = await self.session.execute(qry)  # type: ignore
+
+        ret: list[Page] = [
+            resolve_type(p.type)(  # type:ignore
+                id=p.id,
+                slug=p.slug,
+                title=p.title,
+                description=p.description,
+                **p.body,
+            )
+            for p in pages  # type:ignore
+        ]
         return Ok(ret)
 
     async def add(self, model: Page) -> None:

@@ -104,43 +104,44 @@ async def pages(
         return formated_page
 
     pages: Sequence[Page] = params["pages"]
-    await sqla_session.execute(  # type: ignore
-        orm.pages.insert(),  # type: ignore
-        [format_page(p) for p in pages],
-    )
+    if pages:
+        await sqla_session.execute(  # type: ignore
+            orm.pages.insert(),  # type: ignore
+            [format_page(p) for p in pages],
+        )
 
-    await sqla_session.execute(  # type: ignore
-        orm.pages_treepath.insert(),  # type: ignore
-        [
-            {
-                "ancestor_id": p.id,
-                "descendant_id": p.id,
-                "length": 0,
-            }
-            for p in pages
-        ],
-    )
+        await sqla_session.execute(  # type: ignore
+            orm.pages_treepath.insert(),  # type: ignore
+            [
+                {
+                    "ancestor_id": p.id,
+                    "descendant_id": p.id,
+                    "length": 0,
+                }
+                for p in pages
+            ],
+        )
 
-    for page in pages:
-        # process parents
-        if page.parent:
-            page.parent.id
-            await sqla_session.execute(
-                text(
-                    """
-                    INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
-                    SELECT
-                        pages_treepath.ancestor_id,
-                        :page_id,
-                        pages_treepath.length + 1
-                    FROM pages_treepath
-                    WHERE pages_treepath.descendant_id = :parent_id
-                    """
-                ),
-                {"page_id": page.id, "parent_id": page.parent.id},
-            )
+        for page in pages:
+            # process parents
+            if page.parent:
+                page.parent.id
+                await sqla_session.execute(
+                    text(
+                        """
+                        INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
+                        SELECT
+                            pages_treepath.ancestor_id,
+                            :page_id,
+                            pages_treepath.length + 1
+                        FROM pages_treepath
+                        WHERE pages_treepath.descendant_id = :parent_id
+                        """
+                    ),
+                    {"page_id": page.id, "parent_id": page.parent.id},
+                )
 
-    await sqla_session.commit()
+        await sqla_session.commit()
 
     yield None
 

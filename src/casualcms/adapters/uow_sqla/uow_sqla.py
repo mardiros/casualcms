@@ -1,8 +1,8 @@
 from operator import and_
-from typing import Any, Optional, cast
+from typing import Any, Dict, Optional, cast
 
 from result import Err, Ok
-from sqlalchemy import alias, delete  # type: ignore
+from sqlalchemy import alias, delete, text  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 
@@ -165,6 +165,53 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def add(self, model: Page) -> None:
         """Append a new model to the repository."""
+
+        def format_page(page: Page) -> Dict[str, Any]:
+            p: Dict[str, Any] = page.dict()
+            formated_page: Dict[str, Any] = {
+                "id": p.pop("id"),
+                "type": page.__meta__.type,
+                "created_at": page.created_at,
+                "slug": p.pop("slug"),
+                "title": p.pop("title"),
+                "description": p.pop("description"),
+            }
+            formated_page["body"] = p
+            return formated_page
+
+        await self.session.execute(  # type: ignore
+            orm.pages.insert(),  # type: ignore
+            [format_page(model)],
+        )
+
+        await self.session.execute(  # type: ignore
+            orm.pages_treepath.insert(),  # type: ignore
+            [
+                {
+                    "ancestor_id": model.id,
+                    "descendant_id": model.id,
+                    "length": 0,
+                }
+            ],
+        )
+
+        # process parents
+        if model.parent:
+            model.parent.id
+            await self.session.execute(
+                text(
+                    """
+                    INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
+                    SELECT
+                        pages_treepath.ancestor_id,
+                        :page_id,
+                        pages_treepath.length + 1
+                    FROM pages_treepath
+                    WHERE pages_treepath.descendant_id = :parent_id
+                    """
+                ),
+                {"page_id": model.id, "parent_id": model.parent.id},
+            )
         self.seen.add(model)
 
     async def update(self, model: Page) -> None:
@@ -214,10 +261,10 @@ class SQLUnitOfWork(AbstractUnitOfWork):
         self.accounts = AccountSQLRepository(session)
         self.authn_tokens = AuthnTokenSQLRepository(session)
         self.pages = PageSQLRepository(session)
-        self.committed: bool | None = None
+        self.session = session
 
     async def commit(self) -> None:
-        self.committed = True
+        await self.session.commit()
 
     async def rollback(self) -> None:
-        self.committed = False
+        await self.session.rollback()

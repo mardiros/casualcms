@@ -272,11 +272,56 @@ async def test_page_by_path_err(
         },
     ],
 )
-async def test_page_by_path(
-    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
-):
+async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
     repo = PageSQLRepository(sqla_session)
     child_pages = await repo.by_parent(params["parent"])
     assert child_pages.is_ok()
     ps = child_pages.unwrap()
     assert [p.slug for p in ps] == params["expected_slugs"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "parent": None,
+            "page": home_page,
+            "pages": [],  # type: ignore
+            "expected_ancestors": [(home_page.id, 0)],
+        },
+        {
+            "parent": home_page,
+            "page": cat_page,
+            "pages": [home_page],  # type: ignore
+            "expected_ancestors": [(home_page.id, 1), (cat_page.id, 0)],
+        },
+    ],
+)
+async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
+    repo = PageSQLRepository(sqla_session)
+    await repo.add(params["page"])
+
+    qry = select(orm.pages).filter(orm.pages.c.id == params["page"].id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    page = resp.first()  # type: ignore
+    assert page is not None
+    assert page.id == params["page"].id
+
+    qry = (
+        select(orm.pages_treepath.c.ancestor_id, orm.pages_treepath.c.length)
+        .filter(orm.pages_treepath.c.descendant_id == params["page"].id)
+        .order_by(orm.pages_treepath.c.length.desc())
+    )
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    assert list(resp) == params["expected_ancestors"]  # type: ignore
+
+    qry = (
+        select(orm.pages_treepath.c.descendant_id, orm.pages_treepath.c.length)
+        .filter(orm.pages_treepath.c.ancestor_id == params["page"].id)
+        .order_by(orm.pages_treepath.c.length)
+    )
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    assert list(resp) == [(params["page"].id, 0)]  # type: ignore

@@ -36,11 +36,15 @@ async def bootstrap(settings: Settings) -> FastAPI:
             lang="en",
         )
         async with configurator.config.uow as uow:
-            await configurator.config.bus.handle(
-                admin,
-                uow,
-            )
-            await uow.commit()
+            user = await uow.accounts.by_username(settings.admin_username)
+            if user:
+                await uow.rollback()
+            else:
+                await configurator.config.bus.handle(
+                    admin,
+                    uow,
+                )
+                await uow.commit()
 
     if settings.import_models:
         scan(*settings.import_models)

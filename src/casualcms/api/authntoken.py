@@ -24,6 +24,7 @@ async def authenticate(
             user = stored_user.unwrap()
             if user.status == AccountStatus.active and user.match_password(password):
                 authenticated_user = user
+        await uow.commit()
 
     if not authenticated_user:
         raise HTTPException(
@@ -44,6 +45,7 @@ async def authenticate(
 
     async with app.uow as uow:
         await app.bus.handle(cmd, uow)
+        await uow.commit()
 
     return {
         "token": cmd.token,
@@ -72,6 +74,7 @@ async def logout(
 
     async with app.uow as uow:
         await app.bus.handle(cmd, uow)
+        await uow.commit()
 
     return Response(
         "",

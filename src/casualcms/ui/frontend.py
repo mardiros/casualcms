@@ -21,6 +21,7 @@ async def serve_pages(
                 status_code=404,
                 detail=[{"msg": f"Page {path} not found"}],
             )
+        await uow.commit()
     rpage = page.unwrap()
     renderer = Jinja2TemplateRender(app.settings.template_search_path)
     data = renderer.render_template(

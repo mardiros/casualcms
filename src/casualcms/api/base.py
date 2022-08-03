@@ -21,6 +21,7 @@ async def get_token_info(
         authntoken = await uow.authn_tokens.by_token(token.credentials)
         if authntoken.is_err():
             raise credentials_exception
+        await uow.commit()
     return authntoken.unwrap()
 
 

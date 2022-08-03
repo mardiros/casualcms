@@ -45,6 +45,7 @@ async def create_page(
                 )
             params["parent"] = parent_page.unwrap()
         page_type(**params)  # validate pydantic model
+        await uow.commit()
 
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host
@@ -52,6 +53,7 @@ async def create_page(
 
     async with app.uow as uow:
         page = await app.bus.handle(cmd, uow)
+        await uow.commit()
 
     return {"href": page.path}
 
@@ -65,6 +67,7 @@ async def list_pages(
 
     async with app.uow as uow:
         pages = await uow.pages.by_parent(parent)
+        await uow.commit()
 
     if pages.is_err():
         raise HTTPException(
@@ -93,6 +96,8 @@ async def get_page(
     async with app.uow as uow:
         path = path.strip("/")
         page = await uow.pages.by_path(f"/{path}")
+        await uow.commit()
+
     if page.is_err():
         raise HTTPException(
             status_code=422,
@@ -113,6 +118,7 @@ async def update_page(
     async with app.uow as uow:
         path = path.strip("/")
         page = await uow.pages.by_path(f"/{path}")
+        await uow.commit()
 
     if page.is_err():
         raise HTTPException(
@@ -129,5 +135,6 @@ async def update_page(
     cmd.metadata.userId = token.account_id
     async with app.uow as uow:
         upage = await app.bus.handle(cmd, uow)
+        await uow.commit()
 
     return upage.get_data_context()

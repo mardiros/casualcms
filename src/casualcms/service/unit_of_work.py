@@ -3,7 +3,10 @@ from __future__ import annotations
 
 import abc
 from types import TracebackType
-from typing import Iterable, Optional, Type
+from typing import Iterable, Optional, Type, TYPE_CHECKING
+
+if TYPE_CHECKING:  # avoid circular dependency
+    from casualcms.config import Settings
 
 from casualcms.domain.messages import Event
 from casualcms.domain.repositories import AbstractAccountRepository
@@ -15,6 +18,10 @@ class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
     pages: AbstractPageRepository
     authn_tokens: AbstractAuthnRepository
+
+    @abc.abstractmethod
+    def __init__(self, settings: "Settings") -> None:
+        """Create the unit of work, from the given configuration"""
 
     def collect_new_events(self) -> Iterable[Event]:
         for account in self.accounts.seen:

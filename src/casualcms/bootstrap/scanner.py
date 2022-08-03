@@ -17,11 +17,9 @@ def scan(*modules: str) -> None:
         if modname.startswith("."):
             raise ValueError(f"{modname}: Relative package unsupported")
         mod = importlib.import_module(modname)
-        print(modname)
         if hasattr(mod, "__path__"):  # it means it is a __init__.py.
             for _loader, submod, _is_pkg in pkgutil.walk_packages(
                 path=mod.__path__,
                 prefix=mod.__name__ + ".",
             ):
                 importlib.import_module(submod)
-                print(submod)

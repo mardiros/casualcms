@@ -4,6 +4,8 @@ import json
 from typing import Any
 
 from citext import CIText  # type: ignore
+setattr(CIText, "cache_ok",  True)  # useless SAWarning
+
 from sqlalchemy import (  # type: ignore
     CHAR,
     Boolean,
@@ -52,6 +54,7 @@ class UUID(TypeDecorator):
 
     impl = CHAR
     _type_affinity = None
+    cache_ok = True
 
     def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
         if dialect.name == "postgresql":
@@ -76,6 +79,7 @@ class JSON(TypeDecorator):
     """Platform-independent JSONB type, if not postgress limited query."""
 
     impl = CHAR
+    cache_ok = True
 
     def __init__(self, as_uuid: bool = False):
         self.as_uuid = as_uuid
@@ -110,6 +114,7 @@ class JSON(TypeDecorator):
 class IpAddress(TypeDecorator):
 
     impl = CHAR
+    cache_ok = True
 
     # bind/result is idempotent for this type
     cache_ok = True

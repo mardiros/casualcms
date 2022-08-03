@@ -1,10 +1,16 @@
 from operator import and_
-from typing import Any, Dict, Optional, Sequence, cast
+from typing import Any, Callable, Dict, Optional, Type, cast
 
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
-from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine,  # type: ignore
+)
 from sqlalchemy.future import select  # type: ignore
+from sqlalchemy.orm import sessionmaker
+from casualcms.config import Settings
 
 from casualcms.domain.model import Account
 from casualcms.domain.model.account import AuthnToken
@@ -258,7 +264,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
                     account_id=token_.account_id,
                     created_at=token_.created_at,
                     expires_at=token_.expires_at,
-                    client_addr=token_.client_addr,
+                    client_addr=str(token_.client_addr),
                     user_agent=token_.user_agent,
                 )
             )
@@ -277,15 +283,79 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
         )
 
 
-class SQLUnitOfWork(AbstractUnitOfWork):
+class SQLUnitOfWorkBySession:
     def __init__(self, session: AsyncSession) -> None:
+        self.session = session
         self.accounts = AccountSQLRepository(session)
         self.authn_tokens = AuthnTokenSQLRepository(session)
         self.pages = PageSQLRepository(session)
-        self.session = session
 
     async def commit(self) -> None:
         await self.session.commit()
 
     async def rollback(self) -> None:
         await self.session.rollback()
+
+
+class SQLUnitOfWork(AbstractUnitOfWork):
+
+    create_session: Callable[[], AsyncSession]
+
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self.uow = None
+        self.create_session = None  # type: ignore
+
+    async def initialize(self) -> None:
+        self.create_session = await create_session(self.settings)
+
+    async def __aenter__(self) -> AbstractUnitOfWork:
+        self.session: AsyncSession = self.create_session()
+        self.uow = SQLUnitOfWorkBySession(self.session)
+        return self
+
+    @property
+    def accounts(self):
+        if not self.uow:
+            raise RuntimeError(".accounts called outside 'async with'")
+        return self.uow.accounts
+
+    @property
+    def authn_tokens(self):
+        if not self.uow:
+            raise RuntimeError(".authn_tokens called outside 'async with'")
+        return self.uow.authn_tokens
+
+    @property
+    def pages(self):
+        if not self.uow:
+            raise RuntimeError(".pages called outside 'async with'")
+        return self.uow.pages
+
+    async def commit(self) -> None:
+        if not self.uow:
+            raise RuntimeError(".commit() called outside 'async with'")
+        await self.uow.commit()
+        await self.session.close()
+
+    async def rollback(self) -> None:
+        if not self.uow:
+            raise RuntimeError(".rollback() called outside 'async with'")
+        await self.uow.rollback()
+        await self.session.close()
+
+
+def create_engine(settings: Settings) -> AsyncEngine:
+    engine = create_async_engine(
+        settings.database_url,
+        future=True,
+        echo=False,
+    )
+    return engine
+
+
+async def create_session(settings: Settings) -> Type[AsyncSession]:
+    engine = create_engine(settings)
+    async with engine.begin() as conn:  # type: ignore
+        await conn.run_sync(orm.metadata.create_all)
+    return sessionmaker(engine, class_=AsyncSession)  # type: ignore

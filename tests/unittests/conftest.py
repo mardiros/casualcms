@@ -26,13 +26,14 @@ def app_settings() -> Iterator[Settings]:
     os.environ["casualcms_template_search_path"] = str(
         (Path(__file__).parent / "templates").resolve()
     )
+
     yield Settings()  # type: ignore
     del os.environ["casualcms_template_search_path"]
 
 
 @pytest.fixture()
-def uow() -> Iterator[AbstractUnitOfWork]:
-    uow = InMemoryUnitOfWork()
+def uow(app_settings: Settings) -> Iterator[AbstractUnitOfWork]:
+    uow = InMemoryUnitOfWork(app_settings)
     yield uow
     uow.accounts.accounts.clear()  # type: ignore
     uow.pages.pages.clear()  # type: ignore

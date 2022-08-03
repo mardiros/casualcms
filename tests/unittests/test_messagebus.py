@@ -25,7 +25,7 @@ class DummyEvent(Event):
 
 class FakeUnitOfWorkWithDummyEvents(InMemoryUnitOfWork):
     def __init__(self):
-        super().__init__()
+        super().__init__(None)
         self.events = []
 
     def collect_new_events(self) -> Iterable[Event]:

@@ -29,6 +29,8 @@ services:
       - 'CASUALCMS_IMPORT_MODELS=["casualblog"]'
       - "CASUALCMS_ADMIN_USERNAME=alice"
       - "CASUALCMS_ADMIN_PASSWORD=secret"
+      - "CASUALCMS_UNIT_OF_WORK=casualcms.adapters.uow_sqla:SQLUnitOfWork"
+      - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
     volumes:
       - "./tests/functionals/templates:/app/templates"
       - "./tests/casualblog:/app/casualblog"

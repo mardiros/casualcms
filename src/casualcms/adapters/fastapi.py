@@ -30,11 +30,11 @@ def configure(
     return wrapped
 
 
-def resolve(value: str) -> AbstractUnitOfWork:
+def resolve(value: str) -> Callable[[Settings], AbstractUnitOfWork]:
     cls = resolver.resolve(value)
     if cls.is_err():
         raise ValueError(f"Invalid configuration: {cls.err()}")
-    return cls.unwrap()()
+    return cls.unwrap()
 
 
 class AppConfig:
@@ -45,11 +45,14 @@ class AppConfig:
         self.settings = settings
 
         if isinstance(self.settings.unit_of_work, str):
-            self.uow = resolve(self.settings.unit_of_work)
+            self.uow = resolve(self.settings.unit_of_work)(self.settings)
         else:
             self.uow = self.settings.unit_of_work
 
         self.bus = self.settings.messagebus or MessageRegistry()
+
+    async def initialize(self) -> None:
+        await self.uow.initialize()
 
 
 class FastAPIConfigurator(venusian.Scanner):
@@ -64,6 +67,9 @@ class FastAPIConfigurator(venusian.Scanner):
             app=FastAPI(),
             messagebus=self.config.bus,  # type: ignore
         )
+
+    async def initialize(self) -> None:
+        await self.config.initialize()
 
     def __enter__(self) -> "FastAPIConfigurator":
         return self

@@ -223,7 +223,7 @@ async def test_page_by_id(
     assert rok.path == params["expected_path"]
 
 
-async def test_page_by_id(sqla_session: AsyncSession):
+async def test_page_by_id_err(sqla_session: AsyncSession):
     repo = PageSQLRepository(sqla_session)
     root_page = await repo.by_id(home_page.id)
     assert root_page.is_err()

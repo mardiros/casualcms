@@ -24,10 +24,10 @@ def configure(configurator: FastAPIConfigurator) -> None:
 
 async def bootstrap(settings: Settings) -> FastAPI:
     with FastAPIConfigurator(settings) as configurator:
+        await configurator.initialize()
         configure(configurator)
 
     app = configurator.app
-
     if settings.admin_password:
         admin = CreateAccount(
             username=settings.admin_username,

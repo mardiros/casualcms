@@ -3,10 +3,13 @@ from typing import Any, Callable, Dict, Optional, Type, cast
 
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
-from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
+from sqlalchemy.ext.asyncio import (  # type: ignore
+    AsyncEngine,
+    AsyncSession,
+    create_async_engine,  # type: ignore
+)
 from sqlalchemy.future import select  # type: ignore
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account
@@ -165,10 +168,10 @@ class PageSQLRepository(AbstractPageRepository):
             ).exists()
             parent = None
         else:
-            parent = await self.by_path(path or "")
-            if parent.is_err():
-                return cast(Err[PageRepositoryError], parent)
-            parent = parent.unwrap()
+            parent_res = await self.by_path(path or "")
+            if parent_res.is_err():
+                return cast(Err[PageRepositoryError], parent_res)
+            parent = parent_res.unwrap()
             sub = (
                 select(orm.pages_treepath.c.ancestor_id)
                 .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
@@ -233,7 +236,7 @@ class PageSQLRepository(AbstractPageRepository):
         """Update model in the repository."""
         page = format_page(model)
         page.pop("id")
-        await self.session.execute(  # type: ignore
+        await self.session.execute(
             orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
         )
         self.seen.add(model)
@@ -292,35 +295,35 @@ class SQLUnitOfWorkBySession:
 
 class SQLUnitOfWork(AbstractUnitOfWork):
 
-    create_session: Callable[[], AsyncSession]
-
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
-        self.uow = None
-        self.create_session = None  # type: ignore
+        self.uow: SQLUnitOfWorkBySession | None = None
+        self.create_session: Callable[[], AsyncSession] | None= None
 
     async def initialize(self) -> None:
         self.create_session = await create_session(self.settings)
 
     async def __aenter__(self) -> AbstractUnitOfWork:
+        if self.create_session is None:
+            raise RuntimeError("SQLUnitOfWork.initialize() has not been called yet")
         self.session: AsyncSession = self.create_session()
         self.uow = SQLUnitOfWorkBySession(self.session)
         return self
 
     @property
-    def accounts(self):
+    def accounts(self) -> AccountSQLRepository:  # type: ignore
         if not self.uow:
             raise RuntimeError(".accounts called outside 'async with'")
         return self.uow.accounts
 
     @property
-    def authn_tokens(self):
+    def authn_tokens(self) -> AuthnTokenSQLRepository:  # type: ignore
         if not self.uow:
             raise RuntimeError(".authn_tokens called outside 'async with'")
         return self.uow.authn_tokens
 
     @property
-    def pages(self):
+    def pages(self) -> PageSQLRepository:  # type: ignore
         if not self.uow:
             raise RuntimeError(".pages called outside 'async with'")
         return self.uow.pages

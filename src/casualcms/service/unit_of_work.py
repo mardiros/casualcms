@@ -6,7 +6,7 @@ from types import TracebackType
 from typing import TYPE_CHECKING, Iterable, Optional, Type
 
 if TYPE_CHECKING:  # avoid circular dependency
-    from casualcms.config import Settings
+    from casualcms.config import Settings  # coverage: ignore
 
 from casualcms.domain.messages import Event
 from casualcms.domain.repositories import AbstractAccountRepository

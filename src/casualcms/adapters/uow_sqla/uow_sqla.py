@@ -1,7 +1,9 @@
 from operator import and_
+from types import TracebackType
 from typing import Any, Callable, Dict, Optional, Type, cast
 
 from result import Err, Ok
+from sqlalchemy.engine.cursor import CursorResult  # type: ignore
 from sqlalchemy import alias, delete, text  # type: ignore
 from sqlalchemy.ext.asyncio import (  # type: ignore
     AsyncEngine,
@@ -45,10 +47,10 @@ class AccountSQLRepository(AbstractAccountRepository):
 
     async def by_username(self, username: str) -> AccountRepositoryResult:
         """Fetch one user account by its unique username."""
-        accounts_ = await self.session.execute(  # type: ignore
+        accounts_: CursorResult = await self.session.execute(
             select(orm.accounts).filter_by(username=username).limit(1)
         )
-        account: Account = accounts_.first()  # its a Row actually
+        account = cast(Account, accounts_.first())
         if account:
             return Ok(
                 Account(
@@ -104,7 +106,7 @@ class PageSQLRepository(AbstractPageRepository):
             )
             .order_by(orm.pages_treepath.c.length.desc())
         )
-        orm_pages = await self.session.execute(qry)  # type: ignore
+        orm_pages: CursorResult = await self.session.execute(qry)
         page: Page | None = None
         orm_page_iter = iter(orm_pages)  # type: ignore
         try:
@@ -150,7 +152,7 @@ class PageSQLRepository(AbstractPageRepository):
             )
             qry = qry.filter(sub.exists())
 
-        page = await self.session.execute(qry)  # type: ignore
+        page: CursorResult = await self.session.execute(qry)
         p: Any = page.first()
         if p:
             return await self.by_id(p.id)
@@ -179,7 +181,7 @@ class PageSQLRepository(AbstractPageRepository):
                 .filter(orm.pages_treepath.c.ancestor_id == parent.id)
             ).exists()
         qry = select(orm.pages).filter(sub).order_by(orm.pages.c.slug)
-        pages = await self.session.execute(qry)  # type: ignore
+        pages: CursorResult = await self.session.execute(qry)
 
         ret: list[Page] = [
             resolve_type(p.type)(  # type:ignore
@@ -248,38 +250,38 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
 
     async def by_token(self, token: str) -> AuthnTokenRepositoryResult:
         """Fetch given token informations from the given token."""
-        tokens_ = await self.session.execute(  # type: ignore
+        orm_tokens: CursorResult = await self.session.execute(
             select(orm.authn_tokens).filter_by(token=token).limit(1)
         )
-        token_: AuthnToken = tokens_.first()  # its a Row actually
-        if token_:
+        orm_token = cast(AuthnToken, orm_tokens.first())
+        if orm_token:
             return Ok(
                 AuthnToken(
-                    id=token_.id,
-                    token=token_.token,
-                    account_id=token_.account_id,
-                    created_at=token_.created_at,
-                    expires_at=token_.expires_at,
-                    client_addr=str(token_.client_addr),
-                    user_agent=token_.user_agent,
+                    id=orm_token.id,
+                    token=orm_token.token,
+                    account_id=orm_token.account_id,
+                    created_at=orm_token.created_at,
+                    expires_at=orm_token.expires_at,
+                    client_addr=str(orm_token.client_addr),
+                    user_agent=orm_token.user_agent,
                 )
             )
         return Err(AuthnTokenRepositoryError.token_not_found)
 
     async def add(self, model: AuthnToken) -> None:
         """Append a new model to the repository."""
-        await self.session.execute(  # type: ignore
+        await self.session.execute(
             orm.authn_tokens.insert().values(model.dict())  # type: ignore
         )
 
     async def remove(self, token: str) -> None:
         """Delete a new model to the repository."""
-        await self.session.execute(  # type: ignore
+        await self.session.execute(
             delete(orm.authn_tokens).where(orm.authn_tokens.c.token == token),
         )
 
 
-class SQLUnitOfWorkBySession:
+class SQLUnitOfWorkBySession(AbstractUnitOfWork):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
         self.accounts = AccountSQLRepository(session)
@@ -292,13 +294,25 @@ class SQLUnitOfWorkBySession:
     async def rollback(self) -> None:
         await self.session.rollback()
 
+    async def __aenter__(self) -> "SQLUnitOfWorkBySession":
+        return self
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        tb: Optional[TracebackType],
+    ) -> None:
+        """Rollback in case of exception."""
+        if self.session:
+            await self.session.close()
+
 
 class SQLUnitOfWork(AbstractUnitOfWork):
-
     def __init__(self, settings: Settings) -> None:
         self.settings = settings
         self.uow: SQLUnitOfWorkBySession | None = None
-        self.create_session: Callable[[], AsyncSession] | None= None
+        self.create_session: Callable[[], AsyncSession] | None = None
 
     async def initialize(self) -> None:
         self.create_session = await create_session(self.settings)
@@ -306,39 +320,14 @@ class SQLUnitOfWork(AbstractUnitOfWork):
     async def __aenter__(self) -> AbstractUnitOfWork:
         if self.create_session is None:
             raise RuntimeError("SQLUnitOfWork.initialize() has not been called yet")
-        self.session: AsyncSession = self.create_session()
-        self.uow = SQLUnitOfWorkBySession(self.session)
-        return self
-
-    @property
-    def accounts(self) -> AccountSQLRepository:  # type: ignore
-        if not self.uow:
-            raise RuntimeError(".accounts called outside 'async with'")
-        return self.uow.accounts
-
-    @property
-    def authn_tokens(self) -> AuthnTokenSQLRepository:  # type: ignore
-        if not self.uow:
-            raise RuntimeError(".authn_tokens called outside 'async with'")
-        return self.uow.authn_tokens
-
-    @property
-    def pages(self) -> PageSQLRepository:  # type: ignore
-        if not self.uow:
-            raise RuntimeError(".pages called outside 'async with'")
-        return self.uow.pages
+        async with SQLUnitOfWorkBySession(self.create_session()) as uow:
+            return uow
 
     async def commit(self) -> None:
-        if not self.uow:
-            raise RuntimeError(".commit() called outside 'async with'")
-        await self.uow.commit()
-        await self.session.close()
+        raise RuntimeError("use the locale variable `async with ... as uow`")
 
     async def rollback(self) -> None:
-        if not self.uow:
-            raise RuntimeError(".rollback() called outside 'async with'")
-        await self.uow.rollback()
-        await self.session.close()
+        raise RuntimeError("use the locale variable `async with ... as uow`")
 
 
 def create_engine(settings: Settings) -> AsyncEngine:
@@ -354,4 +343,10 @@ async def create_session(settings: Settings) -> Type[AsyncSession]:
     engine = create_engine(settings)
     async with engine.begin() as conn:  # type: ignore
         await conn.run_sync(orm.metadata.create_all)
-    return sessionmaker(engine, class_=AsyncSession)  # type: ignore
+    return sessionmaker(
+        engine,
+        class_=AsyncSession,
+        autoflush=True,
+        autocommit=False,
+        expire_on_commit=True,
+    )  # type: ignore

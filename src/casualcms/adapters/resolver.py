@@ -9,7 +9,7 @@ def resolve(value: str) -> Result[Any, str]:
     ep = pkg_resources.EntryPoint.parse(f"x={value}")
     try:
         cls = ep.resolve()
-    except ModuleNotFoundError:
+    except (ImportError, ModuleNotFoundError):
         return Err(f"{value} is not a valid.")
     else:
         return Ok(cls)

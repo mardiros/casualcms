@@ -4,7 +4,6 @@ import json
 from typing import Any
 
 from citext import CIText  # type: ignore
-setattr(CIText, "cache_ok",  True)  # useless SAWarning
 
 from sqlalchemy import (  # type: ignore
     CHAR,
@@ -27,6 +26,8 @@ from sqlalchemy.dialects.postgresql import JSONB as PgJSONB
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
+
+setattr(CIText, "cache_ok", True)  # useless SAWarning
 
 __all__ = [
     "event",

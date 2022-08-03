@@ -3,15 +3,12 @@ from typing import Any, Callable, Dict, Optional, Type, cast
 
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
-from sqlalchemy.ext.asyncio import (
-    AsyncEngine,
-    AsyncSession,
-    create_async_engine,  # type: ignore
-)
+from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker
-from casualcms.config import Settings
 
+from casualcms.config import Settings
 from casualcms.domain.model import Account
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page, resolve_type
@@ -160,11 +157,7 @@ class PageSQLRepository(AbstractPageRepository):
         """Fetch one page by its unique path."""
 
         if not path:
-            # we want roots here
-            """
-            select *
-            from page
-            where not exists (select 1 from from tp where descendant_id = page.id and length > 0)"""
+            # we want roots page here
             sub = ~(
                 select(orm.pages_treepath.c.ancestor_id)
                 .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)

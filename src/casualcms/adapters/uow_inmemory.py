@@ -1,8 +1,8 @@
 from typing import Optional
 
 from result import Err, Ok
-from casualcms.config import Settings
 
+from casualcms.config import Settings
 from casualcms.domain.model import Account
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
@@ -115,7 +115,6 @@ class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
 
 
 class InMemoryUnitOfWork(AbstractUnitOfWork):
-
     def __init__(self, settings: Settings) -> None:
         self.accounts = AccountInMemoryRepository()
         self.pages = PageInMemoryRepository()

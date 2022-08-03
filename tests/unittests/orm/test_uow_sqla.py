@@ -319,7 +319,9 @@ async def test_page_by_path_err(
         },
     ],
 )
-async def test_page_by_parent(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
+async def test_page_by_parent(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
     repo = PageSQLRepository(sqla_session)
     child_pages = await repo.by_parent(params["parent"])
     assert child_pages.is_ok()

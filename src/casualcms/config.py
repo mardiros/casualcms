@@ -5,6 +5,7 @@ from pydantic import BaseSettings, Field
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
+
 class Settings(BaseSettings):
 
     # Jinja2 config

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import abc
 from types import TracebackType
-from typing import Iterable, Optional, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable, Optional, Type
 
 if TYPE_CHECKING:  # avoid circular dependency
     from casualcms.config import Settings

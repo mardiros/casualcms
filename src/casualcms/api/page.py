@@ -11,11 +11,15 @@ from casualcms.domain.model.page import resolve_type
 from .base import get_token_info
 
 
+class PartialPageMeta(BaseModel):
+    path: str = Field(...)
+    type: str = Field(...)
+
+
 class PartialPage(BaseModel):
     slug: str = Field(...)
     title: str = Field(...)
-    path: str = Field(...)
-    type: str = Field(...)
+    meta: PartialPageMeta = Field(...)
 
 
 async def create_page(
@@ -79,8 +83,10 @@ async def list_pages(
         PartialPage(
             slug=p.slug,
             title=p.title,
-            path=p.path,
-            type=p.__meta__.type,
+            meta=PartialPageMeta(
+                path=p.path,
+                type=p.__meta__.type,
+            ),
         )
         for p in ps
     ]

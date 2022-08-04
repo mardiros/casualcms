@@ -25,9 +25,9 @@ export class FetchAccountApi extends BaseFetchApi implements IAccountApi {
     await this.fetch("/api/authntokens", {
       method: "DELETE",
       headers: {
-        "Authorization": `Bearer ${authntoken}`,
+        Authorization: `Bearer ${authntoken}`,
       },
     });
-    return true
+    return true;
   }
 }

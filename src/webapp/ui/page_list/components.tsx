@@ -43,21 +43,25 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
       <Td>{page.title}</Td>
       <Td>
         <Link
-          to={`/admin/page/edit?${new URLSearchParams({ page: page.path })}`}
+          to={`/admin/page/edit?${new URLSearchParams({
+            page: page.meta.path,
+          })}`}
         >
           <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Link>
       </Td>
       <Td>
-        <a href={`${page.path}`}>
+        <a href={`${page.meta.path}`}>
           <Icon as={ViewIcon} marginEnd={2} />
           View
         </a>
       </Td>
       <Td>
         <Link
-          to={`/admin/pages/?${new URLSearchParams({ parent: page.path })}`}
+          to={`/admin/pages/?${new URLSearchParams({
+            parent: page.meta.path,
+          })}`}
           data-testid="View child pages"
         >
           <Icon as={ArrowRightIcon} marginEnd={2} />
@@ -127,7 +131,10 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
   const curPage = props.curPage;
   let navigate = useNavigate();
   const qs = curPage
-    ? new URLSearchParams({ parent: curPage.path, type: curPage.type })
+    ? new URLSearchParams({
+        parent: curPage.meta.path,
+        type: curPage.meta.type,
+      })
     : "";
   return (
     <Stack p={4} spacing={4} direction="row" align="right">

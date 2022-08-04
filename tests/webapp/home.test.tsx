@@ -48,10 +48,7 @@ describe("As a user, I am redirected to the root list if one exists", () => {
       </>,
       "/"
     );
-    await waitForLoadingLabel("preparing data...");
-    await waitForLoadingLabel("Loading page");
-    await waitForLoadingLabel("Loading pages list");
-    let tpl = screen.getByText("dummy home");
+    let tpl = await screen.findByText("dummy home");
     expect(tpl).not.equal(null);
   });
 });

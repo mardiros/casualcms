@@ -70,8 +70,10 @@ async def test_api_list_root_page(
         {
             "slug": home_page.slug,
             "title": home_page.title,
-            "path": home_page.path,
-            "type": home_page.__meta__.type,
+            "meta": {
+                "path": home_page.path,
+                "type": home_page.__meta__.type,
+            },
         }
     ]
 
@@ -133,8 +135,10 @@ async def test_create_subpage(
         {
             "path": "/api/pages/home",
             "response": {
-                "type": "blog:HomePage",
-                "path": "/home",
+                "meta": {
+                    "type": "blog:HomePage",
+                    "path": "/home",
+                },
                 "slug": "home",
                 "title": "hello world - casualcms",
                 "description": "I am so glad to be there",
@@ -145,10 +149,12 @@ async def test_create_subpage(
         {
             "path": "/api/pages/home/sub",
             "response": {
-                "path": "/home/sub",
+                "meta": {
+                    "type": "blog:CategoryPage",
+                    "path": "/home/sub",
+                },
                 "slug": "sub",
                 "title": "a sub page",
-                "type": "blog:CategoryPage",
                 "description": "I am so glad to be a sub page",
                 "hero_title": "a sub page",
                 "intro": None,
@@ -197,9 +203,11 @@ async def test_update_home_page_content(
         json=payload,
     )
     assert resp.json() == {
-        "path": "/new-home",
-        "type": "blog:HomePage",
         "id": home_page.id,
+        "meta": {
+            "path": "/new-home",
+            "type": "blog:HomePage",
+        },
         "slug": "new-home",
         "title": "new title",
         "body": [{"body": "my new body"}],
@@ -236,9 +244,11 @@ async def test_update_sub_page_content(
         json=payload,
     )
     assert resp.json() == {
-        "path": "/home/new-slug",
         "id": sub_page.id,
-        "type": "blog:CategoryPage",
+        "meta": {
+            "path": "/home/new-slug",
+            "type": "blog:CategoryPage",
+        },
         "slug": "new-slug",
         "title": "new title",
         "description": "I am so glad to be a sub page",

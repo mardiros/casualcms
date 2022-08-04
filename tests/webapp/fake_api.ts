@@ -30,7 +30,7 @@ class FakeAccountApi implements IAccountApi {
     });
   }
   async logout(authntoken: string): Promise<boolean> {
-    return true
+    return true;
   }
 }
 
@@ -113,8 +113,10 @@ class FakePageApi implements IPageApi {
     payload: any,
     parent: string | null
   ): Promise<Result<boolean, Map<string, string>>> {
-    payload["type"] = type;
-    payload["path"] = `${parent || ""}/${payload.slug}`;
+    payload["meta"] = {
+      type: type,
+      path: `${parent || ""}/${payload.slug}`,
+    };
     this.pages.push(payload);
     return ok(true);
   }
@@ -126,7 +128,7 @@ class FakePageApi implements IPageApi {
     let pages: Page[] = [];
     this.pages
       .filter((page) => {
-        return page.path == path;
+        return page.meta.path == path;
       })
       .map((page) => pages.push(page));
     if (pages.length) {
@@ -143,20 +145,23 @@ class FakePageApi implements IPageApi {
     parent: string | null
   ): Promise<Result<PartialPage[], Map<string, string>>> {
     let pages: PartialPage[] = [];
+
     this.pages
-      .filter((page) => {
+      .filter((page: PartialPage) => {
         let starter = parent || "";
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
-        const pathLen = page.path.split("/").length;
-        return page.path.startsWith(starter) && pathLen == startLen + 1;
+        const pathLen = page.meta.path.split("/").length;
+        return page.meta.path.startsWith(starter) && pathLen == startLen + 1;
       })
       .map((page) =>
         pages.push({
           slug: page.slug,
           title: page.title,
-          path: page.path,
-          type: "casual:HomePage",
+          meta: {
+            path: page.meta.path,
+            type: "casual:HomePage",
+          },
         })
       );
     return ok(pages);
@@ -171,9 +176,9 @@ class FakePageApi implements IPageApi {
     this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
     if (pages.length) {
       const newPage = { ...oldPage, ...page };
-      const newPath: string[] = newPage.path.split("/");
+      const newPath: string[] = newPage.meta.path.split("/");
       newPath[newPath.length - 1] = page.slug;
-      newPage.path = newPath.join("/");
+      newPage.meta.path = newPath.join("/");
       pages.push(newPage);
       this.pages = pages;
       return ok(newPage);
@@ -188,8 +193,8 @@ class FakePageApi implements IPageApi {
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>> {
-    const pages = this.pages.filter((page) => {
-      return page.path != path;
+    const pages = this.pages.filter((page: PartialPage) => {
+      return page.meta.path != path;
     });
     this.pages = pages;
     return ok(true);

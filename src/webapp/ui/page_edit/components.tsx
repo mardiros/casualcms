@@ -39,7 +39,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       if (!page) {
         return;
       }
-      const template = await config.api.template.showTemplate(token, page.type);
+      const template = await config.api.template.showTemplate(
+        token,
+        page.meta.type
+      );
       // console.log(template);
       template
         .map((tpl: PageTemplate) => setTemplate(tpl))
@@ -77,7 +80,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       return;
     }
     const newPage = data.formData;
-    await config.api.page.updatePage(token, page.path, newPage);
+    await config.api.page.updatePage(token, page.meta.path, newPage);
     navigate(`/admin/pages?${q}`, { replace: true });
   };
 

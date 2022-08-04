@@ -17,13 +17,18 @@ export type PageTemplate = {
   uiSchema: any;
 };
 
-export type PartialPage = {
-  slug: string;
-  title: string;
+export type PartialPageMeta = {
   path: string;
   type: string;
 };
 
+export type PartialPage = {
+  slug: string;
+  title: string;
+  meta: PartialPageMeta;
+};
+
 export type Page = {
-  readonly [k: string]: any;
+  meta: PartialPageMeta;
+  [k: string]: any;
 };

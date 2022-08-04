@@ -134,8 +134,10 @@ class Page(AbstractPage):
 
     def get_data_context(self) -> MutableMapping[str, Any]:
         return {
-            "type": self.__meta__.type,
-            "path": self.path,
+            "meta": {
+                "type": self.__meta__.type,
+                "path": self.path,
+            },
             **self.dict(exclude={"events", "created_at"}),
         }
 

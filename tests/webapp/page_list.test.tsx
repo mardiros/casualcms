@@ -64,8 +64,10 @@ describe("As a user, I can list pages", () => {
     const page = {
       slug: "home",
       title: "Home Page",
-      path: "/home",
-      type: "casual:HomePage",
+      meta: {
+        path: "/home",
+        type: "casual:HomePage",
+      },
     };
     renderWithRouter(
       <Route

@@ -18,6 +18,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 )
 from casualcms.config import Settings
 from casualcms.domain.model.page import Page
+from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 from .fixtures import fake_account, fake_authn_tokens, fake_page
 
@@ -477,7 +478,7 @@ async def test_sql_uow_runtime_error(method: str, app_settings_sqlite: Settings)
 
 @pytest.mark.parametrize("method", ["commit", "rollback"])
 async def test_sql_uow_with_runtime_error(method: str, app_settings_sqlite: Settings):
-    uow = SQLUnitOfWork(app_settings_sqlite)
+    uow: AbstractUnitOfWork = SQLUnitOfWork(app_settings_sqlite)
     with pytest.raises(RuntimeError) as ctx:
         async with uow as uow:
             pass

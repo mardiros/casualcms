@@ -4,7 +4,6 @@ import json
 from typing import Any
 
 from citext import CIText  # type: ignore
-
 from sqlalchemy import (  # type: ignore
     CHAR,
     Boolean,
@@ -21,11 +20,9 @@ from sqlalchemy import (  # type: ignore
     TypeDecorator,
     event,
 )
-from sqlalchemy.dialects.postgresql import (  # type: ignore
-    INET as PgINET,
-    JSONB as PgJSONB,
-    UUID as PgUUID,
-)
+from sqlalchemy.dialects.postgresql import INET as PgINET  # type: ignore
+from sqlalchemy.dialects.postgresql import JSONB as PgJSONB
+from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.engine.interfaces import Dialect  # type: ignore
 from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
 
@@ -97,7 +94,7 @@ class JSON(TypeDecorator):
         if value is None:
             return value
         elif dialect.name == "postgresql":
-            return value
+            return value  # coverage: ignore
         else:
             return json.dumps(value)
 
@@ -109,7 +106,7 @@ class JSON(TypeDecorator):
         if value is None:
             return value
         elif dialect.name == "postgresql":
-            return value
+            return value  # coverage: ignore
         else:
             return json.loads(value)
 
@@ -132,7 +129,7 @@ class IpAddress(TypeDecorator):
         if value is None:
             return value
         elif dialect.name == "postgresql":
-            return str(value)
+            return str(value)  # coverage: ignore
         return value
 
     def process_result_value(  # type: ignore

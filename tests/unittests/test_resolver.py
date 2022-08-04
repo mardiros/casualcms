@@ -1,6 +1,6 @@
 import pytest
-from casualcms.adapters.resolver import resolve
 
+from casualcms.adapters.resolver import resolve
 from casualcms.domain.model.page import Page
 
 

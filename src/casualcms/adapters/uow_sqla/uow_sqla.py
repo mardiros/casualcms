@@ -3,13 +3,10 @@ from types import TracebackType
 from typing import Any, Callable, Dict, Optional, Type, cast
 
 from result import Err, Ok
-from sqlalchemy.engine.cursor import CursorResult  # type: ignore
 from sqlalchemy import alias, delete, text  # type: ignore
-from sqlalchemy.ext.asyncio import (  # type: ignore
-    AsyncEngine,
-    AsyncSession,
-    create_async_engine,  # type: ignore
-)
+from sqlalchemy.engine.cursor import CursorResult  # type: ignore
+from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 

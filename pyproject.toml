@@ -62,6 +62,7 @@ asyncio_mode = "auto"
 [tool.coverage.report]
 exclude_lines = [
   "# coverage: ignore",
+  "dialect\\.type_descriptor\\(Pg.*"
 ]
 
 [build-system]

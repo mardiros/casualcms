@@ -337,6 +337,29 @@ async def test_page_by_parent(
     "params",
     [
         {
+            "parent": "/foo",
+            "pages": [home_page],
+        },
+        {
+            "parent": "/root/foo",
+            "pages": [home_page],
+        },
+    ],
+)
+async def test_page_by_parent_err(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+    child_pages = await repo.by_parent(params["parent"])
+    assert child_pages.is_err()
+    err = child_pages.unwrap_err()
+    assert err.name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
             "parent": None,
             "page": home_page,
             "pages": [],  # type: ignore
@@ -450,6 +473,15 @@ async def test_sql_uow_runtime_error(method: str, app_settings_sqlite: Settings)
         str(ctx.value)
         == "Bad usage: use the uow from `async with SQLUnitOfWork(settings) as uow`"
     )
+
+
+@pytest.mark.parametrize("method", ["commit", "rollback"])
+async def test_sql_uow_with_runtime_error(method: str, app_settings_sqlite: Settings):
+    uow = SQLUnitOfWork(app_settings_sqlite)
+    with pytest.raises(RuntimeError) as ctx:
+        async with uow as uow:
+            pass
+    assert str(ctx.value) == "SQLUnitOfWork.initialize() has not been called yet"
 
 
 @pytest.mark.parametrize(

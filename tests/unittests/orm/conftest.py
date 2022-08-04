@@ -215,18 +215,14 @@ async def accounts_uow(
     params: Mapping[str, Any],
 ) -> AsyncGenerator[None, None]:
 
-    breakpoint()
     accounts: Sequence[Account] = params["accounts"]
-    sqla_session = sql_uow.create_session()  # type: ignore
-
-    await sqla_session.execute(  # type: ignore
-        orm.accounts.insert(),  # type: ignore
-        [a.dict() for a in accounts],
-    )
-    await sqla_session.commit()
+    async with sql_uow as uow:
+        for account in accounts:
+            await uow.accounts.add(account)
+        await uow.commit()
 
     yield None
-
+    sqla_session = sql_uow.create_session()  # type: ignore
     await sqla_session.execute(  # type: ignore
         delete(orm.accounts).where(
             orm.accounts.c.username.in_([a.email for a in accounts])

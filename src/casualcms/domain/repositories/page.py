@@ -9,6 +9,7 @@ from .base import AbstractRepository, RepositoryResult
 
 class PageRepositoryError(enum.Enum):
     page_not_found = "Page not found"
+    page_broken_treepath = "Page not found"  # we can set the same error message
 
 
 PageRepositoryResult = RepositoryResult[Page, PageRepositoryError]

@@ -127,7 +127,8 @@ class PageSQLRepository(AbstractPageRepository):
 
         if page:
             return Ok(page)
-        return Err(PageRepositoryError.page_not_found)
+        # If we don't have a page here, it means that the tree path is broken
+        return Err(PageRepositoryError.page_broken_treepath)  # coverage: ignore
 
     async def by_path(self, path: str) -> PageRepositoryResult:
         """Fetch one page by its unique path."""

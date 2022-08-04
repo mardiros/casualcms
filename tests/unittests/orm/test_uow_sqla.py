@@ -13,7 +13,10 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
     PageSQLRepository,
+    SQLUnitOfWork,
+    SQLUnitOfWorkBySession,
 )
+from casualcms.config import Settings
 from casualcms.domain.model.page import Page
 
 from .fixtures import fake_account, fake_authn_tokens, fake_page
@@ -412,3 +415,54 @@ async def test_page_update(
     assert page.title == params["expected_title"]
     assert page.description == params["expected_description"]
     assert page.body == params["expected_body"]
+
+
+async def test_sql_uow_by_session_commit(dummy_session: AsyncSession):
+    uow = SQLUnitOfWorkBySession(dummy_session)
+    await uow.commit()
+    assert dummy_session.get_transaction() == "begin_commit"
+
+
+async def test_sql_uow_by_session_rollback(dummy_session: AsyncSession):
+    uow = SQLUnitOfWorkBySession(dummy_session)
+    await uow.rollback()
+    assert dummy_session.get_transaction() == "begin_rollback"
+
+
+async def test_sql_uow_by_session_rollback_on_exc(dummy_session: AsyncSession):
+    uow = SQLUnitOfWorkBySession(dummy_session)
+    try:
+        async with uow:
+            raise ValueError("Boom")
+    except ValueError:
+        pass
+    assert dummy_session.get_transaction() == "begin_rollback_close"
+
+
+@pytest.mark.parametrize("method", ["commit", "rollback"])
+async def test_sql_uow_runtime_error(method: str, app_settings_sqlite: Settings):
+    uow = SQLUnitOfWork(app_settings_sqlite)
+
+    with pytest.raises(RuntimeError) as ctx:
+        await getattr(uow, method)()
+
+    assert (
+        str(ctx.value)
+        == "Bad usage: use the uow from `async with SQLUnitOfWork(settings) as uow`"
+    )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "accounts": [alice, bob, dylan],  # type: ignore
+        },
+    ],
+)
+async def test_sql_uow(params: Any, sql_uow: SQLUnitOfWork, accounts_uow: NoneType):
+    async with sql_uow as uow:
+        alice_from_uow = await uow.accounts.by_username("alice")
+        await uow.rollback()
+
+    assert alice_from_uow.unwrap().id == alice.id

@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from typing import Any, AsyncGenerator, Dict, Iterator, Mapping, Sequence
 
 import pytest
@@ -8,6 +10,8 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.adapters.uow_sqla import orm
+from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
+from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.domain.model.page import Page
 
@@ -18,6 +22,18 @@ DATABASE_URL = "sqlite+aiosqlite:///"
 def bared_sqla_engine() -> Iterator[AsyncEngine]:
     engine = create_async_engine(DATABASE_URL, future=True, echo=False)
     yield engine
+
+
+@pytest.fixture()
+def app_settings_sqlite() -> Iterator[Settings]:
+    template_search_path = str((Path(__file__).parent.parent / "templates").resolve())
+    yield Settings(
+        template_search_path=template_search_path,
+        unit_of_work="casualcms.adapters.uow_sqla:SQLUnitOfWork",
+        database_url=DATABASE_URL,
+        create_database_schema=True,
+        import_models=[],
+    )
 
 
 @pytest_asyncio.fixture()
@@ -159,5 +175,61 @@ async def pages(
 
     await sqla_session.execute(  # type: ignore
         delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),
+    )
+    await sqla_session.commit()
+
+
+class DummyAsyncSession:
+    def __init__(self):
+        self.transaction_state = "begin"
+
+    async def commit(self):
+        self.transaction_state += "_commit"
+
+    async def rollback(self):
+        self.transaction_state += "_rollback"
+
+    async def close(self):
+        self.transaction_state += "_close"
+
+    def get_transaction(self) -> str:  # fake usage
+        return self.transaction_state
+
+
+@pytest.fixture()
+def dummy_session():
+    return DummyAsyncSession()
+
+
+@pytest_asyncio.fixture()
+async def sql_uow(app_settings_sqlite: Settings) -> AsyncGenerator[SQLUnitOfWork, None]:
+    uow = SQLUnitOfWork(app_settings_sqlite)
+    await uow.initialize()
+    yield uow
+    await uow.dispose()
+
+
+@pytest_asyncio.fixture()
+async def accounts_uow(
+    sql_uow: SQLUnitOfWork,
+    params: Mapping[str, Any],
+) -> AsyncGenerator[None, None]:
+
+    breakpoint()
+    accounts: Sequence[Account] = params["accounts"]
+    sqla_session = sql_uow.create_session()  # type: ignore
+
+    await sqla_session.execute(  # type: ignore
+        orm.accounts.insert(),  # type: ignore
+        [a.dict() for a in accounts],
+    )
+    await sqla_session.commit()
+
+    yield None
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.accounts).where(
+            orm.accounts.c.username.in_([a.email for a in accounts])
+        ),
     )
     await sqla_session.commit()

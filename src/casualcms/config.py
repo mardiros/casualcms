@@ -28,6 +28,7 @@ class Settings(BaseSettings):
         "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork"
     )
     database_url: str = ""
+    create_database_schema: bool = False
 
     messagebus: MessageRegistry | None = None
 

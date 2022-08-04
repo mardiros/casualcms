@@ -301,45 +301,12 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
         tb: Optional[TracebackType],
     ) -> None:
         """Rollback in case of exception."""
+        await super().__aexit__(exc_type, exc, tb)
         if self.session:
             await self.session.close()
 
 
-class SQLUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, settings: Settings) -> None:
-        self.settings = settings
-        self.uow: SQLUnitOfWorkBySession | None = None
-        self.create_session: Callable[[], AsyncSession] | None = None
-
-    async def initialize(self) -> None:
-        self.create_session = await create_session(self.settings)
-
-    async def __aenter__(self) -> AbstractUnitOfWork:
-        if self.create_session is None:
-            raise RuntimeError("SQLUnitOfWork.initialize() has not been called yet")
-        async with SQLUnitOfWorkBySession(self.create_session()) as uow:
-            return uow
-
-    async def commit(self) -> None:
-        raise RuntimeError("use the locale variable `async with ... as uow`")
-
-    async def rollback(self) -> None:
-        raise RuntimeError("use the locale variable `async with ... as uow`")
-
-
-def create_engine(settings: Settings) -> AsyncEngine:
-    engine = create_async_engine(
-        settings.database_url,
-        future=True,
-        echo=False,
-    )
-    return engine
-
-
-async def create_session(settings: Settings) -> Type[AsyncSession]:
-    engine = create_engine(settings)
-    async with engine.begin() as conn:  # type: ignore
-        await conn.run_sync(orm.metadata.create_all)
+async def create_async_session(engine: AsyncEngine) -> Type[AsyncSession]:
     return sessionmaker(
         engine,
         class_=AsyncSession,
@@ -347,3 +314,56 @@ async def create_session(settings: Settings) -> Type[AsyncSession]:
         autocommit=False,
         expire_on_commit=True,
     )  # type: ignore
+
+
+class SQLUnitOfWork(AbstractUnitOfWork):
+    def __init__(self, settings: Settings) -> None:
+        self.settings = settings
+        self.uow: SQLUnitOfWorkBySession | None = None
+        self.create_session: Callable[[], AsyncSession] | None = None
+        self.engine: AsyncEngine | None = None
+
+    async def initialize(self) -> None:
+        self.engine = create_async_engine(
+            self.settings.database_url,
+            future=True,
+            echo=False,
+        )
+        if self.settings.create_database_schema:
+            async with self.engine.begin() as conn:  # type: ignore
+                await conn.run_sync(orm.metadata.create_all)
+        self.create_session = await create_async_session(self.engine)
+
+    async def dispose(self) -> None:
+        if self.engine:
+            await self.engine.dispose()
+
+    async def __aenter__(self) -> AbstractUnitOfWork:
+        if self.create_session is None:
+            raise RuntimeError("SQLUnitOfWork.initialize() has not been called yet")
+        session = self.create_session()
+        async with SQLUnitOfWorkBySession(session) as uow:
+            return uow
+
+    async def commit(self) -> None:
+        raise RuntimeError(
+            "Bad usage: use the uow from `async with SQLUnitOfWork(settings) as uow`"
+        )
+
+    async def rollback(self) -> None:
+        raise RuntimeError(
+            "Bad usage: use the uow from `async with SQLUnitOfWork(settings) as uow`"
+        )
+
+    async def __aexit__(
+        self,
+        exc_type: Optional[Type[BaseException]],
+        exc: Optional[BaseException],
+        tb: Optional[TracebackType],
+    ) -> None:
+        """
+        Override parent class to do nothing.
+
+        the with decorator instanciate one session and one session handler
+        SQLUnitOfWorkBySession.
+        """

@@ -12,7 +12,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { PartialPageTemplate } from "../../casualcms/domain/model";
+import { Page, PartialPageTemplate } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
@@ -21,6 +21,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../loader/components";
 import { ApiErrorUI } from "../errorApi/components";
+import { PageBreadcrumb } from "../breadcrumb/components";
 
 type TemplateTableProps = {
   isLoading: boolean;
@@ -73,6 +74,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
   const [params, setParams] = useSearchParams();
   const parentType = params.get("type");
   const parentPath = params.get("parent");
+  const [parentPage, setParentPage] = React.useState<Page | null>(null);
 
   React.useEffect(() => {
     async function loadTemplates() {
@@ -91,12 +93,35 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
       setError(null);
       setTemplates([]);
     };
-  }, []);
+  }, [parentType]);
+
+  React.useEffect(() => {
+    async function loadPage() {
+      if (parentPath) {
+        const page = await config.api.page.showPage(token, parentPath || "");
+        // console.log(page)
+        page
+          .map((page: Page) => setParentPage(page))
+          .mapErr((err: ApiError) => setError(err));
+      } else {
+        setParentPage({ meta: { path: "", type: "", breadcrumb: [] } });
+      }
+    }
+    loadPage();
+    return () => {
+      setParentPage(null);
+      setError(null);
+    };
+  }, [parentPath]);
+
   return (
     <Container>
       {
         <>
           <Heading>Choose A Type Of Template</Heading>
+          {parentPage && (
+            <PageBreadcrumb meta={parentPage.meta} title="type of template" />
+          )}
           <Box paddingLeft={15}>
             <ApiErrorUI error={error} />
             <TemplateTable

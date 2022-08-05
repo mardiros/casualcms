@@ -91,12 +91,12 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   return (
     <Box maxW="720px">
-      {page &&
+      {page && (
         <>
           <Heading>{page.title}</Heading>
           <PageBreadcrumb meta={page.meta} />
         </>
-      }
+      )}
 
       <ApiErrorUI error={error} />
 

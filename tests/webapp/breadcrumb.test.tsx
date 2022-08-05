@@ -8,23 +8,22 @@ import { PageMeta } from "../../src/webapp/casualcms/domain/model";
 
 describe("As a user, I can navigate throw the breadcrumb", () => {
   it("Render links using the breadcrumb of the page meta", async () => {
-
     const meta: PageMeta = {
-      "path": "",
-      "type": "",
-      "breadcrumb": [
+      path: "",
+      type: "",
+      breadcrumb: [
         {
-          "path": "/home",
-          "title": "Home page",
-          "slug": "home",
+          path: "/home",
+          title: "Home page",
+          slug: "home",
         },
         {
-          "path": "/home/cat",
-          "title": "Categogo",
-          "slug": "cat",
+          path: "/home/cat",
+          title: "Categogo",
+          slug: "cat",
         },
       ],
-    }
+    };
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageBreadcrumb meta={meta} />} />
@@ -32,9 +31,52 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/pages"
     );
     let link = screen.getByText("home");
-    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome")
+    expect(link.getAttribute("href")).to.be.equal(
+      "/admin/pages/?parent=%2Fhome"
+    );
 
     link = screen.getByText("cat");
-    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome%2Fcat")
-  })
+    expect(link.getAttribute("href")).to.be.equal(
+      "/admin/pages/?parent=%2Fhome%2Fcat"
+    );
+  });
+  it.only("Render links using the breadcrumb of the page meta with an appending text", async () => {
+    const meta: PageMeta = {
+      path: "",
+      type: "",
+      breadcrumb: [
+        {
+          path: "/home",
+          title: "Home page",
+          slug: "home",
+        },
+        {
+          path: "/home/cat",
+          title: "Categogo",
+          slug: "cat",
+        },
+      ],
+    };
+    renderWithRouter(
+      <>
+        <Route
+          path="/admin/pages"
+          element={<PageBreadcrumb meta={meta} title="New page" />}
+        />
+      </>,
+      "/admin/pages"
+    );
+    let link = screen.getByText("home");
+    expect(link.getAttribute("href")).to.be.equal(
+      "/admin/pages/?parent=%2Fhome"
+    );
+
+    link = screen.getByText("cat");
+    expect(link.getAttribute("href")).to.be.equal(
+      "/admin/pages/?parent=%2Fhome%2Fcat"
+    );
+
+    let title = screen.getByText("New page");
+    expect(title).to.not.be.equal(undefined);
+  });
 });

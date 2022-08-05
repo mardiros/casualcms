@@ -32,7 +32,7 @@ export type BreadCrumbItem = {
   slug: string;
   path: string;
   title: string;
-}
+};
 
 export type PageMeta = {
   path: string;

@@ -37,7 +37,7 @@ async def bootstrap(settings: Settings) -> FastAPI:
         )
         async with configurator.config.uow as uow:
             user = await uow.accounts.by_username(settings.admin_username)
-            if user:
+            if user.is_ok():
                 await uow.rollback()
             else:
                 await configurator.config.bus.handle(

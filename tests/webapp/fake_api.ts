@@ -116,6 +116,7 @@ class FakePageApi implements IPageApi {
     payload["meta"] = {
       type: type,
       path: `${parent || ""}/${payload.slug}`,
+      breadcrumb: [],
     };
     this.pages.push(payload);
     return ok(true);

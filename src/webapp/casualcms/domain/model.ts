@@ -28,7 +28,19 @@ export type PartialPage = {
   meta: PartialPageMeta;
 };
 
+export type BreadCrumbItem = {
+  slug: string;
+  path: string;
+  title: string;
+}
+
+export type PageMeta = {
+  path: string;
+  type: string;
+  breadcrumb: BreadCrumbItem[];
+};
+
 export type Page = {
-  meta: PartialPageMeta;
+  meta: PageMeta;
   [k: string]: any;
 };

@@ -23,6 +23,7 @@ import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../loader/components";
 import { ApiErrorUI } from "../errorApi/components";
+import { PageBreadcrumb } from "../breadcrumb/components";
 
 type PageRowProps = {
   page: PartialPage;
@@ -91,7 +92,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() {};
+    return function cleanup() { };
   }, [parentPath]);
 
   if (isLoading) {
@@ -132,9 +133,9 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
   let navigate = useNavigate();
   const qs = curPage
     ? new URLSearchParams({
-        parent: curPage.meta.path,
-        type: curPage.meta.type,
-      })
+      parent: curPage.meta.path,
+      type: curPage.meta.type,
+    })
     : "";
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
@@ -184,7 +185,12 @@ export const PageList: React.FunctionComponent<{}> = () => {
   }
   return (
     <Box>
-      <Heading>Pages</Heading>
+      {curPage &&
+        <>
+          <Heading>{curPage.title}</Heading>
+          <PageBreadcrumb meta={curPage.meta} />
+        </>
+      }
       <Box>
         <ApiErrorUI error={error} />
         <PageListTable config={config} token={token} parentPath={parentPath} />

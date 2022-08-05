@@ -1,6 +1,6 @@
 import { v1 as uuidv1 } from "uuid";
 import React from "react";
-import { Box } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useSearchParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import { AppContext } from "../../config";
 import { Page, PageTemplate } from "../../casualcms/domain/model";
 import { ApiErrorUI } from "../errorApi/components";
 import { Loader } from "../loader/components";
+import { PageBreadcrumb } from "../breadcrumb/components";
 
 const Form = withTheme(ChakraUITheme);
 
@@ -90,6 +91,13 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   return (
     <Box maxW="720px">
+      {page &&
+        <>
+          <Heading>{page.title}</Heading>
+          <PageBreadcrumb meta={page.meta} />
+        </>
+      }
+
       <ApiErrorUI error={error} />
 
       {template && page && (

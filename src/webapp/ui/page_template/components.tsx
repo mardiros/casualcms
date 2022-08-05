@@ -1,6 +1,7 @@
 import React from "react";
 import {
   Box,
+  Container,
   Heading,
   Icon,
   Table,
@@ -92,7 +93,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
     };
   }, []);
   return (
-    <Box>
+    <Container>
       {
         <>
           <Heading>Choose A Type Of Template</Heading>
@@ -106,6 +107,6 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
           </Box>
         </>
       }
-    </Box>
+    </Container>
   );
 };

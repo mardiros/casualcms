@@ -138,6 +138,13 @@ async def test_create_subpage(
                 "meta": {
                     "type": "blog:HomePage",
                     "path": "/home",
+                    "breadcrumb": [
+                        {
+                            "slug": "home",
+                            "title": "hello world - casualcms",
+                            "path": "/home",
+                        }
+                    ],
                 },
                 "slug": "home",
                 "title": "hello world - casualcms",
@@ -152,6 +159,18 @@ async def test_create_subpage(
                 "meta": {
                     "type": "blog:CategoryPage",
                     "path": "/home/sub",
+                    "breadcrumb": [
+                        {
+                            "slug": "home",
+                            "title": "hello world - casualcms",
+                            "path": "/home",
+                        },
+                        {
+                            "slug": "sub",
+                            "title": "a sub page",
+                            "path": "/home/sub",
+                        },
+                    ],
                 },
                 "slug": "sub",
                 "title": "a sub page",
@@ -207,6 +226,13 @@ async def test_update_home_page_content(
         "meta": {
             "path": "/new-home",
             "type": "blog:HomePage",
+            "breadcrumb": [
+                {
+                    "path": "/new-home",
+                    "slug": "new-home",
+                    "title": "new title",
+                }
+            ],
         },
         "slug": "new-home",
         "title": "new title",
@@ -248,6 +274,18 @@ async def test_update_sub_page_content(
         "meta": {
             "path": "/home/new-slug",
             "type": "blog:CategoryPage",
+            "breadcrumb": [
+                {
+                    "path": "/home",
+                    "slug": "home",
+                    "title": "hello world - casualcms",
+                },
+                {
+                    "path": "/home/new-slug",
+                    "slug": "new-slug",
+                    "title": "new title",
+                },
+            ],
         },
         "slug": "new-slug",
         "title": "new title",

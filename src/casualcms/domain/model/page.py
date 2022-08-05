@@ -1,6 +1,16 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Iterable, Mapping, MutableMapping, Optional, Set, Type, cast
+from typing import (
+    Any,
+    Iterable,
+    List,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Set,
+    Type,
+    cast,
+)
 
 from pydantic import BaseModel, Field
 from pydantic.fields import ModelField
@@ -133,10 +143,23 @@ class Page(AbstractPage):
         return hash(self.id)
 
     def get_data_context(self) -> MutableMapping[str, Any]:
+        breadcrumb: List[Mapping[str, str]] = []
+        p: Optional[Page] = self
+        while p:
+            breadcrumb.insert(
+                0,
+                {
+                    "slug": p.slug,
+                    "path": p.path,
+                    "title": p.title,
+                },
+            )
+            p = p.parent
         return {
             "meta": {
                 "type": self.__meta__.type,
                 "path": self.path,
+                "breadcrumb": breadcrumb,
             },
             **self.dict(exclude={"events", "created_at"}),
         }

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import CreatePage, UpdatePage
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import resolve_type
+from casualcms.domain.model.page import Page, resolve_type
 
 from .base import get_token_info
 
@@ -140,7 +140,7 @@ async def update_page(
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.account_id
     async with app.uow as uow:
-        upage = await app.bus.handle(cmd, uow)
+        upage: Page = await app.bus.handle(cmd, uow)
         await uow.commit()
 
     return upage.get_data_context()

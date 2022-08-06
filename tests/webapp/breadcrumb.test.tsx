@@ -40,7 +40,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/pages/?parent=%2Fhome%2Fcat"
     );
   });
-  it.only("Render links using the breadcrumb of the page meta with an appending text", async () => {
+  it("Render links using the breadcrumb of the page meta with an appending text", async () => {
     const meta: PageMeta = {
       path: "",
       type: "",

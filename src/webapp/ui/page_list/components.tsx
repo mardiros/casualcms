@@ -41,6 +41,7 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
   const page = props.page;
   return (
     <Tr>
+      <Td>{page.slug}</Td>
       <Td>{page.title}</Td>
       <Td>
         <Link
@@ -106,7 +107,8 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Page</Th>
+            <Th>Slug</Th>
+            <Th>Title</Th>
             <Th>Edit</Th>
             <Th>View</Th>
             <Th>Childs</Th>

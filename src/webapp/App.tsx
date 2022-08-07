@@ -2,7 +2,6 @@ import React from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
 import {
   Box,
-  ButtonGroup,
   ColorModeProvider,
   CSSReset,
   Flex,
@@ -20,6 +19,7 @@ import { PageNew } from "./ui/page_new/components";
 import { HomePage } from "./ui/home/components";
 import { PageEdit } from "./ui/page_edit/components";
 import { AccountMenu } from "./ui/account/components";
+import { SideBar } from "./ui/sidebar/components";
 
 export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   let auth = useAuth();
@@ -53,6 +53,12 @@ export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   );
 };
 
+const menuStyle = {
+  display: "block",
+  padding: "0.5em",
+  textAlign: "center",
+};
+
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   if (auth.authenticatedUser != null) {
@@ -62,49 +68,45 @@ export const Body: React.FunctionComponent<{}> = () => {
   }
 };
 
+const AppRoutes: React.FunctionComponent<{}> = () => {
+  return (
+    <Routes>
+      <Route path="login" element={<Login />} caseSensitive />
+      <Route
+        path="*"
+        element={
+          <RequireAuth>
+            <Routes>
+              <Route path="" element={<Body />} caseSensitive />
+              <Route path="pages" element={<PageList />} caseSensitive />
+              <Route path="page/new" element={<TemplateList />} caseSensitive />
+              <Route
+                path="page/new/:tpltype"
+                element={<PageNew />}
+                caseSensitive
+              />
+              <Route path="page/edit" element={<PageEdit />} caseSensitive />
+              <Route path="*" element={<PageNotFound />} />
+            </Routes>
+          </RequireAuth>
+        }
+      />
+    </Routes>
+  );
+};
 const Layout: React.FunctionComponent<{}> = () => {
   return (
     <>
       <Box w="100%" p={4} bg="teal.300" h="90px">
         <Header />
       </Box>
-      <Box
-        w="100%"
-        p={4}
-        bg="teal.50"
-        minH="calc(100vh - 90px)"
-        color="teal.900"
-      >
-        <Routes>
-          <Route path="login" element={<Login />} caseSensitive />
-          <Route
-            path="*"
-            element={
-              <RequireAuth>
-                <Routes>
-                  <Route path="" element={<Body />} caseSensitive />
-                  <Route path="pages" element={<PageList />} caseSensitive />
-                  <Route
-                    path="page/new"
-                    element={<TemplateList />}
-                    caseSensitive
-                  />
-                  <Route
-                    path="page/new/:tpltype"
-                    element={<PageNew />}
-                    caseSensitive
-                  />
-                  <Route
-                    path="page/edit"
-                    element={<PageEdit />}
-                    caseSensitive
-                  />
-                  <Route path="*" element={<PageNotFound />} />
-                </Routes>
-              </RequireAuth>
-            }
-          />
-        </Routes>
+      <Box w="100%" bg="teal.50" minH="calc(100vh - 90px)" color="teal.900">
+        <Flex>
+          <SideBar />
+          <Box flex="1" padding={4}>
+            <AppRoutes />
+          </Box>
+        </Flex>
       </Box>
     </>
   );

@@ -21,9 +21,9 @@ import { useAuth } from "../login/hooks";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
-import { Loader } from "../loader/components";
-import { ApiErrorUI } from "../errorApi/components";
-import { PageBreadcrumb } from "../breadcrumb/components";
+import { Loader } from "../layout/loader";
+import { ApiErrorUI } from "../layout/error_api";
+import { PageBreadcrumb } from "../layout/breadcrumb";
 
 type PageRowProps = {
   page: PartialPage;

@@ -8,9 +8,9 @@ import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 import { Page, PageTemplate } from "../../casualcms/domain/model";
-import { Loader } from "../loader/components";
-import { ApiErrorUI } from "../errorApi/components";
-import { PageBreadcrumb } from "../breadcrumb/components";
+import { Loader } from "../layout/loader";
+import { ApiErrorUI } from "../layout/error_api";
+import { PageBreadcrumb } from "../layout/breadcrumb";
 
 const Form = withTheme(ChakraUITheme);
 
@@ -57,8 +57,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
         page
           .map((page: Page) => setParentPage(page))
           .mapErr((err: ApiError) => setError(err));
-      }
-      else {
+      } else {
         setParentPage({ meta: { path: "", type: "", breadcrumb: [] } });
       }
     }
@@ -91,7 +90,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
           formData={data}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
-        // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
         />
       )}
     </Box>

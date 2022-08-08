@@ -6,7 +6,7 @@ import { renderWithRouter, waitForLoadingLabel } from "./helpers";
 import config from "./config";
 import { HomePage } from "../../src/webapp/ui/home/components";
 import { ApiError } from "../../src/webapp/casualcms/domain/ports";
-import { PageList } from "../../src/webapp/ui/page_list/components";
+import { PageList } from "../../src/webapp/ui/pages/page_list";
 
 describe("As a user, I have to create a first root template", () => {
   it("display onboarding message", async () => {

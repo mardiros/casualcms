@@ -7,7 +7,7 @@ import { AppContext } from "../../config";
 import { useAuth } from "../login/hooks";
 import { Link, Navigate } from "react-router-dom";
 import { Result } from "neverthrow";
-import { Loader } from "../loader/components";
+import { Loader } from "../layout/loader";
 
 export const HomePage: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);

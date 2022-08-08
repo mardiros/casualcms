@@ -3,7 +3,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
 import { renderWithRouter } from "./helpers";
-import { SideBar } from "../../src/webapp/ui/sidebar/components";
+import { SideBar } from "../../src/webapp/ui/layout/sidebar";
 
 describe("As a user, I can see which entry menu I am in", () => {
   it("render the entry menu in a distinct way", async () => {

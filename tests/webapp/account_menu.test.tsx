@@ -3,9 +3,9 @@ import React from "react";
 import { fireEvent, screen } from "@testing-library/react";
 import { renderWithRouter, waitForPath } from "./helpers";
 import { Route } from "react-router-dom";
-import { AccountMenu } from "../../src/webapp/ui/account/components";
 import config from "./config";
 import { useAuth } from "../../src/webapp/ui/login/hooks";
+import { AccountMenu } from "../../src/webapp/ui/layout/account_menu";
 
 export const LogoutResult: React.FunctionComponent<{}> = () => {
   let auth = useAuth();

@@ -19,9 +19,9 @@ import { AppContext } from "../../config";
 import { useAuth } from "../login/hooks";
 import { Link, useSearchParams } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
-import { Loader } from "../loader/components";
-import { ApiErrorUI } from "../errorApi/components";
-import { PageBreadcrumb } from "../breadcrumb/components";
+import { Loader } from "../layout/loader";
+import { ApiErrorUI } from "../layout/error_api";
+import { PageBreadcrumb } from "../layout/breadcrumb";
 
 type TemplateTableProps = {
   isLoading: boolean;

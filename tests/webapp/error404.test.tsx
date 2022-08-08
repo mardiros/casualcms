@@ -2,7 +2,7 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
-import { PageNotFound } from "../../src/webapp/ui/error404/components";
+import { PageNotFound } from "../../src/webapp/ui/layout/error_404";
 import { renderWithRouter } from "./helpers";
 
 describe("As a user, I have beautiful 404 error", () => {

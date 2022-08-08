@@ -1,11 +1,12 @@
 import { expect } from "chai";
 import React from "react";
 import { render, screen } from "@testing-library/react";
-import { App, Body, Header } from "../../src/webapp/App";
+import { App, Body} from "../../src/webapp/App";
 import { AppContext } from "../../src/webapp/config";
 import config from "./config";
 import { waitForPath, LocationDisplay, renderWithRouter } from "./helpers";
 import { Route } from "react-router-dom";
+import { Header } from "../../src/webapp/ui/layout/header";
 
 describe("As a user, I view a different homepage when I am authenticated or not", () => {
   it("The header display a link to home when I am login", async () => {

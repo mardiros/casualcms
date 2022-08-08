@@ -8,9 +8,9 @@ import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 import { Page, PageTemplate } from "../../casualcms/domain/model";
-import { ApiErrorUI } from "../errorApi/components";
-import { Loader } from "../loader/components";
-import { PageBreadcrumb } from "../breadcrumb/components";
+import { ApiErrorUI } from "../layout/error_api";
+import { Loader } from "../layout/loader";
+import { PageBreadcrumb } from "../layout/breadcrumb";
 
 const Form = withTheme(ChakraUITheme);
 

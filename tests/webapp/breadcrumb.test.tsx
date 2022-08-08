@@ -3,7 +3,7 @@ import React from "react";
 import { screen } from "@testing-library/react";
 import { renderWithRouter } from "./helpers";
 import { Route } from "react-router-dom";
-import { PageBreadcrumb } from "../../src/webapp/ui/breadcrumb/components";
+import { PageBreadcrumb } from "../../src/webapp/ui/layout/breadcrumb";
 import { PageMeta } from "../../src/webapp/casualcms/domain/model";
 
 describe("As a user, I can navigate throw the breadcrumb", () => {

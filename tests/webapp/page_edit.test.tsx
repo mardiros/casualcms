@@ -2,8 +2,8 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { PageEdit } from "../../src/webapp/ui/page_edit/components";
-import { PageList } from "../../src/webapp/ui/page_list/components";
+import { PageEdit } from "../../src/webapp/ui/pages/page_edit";
+import { PageList } from "../../src/webapp/ui/pages/page_list";
 import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 

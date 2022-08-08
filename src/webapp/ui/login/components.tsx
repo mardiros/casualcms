@@ -14,7 +14,7 @@ import { Navigate } from "react-router-dom";
 import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
 import { ApiError } from "../../casualcms/domain/ports";
-import { Loader } from "../loader/components";
+import { Loader } from "../layout/loader";
 import { useAuth, AuthContext } from "./hooks";
 
 export function AuthProvider({

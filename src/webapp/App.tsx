@@ -1,10 +1,6 @@
 import React from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
-import {
-  ColorModeProvider,
-  CSSReset,
-  ThemeProvider,
-} from "@chakra-ui/react";
+import { ColorModeProvider, CSSReset, ThemeProvider } from "@chakra-ui/react";
 import { theme } from "@chakra-ui/theme";
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
 import { useAuth } from "./ui/login/hooks";
@@ -15,6 +11,7 @@ import { TemplateList } from "./ui/pages/page_template";
 import { HomePage } from "./ui/home/components";
 import { PageEdit } from "./ui/pages/page_edit";
 import { Layout } from "./ui/layout/layout";
+import { SiteList } from "./ui/sites/site_list";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -43,6 +40,9 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
                 caseSensitive
               />
               <Route path="page/edit" element={<PageEdit />} caseSensitive />
+
+              <Route path="sites" element={<SiteList />} caseSensitive />
+
               <Route path="*" element={<PageNotFound />} />
             </Routes>
           </RequireAuth>
@@ -52,7 +52,6 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
   );
 };
 
-
 const ThemedLayout: React.FunctionComponent<{}> = () => {
   return (
     <>
@@ -60,7 +59,7 @@ const ThemedLayout: React.FunctionComponent<{}> = () => {
         <ColorModeProvider>
           <CSSReset />
         </ColorModeProvider>
-        <Layout routes={<AppRoutes/>}/>
+        <Layout routes={<AppRoutes />} />
       </ThemeProvider>
     </>
   );

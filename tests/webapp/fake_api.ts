@@ -5,6 +5,7 @@ import {
   PageTemplate,
   PartialPage,
   Page,
+  PartialSite,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -12,6 +13,7 @@ import {
   Credentials,
   ITemplateApi,
   IPageApi,
+  ISiteApi,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
@@ -202,14 +204,33 @@ class FakePageApi implements IPageApi {
   }
 }
 
+export class FakeSiteApi implements ISiteApi {
+  sites: PartialSite[];
+
+  constructor() {
+    this.sites = [
+      { hostname: "*", default: false, root: "/index" },
+      { hostname: "www.localhost", default: true, root: "/root" },
+    ];
+  }
+
+  async listSites(
+    authntoken: string
+  ): Promise<Result<PartialSite[], ApiError>> {
+    return ok(this.sites as PartialSite[]);
+  }
+}
+
 export class FakeApi implements IApi {
   account: IAccountApi;
   template: ITemplateApi;
   page: IPageApi;
+  site: ISiteApi;
 
   constructor() {
     this.account = new FakeAccountApi();
     this.template = new FakeTemplateApi();
     this.page = new FakePageApi();
+    this.site = new FakeSiteApi();
   }
 }

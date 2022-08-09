@@ -2,10 +2,7 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
-import {
-  PageRow,
-  PageListTable,
-} from "../../src/webapp/ui/pages/page_list";
+import { PageRow, PageListTable } from "../../src/webapp/ui/pages/page_list";
 import { renderWithRouter, waitForLoadingLabel } from "./helpers";
 import config from "./config";
 import { Table, Tbody } from "@chakra-ui/react";

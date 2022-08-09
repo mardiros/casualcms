@@ -44,3 +44,17 @@ export type Page = {
   meta: PageMeta;
   [k: string]: any;
 };
+
+export type PartialSite = {
+  hostname: string;
+  default: boolean;
+  root: string;
+  // secure: boolean;
+};
+
+export type Site = {
+  hostname: string;
+  default: boolean;
+  // secure: boolean;
+  root: string;
+};

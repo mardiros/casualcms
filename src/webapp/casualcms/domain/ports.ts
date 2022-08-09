@@ -5,6 +5,7 @@ import {
   PageTemplate,
   PartialPage,
   Page,
+  PartialSite,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -51,4 +52,8 @@ export interface IPageApi {
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>>;
+}
+
+export interface ISiteApi {
+  listSites(authntoken: string): Promise<Result<PartialSite[], ApiError>>;
 }

@@ -4,12 +4,13 @@ import { ThemeProvider } from "@emotion/react";
 import { Header } from "./header";
 import { SideBar } from "./sidebar";
 
-
 type LayoutProps = {
   routes: React.ReactNode;
 };
 
-export const Layout: React.FunctionComponent<LayoutProps> = (props: LayoutProps) => {
+export const Layout: React.FunctionComponent<LayoutProps> = (
+  props: LayoutProps
+) => {
   return (
     <>
       <Box w="100%" p={4} bg="teal.300" h="90px">

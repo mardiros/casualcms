@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
-import { screen } from "@testing-library/react";
-import { PageRow, PageListTable } from "../../src/webapp/ui/pages/page_list";
+import { fireEvent, screen } from "@testing-library/react";
+import { PageRow, PageListTable, PageListButtons } from "../../src/webapp/ui/pages/page_list";
 import { renderWithRouter, waitForLoadingLabel } from "./helpers";
 import config from "./config";
 import { Table, Tbody } from "@chakra-ui/react";
@@ -120,4 +120,31 @@ describe("As a user, I can list pages", () => {
     let links = screen.getAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
   });
+
+  it("Redirect to the new site while clicking on the add button", async () => {
+    const page = {
+      meta: {
+        path: "/home",
+        type: "casual:HomePage",
+        breadcrumb: [],
+      },
+      slug: "home",
+      title: "Home Page",
+      description: "describe the home",
+    }
+
+    renderWithRouter(
+      <>
+        <Route path="/admin/pages" element={<PageListButtons curPage={page} />} />
+        <Route path="/admin/page/new" element={<h4>New page page</h4>} />
+      </>,
+      "/admin/pages"
+    );
+    let link = screen.getByText("Add new page", { exact: false });
+    fireEvent.click(link)
+    const newPage = screen.getByText("New page page");
+    expect(newPage.nodeName).equal("H4")
+
+  })
+
 });

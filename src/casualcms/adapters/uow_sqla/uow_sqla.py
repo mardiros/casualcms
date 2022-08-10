@@ -304,6 +304,7 @@ class SiteSQLRepository(AbstractSiteRepository):
                     root_page_path=page_ok.path,
                     hostname=s.hostname,
                     default=s.default,
+                    secure=s.secure,
                 )
             )
         return Ok(sites)

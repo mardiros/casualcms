@@ -15,6 +15,7 @@ async def create_site(
         hostname=cmd.hostname,
         root_page_path=cmd.root_page_path,
         default=cmd.default,
+        secure=cmd.secure,
         page_id=None,  # handled by the repository
     )
     await uow.sites.add(site)

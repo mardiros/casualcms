@@ -112,6 +112,7 @@ sites = Table(
     ),
     Column("hostname", String(253), primary_key=True),
     Column("default", Boolean, nullable=False),
+    Column("secure", Boolean, nullable=False),
     Index("idx_sites_page_id", "page_id", unique=False),
     Index("idx_sites_created_at", "created_at", unique=False),
     Index("idx_sites_hostname", "hostname", unique=True),

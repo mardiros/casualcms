@@ -16,6 +16,9 @@ class Site(BaseModel):
     hostname: str = Field(..., description="hostname of this website")
     root_page_path: str = Field(..., description="Root page path")
     default: bool = Field(..., description="Is the default site")
+    secure: bool = Field(
+        ..., description="True means that the site use https, not http"
+    )
     events: list[Event] = Field(default_factory=list, exclude=True)
 
     def __hash__(self) -> int:

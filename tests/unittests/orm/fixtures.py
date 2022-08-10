@@ -59,6 +59,7 @@ def fake_site(page: Page, **kwargs: Any) -> Site:
         "created_at": fake.past_datetime(),
         "hostname": fake.domain_name(),
         "default": False,
+        "secure": True,
         "page_id": page.id,
         "root_page_path": page.path,
     }

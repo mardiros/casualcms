@@ -84,4 +84,5 @@ class CreateSite(Command):
     hostname: str = Field(...)
     root_page_path: str = Field(...)
     default: bool = Field(...)
+    secure: bool = Field(...)
     metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)

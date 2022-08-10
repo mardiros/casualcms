@@ -23,6 +23,7 @@ async def test_api_create_site(
     assert resp.json() == {
         "hostname": site.hostname,
         "default": site.default,
+        "secure": site.secure,
         "root_page_path": home_page.path,
     }
 
@@ -44,6 +45,7 @@ async def test_api_list_sites(
         {
             "hostname": default_site.hostname,
             "default": True,
+            "secure": False,
             "root_page_path": home_page.path,
         }
     ]

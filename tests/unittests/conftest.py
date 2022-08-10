@@ -155,6 +155,7 @@ async def default_site(
                 hostname="www.example.net",
                 default=True,
                 root_page_path=home_page.path,
+                secure=False,
             ),
             uow,
         )

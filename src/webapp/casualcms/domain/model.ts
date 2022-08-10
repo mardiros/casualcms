@@ -48,7 +48,7 @@ export type Page = {
 export type PartialSite = {
   hostname: string;
   default: boolean;
-  root: string;
+  root_page_path: string;
   // secure: boolean;
 };
 

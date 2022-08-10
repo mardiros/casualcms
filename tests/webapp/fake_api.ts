@@ -209,8 +209,8 @@ export class FakeSiteApi implements ISiteApi {
 
   constructor() {
     this.sites = [
-      { hostname: "*", default: false, root: "/index" },
-      { hostname: "www.localhost", default: true, root: "/root" },
+      { hostname: "*", default: false, root_page_path: "/index" },
+      { hostname: "www.localhost", default: true, root_page_path: "/root" },
     ];
   }
 

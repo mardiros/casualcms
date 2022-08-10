@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Iterator
+from typing import AsyncGenerator, Iterator
 
 import pytest
 from fastapi import FastAPI
@@ -12,9 +12,10 @@ from casualcms.domain.messages.commands import (
     CreateAccountCipheredPassword,
     CreateAuthnToken,
     CreatePage,
+    CreateSite,
     generate_id,
 )
-from casualcms.domain.model.account import Account
+from casualcms.domain.model import Account, AuthnToken, Page, Site
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -60,7 +61,7 @@ async def admin_account(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-):
+) -> AsyncGenerator[Account, None]:
     async with uow as uow:
         account = await messagebus.handle(
             CreateAccountCipheredPassword(
@@ -80,7 +81,7 @@ async def authntoken(
     admin_account: Account,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-):
+) -> AsyncGenerator[AuthnToken, None]:
     async with uow as uow:
         token = await messagebus.handle(
             CreateAuthnToken(
@@ -98,7 +99,7 @@ async def home_page(
     app_settings: Settings,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-):
+) -> AsyncGenerator[Page, None]:
     async with uow as uow:
         page = await messagebus.handle(
             CreatePage(
@@ -122,7 +123,7 @@ async def sub_page(
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
     home_page: HomePage,
-):
+) -> AsyncGenerator[Page, None]:
     async with uow as uow:
         page = await messagebus.handle(
             CreatePage(
@@ -135,6 +136,25 @@ async def sub_page(
                     "description": "I am so glad to be a sub page",
                     "hero_title": "a sub page",
                 },
+            ),
+            uow,
+        )
+    yield page
+
+
+@pytest.fixture
+async def default_site(
+    app_settings: Settings,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    home_page: Page,
+) -> AsyncGenerator[Site, None]:
+    async with uow as uow:
+        page = await messagebus.handle(
+            CreateSite(
+                hostname="www.example.net",
+                default=True,
+                root_page_path=home_page.path,
             ),
             uow,
         )

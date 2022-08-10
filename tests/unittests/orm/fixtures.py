@@ -60,7 +60,7 @@ def fake_site(page: Page, **kwargs: Any) -> Site:
         "hostname": fake.domain_name(),
         "default": False,
         "page_id": page.id,
-        "root": page.path,
+        "root_page_path": page.path,
     }
     site.update(kwargs)
     return Site(**site)

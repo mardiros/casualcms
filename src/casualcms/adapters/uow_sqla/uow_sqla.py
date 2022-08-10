@@ -290,15 +290,17 @@ class SiteSQLRepository(AbstractSiteRepository):
         )
         sites: list[Site] = []
         for orm_site in orm_sites:  # type: ignore
-            s: Any = cast(orm_site, Any)
-            page = await PageSQLRepository(self.session).by_id(s.id)
+            s = cast(Site, orm_site)
+            page = await PageSQLRepository(self.session).by_id(
+                s.page_id  # type: ignore
+            )
             page_ok = page.unwrap()
 
             sites.append(
                 Site(
                     id=s.id,
                     page_id=page_ok.id,
-                    root=page_ok.path,
+                    root_page_path=page_ok.path,
                     hostname=s.hostname,
                     default=s.default,
                 )
@@ -309,7 +311,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Append a new model to the repository."""
         data = model.dict()
         data["created_at"] = model.created_at
-        page = await PageSQLRepository(self.session).by_path(data.pop("root"))
+        page = await PageSQLRepository(self.session).by_path(data.pop("root_page_path"))
 
         page_ok = page.unwrap()  # FIXME, should return Ok(...)
         data["page_id"] = page_ok.id

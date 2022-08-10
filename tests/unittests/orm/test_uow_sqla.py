@@ -464,6 +464,29 @@ async def test_site_add(params: Any, sqla_session: AsyncSession, pages: Sequence
     assert site.default == params["site"].default
 
 
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page],
+            "sites": [fake_site(home_page)],
+        },
+    ],
+)
+async def test_site_list(
+    params: Any,
+    sqla_session: AsyncSession,
+    pages: Sequence[Page],
+    sites: Sequence[Site],
+):
+    repo = SiteSQLRepository(sqla_session)
+    rsites = await repo.list()
+    assert rsites.is_ok()
+    sites_ok = rsites.unwrap()
+    ss = [s.hostname for s in sites_ok]
+    assert ss == [sites[0].hostname]
+
+
 async def test_sql_uow_by_session_commit(dummy_session: AsyncSession):
     uow = SQLUnitOfWorkBySession(dummy_session)
     await uow.commit()

@@ -71,7 +71,7 @@ async def list_pages(
 
     async with app.uow as uow:
         pages = await uow.pages.by_parent(parent)
-        await uow.commit()
+        await uow.rollback()
 
     if pages.is_err():
         raise HTTPException(

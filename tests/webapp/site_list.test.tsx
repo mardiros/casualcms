@@ -18,7 +18,7 @@ describe("As a user, I can list sites", () => {
   //     "www.example.net",
   //     {
   //       default: true,
-  //       root: "/root",
+  //       root_page_path: "/root",
   //     },
   //   );
   // });
@@ -30,7 +30,7 @@ describe("As a user, I can list sites", () => {
     const site = {
       hostname: "*",
       default: true,
-      root: "/index",
+      root_page_path: "/index",
     };
     renderWithRouter(
       <Route

@@ -82,16 +82,16 @@ async def accounts(
 async def sites(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[Sequence[Site], None]:
 
     sites: Sequence[Site] = params["sites"]
     await sqla_session.execute(  # type: ignore
         orm.sites.insert(),  # type: ignore
-        [s.dict() for s in sites],
+        [{"created_at": s.created_at, **s.dict()} for s in sites],
     )
     await sqla_session.commit()
 
-    yield None
+    yield sites
 
     await sqla_session.execute(  # type: ignore
         delete(orm.sites).where(orm.sites.c.hostname.in_([s.hostname for s in sites])),

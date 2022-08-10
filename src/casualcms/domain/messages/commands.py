@@ -76,3 +76,12 @@ class UpdatePage(Command):
     payload: dict[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     metadata: Metadata = Metadata(category="page", name="update_page", schemaVersion=1)
+
+
+class CreateSite(Command):
+    id: str = Field(default_factory=generate_id)
+    created_at: datetime = Field(default_factory=datetime.now)
+    hostname: str = Field(...)
+    root_page_path: str = Field(...)
+    default: bool = Field(...)
+    metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)

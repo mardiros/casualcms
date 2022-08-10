@@ -282,6 +282,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
 class SiteSQLRepository(AbstractSiteRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        self.seen = set()
 
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch given token informations from the given token."""
@@ -316,6 +317,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         page_ok = page.unwrap()  # FIXME, should return Ok(...)
         data["page_id"] = page_ok.id
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
+        self.seen.add(model)
 
 
 class SQLUnitOfWorkBySession(AbstractUnitOfWork):
@@ -324,6 +326,7 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
         self.accounts = AccountSQLRepository(session)
         self.authn_tokens = AuthnTokenSQLRepository(session)
         self.pages = PageSQLRepository(session)
+        self.sites = SiteSQLRepository(session)
 
     async def commit(self) -> None:
         await self.session.commit()

@@ -3,9 +3,9 @@
 from casualcms.domain.model import AccountStatus
 
 from .orm_types import (
-    Boolean,
     JSON,
     UUID,
+    Boolean,
     CIText,
     Column,
     DateTime,

@@ -35,8 +35,15 @@ class AbstractUnitOfWork(abc.ABC):
             while page.events:
                 yield page.events.pop(0)
 
+        for site in self.sites.seen:
+            while site.events:
+                yield site.events.pop(0)
+
     async def initialize(self) -> None:
-        """Override to initialize  repositories."""
+        """Override to initialize repositories."""
+
+    async def dispose(self) -> None:
+        """Override to dispose repositories."""
 
     async def __aenter__(self) -> AbstractUnitOfWork:
         return self

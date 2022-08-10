@@ -33,11 +33,11 @@ def app_settings() -> Iterator[Settings]:
 
 
 @pytest.fixture()
-def uow(app_settings: Settings) -> Iterator[AbstractUnitOfWork]:
+async def uow(app_settings: Settings) -> AsyncGenerator[AbstractUnitOfWork, None]:
     uow = InMemoryUnitOfWork(app_settings)
+    await uow.initialize()
     yield uow
-    uow.accounts.accounts.clear()  # type: ignore
-    uow.pages.pages.clear()  # type: ignore
+    await uow.dispose()
 
 
 @pytest.fixture()

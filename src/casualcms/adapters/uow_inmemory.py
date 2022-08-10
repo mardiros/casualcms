@@ -119,10 +119,14 @@ class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
 class SiteInMemoryRepository(AbstractSiteRepository):
     sites: list[Site] = []
 
+    def __init__(self) -> None:
+        self.seen = set()
+
     async def add(self, model: Site) -> None:
         """Append a new model to the repository."""
         self.sites.append(model)
         self.sites.sort(key=lambda s: s.hostname)
+        self.seen.add(model)
 
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch all sites."""
@@ -140,6 +144,11 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
 
     async def initialize(self) -> None:
         self.initialized = True
+
+    async def dispose(self) -> None:
+        self.accounts.accounts.clear()  # type: ignore
+        self.pages.pages.clear()  # type: ignore
+        self.sites.sites.clear()  # type: ignore
 
     async def commit(self) -> None:
         self.committed = True

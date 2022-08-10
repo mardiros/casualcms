@@ -17,3 +17,6 @@ class Site(BaseModel):
     root_page_path: str = Field(..., description="Root page path")
     default: bool = Field(..., description="Is the default site")
     events: list[Event] = Field(default_factory=list, exclude=True)
+
+    def __hash__(self) -> int:
+        return hash(self.id)  # type: ignore

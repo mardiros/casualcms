@@ -1,9 +1,11 @@
+from datetime import datetime
 from typing import Optional
 
-from fastapi import Depends, HTTPException, Request
+from fastapi import Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
+from casualcms.domain.messages.commands import CreateSite, generate_id
 from casualcms.domain.model import AuthnToken
 
 from .base import get_token_info
@@ -13,6 +15,36 @@ class PartialSite(BaseModel):
     hostname: str = Field(...)
     default: bool = Field(...)
     root_page_path: str = Field(...)
+
+
+async def create_site(
+    request: Request,
+    hostname: str = Body(...),
+    default: bool = Body(...),
+    root_page_path: str = Body(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> PartialSite:
+
+    cmd = CreateSite(
+        id=generate_id(),
+        hostname=hostname,
+        default=default,
+        created_at=datetime.utcnow(),
+        root_page_path=root_page_path,
+    )
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+
+    async with app.uow as uow:
+        site = await app.bus.handle(cmd, uow)
+        await uow.commit()
+
+    return PartialSite(
+        hostname=site.hostname,
+        default=site.default,
+        root_page_path=site.root_page_path,
+    )
 
 
 async def list_sites(

@@ -1,5 +1,6 @@
 from .account import Account, AccountStatus, AuthnToken
-from .page import AbstractPageError, Page, get_available_subtypes
+from .page import AbstractPageError, Page, get_available_subtypes, resolve_type
+from .site import Site
 
 __all__ = [
     # User account
@@ -10,4 +11,7 @@ __all__ = [
     "AbstractPageError",
     "Page",
     "get_available_subtypes",
+    "resolve_type",
+    # Sites
+    "Site",
 ]

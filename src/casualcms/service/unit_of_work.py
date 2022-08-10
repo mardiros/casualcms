@@ -5,6 +5,8 @@ import abc
 from types import TracebackType
 from typing import TYPE_CHECKING, Iterable, Optional, Type
 
+from casualcms.domain.repositories.site import AbstractSiteRepository
+
 if TYPE_CHECKING:  # avoid circular dependency
     from casualcms.config import Settings  # coverage: ignore
 
@@ -18,6 +20,7 @@ class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
     pages: AbstractPageRepository
     authn_tokens: AbstractAuthnRepository
+    sites: AbstractSiteRepository
 
     @abc.abstractmethod
     def __init__(self, settings: "Settings") -> None:

@@ -3,9 +3,7 @@ from typing import Optional
 from result import Err, Ok
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page
+from casualcms.domain.model import Account, AuthnToken, Page, Site
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -19,6 +17,10 @@ from casualcms.domain.repositories.page import (
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.site import (
+    AbstractSiteRepository,
+    SiteSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -114,10 +116,24 @@ class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
         del self.tokens[token]
 
 
+class SiteInMemoryRepository(AbstractSiteRepository):
+    sites: list[Site] = []
+
+    async def add(self, model: Site) -> None:
+        """Append a new model to the repository."""
+        self.sites.append(model)
+        self.sites.sort(key=lambda s: s.hostname)
+
+    async def list(self) -> SiteSequenceRepositoryResult:
+        """Fetch all sites."""
+        return Ok(self.sites)
+
+
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self, settings: Settings) -> None:
         self.accounts = AccountInMemoryRepository()
         self.pages = PageInMemoryRepository()
+        self.sites = SiteInMemoryRepository()
         self.authn_tokens = AuthnTokenInMemoryRepository()
         self.committed: bool | None = None
         self.initialized = False

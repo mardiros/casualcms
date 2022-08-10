@@ -13,6 +13,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.domain.model.page import Page
+from casualcms.domain.model.site import Site
 
 DATABASE_URL = "sqlite+aiosqlite:///"
 
@@ -72,6 +73,29 @@ async def accounts(
     await sqla_session.execute(  # type: ignore
         delete(orm.accounts).where(
             orm.accounts.c.username.in_([a.email for a in accounts])
+        ),
+    )
+    await sqla_session.commit()
+
+
+@pytest_asyncio.fixture()
+async def sites(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+) -> AsyncGenerator[None, None]:
+
+    sites: Sequence[Site] = params["sites"]
+    await sqla_session.execute(  # type: ignore
+        orm.sites.insert(),  # type: ignore
+        [s.dict() for s in sites],
+    )
+    await sqla_session.commit()
+
+    yield None
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.sites).where(
+            orm.sites.c.hostname.in_([s.hostname for s in sites])
         ),
     )
     await sqla_session.commit()

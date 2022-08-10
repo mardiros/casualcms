@@ -1,5 +1,6 @@
 """SQLAlchemy schema."""
 
+from sqlalchemy import Boolean
 from casualcms.domain.model import AccountStatus
 
 from .orm_types import (
@@ -95,4 +96,23 @@ pages_treepath = Table(
         "length",
         unique=False,
     ),
+)
+
+
+sites = Table(
+    "sites",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("created_at", DateTime(), nullable=False),
+    Column(
+        "page_id",
+        UUID,
+        ForeignKey("pages.id", name="fk_sites_page_id"),
+        nullable=False,
+    ),
+    Column("hostname", String(253), primary_key=True),
+    Column("default", Boolean, nullable=False),
+    Index("idx_sites_page_id", "page_id", unique=False),
+    Index("idx_sites_created_at", "created_at", unique=False),
+    Index("idx_sites_hostname", "hostname", unique=True),
 )

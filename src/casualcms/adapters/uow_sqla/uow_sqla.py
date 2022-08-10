@@ -11,13 +11,12 @@ from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page, resolve_type
+from casualcms.domain.model import Account, Page, Site, AuthnToken, resolve_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
     AbstractPageRepository,
+    AbstractSiteRepository,
 )
 from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryError,
@@ -27,6 +26,9 @@ from casualcms.domain.repositories.page import (
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.site import (
+    SiteSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -276,6 +278,45 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
         """Delete a new model to the repository."""
         await self.session.execute(
             delete(orm.authn_tokens).where(orm.authn_tokens.c.token == token),
+        )
+
+
+class SiteSQLRepository(AbstractSiteRepository):
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def list(self) -> SiteSequenceRepositoryResult:
+        """Fetch given token informations from the given token."""
+        orm_sites: CursorResult = await self.session.execute(
+            select(orm.sites).order_by(orm.sites.c.hostname).limit(1)
+        )
+        sites: list[Site] = []
+        for orm_site in orm_sites:  # type: ignore
+            s: Any = cast(orm_site, Any)
+            page = await PageSQLRepository(self.session).by_id(s.id)
+            page_ok = page.unwrap()
+
+            sites.append(
+                Site(
+                    id=s.id,
+                    page_id=page_ok.id,
+                    root=page_ok.path,
+                    hostname=s.hostname,
+                    default=s.default,
+                )
+            )
+        return Ok(sites)
+
+    async def add(self, model: Site) -> None:
+        """Append a new model to the repository."""
+        data = model.dict()
+        data["created_at"] = model.created_at
+        page = await PageSQLRepository(self.session).by_path(data.pop("root"))
+
+        page_ok = page.unwrap()  # FIXME, should return Ok(...)
+        data["page_id"] = page_ok.id
+        await self.session.execute(
+            orm.sites.insert().values(data)  # type: ignore
         )
 
 

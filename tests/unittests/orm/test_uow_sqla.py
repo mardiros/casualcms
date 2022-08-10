@@ -15,12 +15,14 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     PageSQLRepository,
     SQLUnitOfWork,
     SQLUnitOfWorkBySession,
+    SiteSQLRepository,
 )
 from casualcms.config import Settings
 from casualcms.domain.model.page import Page
+from casualcms.domain.model.site import Site
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from .fixtures import fake_account, fake_authn_tokens, fake_page
+from .fixtures import fake_account, fake_authn_tokens, fake_page, fake_site
 
 alice = fake_account(username="alice")
 bob = fake_account(username="bob")
@@ -439,6 +441,27 @@ async def test_page_update(
     assert page.title == params["expected_title"]
     assert page.description == params["expected_description"]
     assert page.body == params["expected_body"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page],
+            "site": fake_site(home_page),
+        },
+    ],
+)
+async def test_site_add(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
+    repo = SiteSQLRepository(sqla_session)
+    await repo.add(params["site"])
+
+    qry = select(orm.sites).filter(orm.sites.c.id == params["site"].id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    site: orm.sites = resp.first()  # type: ignore
+    assert site.hostname == params["site"].hostname
+    assert site.default == params["site"].default
 
 
 async def test_sql_uow_by_session_commit(dummy_session: AsyncSession):

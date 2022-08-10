@@ -4,6 +4,7 @@ from faker import Faker
 
 from casualcms.domain.messages.commands import generate_secret
 from casualcms.domain.model import Account, AuthnToken, Page
+from casualcms.domain.model.site import Site
 
 fake = Faker()
 
@@ -50,3 +51,16 @@ def fake_page(type: str, **kwargs: Any) -> Page:
     typ = resolve_type(type)
     page.update(kwargs)
     return typ(**page)
+
+
+def fake_site(page: Page, **kwargs: Any) -> Site:
+    site = {
+        "id": fake.uuid4(),
+        "created_at": fake.past_datetime(),
+        "hostname": fake.domain_name(),
+        "default": False,
+        "page_id": page.id,
+        "root": page.path,
+    }
+    site.update(kwargs)
+    return Site(**site)

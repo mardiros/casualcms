@@ -1,12 +1,13 @@
 import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { renderWithRouter } from "./helpers";
 import config from "./config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SiteList,
+  SiteListButtons,
   SiteListTable,
   SiteRow,
 } from "../../src/webapp/ui/sites/site_list";
@@ -87,5 +88,18 @@ describe("As a user, I can list sites", () => {
     expect(links[2].getAttribute("href")).equal(
       "/admin/site/edit?site=www.localhost"
     );
+  });
+  it("Redirect to the new site while clicking on the add button", async () => {
+    renderWithRouter(
+      <>
+        <Route path="/admin/sites" element={<SiteListButtons />} />
+        <Route path="/admin/site/new" element={<h4>New web site page</h4>} />
+      </>,
+      "/admin/sites"
+    );
+    let link = screen.getByText("Add new site", { exact: false });
+    fireEvent.click(link)
+    const newPage = screen.getByText("New web site page");
+    expect(newPage.nodeName).equal("H4")
   });
 });

@@ -1,7 +1,9 @@
 import React from "react";
 import {
   Box,
+  Button,
   Icon,
+  Stack,
   Table,
   TableContainer,
   Tbody,
@@ -15,8 +17,8 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 
 import { useAuth } from "../login/hooks";
-import { Link } from "react-router-dom";
-import { EditIcon } from "@chakra-ui/icons";
+import { Link, useNavigate } from "react-router-dom";
+import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
@@ -39,6 +41,7 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
     <Tr>
       <Td>{site.hostname}</Td>
       <Td>{site.default}</Td>
+      <Td>{site.root_page_path}</Td>
       <Td>
         <Link
           to={`/admin/site/edit?${new URLSearchParams({
@@ -72,7 +75,7 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
       setIsLoading(false);
     }
     loadSubSites();
-    return function cleanup() {};
+    return function cleanup() { };
   }, []);
 
   if (isLoading) {
@@ -88,6 +91,7 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
           <Tr>
             <Th>Hostname</Th>
             <Th>Default</Th>
+            <Th>Root Page</Th>
             <Th>Edit</Th>
           </Tr>
         </Thead>
@@ -101,32 +105,19 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
   );
 };
 
-// type SiteListButtonsProps = {
-//   curSite: Site | null;
-// };
-
-// export const SiteListButtons: React.FunctionComponent<SiteListButtonsProps> = (
-//   props: SiteListButtonsProps
-// ) => {
-//   const curSite = props.curSite;
-//   let navigate = useNavigate();
-//   const qs = curSite
-//     ? new URLSearchParams({
-//         parent: curSite.meta.path,
-//         type: curSite.meta.type,
-//       })
-//     : "";
-//   return (
-//     <Stack p={4} spacing={4} direction="row" align="right">
-//       <Button
-//         onClick={() => navigate(`/admin/site/new?${qs}`, { replace: true })}
-//       >
-//         <Icon as={AddIcon} marginEnd={2} />
-//         Add new site
-//       </Button>
-//     </Stack>
-//   );
-// };
+export const SiteListButtons: React.FunctionComponent<{}> = () => {
+  let navigate = useNavigate();
+  return (
+    <Stack p={4} spacing={4} direction="row" align="right">
+      <Button
+        onClick={() => navigate(`/admin/site/new`, { replace: true })}
+      >
+        <Icon as={AddIcon} marginEnd={2} />
+        Add new site
+      </Button>
+    </Stack>
+  );
+};
 
 export const SiteList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
@@ -136,7 +127,7 @@ export const SiteList: React.FunctionComponent<{}> = () => {
   return (
     <Box>
       <SiteListTable config={config} token={token} />
-      {/* <SiteListButtons curSite={curSite} /> */}
+      <SiteListButtons />
     </Box>
   );
 };

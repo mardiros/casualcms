@@ -54,6 +54,21 @@ export interface IPageApi {
   ): Promise<Result<boolean, ApiError>>;
 }
 
+export type SiteOption = {
+  default: boolean;
+  secure: boolean;
+  root_page_path: string;
+};
+
 export interface ISiteApi {
+  createSite(
+    authntoken: string,
+    hostname: string,
+    payload: SiteOption
+  ): Promise<Result<PartialSite, ApiError>>;
+  deleteSite(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<boolean, ApiError>>;
   listSites(authntoken: string): Promise<Result<PartialSite[], ApiError>>;
 }

@@ -14,6 +14,7 @@ import {
   ITemplateApi,
   IPageApi,
   ISiteApi,
+  SiteOption,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
@@ -208,10 +209,28 @@ export class FakeSiteApi implements ISiteApi {
   sites: PartialSite[];
 
   constructor() {
-    this.sites = [
-      { hostname: "*", default: false, root_page_path: "/index" },
-      { hostname: "www.localhost", default: true, root_page_path: "/root" },
-    ];
+    this.sites = [];
+  }
+
+  async createSite(
+    authntoken: string,
+    hostname: string,
+    payload: SiteOption
+  ): Promise<Result<PartialSite, ApiError>> {
+    const postBody = { hostname: hostname, ...payload };
+    this.sites.push(postBody);
+    return ok(postBody);
+  }
+
+  async deleteSite(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<boolean, ApiError>> {
+    const sites = this.sites.filter((site: PartialSite) => {
+      return site.hostname != hostname;
+    });
+    this.sites = sites;
+    return ok(true);
   }
 
   async listSites(

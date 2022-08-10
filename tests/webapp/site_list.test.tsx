@@ -12,25 +12,29 @@ import {
 } from "../../src/webapp/ui/sites/site_list";
 
 describe("As a user, I can list sites", () => {
-  // before(async () => {
-  //   await config.api.site.createSite(
-  //     "",
-  //     "www.example.net",
-  //     {
-  //       default: true,
-  //       root_page_path: "/root",
-  //     },
-  //   );
-  // });
-  // after(async () => {
-  //   await config.api.page.deleteSite("", "www.example.net");
-  // });
+  before(async () => {
+    await config.api.site.createSite("", "*", {
+      default: true,
+      secure: false,
+      root_page_path: "/root",
+    });
+    await config.api.site.createSite("", "www.localhost", {
+      default: false,
+      secure: false,
+      root_page_path: "/index",
+    });
+  });
+  after(async () => {
+    await config.api.site.deleteSite("", "www.localhost");
+    await config.api.site.deleteSite("", "*");
+  });
 
   it("Render a row for a page", async () => {
     const site = {
       hostname: "*",
       default: true,
-      root_page_path: "/index",
+      secure: false,
+      root_page_path: "/root",
     };
     renderWithRouter(
       <Route

@@ -94,9 +94,7 @@ async def sites(
     yield None
 
     await sqla_session.execute(  # type: ignore
-        delete(orm.sites).where(
-            orm.sites.c.hostname.in_([s.hostname for s in sites])
-        ),
+        delete(orm.sites).where(orm.sites.c.hostname.in_([s.hostname for s in sites])),
     )
     await sqla_session.commit()
 

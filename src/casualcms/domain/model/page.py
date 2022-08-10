@@ -18,6 +18,8 @@ from pydantic.main import ModelMetaclass
 
 from casualcms.domain.messages import Event
 
+uuid = str
+
 
 class AbstractPageError(Exception):
     ...
@@ -118,7 +120,7 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
 
 class Page(AbstractPage):
 
-    id: str = Field(widget="hidden")
+    id: uuid = Field(widget="hidden")
     slug: str = Field(...)
     title: str = Field(...)
     description: str = Field(...)

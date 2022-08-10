@@ -38,9 +38,9 @@ class Account(BaseModel):
 class AuthnToken(BaseModel):
     """Authentication tokens"""
 
-    id: uuid = Field(...)  # UUID
+    id: uuid = Field(...)
     token: str = Field(...)
-    account_id: uuid = Field(...)  # UUID
+    account_id: uuid = Field(...)
     created_at: datetime = Field(...)
     expires_at: datetime = Field(...)
     client_addr: str = Field(...)

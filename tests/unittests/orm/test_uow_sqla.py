@@ -13,9 +13,9 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
     PageSQLRepository,
+    SiteSQLRepository,
     SQLUnitOfWork,
     SQLUnitOfWorkBySession,
-    SiteSQLRepository,
 )
 from casualcms.config import Settings
 from casualcms.domain.model.page import Page

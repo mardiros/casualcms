@@ -11,7 +11,7 @@ from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account, Page, Site, AuthnToken, resolve_type
+from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -27,9 +27,7 @@ from casualcms.domain.repositories.page import (
     PageRepositoryResult,
     PageSequenceRepositoryResult,
 )
-from casualcms.domain.repositories.site import (
-    SiteSequenceRepositoryResult,
-)
+from casualcms.domain.repositories.site import SiteSequenceRepositoryResult
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
     AccountRepositoryResult,
@@ -315,9 +313,7 @@ class SiteSQLRepository(AbstractSiteRepository):
 
         page_ok = page.unwrap()  # FIXME, should return Ok(...)
         data["page_id"] = page_ok.id
-        await self.session.execute(
-            orm.sites.insert().values(data)  # type: ignore
-        )
+        await self.session.execute(orm.sites.insert().values(data))  # type: ignore
 
 
 class SQLUnitOfWorkBySession(AbstractUnitOfWork):

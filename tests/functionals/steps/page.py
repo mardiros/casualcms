@@ -1,8 +1,8 @@
 from typing import Any, Dict
 
-from faker import Faker
 from behave import given  # type: ignore
-from blacksmith import HTTPError, SyncHTTPBearerMiddleware, SyncClient
+from blacksmith import HTTPError, SyncClient, SyncHTTPBearerMiddleware
+from faker import Faker
 
 fake = Faker()
 

@@ -1,6 +1,7 @@
 """SQLAlchemy schema."""
 
 from sqlalchemy import Boolean
+
 from casualcms.domain.model import AccountStatus
 
 from .orm_types import (

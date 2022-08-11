@@ -27,7 +27,11 @@ from casualcms.domain.repositories.page import (
     PageRepositoryResult,
     PageSequenceRepositoryResult,
 )
-from casualcms.domain.repositories.site import SiteSequenceRepositoryResult
+from casualcms.domain.repositories.site import (
+    SiteRepositoryError,
+    SiteRepositoryResult,
+    SiteSequenceRepositoryResult,
+)
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
     AccountRepositoryResult,
@@ -287,7 +291,7 @@ class SiteSQLRepository(AbstractSiteRepository):
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch given token informations from the given token."""
         orm_sites: CursorResult = await self.session.execute(
-            select(orm.sites).order_by(orm.sites.c.hostname).limit(1)
+            select(orm.sites).order_by(orm.sites.c.hostname)
         )
         sites: list[Site] = []
         for orm_site in orm_sites:  # type: ignore
@@ -319,6 +323,30 @@ class SiteSQLRepository(AbstractSiteRepository):
         data["page_id"] = page_ok.id
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
         self.seen.add(model)
+
+    async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
+        """Fetch all sites."""
+        orm_sites: CursorResult = await self.session.execute(
+            select(orm.sites).filter_by(hostname=hostname)
+        )
+        orm_site = orm_sites.first()
+        if orm_site:
+            s = cast(Site, orm_site)
+            page = await PageSQLRepository(self.session).by_id(
+                s.page_id  # type: ignore
+            )
+            page_ok = page.unwrap()
+            return Ok(
+                Site(
+                    id=s.id,
+                    page_id=page_ok.id,
+                    root_page_path=page_ok.path,
+                    hostname=s.hostname,
+                    default=s.default,
+                    secure=s.secure,
+                )
+            )
+        return Err(SiteRepositoryError.site_not_found)
 
 
 class SQLUnitOfWorkBySession(AbstractUnitOfWork):

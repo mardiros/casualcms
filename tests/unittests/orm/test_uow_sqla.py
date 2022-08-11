@@ -29,6 +29,38 @@ bob = fake_account(username="bob")
 dylan = fake_account(username="dylan")
 henry = fake_account(username="henry")
 
+home_page = fake_page(
+    type="blog:HomePage",
+    slug="root",
+    hero_title="lorem atchoum",
+)
+
+
+cat_page = fake_page(
+    type="blog:CategoryPage",
+    slug="tech",
+    parent=home_page,
+    hero_title="Technologies",
+    intro={"title": "tech", "body": "loli pop"},
+)
+
+
+cat2_page = fake_page(
+    type="blog:CategoryPage",
+    slug="seo",
+    parent=home_page,
+    hero_title="SEO",
+    intro={"title": "SEO", "body": "You bot"},
+)
+
+blog_page = fake_page(
+    type="blog:BlogPage",
+    slug="seo",
+    parent=cat_page,
+    hero_title="SEO In Tech",
+    body=[{"title": "SEO In Tech", "body": "U robot.txt"}],
+)
+
 
 @pytest.mark.parametrize(
     "params",
@@ -160,39 +192,6 @@ async def test_authntoken_delete(
         )
     )
     assert tokens_count.first() == (0,)
-
-
-home_page = fake_page(
-    type="blog:HomePage",
-    slug="root",
-    hero_title="lorem atchoum",
-)
-
-
-cat_page = fake_page(
-    type="blog:CategoryPage",
-    slug="tech",
-    parent=home_page,
-    hero_title="Technologies",
-    intro={"title": "tech", "body": "loli pop"},
-)
-
-
-cat2_page = fake_page(
-    type="blog:CategoryPage",
-    slug="seo",
-    parent=home_page,
-    hero_title="SEO",
-    intro={"title": "SEO", "body": "You bot"},
-)
-
-blog_page = fake_page(
-    type="blog:BlogPage",
-    slug="seo",
-    parent=cat_page,
-    hero_title="SEO In Tech",
-    body=[{"title": "SEO In Tech", "body": "U robot.txt"}],
-)
 
 
 @pytest.mark.parametrize(
@@ -468,8 +467,11 @@ async def test_site_add(params: Any, sqla_session: AsyncSession, pages: Sequence
     "params",
     [
         {
-            "pages": [home_page],
-            "sites": [fake_site(home_page)],
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(cat_page, hostname="www1"),
+                fake_site(cat2_page, hostname="www2"),
+            ],
         },
     ],
 )
@@ -484,7 +486,37 @@ async def test_site_list(
     assert rsites.is_ok()
     sites_ok = rsites.unwrap()
     ss = [s.hostname for s in sites_ok]
-    assert ss == [sites[0].hostname]
+    assert ss == ["www1", "www2"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(cat_page, hostname="www1"),
+                fake_site(cat2_page, hostname="www2"),
+            ],
+        },
+    ],
+)
+async def test_by_hostname(
+    params: Any,
+    sqla_session: AsyncSession,
+    pages: Sequence[Page],
+    sites: Sequence[Site],
+):
+    repo = SiteSQLRepository(sqla_session)
+    rsite = await repo.by_hostname("www1")
+    assert rsite.is_ok()
+    site_ok = rsite.unwrap()
+    assert site_ok.root_page_path == "/root/tech"
+
+    rsite = await repo.by_hostname("www3")
+    assert rsite.is_err()
+    site_err = rsite.unwrap_err()
+    assert site_err.name == "site_not_found"
 
 
 async def test_sql_uow_by_session_commit(dummy_session: AsyncSession):

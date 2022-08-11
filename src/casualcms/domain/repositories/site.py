@@ -26,3 +26,7 @@ class AbstractSiteRepository(AbstractRepository):
     @abc.abstractmethod
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch all sites."""
+
+    @abc.abstractmethod
+    async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
+        """Fetch the site with given hostname."""

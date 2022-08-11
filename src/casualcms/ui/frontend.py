@@ -1,4 +1,4 @@
-from fastapi import HTTPException, Response
+from fastapi import HTTPException, Request, Response
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
@@ -6,6 +6,7 @@ from casualcms.adapters.jinja2 import Jinja2TemplateRender
 
 async def serve_pages(
     path: str,
+    request: Request,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Response:
     path = path.strip("/") or "/"
@@ -15,6 +16,9 @@ async def serve_pages(
                 status_code=302,
                 headers={"location": "/admin/"},
             )
+
+        site = await uow.sites.by_hostname(request.url.hostname)
+
         page = await uow.pages.by_path(f"/{path}")
         if page.is_err():
             raise HTTPException(

@@ -58,12 +58,12 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
       <form onSubmit={handleSubmit}>
         <FormControl>
           <FormLabel>Hostname</FormLabel>
-          <Input type="text" name="hostname" />
+          <Input type="text" name="hostname" placeholder="hostname" />
           <FormHelperText>Hostname for this site.</FormHelperText>
         </FormControl>
         <FormControl>
           <FormLabel>Root Page</FormLabel>
-          <Input type="text" name="root_page_path" />
+          <Input type="text" name="root_page_path" placeholder="/index" />
           <FormHelperText>
             Path of the page, that will be the index page for this site (paged
             used for /).

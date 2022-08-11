@@ -17,9 +17,26 @@ async def serve_pages(
                 headers={"location": "/admin/"},
             )
 
-        site = await uow.sites.by_hostname(request.url.hostname)
+        host = request.url.hostname or ""
+        if request.url.scheme == "http" and request.url.port != 80:
+            host += f":{request.url.port}"
+        elif request.url.scheme == "https" and request.url.port != 443:
+            host += f":{request.url.port}"
+        site = await uow.sites.by_hostname(host)
+        if site.is_err():
+            raise HTTPException(
+                status_code=404,
+                detail=[{"msg": f"Host {request.url.hostname} not found"}],
+            )
+        site_ok = site.unwrap()
+        if site_ok.secure and request.url.scheme == "http":
+            return Response(
+                status_code=302,
+                headers={"location": f"https://{host}/{request.url.path}"},
+            )
 
-        page = await uow.pages.by_path(f"/{path}")
+        root_page_path = site.unwrap().root_page_path
+        page = await uow.pages.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if page.is_err():
             raise HTTPException(
                 status_code=404,

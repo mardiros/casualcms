@@ -45,7 +45,10 @@ class Browser:
         return self.wait_for(self.browser.find_elements_by_xpath, path)  # type: ignore
 
     def get(self, path: str):
-        self.browser.get(f"{self.web_root}{path}")
+        if path.startswith("/"):
+            self.browser.get(f"{self.web_root}{path}")
+        else:
+            self.browser.get(f"{path}")
 
     def quit(self):
         self.browser.quit()

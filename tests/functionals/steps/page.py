@@ -61,7 +61,7 @@ def create_page(context: Any, path: str, page_type: str) -> None:
                 "slug": slug,
                 "title": fake.name(),
                 "description": fake.paragraph(nb_sentences=1),
-                "hero_title": fake.name(),
+                "hero_title": slug.split("/").pop().capitalize(),
             },
         }
 
@@ -74,7 +74,7 @@ def create_page(context: Any, path: str, page_type: str) -> None:
                 "slug": slug,
                 "title": fake.name(),
                 "description": fake.paragraph(nb_sentences=1),
-                "hero_title": fake.name(),
+                "hero_title": slug.split("/").pop().replace("-", " ").title(),
                 "body": [],
             },
         }

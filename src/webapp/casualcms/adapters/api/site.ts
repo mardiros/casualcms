@@ -11,7 +11,7 @@ export class SiteApi extends BaseFetchApi implements ISiteApi {
     payload: SiteOption
   ): Promise<Result<PartialSite, ApiError>> {
     const postBody = { hostname: hostname, ...payload };
-    const response = await this.fetch("/api/pages", {
+    const response = await this.fetch("/api/sites", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -31,7 +31,7 @@ export class SiteApi extends BaseFetchApi implements ISiteApi {
     hostname: string
   ): Promise<Result<boolean, ApiError>> {
     const postBody = { hostname: hostname };
-    const response = await this.fetch("/api/pages", {
+    const response = await this.fetch("/api/sites", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,

@@ -40,8 +40,8 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
   return (
     <Tr>
       <Td>{site.hostname}</Td>
-      <Td>{site.default}</Td>
       <Td>{site.root_page_path}</Td>
+      <Td>{{true: "yes", false: "no"}[site.default.toString()]}</Td>
       <Td>
         <Link
           to={`/admin/site/edit?${new URLSearchParams({
@@ -75,7 +75,7 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
       setIsLoading(false);
     }
     loadSubSites();
-    return function cleanup() { };
+    return function cleanup() {};
   }, []);
 
   if (isLoading) {
@@ -90,8 +90,8 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
         <Thead>
           <Tr>
             <Th>Hostname</Th>
-            <Th>Default</Th>
             <Th>Root Page</Th>
+            <Th>Default</Th>
             <Th>Edit</Th>
           </Tr>
         </Thead>
@@ -109,9 +109,7 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
   let navigate = useNavigate();
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
-      <Button
-        onClick={() => navigate(`/admin/site/new`, { replace: true })}
-      >
+      <Button onClick={() => navigate(`/admin/site/new`, { replace: true })}>
         <Icon as={AddIcon} marginEnd={2} />
         Add new site
       </Button>

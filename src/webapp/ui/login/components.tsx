@@ -76,19 +76,19 @@ export function RequireAuth({
 }
 
 export const Login: React.FunctionComponent<{}> = () => {
-  let auth = useAuth();
-  let config = useConfig();
+  const auth = useAuth();
+  const config = useConfig();
   const [error, setError] = React.useState<ApiError>(null);
   const [authSucceed, setAuthSuceed] = React.useState<boolean>(false);
   // let from = location.state?.from?.pathname || "/admin/";
-  let from = "/admin/"; // keep last / to avoid one redirection
+  const from = "/admin/"; // keep last / to avoid one redirection
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    let formData = new FormData(event.currentTarget);
-    let username = formData.get("username") as string;
-    let password = formData.get("password") as string;
-    let accountResult = await config.api.account.byCredentials({
+    const formData = new FormData(event.currentTarget);
+    const username = formData.get("username") as string;
+    const password = formData.get("password") as string;
+    const accountResult = await config.api.account.byCredentials({
       username,
       password,
     });

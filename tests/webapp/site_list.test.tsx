@@ -98,8 +98,8 @@ describe("As a user, I can list sites", () => {
       "/admin/sites"
     );
     let link = screen.getByText("Add new site", { exact: false });
-    fireEvent.click(link)
+    fireEvent.click(link);
     const newPage = screen.getByText("New web site page");
-    expect(newPage.nodeName).equal("H4")
+    expect(newPage.nodeName).equal("H4");
   });
 });

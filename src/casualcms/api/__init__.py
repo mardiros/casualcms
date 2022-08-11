@@ -16,6 +16,7 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route("/pages", page.list_pages, methods=["GET"])
     router.add_api_route("/pages/{path:path}", page.get_page, methods=["GET"])
     router.add_api_route("/pages/{path:path}", page.update_page, methods=["PATCH"])
+    router.add_api_route("/pages/{path:path}", page.delete_page, methods=["DELETE"])
 
     router.add_api_route("/sites", site.create_site, methods=["POST"])
     router.add_api_route("/sites", site.list_sites, methods=["GET"])

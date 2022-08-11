@@ -300,3 +300,24 @@ async def test_update_sub_page_content(
         )
     assert saved_home.slug == "new-slug"
     assert saved_home.title == payload["title"]
+
+
+async def test_delete_page(
+    client: TestClient,
+    authntoken: AuthnToken,
+    home_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(
+        f"/api/pages/{home_page.path}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 204
+
+    async with uow as uow:
+        saved_home = await uow.pages.by_path("/home")
+
+    assert saved_home.is_err()
+    assert saved_home.unwrap_err().name == "page_not_found"

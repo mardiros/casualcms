@@ -1,5 +1,10 @@
-from casualcms.domain.messages.commands import CreatePage, UpdatePage
+from typing import cast
+
+from result import Err
+
+from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
 from casualcms.domain.model.page import Page, resolve_type
+from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -28,3 +33,18 @@ async def update_page(
         setattr(p, key, val)
     await uow.pages.update(p)
     return p
+
+
+@listen
+async def delete_page(
+    cmd: DeletePage,
+    uow: AbstractUnitOfWork,
+) -> PageOperationResult:
+
+    async with uow as uow:
+        page = await uow.pages.by_id(cmd.id)
+        if page.is_err():
+            return cast(Err[PageRepositoryError], page)
+    p = page.unwrap()
+    resp = await uow.pages.remove(p)
+    return resp

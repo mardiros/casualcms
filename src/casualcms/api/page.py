@@ -1,10 +1,10 @@
 from typing import Any, Optional
 
-from fastapi import Body, Depends, HTTPException, Request
+from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreatePage, UpdatePage
+from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page, resolve_type
 
@@ -102,7 +102,7 @@ async def get_page(
     async with app.uow as uow:
         path = path.strip("/")
         page = await uow.pages.by_path(f"/{path}")
-        await uow.commit()
+        await uow.rollback()
 
     if page.is_err():
         raise HTTPException(
@@ -124,7 +124,7 @@ async def update_page(
     async with app.uow as uow:
         path = path.strip("/")
         page = await uow.pages.by_path(f"/{path}")
-        await uow.commit()
+        await uow.rollback()
 
     if page.is_err():
         raise HTTPException(
@@ -144,3 +144,44 @@ async def update_page(
         await uow.commit()
 
     return upage.get_data_context()
+
+
+async def delete_page(
+    request: Request,
+    path: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Response:
+
+    async with app.uow as uow:
+        path = path.strip("/")
+        page = await uow.pages.by_path(f"/{path}")
+        await uow.rollback()
+
+    p = page.unwrap()
+
+    cmd = DeletePage(
+        id=p.id,
+        path=p.path,
+    )
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+    async with app.uow as uow:
+        resp = await app.bus.handle(cmd, uow)
+        if resp.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "path"], "msg": resp.unwrap_err().value}
+                ],
+            )
+        else:
+            await uow.commit()
+
+    if page.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
+        )
+
+    return Response(content="", status_code=204)

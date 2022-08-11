@@ -446,6 +446,32 @@ async def test_page_update(
     "params",
     [
         {
+            "pages": [home_page, cat_page],  # type: ignore
+        },
+    ],
+)
+async def test_page_remove(
+    params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
+):
+    repo = PageSQLRepository(sqla_session)
+
+    resp = await repo.remove(home_page)
+    assert resp.is_err()
+    assert resp.unwrap_err().name == "page_has_children"
+
+    resp = await repo.remove(cat2_page)
+    assert resp.is_err()
+    assert resp.unwrap_err().name == "page_not_found"
+
+    resp = await repo.remove(cat_page)
+    assert resp.is_ok()
+    assert resp.unwrap() == ...
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
             "pages": [home_page],
             "site": fake_site(home_page),
         },

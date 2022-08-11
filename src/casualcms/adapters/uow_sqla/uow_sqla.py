@@ -23,6 +23,7 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
+    PageOperationResult,
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
@@ -244,6 +245,26 @@ class PageSQLRepository(AbstractPageRepository):
             orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
         )
         self.seen.add(model)
+
+    async def remove(self, model: Page) -> PageOperationResult:
+        """Remove the model from the repository."""
+        child_pages = await self.by_parent(model.path)
+        if child_pages.is_err():
+            return cast(Err[PageRepositoryError], child_pages)
+
+        if child_pages.unwrap():
+            return Err(PageRepositoryError.page_has_children)
+
+        await self.session.execute(
+            delete(orm.pages_treepath).where(
+                orm.pages_treepath.c.descendant_id == model.id
+            ),
+        )
+        await self.session.execute(
+            delete(orm.pages).where(orm.pages.c.id == model.id),
+        )
+        self.seen.add(model)
+        return Ok(...)
 
 
 class AuthnTokenSQLRepository(AbstractAuthnRepository):

@@ -14,6 +14,7 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
+    PageOperationResult,
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
@@ -86,6 +87,12 @@ class PageInMemoryRepository(AbstractPageRepository):
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
+
+    async def remove(self, model: Page) -> PageOperationResult:
+        """Remove the model from the repository."""
+        self.seen.add(model)
+        del self.pages[model.path]
+        return Ok(...)
 
     async def update(self, model: Page) -> None:
         """Append a new model to the repository."""

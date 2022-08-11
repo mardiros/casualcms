@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model import Site
+
 from ..casualblog.models import HomePage
 
 

@@ -1,6 +1,7 @@
 """Account repository."""
 import abc
 import enum
+from types import EllipsisType
 from typing import Optional, Sequence
 
 from ..model import Page
@@ -10,10 +11,12 @@ from .base import AbstractRepository, RepositoryResult
 class PageRepositoryError(enum.Enum):
     page_not_found = "Page not found"
     page_broken_treepath = "Page not found"  # we can set the same error message
+    page_has_children = "Page has child pages"
 
 
 PageRepositoryResult = RepositoryResult[Page, PageRepositoryError]
 PageSequenceRepositoryResult = RepositoryResult[Sequence[Page], PageRepositoryError]
+PageOperationResult = RepositoryResult[EllipsisType, PageRepositoryError]
 
 
 class AbstractPageRepository(AbstractRepository):
@@ -38,3 +41,7 @@ class AbstractPageRepository(AbstractRepository):
     @abc.abstractmethod
     async def update(self, model: Page) -> None:
         """Append a new model to the repository."""
+
+    @abc.abstractmethod
+    async def remove(self, model: Page) -> PageOperationResult:
+        """Remove the model from the repository."""

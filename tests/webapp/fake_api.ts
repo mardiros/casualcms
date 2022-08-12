@@ -164,7 +164,7 @@ class FakePageApi implements IPageApi {
           title: page.title,
           meta: {
             path: page.meta.path,
-            type: "casual:HomePage",
+            type: page.meta.type,
           },
         })
       );

@@ -41,7 +41,7 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
     <Tr>
       <Td>{site.hostname}</Td>
       <Td>{site.root_page_path}</Td>
-      <Td>{{true: "yes", false: "no"}[site.default.toString()]}</Td>
+      <Td>{{ true: "yes", false: "no" }[site.default.toString()]}</Td>
       <Td>
         <Link
           to={`/admin/site/edit?${new URLSearchParams({

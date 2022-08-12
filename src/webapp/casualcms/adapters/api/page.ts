@@ -96,10 +96,17 @@ export class PageApi extends BaseFetchApi implements IPageApi {
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>> {
-    return err(
-      castError({
-        detail: [{ loc: [], msg: "Not Implemented" }],
-      }) as ApiError
-    );
+    const response = await this.fetch(`/api/pages${path}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      const jsonData = await (response.json() as unknown);
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(true);
   }
 }

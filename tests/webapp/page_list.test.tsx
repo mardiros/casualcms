@@ -102,7 +102,14 @@ describe("As a user, I can list pages", () => {
     renderWithRouter(
       <Route
         path="/admin/pages"
-        element={<PageListTable parentPath={null} config={config} token="" />}
+        element={
+          <PageListTable
+            curPage={null}
+            parentPath={null}
+            config={config}
+            token=""
+          />
+        }
       />,
       "/admin/pages"
     );
@@ -116,7 +123,14 @@ describe("As a user, I can list pages", () => {
     renderWithRouter(
       <Route
         path="/admin/pages"
-        element={<PageListTable parentPath="/home" config={config} token="" />}
+        element={
+          <PageListTable
+            curPage={null}
+            parentPath="/home"
+            config={config}
+            token=""
+          />
+        }
       />,
       "/admin/pages?parent=/home"
     );
@@ -141,7 +155,7 @@ describe("As a user, I can list pages", () => {
       <>
         <Route
           path="/admin/pages"
-          element={<PageListButtons curPage={page} />}
+          element={<PageListButtons curPage={page} subPages={[]} />}
         />
         <Route path="/admin/page/new" element={<h4>New page page</h4>} />
       </>,
@@ -151,5 +165,61 @@ describe("As a user, I can list pages", () => {
     fireEvent.click(link);
     const newPage = screen.getByText("New page page");
     expect(newPage.nodeName).equal("H4");
+  });
+
+  it("Render a delete button if there is no child pages", async () => {
+    const page = {
+      meta: {
+        path: "/home/sub1",
+        type: "casual:HomePage",
+        breadcrumb: [
+          {
+            path: "/home",
+            title: "home",
+            slug: "home",
+          },
+          {
+            path: "/home/sub1",
+            title: "sub",
+            slug: "sub1",
+          },
+        ],
+      },
+      slug: "sub1",
+      title: "sub",
+      description: "",
+    };
+
+    renderWithRouter(
+      <>
+        <Route
+          path="/admin/pages/btn"
+          element={<PageListButtons curPage={page} subPages={[]} />}
+        />
+        <Route path="/admin/pages" element={<h4>Page list</h4>} />
+      </>,
+      "/admin/pages/btn"
+    );
+
+    let link = screen.getByText("Delete this page");
+    fireEvent.click(link);
+
+    link = screen.getByText("Confirm Deletion");
+    fireEvent.click(link);
+
+    const newPage = await screen.findByText("Page list");
+    expect(newPage.nodeName).equal("H4");
+
+    const subList = await config.api.page.listPages("", "/home");
+    expect(subList._unsafeUnwrap()).eql([
+      {
+        meta: {
+          path: "/home/sub0",
+          type: "casual:SectionPage",
+        },
+        slug: "sub0",
+        title: "Section Page",
+      },
+    ]);
   });
 });

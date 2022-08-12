@@ -11,7 +11,10 @@ export const SideBar: React.FunctionComponent<{}> = () => {
   let pagesColor = ["teal.500", "white", "false"];
   let sitesColor = ["teal.500", "white", "false"];
   const location = useLocation();
-  if (location.pathname.startsWith("/admin/page") || location.pathname == ("/admin/")) {
+  if (
+    location.pathname.startsWith("/admin/page") ||
+    location.pathname == "/admin/"
+  ) {
     pagesColor = selectedColor;
   } else if (location.pathname.startsWith("/admin/site")) {
     sitesColor = selectedColor;

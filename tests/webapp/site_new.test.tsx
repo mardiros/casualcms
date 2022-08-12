@@ -53,7 +53,7 @@ describe("As a user, I can create a new site", () => {
         default: false,
         hostname: "www.example.net",
         root_page_path: "/index",
-        secure: false
+        secure: false,
       },
     ]);
 

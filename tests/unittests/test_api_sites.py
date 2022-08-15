@@ -52,6 +52,45 @@ async def test_api_list_sites(
     ]
 
 
+def test_get_site(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    home_page: Page,
+):
+    resp = client.get(
+        f"/api/sites/{default_site.hostname}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "hostname": default_site.hostname,
+        "default": True,
+        "secure": False,
+        "root_page_path": home_page.path,
+    }
+
+
+def test_get_site_404(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    home_page: Page,
+):
+    resp = client.get(
+        "/api/sites/www.e404.net",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 404
+    assert resp.json() == {
+        "detail": [{"loc": ["path", "hostname"], "msg": "Site not found"}]
+    }
+
+
 async def test_delete_site(
     client: TestClient,
     authntoken: AuthnToken,

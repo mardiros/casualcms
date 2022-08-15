@@ -18,6 +18,9 @@ class PartialSite(BaseModel):
     root_page_path: str = Field(...)
 
 
+Site = PartialSite
+
+
 async def create_site(
     request: Request,
     hostname: str = Body(...),
@@ -78,6 +81,37 @@ async def list_sites(
         )
         for s in sites_ok
     ]
+
+
+async def get_site(
+    request: Request,
+    hostname: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Site:
+
+    async with app.uow as uow:
+        site = await uow.sites.by_hostname(hostname)
+        await uow.rollback()
+
+    if site.is_err():
+        raise HTTPException(
+            detail=[
+                {
+                    "loc": ["path", "hostname"],
+                    "msg": site.unwrap_err().value,
+                }
+            ],
+            status_code=404,
+        )
+
+    s = site.unwrap()
+    return Site(
+        hostname=s.hostname,
+        default=s.default,
+        root_page_path=s.root_page_path,
+        secure=s.secure,
+    )
 
 
 async def delete_site(

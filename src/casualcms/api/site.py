@@ -1,11 +1,11 @@
 from datetime import datetime
 from typing import Optional
 
-from fastapi import Body, Depends, HTTPException, Request
+from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreateSite, generate_id
+from casualcms.domain.messages.commands import CreateSite, DeleteSite, generate_id
 from casualcms.domain.model import AuthnToken
 
 from .base import get_token_info
@@ -78,3 +78,40 @@ async def list_sites(
         )
         for s in sites_ok
     ]
+
+
+async def delete_site(
+    request: Request,
+    hostname: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Response:
+
+    async with app.uow as uow:
+        site = await uow.sites.by_hostname(hostname)
+        await uow.rollback()
+
+    if site.is_err():
+        return Response(content=site.unwrap_err().value, status_code=404)
+
+    s = site.unwrap()
+
+    cmd = DeleteSite(
+        id=s.id,
+        hostname=s.hostname,
+    )
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+    async with app.uow as uow:
+        resp = await app.bus.handle(cmd, uow)
+        if resp.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "path"], "msg": resp.unwrap_err().value}
+                ],
+            )
+        else:
+            await uow.commit()
+
+    return Response(content="", status_code=204)

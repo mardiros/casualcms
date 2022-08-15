@@ -79,7 +79,7 @@ class UpdatePage(Command):
 
 
 class DeletePage(Command):
-    id: str = Field(default_factory=generate_id)
+    id: str = Field(...)
     deleted_at: datetime = Field(default_factory=datetime.now)
     path: str = Field(...)
     metadata: Metadata = Metadata(category="page", name="delete_page", schemaVersion=1)
@@ -93,3 +93,10 @@ class CreateSite(Command):
     default: bool = Field(...)
     secure: bool = Field(...)
     metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)
+
+
+class DeleteSite(Command):
+    id: str = Field(...)
+    deleted_at: datetime = Field(default_factory=datetime.now)
+    hostname: str = Field(...)
+    metadata: Metadata = Metadata(category="site", name="delete_site", schemaVersion=1)

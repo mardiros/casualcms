@@ -1,5 +1,10 @@
-from casualcms.domain.messages.commands import CreateSite
+from typing import cast
+
+from result import Err
+
+from casualcms.domain.messages.commands import CreateSite, DeleteSite
 from casualcms.domain.model import Site
+from casualcms.domain.repositories.site import SiteOperationResult, SiteRepositoryError
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -20,3 +25,18 @@ async def create_site(
     )
     await uow.sites.add(site)
     return site
+
+
+@listen
+async def delete_site(
+    cmd: DeleteSite,
+    uow: AbstractUnitOfWork,
+) -> SiteOperationResult:
+
+    async with uow as uow:
+        site = await uow.sites.by_id(cmd.id)
+        if site.is_err():
+            return cast(Err[SiteRepositoryError], site)
+    s = site.unwrap()
+    resp = await uow.sites.remove(s)
+    return resp

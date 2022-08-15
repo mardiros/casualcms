@@ -21,6 +21,7 @@ from casualcms.domain.repositories.page import (
 )
 from casualcms.domain.repositories.site import (
     AbstractSiteRepository,
+    SiteOperationResult,
     SiteRepositoryError,
     SiteRepositoryResult,
     SiteSequenceRepositoryResult,
@@ -141,12 +142,27 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         """Fetch all sites."""
         return Ok(self.sites)
 
+    async def by_id(self, id: str) -> SiteRepositoryResult:
+        """Fetch site by id."""
+        for site in self.sites:
+            if site.id == id:
+                return Ok(site)
+        return Err(SiteRepositoryError.site_not_found)
+
     async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
         """Fetch all sites."""
         for site in self.sites:
             if site.hostname == hostname:
                 return Ok(site)
         return Err(SiteRepositoryError.site_not_found)
+
+    async def remove(self, model: Site) -> SiteOperationResult:
+        sites: list[Site] = []
+        for site in self.sites:
+            if site.id != model.id:
+                sites.append(site)
+        self.sites = sites
+        return Ok(...)
 
 
 class InMemoryUnitOfWork(AbstractUnitOfWork):

@@ -158,6 +158,9 @@ async def delete_page(
         page = await uow.pages.by_path(f"/{path}")
         await uow.rollback()
 
+    if page.is_err():
+        return Response(content=page.unwrap_err().value, status_code=404)
+
     p = page.unwrap()
 
     cmd = DeletePage(

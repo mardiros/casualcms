@@ -29,6 +29,7 @@ from casualcms.domain.repositories.page import (
     PageSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.site import (
+    SiteOperationResult,
     SiteRepositoryError,
     SiteRepositoryResult,
     SiteSequenceRepositoryResult,
@@ -345,11 +346,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
         self.seen.add(model)
 
-    async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
-        """Fetch all sites."""
-        orm_sites: CursorResult = await self.session.execute(
-            select(orm.sites).filter_by(hostname=hostname)
-        )
+    async def _to_site_result(self, orm_sites: CursorResult) -> SiteRepositoryResult:
         orm_site = orm_sites.first()
         if orm_site:
             s = cast(Site, orm_site)
@@ -367,7 +364,26 @@ class SiteSQLRepository(AbstractSiteRepository):
                     secure=s.secure,
                 )
             )
+
         return Err(SiteRepositoryError.site_not_found)
+
+    async def by_id(self, id: str) -> SiteRepositoryResult:
+        """Fetch site by id."""
+        orm_sites: CursorResult = await self.session.execute(
+            select(orm.sites).filter_by(id=id)
+        )
+        return await self._to_site_result(orm_sites)
+
+    async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
+        """Fetch site by hostname."""
+        orm_sites: CursorResult = await self.session.execute(
+            select(orm.sites).filter_by(hostname=hostname)
+        )
+        return await self._to_site_result(orm_sites)
+
+    async def remove(self, model: Site) -> SiteOperationResult:
+        raise NotImplementedError
+        return Ok(...)
 
 
 class SQLUnitOfWorkBySession(AbstractUnitOfWork):

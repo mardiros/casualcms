@@ -1,6 +1,7 @@
 """Account repository."""
 import abc
 import enum
+from types import EllipsisType
 from typing import Sequence
 
 from casualcms.domain.model import Site
@@ -14,6 +15,7 @@ class SiteRepositoryError(enum.Enum):
 
 SiteRepositoryResult = RepositoryResult[Site, SiteRepositoryError]
 SiteSequenceRepositoryResult = RepositoryResult[Sequence[Site], SiteRepositoryError]
+SiteOperationResult = RepositoryResult[EllipsisType, SiteRepositoryError]
 
 
 class AbstractSiteRepository(AbstractRepository):
@@ -28,5 +30,13 @@ class AbstractSiteRepository(AbstractRepository):
         """Fetch all sites."""
 
     @abc.abstractmethod
+    async def by_id(self, id: str) -> SiteRepositoryResult:
+        """Fetch the site with given id."""
+
+    @abc.abstractmethod
     async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
         """Fetch the site with given hostname."""
+
+    @abc.abstractmethod
+    async def remove(self, model: Site) -> SiteOperationResult:
+        """Remove given model from the repository."""

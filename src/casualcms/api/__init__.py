@@ -20,6 +20,7 @@ def includeme(app: FastAPIConfigurator) -> None:
 
     router.add_api_route("/sites", site.create_site, methods=["POST"])
     router.add_api_route("/sites", site.list_sites, methods=["GET"])
+    router.add_api_route("/sites/{hostname}", site.delete_site, methods=["DELETE"])
 
     router.add_api_route("/templates", template.list_templates, methods=["GET"])
     router.add_api_route("/templates/{type}", template.show_template, methods=["GET"])

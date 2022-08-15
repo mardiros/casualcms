@@ -11,7 +11,7 @@ models. It does not requires to handle SQL migrations either.
 TODO
 ----
 
-* Delete a page
+* Ensure we can't delete a page if it is associated to a site
 
 * Delete a site
 

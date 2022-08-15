@@ -382,7 +382,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         return await self._to_site_result(orm_sites)
 
     async def remove(self, model: Site) -> SiteOperationResult:
-        raise NotImplementedError
+        await self.session.execute(delete(orm.sites).where(orm.sites.c.id == model.id))
         return Ok(...)
 
 

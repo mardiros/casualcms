@@ -521,6 +521,36 @@ async def test_site_list(
         {
             "pages": [home_page, cat_page, cat2_page],
             "sites": [
+                fake_site(cat_page, id="abc"),
+                fake_site(cat2_page, id="123"),
+            ],
+        },
+    ],
+)
+async def test_by_id(
+    params: Any,
+    sqla_session: AsyncSession,
+    pages: Sequence[Page],
+    sites: Sequence[Site],
+):
+    repo = SiteSQLRepository(sqla_session)
+    rsite = await repo.by_id("abc")
+    assert rsite.is_ok()
+    site_ok = rsite.unwrap()
+    assert site_ok.root_page_path == "/root/tech"
+
+    rsite = await repo.by_id("xyz")
+    assert rsite.is_err()
+    site_err = rsite.unwrap_err()
+    assert site_err.name == "site_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
                 fake_site(cat_page, hostname="www1"),
                 fake_site(cat2_page, hostname="www2"),
             ],
@@ -540,6 +570,35 @@ async def test_by_hostname(
     assert site_ok.root_page_path == "/root/tech"
 
     rsite = await repo.by_hostname("www3")
+    assert rsite.is_err()
+    site_err = rsite.unwrap_err()
+    assert site_err.name == "site_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(cat_page, hostname="www1"),
+                fake_site(cat2_page, hostname="www2"),
+            ],
+        },
+    ],
+)
+async def test_site_remove(
+    params: Any,
+    sqla_session: AsyncSession,
+    pages: Sequence[Page],
+    sites: Sequence[Site],
+):
+    repo = SiteSQLRepository(sqla_session)
+    rsite = await repo.by_hostname("www1")
+
+    await repo.remove(rsite.unwrap())
+
+    rsite = await repo.by_hostname("www1")
     assert rsite.is_err()
     site_err = rsite.unwrap_err()
     assert site_err.name == "site_not_found"

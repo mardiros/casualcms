@@ -73,20 +73,14 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                     "type": "string",
                     "description": "Title of the hero section",
                 },
-                "id": {
-                    "title": "Id",
-                    "type": "string",
-                    "widget": "hidden",  # FIXME
-                },
                 "slug": {"title": "Slug", "type": "string"},
                 "title": {"title": "Title", "type": "string"},
             },
-            "required": ["id", "slug", "title", "description", "hero_title"],
+            "required": ["slug", "title", "description", "hero_title"],
             "title": "HomePage",
             "type": "object",
         },
         "uiSchema": {
-            "id": {"ui:widget": "hidden"},
             "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
             "hero_title": {"ui:widget": "text", "ui:placeholder": "hero_title"},
             "title": {"ui:widget": "text", "ui:placeholder": "title"},

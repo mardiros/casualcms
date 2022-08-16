@@ -1,10 +1,15 @@
-from typing import Any, Optional
+from typing import Any, MutableMapping, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
+from casualcms.domain.messages.commands import (
+    CreatePage,
+    DeletePage,
+    UpdatePage,
+    generate_id,
+)
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page, resolve_type
 
@@ -39,7 +44,7 @@ async def create_page(
     #     )
     # page_type = rtype.unwrap()
     async with app.uow as uow:
-        params = {**payload}
+        params: MutableMapping[str, Any] = {"id": generate_id(), **payload}
         if parent:
             parent_page = await uow.pages.by_path(parent)
             if parent_page.is_err():

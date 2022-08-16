@@ -17,6 +17,7 @@ from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
 from casualcms.domain.messages import Event
+from casualcms.domain.messages.commands import generate_id
 
 uuid = str
 
@@ -120,7 +121,7 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
 
 class Page(AbstractPage):
 
-    id: uuid = Field(widget="hidden")
+    id: uuid = Field(default_factory=generate_id, exclude=True)
     slug: str = Field(...)
     title: str = Field(...)
     description: str = Field(...)
@@ -173,11 +174,7 @@ class Page(AbstractPage):
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}
         for key, val in cls.__fields__.items():
-            if key == "parent":
-                continue
-            if key == "events":
-                continue
-            if key == "created_at":
+            if key in ("id", "parent", "events", "created_at"):
                 continue
             ret[key] = cls.get_widget(val)
         return ret

@@ -77,7 +77,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
     navigate(`/admin/pages?${params}`, { replace: true });
   };
 
-  const data = { id: uuidv1() };
+  const data = {};
   return (
     <Box maxW="720px">
       <Heading>New Page</Heading>

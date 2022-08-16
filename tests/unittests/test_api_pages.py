@@ -33,7 +33,6 @@ async def test_api_create_page(
         json={
             "type": "blog:HomePage",
             "payload": {
-                "id": "abc",
                 "slug": "index",
                 "title": "Root Page",
                 "description": "The home page",
@@ -47,7 +46,6 @@ async def test_api_create_page(
     async with uow as uow:
         page = (await uow.pages.by_path("/index")).unwrap()
         assert page.dict() == {
-            "id": "abc",
             "slug": "index",
             "title": "Root Page",
             "description": "The home page",
@@ -93,7 +91,6 @@ async def test_create_subpage(
             "type": "blog:CategoryPage",
             "parent": "/home",
             "payload": {
-                "id": "abcd",
                 "slug": "test",
                 "title": "sub Page",
                 "description": "A sub page",
@@ -106,7 +103,6 @@ async def test_create_subpage(
     async with uow as uow:
         page = (await uow.pages.by_path("/home/test")).unwrap()
         assert page.dict() == {
-            "id": "abcd",
             "slug": "test",
             "title": "sub Page",
             "description": "A sub page",
@@ -119,7 +115,6 @@ async def test_create_subpage(
         pages_dict = [page.dict() for page in pages]
         assert pages_dict == [
             {
-                "id": "abcd",
                 "slug": "test",
                 "title": "sub Page",
                 "description": "A sub page",
@@ -195,9 +190,6 @@ async def test_get_page(
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    params["response"]["id"] = (
-        home_page.id if params["response"]["slug"] == "home" else sub_page.id
-    )
     assert resp.json() == params["response"]
 
 
@@ -222,7 +214,6 @@ async def test_update_home_page_content(
         json=payload,
     )
     assert resp.json() == {
-        "id": home_page.id,
         "meta": {
             "path": "/new-home",
             "type": "blog:HomePage",
@@ -270,7 +261,6 @@ async def test_update_sub_page_content(
         json=payload,
     )
     assert resp.json() == {
-        "id": sub_page.id,
         "meta": {
             "path": "/home/new-slug",
             "type": "blog:CategoryPage",

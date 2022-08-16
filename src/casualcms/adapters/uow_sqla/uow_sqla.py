@@ -80,7 +80,7 @@ def format_page(page: Page) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.pages."""
     p: Dict[str, Any] = page.dict()
     formated_page: Dict[str, Any] = {
-        "id": p.pop("id"),
+        "id": page.id,
         "type": page.__meta__.type,
         "created_at": page.created_at,
         "slug": p.pop("slug"),

@@ -11,10 +11,6 @@ models. It does not requires to handle SQL migrations either.
 TODO
 ----
 
-* Ensure we can't delete a page if it is associated to a site
-
-* Delete a site
-
 * Page revision
 
 * Historic
@@ -30,3 +26,5 @@ TODO
 * Do a popup to fillout the root page
 
 * Implement default site
+
+* Ensure we can't delete a page if it is associated to a site

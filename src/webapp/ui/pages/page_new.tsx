@@ -1,4 +1,3 @@
-import { v1 as uuidv1 } from "uuid";
 import React from "react";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";

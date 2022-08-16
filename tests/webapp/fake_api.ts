@@ -56,7 +56,6 @@ class FakeTemplateApi implements ITemplateApi {
     if (tpltype == "casual:HomePage") {
       return ok({
         uiSchema: {
-          id: { "ui:widget": "hidden" },
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
           title: { "ui:widget": "text", "ui:placeholder": "title" },
           body: { "ui:widget": "text", "ui:placeholder": "body" },
@@ -65,12 +64,11 @@ class FakeTemplateApi implements ITemplateApi {
           title: "HomePage",
           type: "object",
           properties: {
-            id: { title: "Id", type: "string" },
             slug: { title: "Slug", type: "string" },
             title: { title: "Title", type: "string" },
             body: { title: "Body", type: "string" },
           },
-          required: ["id", "slug", "title", "body"],
+          required: ["slug", "title", "body"],
           definitions: {},
         },
       });
@@ -79,7 +77,6 @@ class FakeTemplateApi implements ITemplateApi {
     if (tpltype == "casual:SectionPage") {
       return ok({
         uiSchema: {
-          id: { "ui:widget": "hidden" },
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
           title: { "ui:widget": "text", "ui:placeholder": "title" },
           description: { "ui:widget": "text", "ui:placeholder": "description" },
@@ -88,12 +85,11 @@ class FakeTemplateApi implements ITemplateApi {
           title: "HomePage",
           type: "object",
           properties: {
-            id: { title: "Id", type: "string" },
             slug: { title: "Slug", type: "string" },
             title: { title: "Title", type: "string" },
             description: { title: "Description", type: "string" },
           },
-          required: ["id", "slug", "title"],
+          required: ["slug", "title"],
           definitions: {},
         },
       });

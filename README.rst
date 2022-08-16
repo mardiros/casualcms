@@ -19,8 +19,6 @@ TODO
 
 * snippets
 
-* Refactor to remove uuid in API page and uuidv1 deps in frontend
-
 * Display Errors in forms
 
 * Do a popup to fillout the root page

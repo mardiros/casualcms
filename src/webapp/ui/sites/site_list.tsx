@@ -22,6 +22,7 @@ import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
+import { SiteBreadcrumb } from "../layout/breadcrumb";
 // import { SiteBreadcrumb } from "../layout/breadcrumb";
 
 type SiteRowProps = {
@@ -45,7 +46,7 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
       <Td>
         <Link
           to={`/admin/site/edit?${new URLSearchParams({
-            site: site.hostname,
+            hostname: site.hostname,
           })}`}
         >
           <Icon as={EditIcon} marginEnd={2} />
@@ -109,7 +110,10 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
   let navigate = useNavigate();
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
-      <Button onClick={() => navigate(`/admin/site/new`, { replace: true })}>
+      <Button
+        colorScheme="teal"
+        onClick={() => navigate(`/admin/site/new`, { replace: true })}
+      >
         <Icon as={AddIcon} marginEnd={2} />
         Add new site
       </Button>
@@ -124,6 +128,7 @@ export const SiteList: React.FunctionComponent<{}> = () => {
 
   return (
     <Box>
+      <SiteBreadcrumb />
       <SiteListTable config={config} token={token} />
       <SiteListButtons />
     </Box>

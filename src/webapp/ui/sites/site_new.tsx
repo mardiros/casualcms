@@ -15,6 +15,7 @@ import { useConfig } from "../../config";
 import { useAuth } from "../login/hooks";
 import { ApiErrorUI } from "../layout/error_api";
 import { Navigate } from "react-router-dom";
+import { SiteBreadcrumb } from "../layout/breadcrumb";
 
 export const SiteNew: React.FunctionComponent<{}> = () => {
   const auth = useAuth();
@@ -52,6 +53,7 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
 
   return (
     <Box maxW="720px">
+      <SiteBreadcrumb title="New Site"/>
       <Heading>New Site</Heading>
       {/* {<SiteBreadcrumb title="new page" />} */}
       <ApiErrorUI error={error} />
@@ -78,11 +80,15 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
           </FormHelperText>
         </FormControl>
         <FormControl>
-          <Checkbox>Secure</Checkbox>
+          <Checkbox name="secure" value="true">
+            Secure
+          </Checkbox>
           <FormHelperText>Use https.</FormHelperText>
         </FormControl>
         <FormControl paddingTop={5}>
-          <Button type="submit">Submit</Button>
+          <Button type="submit" colorScheme="teal">
+            Submit
+          </Button>
         </FormControl>
       </form>
     </Box>

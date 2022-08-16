@@ -49,12 +49,7 @@ export type PartialSite = {
   hostname: string;
   default: boolean;
   root_page_path: string;
-  // secure: boolean;
+  secure: boolean;
 };
 
-export type Site = {
-  hostname: string;
-  default: boolean;
-  // secure: boolean;
-  root: string;
-};
+export type Site = PartialSite;

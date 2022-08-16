@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterator, Optional
 
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
-from selenium.common.exceptions import WebDriverException
+from selenium.common.exceptions import WebDriverException, NoSuchElementException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 from casualcms.entrypoint import main
@@ -40,6 +40,14 @@ class Browser:
 
     def find_element_by_xpath(self, path: str):
         return self.wait_for(self.browser.find_element_by_xpath, path)  # type: ignore
+
+    def dont_find_element_by_xpath(self, path: str):
+        try:
+            self.browser.find_element_by_xpath(path)
+        except NoSuchElementException:
+            return
+        else:
+            raise ValueError(f"Element {path} exists")
 
     def find_elements_by_xpath(self, path: str):
         return self.wait_for(self.browser.find_elements_by_xpath, path)  # type: ignore

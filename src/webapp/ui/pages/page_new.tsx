@@ -81,7 +81,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   return (
     <Box maxW="720px">
       <Heading>New Page</Heading>
-      {parentPage && <PageBreadcrumb meta={parentPage.meta} title="new page" />}
+      {parentPage && <PageBreadcrumb page={parentPage} title="new page" />}
       <ApiErrorUI error={error} />
       {template && (
         <Form

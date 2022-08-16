@@ -23,7 +23,6 @@ Feature: As a user, I can create a site
     Then I see the text "www.example.net"
     And I see the text "/home"
 
-
   Scenario: Display site path
     Given user on the admin page
     And a "/home" page of type "blog:HomePage"

@@ -1,4 +1,3 @@
-import { v1 as uuidv1 } from "uuid";
 import React from "react";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
@@ -6,7 +5,7 @@ import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
-import { AppContext } from "../../config";
+import { useConfig } from "../../config";
 import { Page, PageTemplate } from "../../casualcms/domain/model";
 import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
@@ -16,7 +15,7 @@ const Form = withTheme(ChakraUITheme);
 
 export const PageEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [template, setTemplate] = React.useState<PageTemplate | null>(null);
   const [page, setPage] = React.useState<Page | null>(null);
@@ -94,7 +93,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       {page && (
         <>
           <Heading>{page.title}</Heading>
-          <PageBreadcrumb meta={page.meta} />
+          <PageBreadcrumb page={page} />
         </>
       )}
 

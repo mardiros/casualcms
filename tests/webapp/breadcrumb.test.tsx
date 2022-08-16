@@ -24,9 +24,12 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
         },
       ],
     };
+    const page = {
+      meta: meta
+    }
     renderWithRouter(
       <>
-        <Route path="/admin/pages" element={<PageBreadcrumb meta={meta} />} />
+        <Route path="/admin/pages" element={<PageBreadcrumb page={page} />} />
       </>,
       "/admin/pages"
     );
@@ -57,11 +60,12 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
         },
       ],
     };
+    const page = {meta: meta};
     renderWithRouter(
       <>
         <Route
           path="/admin/pages"
-          element={<PageBreadcrumb meta={meta} title="New page" />}
+          element={<PageBreadcrumb page={page} title="New page" />}
         />
       </>,
       "/admin/pages"

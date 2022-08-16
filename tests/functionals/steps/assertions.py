@@ -21,6 +21,14 @@ def assert_text(context: Any, text: str):
     )
 
 
+@then('I don\'t see the text "{text}"')
+def assert_not_text(context: Any, text: str):
+    text = text.replace("'", "\\'")
+    context.browser.dont_find_element_by_xpath(
+        f"//*[contains(text(), '{text}') or .='{text}']"
+    )
+
+
 @then('I see the breadcrumb "{text}"')
 def assert_breadcrumb(context: Any, text: str):
     text_part = [t.strip() for t in text.split("/")]

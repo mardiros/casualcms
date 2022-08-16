@@ -93,14 +93,14 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
   let navigate = useNavigate();
   const qsEdit = curPage
     ? new URLSearchParams({
-        page: curPage.meta.path,
-      })
+      page: curPage.meta.path,
+    })
     : "";
   const qs = curPage
     ? new URLSearchParams({
-        parent: curPage.meta.path,
-        type: curPage.meta.type,
-      })
+      parent: curPage.meta.path,
+      type: curPage.meta.type,
+    })
     : "";
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
@@ -149,7 +149,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
       setIsLoading(false);
     }
     loadSubPages();
-    return function cleanup() {};
+    return function cleanup() { };
   }, [parentPath]);
 
   if (isLoading) {
@@ -220,11 +220,9 @@ export const PageList: React.FunctionComponent<{}> = () => {
   return (
     <Box>
       {curPage && (
-        <>
-          <Heading>{curPage.title}</Heading>
-          <PageBreadcrumb meta={curPage.meta} />
-        </>
+        <Heading>{curPage.title}</Heading>
       )}
+      <PageBreadcrumb page={curPage} />
       <Box>
         <ApiErrorUI error={error} />
         <PageListTable

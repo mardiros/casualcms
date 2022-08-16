@@ -6,6 +6,7 @@ import {
   PartialPage,
   Page,
   PartialSite,
+  Site,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -231,6 +232,22 @@ export class FakeSiteApi implements ISiteApi {
     });
     this.sites = sites;
     return ok(true);
+  }
+
+  async showSite(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<Site, ApiError>> {
+    const errors: ApiError = new Map();
+    errors.set("site", "Site does not exists");
+    let res: Result<Site, ApiError> = err(errors);
+
+    this.sites.filter((site: PartialSite) => {
+      if (site.hostname == hostname) {
+        res = ok(site)
+      }
+    });
+    return res
   }
 
   async listSites(

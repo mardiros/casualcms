@@ -5,9 +5,8 @@ import { screen, fireEvent } from "@testing-library/react";
 import { renderWithRouter } from "./helpers";
 import config from "./config";
 import { PageDeletePopoverForm } from "../../src/webapp/ui/pages/page_delete";
-import { DeletePopoverForm } from "../../src/webapp/ui/layout/confirm";
 
-describe("As a user, I can confirm deletion", () => {
+describe("As a user, I can delete a page", () => {
   before(async () => {
     await config.api.page.createPage(
       "",

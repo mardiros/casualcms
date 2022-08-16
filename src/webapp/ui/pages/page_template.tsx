@@ -120,7 +120,7 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
         <>
           <Heading>Choose A Type Of Template</Heading>
           {parentPage && (
-            <PageBreadcrumb meta={parentPage.meta} title="type of template" />
+            <PageBreadcrumb page={parentPage} title="type of template" />
           )}
           <Box paddingLeft={15}>
             <ApiErrorUI error={error} />

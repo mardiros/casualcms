@@ -6,12 +6,17 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { PageMeta } from "../../casualcms/domain/model";
+import { Page, Site } from "../../casualcms/domain/model";
 
 type PageBreadcrumbProps = {
-  meta: PageMeta;
+  page?: Page | null;
   title?: string;
 };
+
+type SiteBreadcrumbProps = {
+  site?: Site | null;
+  title?: string;
+}
 
 export const HomeIcon = (): JSX.Element => {
   return (
@@ -28,15 +33,15 @@ export const HomeIcon = (): JSX.Element => {
 export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
   props: PageBreadcrumbProps
 ) => {
-  const meta = props.meta;
+  const { page, title } = props;
   return (
-    <Breadcrumb>
+    <Breadcrumb padding={5}>
       <BreadcrumbItem>
         <Link to="/admin/pages">
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
-      {meta.breadcrumb.map((item, i) => (
+      {page && page.meta.breadcrumb.map((item, i) => (
         <BreadcrumbItem key={i}>
           <Link
             to={`/admin/pages/?${new URLSearchParams({
@@ -48,11 +53,40 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
           </Link>
         </BreadcrumbItem>
       ))}
-      {props.title && (
+      {title && (
         <BreadcrumbItem>
-          <BreadcrumbLink href="#">{props.title}</BreadcrumbLink>
+          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
         </BreadcrumbItem>
       )}
     </Breadcrumb>
   );
 };
+
+
+
+export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
+  props: SiteBreadcrumbProps
+) => {
+  const { site, title } = props;
+  return (
+    <Breadcrumb padding={5}>
+      <BreadcrumbItem>
+        <Link to="/admin/sites">
+          <Icon as={HomeIcon} />
+        </Link>
+      </BreadcrumbItem>
+      {site && (
+        <BreadcrumbItem>
+          <BreadcrumbLink href={`/admin/site/edit?hostname=${site.hostname}`}>
+            {site.hostname}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      )}
+      {title && (
+        <BreadcrumbItem>
+          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+        </BreadcrumbItem>
+      )}
+    </Breadcrumb>
+  );
+}

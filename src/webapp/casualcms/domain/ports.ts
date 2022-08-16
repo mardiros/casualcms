@@ -6,6 +6,7 @@ import {
   PartialPage,
   Page,
   PartialSite,
+  Site,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -66,6 +67,10 @@ export interface ISiteApi {
     hostname: string,
     payload: SiteOption
   ): Promise<Result<PartialSite, ApiError>>;
+  showSite(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<Site, ApiError>>;
   deleteSite(
     authntoken: string,
     hostname: string

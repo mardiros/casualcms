@@ -13,6 +13,7 @@ import { PageEdit } from "./ui/pages/page_edit";
 import { Layout } from "./ui/layout/layout";
 import { SiteList } from "./ui/sites/site_list";
 import { SiteNew } from "./ui/sites/site_new";
+import { SiteEdit } from "./ui/sites/site_edit";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -44,6 +45,7 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
 
               <Route path="sites" element={<SiteList />} caseSensitive />
               <Route path="site/new" element={<SiteNew />} caseSensitive />
+              <Route path="site/edit" element={<SiteEdit />} caseSensitive />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

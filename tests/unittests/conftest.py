@@ -13,9 +13,11 @@ from casualcms.domain.messages.commands import (
     CreateAuthnToken,
     CreatePage,
     CreateSite,
+    CreateSnippet,
     generate_id,
 )
 from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model.snippet import Snippet
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -77,7 +79,7 @@ async def admin_account(
 
 @pytest.fixture()
 async def authntoken(
-    app_settings: Settings,
+    app: FastAPI,
     admin_account: Account,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
@@ -96,7 +98,7 @@ async def authntoken(
 
 @pytest.fixture
 async def home_page(
-    app_settings: Settings,
+    app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
 ) -> AsyncGenerator[Page, None]:
@@ -119,7 +121,7 @@ async def home_page(
 
 @pytest.fixture
 async def sub_page(
-    app_settings: Settings,
+    app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
     home_page: HomePage,
@@ -143,8 +145,32 @@ async def sub_page(
 
 
 @pytest.fixture
+async def header_snippet(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Snippet, None]:
+    async with uow as uow:
+        snippet = await messagebus.handle(
+            CreateSnippet(
+                type="blog:HeaderSnippet",
+                slug="header",
+                body={
+                    "title": "A personal blog",
+                    "links": [
+                        {"title": "cats", "href": "/cats"},
+                        {"title": "dogs", "href": "/dogs"},
+                    ],
+                },
+            ),
+            uow,
+        )
+    yield snippet
+
+
+@pytest.fixture
 async def default_site(
-    app_settings: Settings,
+    app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
     home_page: Page,

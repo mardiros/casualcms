@@ -100,3 +100,14 @@ class DeleteSite(Command):
     deleted_at: datetime = Field(default_factory=datetime.now)
     hostname: str = Field(...)
     metadata: Metadata = Metadata(category="site", name="delete_site", schemaVersion=1)
+
+
+class CreateSnippet(Command):
+    type: str = Field(...)
+    slug: str = Field(...)
+    body: dict[str, Any] = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(
+        category="snippet", name="create_snippet", schemaVersion=1
+    )

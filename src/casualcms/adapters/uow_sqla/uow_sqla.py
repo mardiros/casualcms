@@ -279,6 +279,7 @@ class PageSQLRepository(AbstractPageRepository):
 class SnippetSQLRepository(AbstractSnippetRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
+        self.seen = set()
 
     async def by_slug(self, slug: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
@@ -310,6 +311,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             }
         )
         await self.session.execute(qry)
+        self.seen.add(model)
         return Ok(...)
 
     async def remove(self, model: Snippet) -> SnippetOperationResult:
@@ -317,6 +319,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         await self.session.execute(
             delete(orm.snippets).where(orm.snippets.c.slug == model.slug),
         )
+        self.seen.add(model)
         return Ok(...)
 
 

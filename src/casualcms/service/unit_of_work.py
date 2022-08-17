@@ -43,6 +43,10 @@ class AbstractUnitOfWork(abc.ABC):
             while site.events:
                 yield site.events.pop(0)
 
+        for snippet in self.snippets.seen:
+            while snippet.events:
+                yield snippet.events.pop(0)
+
     async def initialize(self) -> None:
         """Override to initialize repositories."""
 

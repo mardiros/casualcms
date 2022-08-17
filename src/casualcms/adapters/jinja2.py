@@ -4,6 +4,8 @@ from typing import Any, Mapping
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
+from casualcms.service.unit_of_work import AbstractUnitOfWork
+
 
 def build_searchpath(template_search_path: str) -> list[str]:
     searchpath: list[str] = []
@@ -23,17 +25,24 @@ class AbstractTemplateRenderer(ABC):
 
 
 class Jinja2TemplateRender(AbstractTemplateRenderer):
-    def __init__(self, template_search_path: str) -> None:
+    uow: AbstractUnitOfWork
+
+    def __init__(self, uow: AbstractUnitOfWork, template_search_path: str) -> None:
         super().__init__()
+        self.uow = uow
         self.env = Environment(
             loader=FileSystemLoader(build_searchpath(template_search_path)),
             enable_async=True,
         )
 
-    async def include_snippet(self, name: str) -> str:
-        # FIXME
-        # breakpoint()
-        return name
+    async def include_snippet(self, slug: str) -> str:
+        snippet = await self.uow.snippets.by_slug(slug)
+        if snippet.is_ok():
+            sok = snippet.unwrap()
+            return await self.render_template(sok.get_template(), sok.get_context())
+        else:
+            # should render an error here
+            return ""
 
     def get_template(self, template: str) -> Template:
         return self.env.get_template(

@@ -174,17 +174,22 @@ class SiteInMemoryRepository(AbstractSiteRepository):
 class SnippetInMemoryRepository(AbstractSnippetRepository):
     snippets: dict[str, Snippet] = {}
 
+    def __init__(self) -> None:
+        self.seen = set()
+
     async def by_slug(self, slug: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
         return Ok(self.snippets[slug])
 
     async def add(self, model: Snippet) -> SnippetOperationResult:
         """Append a new model to the repository."""
+        self.seen.add(model)
         self.snippets[model.slug] = model
         return Ok(...)
 
     async def remove(self, model: Snippet) -> SnippetOperationResult:
         """Remove the model from the repository."""
+        self.seen.add(model)
         del self.snippets[model.slug]
         return Ok(...)
 

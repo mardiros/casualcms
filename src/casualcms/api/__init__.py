@@ -1,6 +1,6 @@
 from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 
-from . import authntoken, page, site, snippet, template
+from . import authntoken, page, page_template, site, snippet
 from .base import router
 
 
@@ -26,7 +26,9 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route("/snippets", snippet.create_snippet, methods=["POST"])
     router.add_api_route("/snippets", snippet.list_snippets, methods=["GET"])
 
-    router.add_api_route("/templates", template.list_templates, methods=["GET"])
-    router.add_api_route("/templates/{type}", template.show_template, methods=["GET"])
+    router.add_api_route("/templates", page_template.list_templates, methods=["GET"])
+    router.add_api_route(
+        "/templates/{type}", page_template.show_template, methods=["GET"]
+    )
 
     app.include_router(router, prefix="/api")

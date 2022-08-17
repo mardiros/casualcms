@@ -12,6 +12,8 @@ from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_type
+from casualcms.domain.model.snippet import Snippet, SnippetType
+from casualcms.domain.model.snippet import resolve_type as resolve_snippet
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -33,6 +35,12 @@ from casualcms.domain.repositories.site import (
     SiteRepositoryError,
     SiteRepositoryResult,
     SiteSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.snippet import (
+    AbstractSnippetRepository,
+    SnippetOperationResult,
+    SnippetRepositoryError,
+    SnippetRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -265,6 +273,50 @@ class PageSQLRepository(AbstractPageRepository):
             delete(orm.pages).where(orm.pages.c.id == model.id),
         )
         self.seen.add(model)
+        return Ok(...)
+
+
+class SnippetSQLRepository(AbstractSnippetRepository):
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+
+    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique slug."""
+
+        orm_snippets: CursorResult = await self.session.execute(
+            select(orm.snippets).filter_by(slug=slug).limit(1)
+        )
+        orm_snippet = cast(Snippet, orm_snippets.first())
+        if orm_snippet:
+            typ: SnippetType = resolve_snippet(orm_snippet.type)  # type: ignore
+            return Ok(
+                typ(
+                    id=orm_snippet.id,
+                    slug=orm_snippet.slug,
+                    **orm_snippet.body,  # type: ignore
+                )
+            )
+        return Err(SnippetRepositoryError.snippet_not_found)
+
+    async def add(self, model: Snippet) -> SnippetOperationResult:
+        """Append a new model to the repository."""
+        qry: Any = orm.snippets.insert().values(
+            {
+                "id": model.id,
+                "created_at": model.created_at,
+                "type": model.__meta__.type,
+                "slug": model.slug,
+                "body": model.dict(exclude={"slug"}),
+            }
+        )
+        await self.session.execute(qry)
+        return Ok(...)
+
+    async def remove(self, model: Snippet) -> SnippetOperationResult:
+        """Remove the model from the repository."""
+        await self.session.execute(
+            delete(orm.snippets).where(orm.snippets.c.slug == model.slug),
+        )
         return Ok(...)
 
 

@@ -8,7 +8,7 @@ from typing import Any, Callable, Iterator, Optional
 
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
-from selenium.common.exceptions import WebDriverException, NoSuchElementException
+from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 from casualcms.entrypoint import main

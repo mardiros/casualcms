@@ -11,14 +11,18 @@ if TYPE_CHECKING:  # avoid circular dependency
     from casualcms.config import Settings  # coverage: ignore
 
 from casualcms.domain.messages import Event
-from casualcms.domain.repositories import AbstractAccountRepository
-from casualcms.domain.repositories.authntoken import AbstractAuthnRepository
-from casualcms.domain.repositories.page import AbstractPageRepository
+from casualcms.domain.repositories import (
+    AbstractAccountRepository,
+    AbstractAuthnRepository,
+    AbstractPageRepository,
+    AbstractSnippetRepository,
+)
 
 
 class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
     pages: AbstractPageRepository
+    snippets: AbstractSnippetRepository
     authn_tokens: AbstractAuthnRepository
     sites: AbstractSiteRepository
 

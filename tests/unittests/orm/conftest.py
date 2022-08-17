@@ -14,6 +14,7 @@ from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
+from casualcms.domain.model.snippet import Snippet
 
 DATABASE_URL = "sqlite+aiosqlite:///"
 
@@ -126,7 +127,7 @@ async def authn_tokens(
 async def pages(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
-) -> AsyncGenerator[None, None]:
+) -> AsyncGenerator[Sequence[Page], None]:
     def format_page(page: Page) -> Dict[str, Any]:
         p: Dict[str, Any] = page.dict()
         formated_page: Dict[str, Any] = {
@@ -180,7 +181,7 @@ async def pages(
 
         await sqla_session.commit()
 
-    yield None
+    yield pages
 
     await sqla_session.execute(  # type: ignore
         delete(orm.pages_treepath).where(
@@ -196,6 +197,38 @@ async def pages(
 
     await sqla_session.execute(  # type: ignore
         delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),
+    )
+    await sqla_session.commit()
+
+
+@pytest_asyncio.fixture()
+async def snippets(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+) -> AsyncGenerator[Sequence[Snippet], None]:
+    def format_snippet(snippet: Snippet) -> Dict[str, Any]:
+        s: Dict[str, Any] = snippet.dict()
+        formated_snippet: Dict[str, Any] = {
+            "id": snippet.id,
+            "type": snippet.__meta__.type,
+            "created_at": snippet.created_at,
+            "slug": s.pop("slug"),
+        }
+        formated_snippet["body"] = s
+        return formated_snippet
+
+    snippets: Sequence[Snippet] = params["snippets"]
+    if snippets:
+        await sqla_session.execute(  # type: ignore
+            orm.snippets.insert(),  # type: ignore
+            [format_snippet(p) for p in snippets],
+        )
+        await sqla_session.commit()
+
+    yield snippets
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.snippets).where(orm.snippets.c.id.in_([s.id for s in snippets])),
     )
     await sqla_session.commit()
 

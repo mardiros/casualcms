@@ -4,6 +4,7 @@ from result import Err, Ok
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -25,6 +26,11 @@ from casualcms.domain.repositories.site import (
     SiteRepositoryError,
     SiteRepositoryResult,
     SiteSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.snippet import (
+    AbstractSnippetRepository,
+    SnippetOperationResult,
+    SnippetRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -165,10 +171,29 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         return Ok(...)
 
 
+class SnippetInMemoryRepository(AbstractSnippetRepository):
+    snippets: dict[str, Snippet] = {}
+
+    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique slug."""
+        return Ok(self.snippets[slug])
+
+    async def add(self, model: Snippet) -> SnippetOperationResult:
+        """Append a new model to the repository."""
+        self.snippets[model.slug] = model
+        return Ok(...)
+
+    async def remove(self, model: Snippet) -> SnippetOperationResult:
+        """Remove the model from the repository."""
+        del self.snippets[model.slug]
+        return Ok(...)
+
+
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self, settings: Settings) -> None:
         self.accounts = AccountInMemoryRepository()
         self.pages = PageInMemoryRepository()
+        self.snippets = SnippetInMemoryRepository()
         self.sites = SiteInMemoryRepository()
         self.authn_tokens = AuthnTokenInMemoryRepository()
         self.committed: bool | None = None

@@ -5,6 +5,7 @@ from faker import Faker
 from casualcms.domain.messages.commands import generate_secret
 from casualcms.domain.model import Account, AuthnToken, Page
 from casualcms.domain.model.site import Site
+from casualcms.domain.model.snippet import Snippet
 
 fake = Faker()
 
@@ -65,3 +66,26 @@ def fake_site(page: Page, **kwargs: Any) -> Site:
     }
     site.update(kwargs)
     return Site(**site)
+
+
+def fake_snippet(type: str, **kwargs: Any) -> Snippet:
+    snippet: Dict[str, Any] = {
+        "id": fake.uuid4(),
+        "created_at": fake.past_datetime(),
+        "type": type,
+        "slug": fake.slug(),
+    }
+    from casualcms.domain.model.snippet import resolve_type
+
+    typ = resolve_type(type)
+    snippet.update(kwargs)
+    return typ(**snippet)
+
+
+def fake_header_snippet(**kwargs: Any):
+    snippet: Dict[str, Any] = {
+        "title": fake.name(),
+        "links": [{"title": fake.paragraph(nb_sentences=1), "href": fake.url()}],
+    }
+    snippet.update(kwargs)
+    return fake_snippet("blog:HeaderSnippet", **snippet)

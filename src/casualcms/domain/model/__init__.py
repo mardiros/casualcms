@@ -1,6 +1,7 @@
 from .account import Account, AccountStatus, AuthnToken
 from .page import AbstractPageError, Page, get_available_subtypes, resolve_type
 from .site import Site
+from .snippet import Snippet
 
 __all__ = [
     # User account
@@ -12,6 +13,8 @@ __all__ = [
     "Page",
     "get_available_subtypes",
     "resolve_type",
+    # Snippets
+    "Snippet",
     # Sites
     "Site",
 ]

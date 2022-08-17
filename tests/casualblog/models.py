@@ -2,7 +2,31 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import Page
+from casualcms.domain.model import Page, Snippet
+
+
+class Link(BaseModel):
+    title: str = Field()
+    href: str = Field()
+
+
+class HeaderSnippet(Snippet):
+    title: str = Field()
+    links: list[Link] = Field(default_factory=list)
+
+    class Meta:
+        template = "header.jinja2"
+        type = "blog:HeaderSnippet"
+
+
+class AbstractFooterSnippet(Snippet):
+    class Meta:
+        abstract = True
+
+
+class FooterSnippet(AbstractFooterSnippet):
+    class Meta:
+        template = "footer.jinja2"
 
 
 class Paragraph(BaseModel):

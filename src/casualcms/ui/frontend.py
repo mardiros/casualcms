@@ -44,7 +44,7 @@ async def serve_pages(
         await uow.commit()
     rpage = page.unwrap()
     renderer = Jinja2TemplateRender(app.settings.template_search_path)
-    data = renderer.render_template(
+    data = await renderer.render_template(
         rpage.get_template(),
         rpage.get_context(),
     )

@@ -14,15 +14,24 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     AuthnTokenSQLRepository,
     PageSQLRepository,
     SiteSQLRepository,
+    SnippetSQLRepository,
     SQLUnitOfWork,
     SQLUnitOfWorkBySession,
 )
 from casualcms.config import Settings
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
+from casualcms.domain.model.snippet import Snippet
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from .fixtures import fake_account, fake_authn_tokens, fake_page, fake_site
+from .fixtures import (
+    fake_account,
+    fake_authn_tokens,
+    fake_header_snippet,
+    fake_page,
+    fake_site,
+    fake_snippet,
+)
 
 alice = fake_account(username="alice")
 bob = fake_account(username="bob")
@@ -466,6 +475,59 @@ async def test_page_remove(
     resp = await repo.remove(cat_page)
     assert resp.is_ok()
     assert resp.unwrap() == ...
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippet": fake_snippet("blog:HeaderSnippet", title="Blog"),
+        },
+    ],
+)
+async def test_snippet_add(params: Any, sqla_session: AsyncSession):
+    repo = SnippetSQLRepository(sqla_session)
+    await repo.add(params["snippet"])
+    qry = select(orm.snippets).filter(orm.snippets.c.id == params["snippet"].id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    snippet: orm.snippets = resp.first()  # type: ignore
+    assert snippet.slug == params["snippet"].slug
+    assert snippet.body == {
+        "title": params["snippet"].title,
+        "links": params["snippet"].links,
+    }
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippets": [
+                fake_header_snippet(slug="snip-this"),
+                fake_header_snippet(slug="snip-it"),
+                fake_header_snippet(slug="snip-that"),
+            ],
+        },
+    ],
+)
+async def test_snippet_remove(
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+):
+    repo = SnippetSQLRepository(sqla_session)
+    await repo.remove(snippets[1])
+
+    qry = select(orm.snippets).filter(orm.snippets.c.slug == "snip-it")
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    snippet: orm.snippets = resp.first()  # type: ignore
+    assert snippet is None
+
+    qry = select(orm.snippets).filter(orm.snippets.c.slug == "snip-that")
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    snippet: orm.snippets = resp.first()  # type: ignore
+    assert snippet is not None
 
 
 @pytest.mark.parametrize(

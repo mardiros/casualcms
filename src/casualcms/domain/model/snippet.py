@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, MutableMapping, Type, cast
+from typing import Any, MutableMapping, Set, Type, cast
 
 from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
@@ -27,6 +27,14 @@ class SnippetTypeList:
             return self._types[typ]
         except KeyError:
             raise UnregisterType(typ)
+
+    @property
+    def types(self) -> Set[SnippetType]:
+        return set(self._types.values())
+
+
+def list_snippet_types() -> Set[SnippetType]:
+    return SnippetTypeList().types
 
 
 def resolve_snippet_type(typ: str) -> SnippetType:

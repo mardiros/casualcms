@@ -12,8 +12,7 @@ from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_page_type
-from casualcms.domain.model.snippet import Snippet, SnippetType
-from casualcms.domain.model.snippet import resolve_snippet_type
+from casualcms.domain.model.snippet import Snippet, SnippetType, resolve_snippet_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,

@@ -2,7 +2,7 @@ from fastapi.testclient import TestClient
 
 from casualcms.domain.model import Site
 
-from ..casualblog.models import HomePage, HeaderSnippet
+from ..casualblog.models import HeaderSnippet, HomePage
 
 
 async def test_get_home_page(

@@ -11,7 +11,7 @@ export class FetchTemplateApi extends BaseFetchApi implements ITemplateApi {
     parentType: string | null
   ): Promise<Result<Array<PartialPageTemplate>, ApiError>> {
     const qs = parentType ? new URLSearchParams({ type: parentType }) : "";
-    const response = await this.fetch(`/api/templates?${qs}`, {
+    const response = await this.fetch(`/api/pages-types?${qs}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -30,7 +30,7 @@ export class FetchTemplateApi extends BaseFetchApi implements ITemplateApi {
     tpltype: string
   ): Promise<Result<PageTemplate, ApiError>> {
     // FIXME: tpltype should be urlencoded
-    const response = await this.fetch(`/api/templates/${tpltype}`, {
+    const response = await this.fetch(`/api/pages-types/${tpltype}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

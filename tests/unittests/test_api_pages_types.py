@@ -5,30 +5,30 @@ from casualcms.domain.model.account import AuthnToken
 from ..casualblog.models import HomePage
 
 
-async def test_list_template(client: TestClient, authntoken: AuthnToken):
+async def test_list_page_types(client: TestClient, authntoken: AuthnToken):
 
     resp = client.get(
-        "/api/templates",
+        "/api/pages-types",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    # assert resp.status_code == 200
+    assert resp.status_code == 200
     assert resp.json() == [
         {"type": "blog:HomePage"},
     ]
 
 
-async def test_list_template_for_childs(client: TestClient, authntoken: AuthnToken):
+async def test_list_page_types_for_childs(client: TestClient, authntoken: AuthnToken):
 
     resp = client.get(
-        "/api/templates",
+        "/api/pages-types",
         params={"type": "blog:HomePage"},
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    # assert resp.status_code == 200
+    assert resp.status_code == 200
     assert resp.json() == [
         {"type": "blog:CategoryPage"},
         {"type": "blog:SectionPage"},
@@ -37,12 +37,12 @@ async def test_list_template_for_childs(client: TestClient, authntoken: AuthnTok
 
 async def test_show_template(client: TestClient, authntoken: AuthnToken):
     resp = client.get(
-        f"/api/templates/{HomePage.__meta__.type}",
+        f"/api/pages-types/{HomePage.__meta__.type}",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    # assert resp.status_code == 200
+    assert resp.status_code == 200
     assert resp.json() == {
         "schema": {
             "definitions": {

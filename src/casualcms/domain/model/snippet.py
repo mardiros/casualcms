@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Any, MutableMapping, Set, Type, cast
+from typing import Any, Mapping, MutableMapping, Set, Type, cast
 
 from pydantic import BaseModel, Field
+from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
 from casualcms.domain.messages import Event
@@ -109,3 +110,37 @@ class Snippet(AbstractSnippet):
 
     def get_context(self) -> MutableMapping[str, Any]:
         return self.get_data_context()
+
+    @classmethod
+    def ui_schema(cls) -> Mapping[str, Any]:
+        ret: dict[str, Any] = {}
+        for key, val in cls.__fields__.items():
+            if key in ("id", "parent", "events", "created_at"):
+                continue
+            ret[key] = cls.get_widget(val)
+        return ret
+
+    @classmethod
+    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
+
+        if "widget" in field.field_info.extra:
+            widget = {"ui:widget": field.field_info.extra["widget"]}
+            if field.field_info.extra["widget"] != "hidden":
+                widget["ui:placeholder"] = field.field_info.extra.get(
+                    "placeholder", field.name
+                )
+            return widget
+
+        if field.is_complex():
+
+            if isinstance(field.get_default(), list):
+                items = {}
+                for key, val in field.type_.__fields__.items():
+                    items[key] = cls.get_widget(val)
+                ret: Mapping[str, Any] = {"items": items}
+                return ret
+
+        return {
+            "ui:widget": "text",
+            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
+        }

@@ -26,6 +26,9 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route("/snippets", snippet.create_snippet, methods=["POST"])
     router.add_api_route("/snippets", snippet.list_snippets, methods=["GET"])
     router.add_api_route("/snippets-types", snippet_type.list_types, methods=["GET"])
+    router.add_api_route(
+        "/snippets-types/{type}", snippet_type.show_type, methods=["GET"]
+    )
 
     router.add_api_route("/templates", page_template.list_templates, methods=["GET"])
     router.add_api_route(

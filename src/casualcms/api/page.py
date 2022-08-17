@@ -11,7 +11,7 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page, resolve_type
+from casualcms.domain.model.page import Page, resolve_page_type
 
 from .base import get_token_info
 
@@ -35,7 +35,7 @@ async def create_page(
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
-    page_type = resolve_type(type)
+    page_type = resolve_page_type(type)
     # rtype = resolve(type)
     # if rtype.is_err():
     #     raise HTTPException(

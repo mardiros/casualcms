@@ -4,7 +4,7 @@ from fastapi import Depends, Query
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AuthnToken, get_available_subtypes
-from casualcms.domain.model.page import resolve_type
+from casualcms.domain.model.page import resolve_page_type
 
 from .base import get_token_info
 
@@ -27,7 +27,7 @@ async def show_template(
     type: str,
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
-    ptype = resolve_type(type)
+    ptype = resolve_page_type(type)
     jsonschema = ptype.schema()
     jsonschema["definitions"].pop("Event", None)
     jsonschema["definitions"].pop("Page", None)

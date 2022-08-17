@@ -3,9 +3,15 @@ from typing import Any, Dict
 from faker import Faker
 
 from casualcms.domain.messages.commands import generate_secret
-from casualcms.domain.model import Account, AuthnToken, Page
-from casualcms.domain.model.site import Site
-from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.model import (
+    Account,
+    AuthnToken,
+    Page,
+    Site,
+    Snippet,
+    resolve_page_type,
+    resolve_snippet_type,
+)
 
 fake = Faker()
 
@@ -47,9 +53,8 @@ def fake_page(type: str, **kwargs: Any) -> Page:
         "description": fake.paragraph(nb_sentences=1),
         "parent": None,
     }
-    from casualcms.domain.model.page import resolve_type
 
-    typ = resolve_type(type)
+    typ = resolve_page_type(type)
     page.update(kwargs)
     return typ(**page)
 
@@ -75,9 +80,8 @@ def fake_snippet(type: str, **kwargs: Any) -> Snippet:
         "type": type,
         "slug": fake.slug(),
     }
-    from casualcms.domain.model.snippet import resolve_type
 
-    typ = resolve_type(type)
+    typ = resolve_snippet_type(type)
     snippet.update(kwargs)
     return typ(**snippet)
 

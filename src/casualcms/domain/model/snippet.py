@@ -29,7 +29,7 @@ class SnippetTypeList:
             raise UnregisterType(typ)
 
 
-def resolve_type(typ: str) -> SnippetType:
+def resolve_snippet_type(typ: str) -> SnippetType:
     return SnippetTypeList().resolve_type(typ)
 
 

@@ -72,7 +72,7 @@ def get_available_subtypes(parent: PageType | str | None) -> Set[PageType]:
     return TypeTree().get_childs(parent)
 
 
-def resolve_type(typ: str) -> PageType:
+def resolve_page_type(typ: str) -> PageType:
     return TypeTree().resolve_type(typ)
 
 

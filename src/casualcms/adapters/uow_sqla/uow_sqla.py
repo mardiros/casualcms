@@ -11,9 +11,9 @@ from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_type
+from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_page_type
 from casualcms.domain.model.snippet import Snippet, SnippetType
-from casualcms.domain.model.snippet import resolve_type as resolve_snippet
+from casualcms.domain.model.snippet import resolve_snippet_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -126,7 +126,7 @@ class PageSQLRepository(AbstractPageRepository):
         except StopIteration:
             return Err(PageRepositoryError.page_not_found)
         while orm_page:
-            typ = resolve_type(orm_page.type)  # type: ignore
+            typ = resolve_page_type(orm_page.type)  # type: ignore
             page = typ(
                 id=orm_page.id,
                 slug=orm_page.slug,
@@ -197,7 +197,7 @@ class PageSQLRepository(AbstractPageRepository):
         pages: CursorResult = await self.session.execute(qry)
 
         ret: list[Page] = [
-            resolve_type(p.type)(  # type:ignore
+            resolve_page_type(p.type)(  # type:ignore
                 id=p.id,
                 slug=p.slug,
                 title=p.title,
@@ -290,7 +290,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         )
         orm_snippet = cast(Snippet, orm_snippets.first())
         if orm_snippet:
-            typ: SnippetType = resolve_snippet(orm_snippet.type)  # type: ignore
+            typ: SnippetType = resolve_snippet_type(orm_snippet.type)  # type: ignore
             return Ok(
                 typ(
                     id=orm_snippet.id,
@@ -309,7 +309,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         orm_snippet: Any
         snippets: list[Snippet] = []
         for orm_snippet in orm_snippets:
-            typ: SnippetType = resolve_snippet(orm_snippet.type)  # type: ignore
+            typ: SnippetType = resolve_snippet_type(orm_snippet.type)  # type: ignore
             snippets.append(
                 typ(
                     id=orm_snippet.id,

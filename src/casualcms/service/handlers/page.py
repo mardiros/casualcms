@@ -3,7 +3,7 @@ from typing import cast
 from result import Err
 
 from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
-from casualcms.domain.model.page import Page, resolve_type
+from casualcms.domain.model.page import Page, resolve_page_type
 from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -14,7 +14,7 @@ async def create_page(
     cmd: CreatePage,
     uow: AbstractUnitOfWork,
 ) -> Page:
-    tpage = resolve_type(cmd.type)
+    tpage = resolve_page_type(cmd.type)
     page = tpage(created_at=cmd.created_at, **cmd.payload)
     await uow.pages.add(page)
     return page

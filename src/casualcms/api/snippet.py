@@ -5,8 +5,7 @@ from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import CreateSnippet, generate_id
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.snippet import resolve_type
+from casualcms.domain.model import AuthnToken, resolve_snippet_type
 
 from .base import get_token_info
 
@@ -27,7 +26,7 @@ async def create_snippet(
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSnippet:
-    snippet_type = resolve_type(type)
+    snippet_type = resolve_snippet_type(type)
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {
             "id": generate_id(),

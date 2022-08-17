@@ -25,6 +25,10 @@ class AbstractSnippetRepository(AbstractRepository):
     seen: set[Snippet]
 
     @abc.abstractmethod
+    async def list(self) -> SnippetSequenceRepositoryResult:
+        """list all snippets."""
+
+    @abc.abstractmethod
     async def by_slug(self, slug: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
 

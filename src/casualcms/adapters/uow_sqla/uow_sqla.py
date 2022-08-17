@@ -41,6 +41,7 @@ from casualcms.domain.repositories.snippet import (
     SnippetOperationResult,
     SnippetRepositoryError,
     SnippetRepositoryResult,
+    SnippetSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -298,6 +299,25 @@ class SnippetSQLRepository(AbstractSnippetRepository):
                 )
             )
         return Err(SnippetRepositoryError.snippet_not_found)
+
+    async def list(self) -> SnippetSequenceRepositoryResult:
+        """Fetch one snippet by its unique slug."""
+
+        orm_snippets: CursorResult = await self.session.execute(
+            select(orm.snippets).order_by(orm.snippets.c.slug)
+        )
+        orm_snippet: Any
+        snippets: list[Snippet] = []
+        for orm_snippet in orm_snippets:
+            typ: SnippetType = resolve_snippet(orm_snippet.type)  # type: ignore
+            snippets.append(
+                typ(
+                    id=orm_snippet.id,
+                    slug=orm_snippet.slug,
+                    **orm_snippet.body,  # type: ignore
+                )
+            )
+        return Ok(snippets)
 
     async def add(self, model: Snippet) -> SnippetOperationResult:
         """Append a new model to the repository."""

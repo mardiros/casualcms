@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 from casualcms.domain.model.account import AuthnToken
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
+from ..casualblog.models import HeaderSnippet
+
 
 async def test_api_create_snippet_unauthenticated(
     client: TestClient, uow: AbstractUnitOfWork
@@ -43,3 +45,28 @@ async def test_api_create_snippet(
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],
         }
+
+
+async def test_api_list_snippet_unauthenticated(
+    client: TestClient, uow: AbstractUnitOfWork
+):
+    resp = client.get(
+        "/api/snippets",
+        headers={},
+    )
+    # XXX Fast api is raising a 403, should be a 401 to me
+    assert resp.status_code == 403
+    assert resp.json() == {"detail": "Not authenticated"}
+
+
+async def test_api_list_snippet(
+    client: TestClient, authntoken: AuthnToken, header_snippet: HeaderSnippet
+):
+    resp = client.get(
+        "/api/snippets",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == [{"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"}]

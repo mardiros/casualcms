@@ -1,6 +1,6 @@
-from typing import Any, MutableMapping
+from typing import Any, MutableMapping, Sequence
 
-from fastapi import Body, Depends, Request
+from fastapi import Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
@@ -49,3 +49,22 @@ async def create_snippet(
         slug=snippet.slug,
         meta=PartialSnippetMeta(type=snippet.__meta__.type),
     )
+
+
+async def list_snippets(
+    request: Request,
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Sequence[PartialSnippet]:
+
+    async with app.uow as uow:
+        snippets = await uow.snippets.list()
+        await uow.rollback()
+    if snippets.is_err():
+        raise HTTPException(status_code=500, detail=[{"msg": "Internal Server Error"}])
+    snips = snippets.unwrap()
+
+    return [
+        PartialSnippet(slug=s.slug, meta=PartialSnippetMeta(type=s.__meta__.type))
+        for s in snips
+    ]

@@ -534,6 +534,29 @@ async def test_snippet_remove(
     "params",
     [
         {
+            "snippets": [
+                fake_header_snippet(slug="snip-this"),
+                fake_header_snippet(slug="snip-it"),
+                fake_header_snippet(slug="snip-that"),
+            ],
+        },
+    ],
+)
+async def test_snippet_list(
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+):
+    repo = SnippetSQLRepository(sqla_session)
+    rsites = await repo.list()
+    assert rsites.is_ok()
+    sites_ok = rsites.unwrap()
+    ss = [s.slug for s in sites_ok]
+    assert ss == ["snip-it", "snip-that", "snip-this"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
             "pages": [home_page],
             "site": fake_site(home_page),
         },

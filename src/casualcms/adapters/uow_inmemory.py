@@ -31,6 +31,7 @@ from casualcms.domain.repositories.snippet import (
     AbstractSnippetRepository,
     SnippetOperationResult,
     SnippetRepositoryResult,
+    SnippetSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
     AccountRepositoryError,
@@ -176,6 +177,10 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
 
     def __init__(self) -> None:
         self.seen = set()
+
+    async def list(self) -> SnippetSequenceRepositoryResult:
+        """Fetch one snippet by its unique slug."""
+        return Ok(sorted(self.snippets.values(), key=lambda s: s.slug))
 
     async def by_slug(self, slug: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""

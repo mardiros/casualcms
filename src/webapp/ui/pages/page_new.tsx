@@ -6,7 +6,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
-import { Page, PageTemplate } from "../../casualcms/domain/model";
+import { Page, PageType } from "../../casualcms/domain/model";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
 import { PageBreadcrumb } from "../layout/breadcrumb";
@@ -21,7 +21,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [template, setTemplate] = React.useState<PageTemplate | null>(null);
+  const [template, setTemplate] = React.useState<PageType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
   const [params, setParams] = useSearchParams();
@@ -31,12 +31,12 @@ export const PageNew: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplate() {
-      const template = await config.api.template.showTemplate(
+      const template = await config.api.page_type.showPageType(
         token,
         tpltype || ""
       );
       template
-        .map((tpl: PageTemplate) => setTemplate(tpl))
+        .map((tpl: PageType) => setTemplate(tpl))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }

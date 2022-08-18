@@ -1,8 +1,8 @@
 import { Result } from "neverthrow";
 import {
   Account,
-  PartialPageTemplate,
-  PageTemplate,
+  PartialPageType,
+  PageType,
   PartialPage,
   Page,
   PartialSite,
@@ -22,15 +22,15 @@ export interface IAccountApi {
   logout(authntoken: string): Promise<boolean>;
 }
 
-export interface ITemplateApi {
-  listTemplates(
+export interface IPageTypeApi {
+  listPageTypes(
     authntoken: string,
     parentType: string | null
-  ): Promise<Result<PartialPageTemplate[], ApiError>>;
-  showTemplate(
+  ): Promise<Result<PartialPageType[], ApiError>>;
+  showPageType(
     authntoken: string,
     tpltype: string
-  ): Promise<Result<PageTemplate, ApiError>>;
+  ): Promise<Result<PageType, ApiError>>;
 }
 
 export interface IPageApi {

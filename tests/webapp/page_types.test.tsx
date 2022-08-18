@@ -3,9 +3,9 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
 import {
-  TemplateList,
-  TemplateTable,
-} from "../../src/webapp/ui/pages/page_template";
+  PageTypeList,
+  PageTypesTable,
+} from "../../src/webapp/ui/pages/page_types_list";
 import { renderWithRouter, waitForLoadingLabel } from "./helpers";
 
 describe("As a user, I can choose a root templates type", () => {
@@ -14,12 +14,12 @@ describe("As a user, I can choose a root templates type", () => {
       <Route
         path="/admin/page/new"
         element={
-          <TemplateTable isLoading={true} parentPath={null} templates={[]} />
+          <PageTypesTable isLoading={true} parentPath={null} page_types={[]} />
         }
       />,
       "/admin/page/new"
     );
-    const spinner = screen.getByText("loading page templates...");
+    const spinner = screen.getByText("loading page types...");
     expect(spinner).not.equal(null);
   });
   it("render rows per template type", async () => {
@@ -28,7 +28,7 @@ describe("As a user, I can choose a root templates type", () => {
       <Route
         path="/admin/page/new"
         element={
-          <TemplateTable isLoading={false} parentPath={null} templates={tpls} />
+          <PageTypesTable isLoading={false} parentPath={null} page_types={tpls} />
         }
       />,
       "/admin/page/new"
@@ -44,10 +44,10 @@ describe("As a user, I can choose a root templates type", () => {
       <Route
         path="/admin/page/new"
         element={
-          <TemplateTable
+          <PageTypesTable
             isLoading={false}
             parentPath="/home"
-            templates={[{ type: "casual:One" }]}
+            page_types={[{ type: "casual:One" }]}
           />
         }
       />,
@@ -61,10 +61,10 @@ describe("As a user, I can choose a root templates type", () => {
 
   it("list root templates", async () => {
     renderWithRouter(
-      <Route path="/admin/page/new" element={<TemplateList />} />,
+      <Route path="/admin/page/new" element={<PageTypeList />} />,
       "/admin/page/new"
     );
-    await waitForLoadingLabel("loading page templates...");
+    await waitForLoadingLabel("loading page types...");
     const tpl = screen.getByText("casual:HomePage");
     expect(tpl).not.equal(null);
   });

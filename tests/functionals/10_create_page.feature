@@ -8,7 +8,7 @@ Feature: As a user, I can create and publish new pages
     And I click on the "Sign In" button
     Then I see the text "Create my first page"
     When I click on the "Create my first page" link
-    Then I see the text "Choose A Type Of Template"
+    Then I see the text "Choose A Type Of Page"
     And I see the text "blog:HomePage"
 
   Scenario: Create new page

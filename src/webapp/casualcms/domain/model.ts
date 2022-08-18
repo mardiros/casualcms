@@ -7,11 +7,11 @@ export type Account = {
   lang: string;
 };
 
-export type PartialPageTemplate = {
+export type PartialPageType = {
   type: string;
 };
 
-export type PageTemplate = {
+export type PageType = {
   // type:string;
   schema: JSONSchema7;
   uiSchema: any;
@@ -64,3 +64,7 @@ export type PartialSnippet = {
 };
 
 export type Snippet = PartialSnippet;
+
+export type PartialSnippetType = {
+  type: string;
+};

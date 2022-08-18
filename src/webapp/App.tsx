@@ -7,7 +7,7 @@ import { useAuth } from "./ui/login/hooks";
 import { PageNotFound } from "./ui/layout/error_404";
 import { PageList } from "./ui/pages/page_list";
 import { PageNew } from "./ui/pages/page_new";
-import { TemplateList } from "./ui/pages/page_template";
+import { PageTypeList } from "./ui/pages/page_types_list";
 import { HomePage } from "./ui/home/components";
 import { PageEdit } from "./ui/pages/page_edit";
 import { Layout } from "./ui/layout/layout";
@@ -36,7 +36,7 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
             <Routes>
               <Route path="" element={<Body />} caseSensitive />
               <Route path="pages" element={<PageList />} caseSensitive />
-              <Route path="page/new" element={<TemplateList />} caseSensitive />
+              <Route path="page/new" element={<PageTypeList />} caseSensitive />
               <Route
                 path="page/new/:tpltype"
                 element={<PageNew />}

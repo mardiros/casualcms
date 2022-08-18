@@ -1,8 +1,8 @@
 import { err, ok, Result } from "neverthrow";
 import {
   Account,
-  PartialPageTemplate,
-  PageTemplate,
+  PartialPageType,
+  PageType,
   PartialPage,
   Page,
   PartialSite,
@@ -13,7 +13,7 @@ import {
   ApiError,
   IAccountApi,
   Credentials,
-  ITemplateApi,
+  IPageTypeApi,
   IPageApi,
   ISiteApi,
   SiteOption,
@@ -40,21 +40,21 @@ class FakeAccountApi implements IAccountApi {
   }
 }
 
-class FakeTemplateApi implements ITemplateApi {
-  async listTemplates(
+class FakePageTypeApi implements IPageTypeApi {
+  async listPageTypes(
     authntoken: string,
     parentType: string | null
-  ): Promise<Result<Array<PartialPageTemplate>, ApiError>> {
+  ): Promise<Result<Array<PartialPageType>, ApiError>> {
     return ok([
       {
         type: parentType ? "casual:Page" : "casual:HomePage",
       },
     ]);
   }
-  async showTemplate(
+  async showPageType(
     authntoken: string,
     tpltype: string
-  ): Promise<Result<PageTemplate, ApiError>> {
+  ): Promise<Result<PageType, ApiError>> {
     if (tpltype == "casual:HomePage") {
       return ok({
         uiSchema: {
@@ -295,14 +295,14 @@ export class FakeSnippetApi implements ISnippetApi {
 
 export class FakeApi implements IApi {
   account: IAccountApi;
-  template: ITemplateApi;
+  page_type: IPageTypeApi;
   page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
 
   constructor() {
     this.account = new FakeAccountApi();
-    this.template = new FakeTemplateApi();
+    this.page_type = new FakePageTypeApi();
     this.page = new FakePageApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();

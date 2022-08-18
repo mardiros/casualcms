@@ -12,7 +12,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Page, PartialPageTemplate } from "../../casualcms/domain/model";
+import { Page, PartialPageType } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
@@ -23,19 +23,19 @@ import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
 import { PageBreadcrumb } from "../layout/breadcrumb";
 
-type TemplateTableProps = {
+type PageTypesTableProps = {
   isLoading: boolean;
   parentPath: string | null;
-  templates: PartialPageTemplate[];
+  page_types: PartialPageType[];
 };
-export const TemplateTable: React.FunctionComponent<TemplateTableProps> = (
-  props: TemplateTableProps
+export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
+  props: PageTypesTableProps
 ) => {
   if (props.isLoading) {
-    return <Loader label="loading page templates..." />;
+    return <Loader label="loading page types..." />;
   }
 
-  const templates = props.templates;
+  const page_types = props.page_types;
   const qs = props.parentPath
     ? new URLSearchParams({ parent: props.parentPath })
     : "";
@@ -48,7 +48,7 @@ export const TemplateTable: React.FunctionComponent<TemplateTableProps> = (
           </Tr>
         </Thead>
         <Tbody>
-          {templates.map((tpl, i) => (
+          {page_types.map((tpl, i) => (
             <Tr key={i}>
               <Td>
                 <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
@@ -64,12 +64,12 @@ export const TemplateTable: React.FunctionComponent<TemplateTableProps> = (
   );
 };
 
-export const TemplateList: React.FunctionComponent<{}> = () => {
+export const PageTypeList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [templates, setTemplates] = React.useState<PartialPageTemplate[]>([]);
+  const [page_types, setTemplates] = React.useState<PartialPageType[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
   const [params, setParams] = useSearchParams();
   const parentType = params.get("type");
@@ -78,12 +78,12 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplates() {
-      const pageTemplates = await config.api.template.listTemplates(
+      const pageTemplates = await config.api.page_type.listPageTypes(
         token,
         parentType
       );
       pageTemplates
-        .map((tpls: PartialPageTemplate[]) => setTemplates(tpls))
+        .map((tpls: PartialPageType[]) => setTemplates(tpls))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
@@ -124,8 +124,8 @@ export const TemplateList: React.FunctionComponent<{}> = () => {
           )}
           <Box paddingLeft={15}>
             <ApiErrorUI error={error} />
-            <TemplateTable
-              templates={templates}
+            <PageTypesTable
+              page_types={page_types}
               parentPath={parentPath}
               isLoading={isLoading}
             />

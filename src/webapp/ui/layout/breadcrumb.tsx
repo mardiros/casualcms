@@ -6,7 +6,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Page, Site } from "../../casualcms/domain/model";
+import { Page, Site, Snippet } from "../../casualcms/domain/model";
 
 type PageBreadcrumbProps = {
   page?: Page | null;
@@ -17,6 +17,12 @@ type SiteBreadcrumbProps = {
   site?: Site | null;
   title?: string;
 }
+
+type SnippetBreadcrumbProps = {
+  snippet?: Snippet | null;
+  title?: string;
+}
+
 
 export const HomeIcon = (): JSX.Element => {
   return (
@@ -79,6 +85,34 @@ export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
         <BreadcrumbItem>
           <BreadcrumbLink href={`/admin/site/edit?hostname=${site.hostname}`}>
             {site.hostname}
+          </BreadcrumbLink>
+        </BreadcrumbItem>
+      )}
+      {title && (
+        <BreadcrumbItem>
+          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+        </BreadcrumbItem>
+      )}
+    </Breadcrumb>
+  );
+}
+
+
+export const SnippetBreadcrumb: React.FunctionComponent<SnippetBreadcrumbProps> = (
+  props: SnippetBreadcrumbProps
+) => {
+  const { snippet, title } = props;
+  return (
+    <Breadcrumb padding={5}>
+      <BreadcrumbItem>
+        <Link to="/admin/sites">
+          <Icon as={HomeIcon} />
+        </Link>
+      </BreadcrumbItem>
+      {snippet && (
+        <BreadcrumbItem>
+          <BreadcrumbLink href={`/admin/snippet/edit?slug=${snippet.slug}`}>
+            {snippet.slug}
           </BreadcrumbLink>
         </BreadcrumbItem>
       )}

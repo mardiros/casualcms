@@ -28,10 +28,10 @@ async def update_page(
 
     async with uow as uow:
         page = await uow.pages.by_id(cmd.id)
-    p = page.unwrap()
-    for key, val in cmd.payload.items():
-        setattr(p, key, val)
-    await uow.pages.update(p)
+        p = page.unwrap()
+        for key, val in cmd.payload.items():
+            setattr(p, key, val)
+        await uow.pages.update(p)
     return p
 
 
@@ -45,6 +45,6 @@ async def delete_page(
         page = await uow.pages.by_id(cmd.id)
         if page.is_err():
             return cast(Err[PageRepositoryError], page)
-    p = page.unwrap()
-    resp = await uow.pages.remove(p)
+        p = page.unwrap()
+        resp = await uow.pages.remove(p)
     return resp

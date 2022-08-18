@@ -32,3 +32,5 @@ TODO
 * Implement site update
 
 * Test all unauthenticated calls
+
+* Refactor service to return only result[T|...] for commands

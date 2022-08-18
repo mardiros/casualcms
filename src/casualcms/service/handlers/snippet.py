@@ -1,5 +1,15 @@
-from casualcms.domain.messages.commands import CreateSnippet, UpdateSnippet
+from result import Err, Ok
+
+from casualcms.domain.messages.commands import (
+    CreateSnippet,
+    DeleteSnippet,
+    UpdateSnippet,
+)
 from casualcms.domain.model.snippet import Snippet, resolve_snippet_type
+from casualcms.domain.repositories.snippet import (
+    SnippetOperationResult,
+    SnippetRepositoryError,
+)
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -28,13 +38,27 @@ async def update_snippet(
 
     async with uow as uow:
         snippet = await uow.snippets.by_id(cmd.id)
-    if snippet.is_err():
-        return
-    s = snippet.unwrap()
-    if cmd.slug:
-        s.slug = cmd.slug
-    if cmd.body:
-        for key, val in cmd.body.items():
-            setattr(s, key, val)
-    await uow.snippets.update(s)
+        if snippet.is_err():
+            return None
+        s = snippet.unwrap()
+        if cmd.slug:
+            s.slug = cmd.slug
+        if cmd.body:
+            for key, val in cmd.body.items():
+                setattr(s, key, val)
+        await uow.snippets.update(s)
     return s
+
+
+@listen
+async def delete_snippet(
+    cmd: DeleteSnippet,
+    uow: AbstractUnitOfWork,
+) -> SnippetOperationResult:
+    async with uow as uow:
+        snippet = await uow.snippets.by_id(cmd.id)
+        if snippet.is_err():
+            return Err(SnippetRepositoryError.snippet_not_found)
+        s = snippet.unwrap()
+        await uow.snippets.remove(s)
+    return Ok(...)

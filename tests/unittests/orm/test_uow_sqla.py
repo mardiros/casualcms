@@ -19,7 +19,6 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     SQLUnitOfWorkBySession,
 )
 from casualcms.config import Settings
-from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet

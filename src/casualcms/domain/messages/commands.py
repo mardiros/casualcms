@@ -119,5 +119,13 @@ class UpdateSnippet(Command):
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
     metadata: Metadata = Metadata(
-        category="snippet", name="create_snippet", schemaVersion=1
+        category="snippet", name="update_snippet", schemaVersion=1
+    )
+
+
+class DeleteSnippet(Command):
+    slug: str = Field(...)
+    id: str = Field(...)
+    metadata: Metadata = Metadata(
+        category="snippet", name="update_snippet", schemaVersion=1
     )

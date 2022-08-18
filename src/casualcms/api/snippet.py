@@ -1,10 +1,15 @@
 from typing import Any, MutableMapping, Sequence
 
-from fastapi import Body, Depends, HTTPException, Request
+from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreateSnippet, UpdateSnippet, generate_id
+from casualcms.domain.messages.commands import (
+    CreateSnippet,
+    DeleteSnippet,
+    UpdateSnippet,
+    generate_id,
+)
 from casualcms.domain.model import AuthnToken, resolve_snippet_type
 
 from .base import get_token_info
@@ -112,3 +117,41 @@ async def update_snippet(
         slug=new_slug,
         meta=PartialSnippetMeta(type=snippet.__meta__.type),
     )
+
+
+async def delete_snippet(
+    request: Request,
+    slug: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Response:
+
+    async with app.uow as uow:
+        slug = slug.strip("/")
+        rsnippet = await uow.snippets.by_slug(slug)
+        await uow.rollback()
+
+    if rsnippet.is_err():
+        return Response(content=rsnippet.unwrap_err().value, status_code=404)
+
+    snippet = rsnippet.unwrap()
+
+    cmd = DeleteSnippet(
+        id=snippet.id,
+        slug=snippet.slug,
+    )
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+    async with app.uow as uow:
+        resp = await app.bus.handle(cmd, uow)
+        if resp.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                ],
+            )
+        else:
+            await uow.commit()
+
+    return Response(content="", status_code=204)

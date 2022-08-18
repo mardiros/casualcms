@@ -186,10 +186,4 @@ async def delete_page(
         else:
             await uow.commit()
 
-    if page.is_err():
-        raise HTTPException(
-            status_code=422,
-            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
-        )
-
     return Response(content="", status_code=204)

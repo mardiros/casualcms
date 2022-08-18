@@ -111,3 +111,13 @@ class CreateSnippet(Command):
     metadata: Metadata = Metadata(
         category="snippet", name="create_snippet", schemaVersion=1
     )
+
+
+class UpdateSnippet(Command):
+    slug: str | None = Field(..., description="New slug")
+    body: dict[str, Any] | None = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(...)
+    metadata: Metadata = Metadata(
+        category="snippet", name="create_snippet", schemaVersion=1
+    )

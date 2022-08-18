@@ -30,6 +30,7 @@ from casualcms.domain.repositories.site import (
 from casualcms.domain.repositories.snippet import (
     AbstractSnippetRepository,
     SnippetOperationResult,
+    SnippetRepositoryError,
     SnippetRepositoryResult,
     SnippetSequenceRepositoryResult,
 )
@@ -182,9 +183,19 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         """Fetch one snippet by its unique slug."""
         return Ok(sorted(self.snippets.values(), key=lambda s: s.slug))
 
+    async def by_id(self, id: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique id."""
+        for snippet in self.snippets.values():
+            if snippet.id == id:
+                return Ok(snippet)
+        return Err(SnippetRepositoryError.snippet_not_found)
+
     async def by_slug(self, slug: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
-        return Ok(self.snippets[slug])
+        try:
+            return Ok(self.snippets[slug])
+        except KeyError:
+            return Err(SnippetRepositoryError.snippet_not_found)
 
     async def add(self, model: Snippet) -> SnippetOperationResult:
         """Append a new model to the repository."""
@@ -202,8 +213,8 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
-        for key, page in self.snippets.items():
-            if page.id == model.id:
+        for key, snippet in self.snippets.items():
+            if snippet.id == model.id:
                 k = key
                 break
         if k:

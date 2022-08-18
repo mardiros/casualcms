@@ -19,6 +19,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     SQLUnitOfWorkBySession,
 )
 from casualcms.config import Settings
+from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -478,6 +479,59 @@ async def test_page_remove(
     assert resp.unwrap() == ...
 
 
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippets": [
+                fake_header_snippet(slug="snip-this"),
+                fake_header_snippet(slug="snip-it"),
+                fake_header_snippet(slug="snip-that"),
+            ],
+        },
+    ],
+)
+async def test_snippet_by_slug(
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+):
+    repo = SnippetSQLRepository(sqla_session)
+    rsnippet = await repo.by_slug("snip-it")
+    assert rsnippet.is_ok()
+    snippet = rsnippet.unwrap()
+    assert snippet.id == snippets[1].id
+
+    rsnippet = await repo.by_slug("e404")
+    assert rsnippet.is_err()
+    assert rsnippet.unwrap_err().value == "Snippet not found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippets": [
+                fake_header_snippet(),
+                fake_header_snippet(),
+                fake_header_snippet(),
+            ],
+        },
+    ],
+)
+async def test_snippet_by_id(
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+):
+    repo = SnippetSQLRepository(sqla_session)
+    rsnippet = await repo.by_id(snippets[1].id)
+    assert rsnippet.is_ok()
+    snippet = rsnippet.unwrap()
+    assert snippet.slug == snippets[1].slug
+
+    rsnippet = await repo.by_id(generate_id())
+    assert rsnippet.is_err()
+    assert rsnippet.unwrap_err().value == "Snippet not found"
+
+
 @pytest.mark.parametrize(
     "params",
     [
@@ -645,7 +699,7 @@ async def test_site_list(
         },
     ],
 )
-async def test_by_id(
+async def test_page_by_id(
     params: Any,
     sqla_session: AsyncSession,
     pages: Sequence[Page],
@@ -675,7 +729,7 @@ async def test_by_id(
         },
     ],
 )
-async def test_by_hostname(
+async def test_site_by_hostname(
     params: Any,
     sqla_session: AsyncSession,
     pages: Sequence[Page],

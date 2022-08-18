@@ -292,12 +292,9 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         self.session = session
         self.seen = set()
 
-    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
-        """Fetch one snippet by its unique slug."""
-
-        orm_snippets: CursorResult = await self.session.execute(
-            select(orm.snippets).filter_by(slug=slug).limit(1)
-        )
+    async def _format_response(
+        self, orm_snippets: CursorResult
+    ) -> SnippetRepositoryResult:
         orm_snippet = cast(Snippet, orm_snippets.first())
         if orm_snippet:
             typ: SnippetType = resolve_snippet_type(orm_snippet.type)  # type: ignore
@@ -309,6 +306,21 @@ class SnippetSQLRepository(AbstractSnippetRepository):
                 )
             )
         return Err(SnippetRepositoryError.snippet_not_found)
+
+    async def by_id(self, id: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique id."""
+        orm_snippets: CursorResult = await self.session.execute(
+            select(orm.snippets).filter_by(id=id).limit(1)
+        )
+        return await self._format_response(orm_snippets)
+
+    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique slug."""
+
+        orm_snippets: CursorResult = await self.session.execute(
+            select(orm.snippets).filter_by(slug=slug).limit(1)
+        )
+        return await self._format_response(orm_snippets)
 
     async def list(self) -> SnippetSequenceRepositoryResult:
         """Fetch one snippet by its unique slug."""

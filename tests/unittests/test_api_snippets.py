@@ -1,3 +1,4 @@
+from typing import cast
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
@@ -70,3 +71,33 @@ async def test_api_list_snippet(
     )
     assert resp.status_code == 200
     assert resp.json() == [{"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"}]
+
+
+async def test_api_patch_snippet(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.patch(
+        "/api/snippets/header",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json={
+            "slug": "new-slug",
+            "title": "new title",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {"meta": {"type": "blog:HeaderSnippet"}, "slug": "new-slug"}
+
+    async with uow as uow:
+        snip = await uow.snippets.by_slug("new-slug")
+        assert snip.is_ok()
+        snipok = cast(HeaderSnippet, snip.unwrap())
+        assert snipok.title == "new title"
+
+        snip = await uow.snippets.by_slug("header")
+        assert snip.is_err()
+        assert snip.unwrap_err().name == "snippet_not_found"

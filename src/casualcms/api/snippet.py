@@ -4,7 +4,7 @@ from fastapi import Body, Depends, HTTPException, Request
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreateSnippet, generate_id
+from casualcms.domain.messages.commands import CreateSnippet, UpdateSnippet, generate_id
 from casualcms.domain.model import AuthnToken, resolve_snippet_type
 
 from .base import get_token_info
@@ -67,3 +67,29 @@ async def list_snippets(
         PartialSnippet(slug=s.slug, meta=PartialSnippetMeta(type=s.__meta__.type))
         for s in snips
     ]
+
+
+async def update_snippet(
+    request: Request,
+    app: AppConfig = FastAPIConfigurator.depends,
+    slug: str = Field(...),
+    payload: dict[str, Any] = Body(...),
+    token: AuthnToken = Depends(get_token_info),
+) -> PartialSnippet:
+
+    async with app.uow as uow:
+        rsnippet = await uow.snippets.by_slug(slug)
+        snippet = rsnippet.unwrap()
+
+    new_slug = payload.pop("slug")
+    cmd = UpdateSnippet(id=snippet.id, slug=new_slug, body=payload)
+    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.userId = token.account_id
+    async with app.uow as uow:
+        await app.bus.handle(cmd, uow)
+        await uow.commit()
+
+    return PartialSnippet(
+        slug=new_slug,
+        meta=PartialSnippetMeta(type=snippet.__meta__.type),
+    )

@@ -46,8 +46,17 @@ async def create_snippet(
     cmd.metadata.userId = token.account_id
 
     async with app.uow as uow:
-        snippet = await app.bus.handle(cmd, uow)
-        await uow.commit()
+        rsnippet = await app.bus.handle(cmd, uow)
+        if rsnippet.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "slug"], "msg": rsnippet.unwrap_err().value}
+                ],
+            )
+        else:
+            snippet = rsnippet.unwrap()
+            await uow.commit()
 
     return PartialSnippet(
         slug=snippet.slug,
@@ -110,8 +119,16 @@ async def update_snippet(
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.account_id
     async with app.uow as uow:
-        await app.bus.handle(cmd, uow)
-        await uow.commit()
+        resp = await app.bus.handle(cmd, uow)
+        if resp.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                ],
+            )
+        else:
+            await uow.commit()
 
     return PartialSnippet(
         slug=new_slug,

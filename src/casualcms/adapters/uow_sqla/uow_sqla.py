@@ -219,7 +219,7 @@ class PageSQLRepository(AbstractPageRepository):
         ]
         return Ok(ret)
 
-    async def add(self, model: Page) -> None:
+    async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
 
         await self.session.execute(  # type: ignore
@@ -256,15 +256,19 @@ class PageSQLRepository(AbstractPageRepository):
                 {"page_id": model.id, "parent_id": model.parent.id},
             )
         self.seen.add(model)
+        return Ok(...)
 
-    async def update(self, model: Page) -> None:
+    async def update(self, model: Page) -> PageOperationResult:
         """Update model in the repository."""
         page = format_page(model)
         page.pop("id")
-        await self.session.execute(
+        rcurs: CursorResult = await self.session.execute(
             orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
         )
+        if rcurs.rowcount == 0:
+            return Err(PageRepositoryError.page_not_found)
         self.seen.add(model)
+        return Ok(...)
 
     async def remove(self, model: Page) -> PageOperationResult:
         """Remove the model from the repository."""

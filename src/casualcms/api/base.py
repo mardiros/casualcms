@@ -1,11 +1,21 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
+from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.model.account import AuthnToken
 
 router = APIRouter()
 bearer = HTTPBearer()
+
+
+class HTTPMessage(BaseModel):
+    message: str = Field(...)
+
+
+RESOURCE_CREATED = HTTPMessage(message="Resource Created")
+RESOURCE_UPDATED = HTTPMessage(message="Resource Updated")
+RESOURCE_DELETED = Response(content="", status_code=204)
 
 
 async def get_token_info(

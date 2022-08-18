@@ -20,7 +20,7 @@ async def test_api_create_site(
         },
         json=site.dict(),
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 201
     assert resp.json() == {
         "hostname": site.hostname,
         "default": site.default,

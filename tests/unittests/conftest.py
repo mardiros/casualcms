@@ -103,11 +103,12 @@ async def home_page(
     messagebus: MessageRegistry,
 ) -> AsyncGenerator[Page, None]:
     async with uow as uow:
-        page = await messagebus.handle(
+        page_id = generate_id()
+        await messagebus.handle(
             CreatePage(
                 type="blog:HomePage",
                 payload={
-                    "id": generate_id(),
+                    "id": page_id,
                     "slug": "home",
                     "title": "hello world - casualcms",
                     "description": "I am so glad to be there",
@@ -116,7 +117,8 @@ async def home_page(
             ),
             uow,
         )
-    yield page
+        page = await uow.pages.by_id(page_id)
+        yield page.unwrap()
 
 
 @pytest.fixture
@@ -127,11 +129,12 @@ async def sub_page(
     home_page: HomePage,
 ) -> AsyncGenerator[Page, None]:
     async with uow as uow:
-        page = await messagebus.handle(
+        page_id = generate_id()
+        await messagebus.handle(
             CreatePage(
                 type="blog:CategoryPage",
                 payload={
-                    "id": generate_id(),
+                    "id": page_id,
                     "parent": home_page,
                     "slug": "sub",
                     "title": "a sub page",
@@ -141,7 +144,8 @@ async def sub_page(
             ),
             uow,
         )
-    yield page
+        page = await uow.pages.by_id(page_id)
+        yield page.unwrap()
 
 
 @pytest.fixture
@@ -165,7 +169,7 @@ async def header_snippet(
             ),
             uow,
         )
-    yield snippet
+    yield snippet.unwrap()
 
 
 @pytest.fixture

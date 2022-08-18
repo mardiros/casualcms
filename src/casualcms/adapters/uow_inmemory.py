@@ -92,10 +92,11 @@ class PageInMemoryRepository(AbstractPageRepository):
 
         return Ok(ret)
 
-    async def add(self, model: Page) -> None:
+    async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
+        return Ok(...)
 
     async def remove(self, model: Page) -> PageOperationResult:
         """Remove the model from the repository."""
@@ -103,7 +104,7 @@ class PageInMemoryRepository(AbstractPageRepository):
         del self.pages[model.path]
         return Ok(...)
 
-    async def update(self, model: Page) -> None:
+    async def update(self, model: Page) -> PageOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -111,9 +112,12 @@ class PageInMemoryRepository(AbstractPageRepository):
             if page.id == model.id:
                 k = key
                 break
+        else:
+            Err(PageRepositoryError.page_not_found)
         if k:
             del self.pages[k]
         self.pages[model.path] = model
+        return Ok(...)
 
 
 class AuthnTokenInMemoryRepository(AbstractAuthnRepository):

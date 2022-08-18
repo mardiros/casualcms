@@ -35,11 +35,11 @@ class AbstractPageRepository(AbstractRepository):
         """Fetch child pages of a page identified by its path."""
 
     @abc.abstractmethod
-    async def add(self, model: Page) -> None:
+    async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
 
     @abc.abstractmethod
-    async def update(self, model: Page) -> None:
+    async def update(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
 
     @abc.abstractmethod

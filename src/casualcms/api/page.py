@@ -11,9 +11,15 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page, resolve_page_type
+from casualcms.domain.model.page import resolve_page_type
 
-from .base import get_token_info
+from .base import (
+    RESOURCE_CREATED,
+    RESOURCE_DELETED,
+    RESOURCE_UPDATED,
+    HTTPMessage,
+    get_token_info,
+)
 
 
 class PartialPageMeta(BaseModel):
@@ -34,7 +40,7 @@ async def create_page(
     parent: str = Body(None),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
-) -> dict[str, Any]:
+) -> HTTPMessage:
     page_type = resolve_page_type(type)
     # rtype = resolve(type)
     # if rtype.is_err():
@@ -61,10 +67,15 @@ async def create_page(
     cmd.metadata.userId = token.account_id
 
     async with app.uow as uow:
-        page = await app.bus.handle(cmd, uow)
+        rpage = await app.bus.handle(cmd, uow)
+        if rpage.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[{"loc": ["body", "parent"], "msg": rpage.unwrap_err().value}],
+            )
         await uow.commit()
 
-    return {"href": page.path}
+    return RESOURCE_CREATED
 
 
 async def list_pages(
@@ -98,7 +109,6 @@ async def list_pages(
 
 
 async def show_page(
-    request: Request,
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
@@ -124,31 +134,39 @@ async def update_page(
     payload: dict[str, Any] = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
-) -> Any:
+) -> HTTPMessage:
 
     async with app.uow as uow:
         path = path.strip("/")
-        page = await uow.pages.by_path(f"/{path}")
+        rpage = await uow.pages.by_path(f"/{path}")
         await uow.rollback()
 
-    if page.is_err():
+    if rpage.is_err():
         raise HTTPException(
             status_code=422,
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
         )
-    p = page.unwrap()
+    page = rpage.unwrap()
 
     cmd = UpdatePage(
-        id=p.id,
+        id=page.id,
         payload=payload,
     )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.account_id
     async with app.uow as uow:
-        upage: Page = await app.bus.handle(cmd, uow)
-        await uow.commit()
+        rpage = await app.bus.handle(cmd, uow)
+        if rpage.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {"loc": ["querystring", "path"], "msg": rpage.unwrap_err().value}
+                ],
+            )
+        else:
+            await uow.commit()
 
-    return upage.get_data_context()
+    return RESOURCE_UPDATED
 
 
 async def delete_page(
@@ -186,4 +204,4 @@ async def delete_page(
         else:
             await uow.commit()
 
-    return Response(content="", status_code=204)
+    return RESOURCE_DELETED

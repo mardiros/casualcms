@@ -38,7 +38,7 @@ async def test_api_create_snippet(
             },
         },
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 201
     assert resp.json() == {"slug": "header", "meta": {"type": "blog:HeaderSnippet"}}
     async with uow as uow:
         page = (await uow.snippets.by_slug("header")).unwrap()
@@ -90,7 +90,7 @@ async def test_api_patch_snippet(
             "title": "new title",
         },
     )
-    assert resp.status_code == 200
+    assert resp.status_code == 202
     assert resp.json() == {"meta": {"type": "blog:HeaderSnippet"}, "slug": "new-slug"}
 
     async with uow as uow:

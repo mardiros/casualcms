@@ -41,8 +41,8 @@ async def test_api_create_page(
             },
         },
     )
-    assert resp.status_code == 200
-    assert resp.json() == {"href": "/index"}
+    assert resp.status_code == 201
+    assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
         page = (await uow.pages.by_path("/index")).unwrap()
         assert page.dict() == {
@@ -98,8 +98,8 @@ async def test_create_subpage(
             },
         },
     )
-    assert resp.json() == {"href": "/home/test"}
-    assert resp.status_code == 200
+    assert resp.status_code == 201
+    assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
         page = (await uow.pages.by_path("/home/test")).unwrap()
         assert page.dict() == {
@@ -213,24 +213,8 @@ async def test_update_home_page_content(
         },
         json=payload,
     )
-    assert resp.json() == {
-        "meta": {
-            "path": "/new-home",
-            "type": "blog:HomePage",
-            "breadcrumb": [
-                {
-                    "path": "/new-home",
-                    "slug": "new-home",
-                    "title": "new title",
-                }
-            ],
-        },
-        "slug": "new-home",
-        "title": "new title",
-        "body": [{"body": "my new body"}],
-        "description": "new description",
-        "hero_title": "New hero title",
-    }
+    assert resp.status_code == 202
+    assert resp.json() == {"message": "Resource Updated"}
     async with uow as uow:
         saved_home = cast(
             HomePage,
@@ -260,29 +244,8 @@ async def test_update_sub_page_content(
         },
         json=payload,
     )
-    assert resp.json() == {
-        "meta": {
-            "path": "/home/new-slug",
-            "type": "blog:CategoryPage",
-            "breadcrumb": [
-                {
-                    "path": "/home",
-                    "slug": "home",
-                    "title": "hello world - casualcms",
-                },
-                {
-                    "path": "/home/new-slug",
-                    "slug": "new-slug",
-                    "title": "new title",
-                },
-            ],
-        },
-        "slug": "new-slug",
-        "title": "new title",
-        "description": "I am so glad to be a sub page",
-        "hero_title": "a sub page",
-        "intro": None,
-    }
+    assert resp.status_code == 202
+    assert resp.json() == {"message": "Resource Updated"}
     async with uow as uow:
         saved_home = cast(
             HomePage,

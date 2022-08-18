@@ -1,10 +1,8 @@
-from typing import cast
-
 from result import Err
 
 from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
-from casualcms.domain.model.page import Page, resolve_page_type
-from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
+from casualcms.domain.model.page import resolve_page_type
+from casualcms.domain.repositories.page import PageOperationResult
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -13,26 +11,25 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_page(
     cmd: CreatePage,
     uow: AbstractUnitOfWork,
-) -> Page:
+) -> PageOperationResult:
     tpage = resolve_page_type(cmd.type)
     page = tpage(created_at=cmd.created_at, **cmd.payload)
-    await uow.pages.add(page)
-    return page
+    return await uow.pages.add(page)
 
 
 @listen
 async def update_page(
     cmd: UpdatePage,
     uow: AbstractUnitOfWork,
-) -> Page:
+) -> PageOperationResult:
 
-    async with uow as uow:
-        page = await uow.pages.by_id(cmd.id)
-        p = page.unwrap()
-        for key, val in cmd.payload.items():
-            setattr(p, key, val)
-        await uow.pages.update(p)
-    return p
+    rpage = await uow.pages.by_id(cmd.id)
+    if rpage.is_err():
+        return Err(rpage.unwrap_err())
+    page = rpage.unwrap()
+    for key, val in cmd.payload.items():
+        setattr(page, key, val)
+    return await uow.pages.update(page)
 
 
 @listen
@@ -41,10 +38,8 @@ async def delete_page(
     uow: AbstractUnitOfWork,
 ) -> PageOperationResult:
 
-    async with uow as uow:
-        page = await uow.pages.by_id(cmd.id)
-        if page.is_err():
-            return cast(Err[PageRepositoryError], page)
-        p = page.unwrap()
-        resp = await uow.pages.remove(p)
-    return resp
+    rpage = await uow.pages.by_id(cmd.id)
+    if rpage.is_err():
+        return Err(rpage.unwrap_err())
+    page = rpage.unwrap()
+    return await uow.pages.remove(page)

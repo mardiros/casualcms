@@ -103,7 +103,7 @@ class PageInMemoryRepository(AbstractPageRepository):
         return Ok(...)
 
     async def update(self, model: Page) -> None:
-        """Append a new model to the repository."""
+        """Update a model from the repository."""
         self.seen.add(model)
         k = None
         for key, page in self.pages.items():
@@ -196,6 +196,19 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.snippets[model.slug]
+        return Ok(...)
+
+    async def update(self, model: Snippet) -> SnippetOperationResult:
+        """Update a model from the repository."""
+        self.seen.add(model)
+        k = None
+        for key, page in self.snippets.items():
+            if page.id == model.id:
+                k = key
+                break
+        if k:
+            del self.snippets[k]
+        self.snippets[model.slug] = model
         return Ok(...)
 
 

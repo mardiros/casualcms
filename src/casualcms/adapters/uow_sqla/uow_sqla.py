@@ -99,6 +99,17 @@ def format_page(page: Page) -> Dict[str, Any]:
     return formated_page
 
 
+def format_snippet(snippet: Snippet) -> Dict[str, Any]:
+    formated_snippet: Dict[str, Any] = {
+        "id": snippet.id,
+        "type": snippet.__meta__.type,
+        "created_at": snippet.created_at,
+        "slug": snippet.slug,
+        "body": snippet.dict(exclude={"slug"}),
+    }
+    return formated_snippet
+
+
 class PageSQLRepository(AbstractPageRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.seen = set()
@@ -320,15 +331,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def add(self, model: Snippet) -> SnippetOperationResult:
         """Append a new model to the repository."""
-        qry: Any = orm.snippets.insert().values(
-            {
-                "id": model.id,
-                "created_at": model.created_at,
-                "type": model.__meta__.type,
-                "slug": model.slug,
-                "body": model.dict(exclude={"slug"}),
-            }
-        )
+        qry: Any = orm.snippets.insert().values(format_snippet(model))
         await self.session.execute(qry)
         self.seen.add(model)
         return Ok(...)
@@ -339,6 +342,18 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             delete(orm.snippets).where(orm.snippets.c.slug == model.slug),
         )
         self.seen.add(model)
+        return Ok(...)
+
+    async def update(self, model: Snippet) -> SnippetOperationResult:
+        """Update a model from the repository."""
+        self.seen.add(model)
+        snippet = format_snippet(model)
+        snippet.pop("id")
+        qry = orm.snippets.update(  # type: ignore
+            orm.snippets.c.id == model.id,  # type: ignore
+            values=snippet,
+        )
+        await self.session.execute(qry)  # type: ignore
         return Ok(...)
 
 

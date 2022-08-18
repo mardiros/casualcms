@@ -24,6 +24,7 @@ from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
+from ...casualblog.models import HeaderSnippet, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -546,11 +547,43 @@ async def test_snippet_list(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsites = await repo.list()
-    assert rsites.is_ok()
-    sites_ok = rsites.unwrap()
-    ss = [s.slug for s in sites_ok]
+    rsnippets = await repo.list()
+    assert rsnippets.is_ok()
+    snips = rsnippets.unwrap()
+    ss = [s.slug for s in snips]
     assert ss == ["snip-it", "snip-that", "snip-this"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippets": [
+                fake_header_snippet(slug="snip-this"),
+                fake_header_snippet(slug="snip-it"),
+                fake_header_snippet(slug="snip-that"),
+            ],
+        },
+    ],
+)
+async def test_snippet_update(
+    params: Any, sqla_session: AsyncSession, snippets: list[HeaderSnippet]
+):
+    snippet = snippets[1]
+    snippet.slug = "new-snip-slug"
+    snippet.title = "New title"
+    snippet.links = [Link(title="l1", href="/l1")]
+    repo = SnippetSQLRepository(sqla_session)
+    op = await repo.update(snippet)
+    assert op.is_ok()
+
+    qry = select(orm.snippets).filter(orm.snippets.c.id == snippet.id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    rsnip: orm.snippets = resp.first()  # type: ignore
+    assert rsnip.slug == "new-snip-slug"
+    assert rsnip.body["title"] == "New title"
+    assert rsnip.body["links"] == [{"title": "l1", "href": "/l1"}]
 
 
 @pytest.mark.parametrize(

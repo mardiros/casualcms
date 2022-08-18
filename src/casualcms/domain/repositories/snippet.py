@@ -39,3 +39,7 @@ class AbstractSnippetRepository(AbstractRepository):
     @abc.abstractmethod
     async def remove(self, model: Snippet) -> SnippetOperationResult:
         """Remove the model from the repository."""
+
+    @abc.abstractmethod
+    async def update(self, model: Snippet) -> SnippetOperationResult:
+        """Update a model from the repository."""

@@ -53,7 +53,7 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
       }
       return loc;
     },
-    { interval: 25, timeout: 2000 }
+    { interval: 25, timeout: 500 }
   );
   return resp;
 };

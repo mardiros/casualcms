@@ -2,11 +2,11 @@ import React from "react";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
-import { Snippet, SnippetType } from "../../casualcms/domain/model";
+import { SnippetType } from "../../casualcms/domain/model";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
 import { SnippetBreadcrumb } from "../layout/breadcrumb";
@@ -14,8 +14,6 @@ import { SnippetBreadcrumb } from "../layout/breadcrumb";
 const Form = withTheme(ChakraUITheme);
 
 export const SnippetNew: React.FunctionComponent<{}> = () => {
-  // console.log("-------------------------------------------")
-  // console.log("# Rendering snippet new")
   let { snippet_type } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
@@ -24,7 +22,6 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
   const [template, setTemplate] = React.useState<SnippetType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
-  const [params, setParams] = useSearchParams();
 
   React.useEffect(() => {
     async function loadTemplate() {
@@ -51,7 +48,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
     await config.api.snippet.createSnippet(token, snippet_type || "", snippet);
-    navigate(`/admin/snippets?${params}`, { replace: true });
+    navigate("/admin/snippets", { replace: true });
   };
 
   const data = {};

@@ -12,7 +12,7 @@ describe("As a user, I can create the root page", () => {
     renderWithRouter(
       <>
         <Route path="/admin/page/new/:tpltype" element={<PageNew />}></Route>
-        <Route path="/admin/pages" element={<PageList />}></Route>
+        <Route path="/admin/pages" element={<div>Page list</div>}></Route>
       </>,
       "/admin/page/new/casual:HomePage"
     );
@@ -21,15 +21,12 @@ describe("As a user, I can create the root page", () => {
     await waitForLoadingLabel("Loading form...");
 
     let input = screen.getByLabelText("Slug", { exact: false });
-    expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "home" } });
 
     input = screen.getByLabelText("Title", { exact: false });
-    expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "Welcome Home" } });
 
     input = screen.getByLabelText("Body", { exact: false });
-    expect(input).not.equal(null);
     fireEvent.change(input, { target: { value: "lorem ipsum" } });
 
     // does now work like that, it raise
@@ -37,19 +34,20 @@ describe("As a user, I can create the root page", () => {
     // expect(input).equal(null);
 
     let button = screen.getByText("Submit");
-    expect(button).not.equal(null);
     fireEvent.click(button);
 
     await waitForPath("/admin/pages");
-    await waitForLoadingLabel("preparing data...");
-    await waitForLoadingLabel("Loading pages list");
-
-    const edits = screen.getAllByText("Edit", { exact: false });
-    expect(edits.length).equal(2);
-    expect(edits[1].getAttribute("href")).equal(
-      "/admin/page/edit?page=%2Fhome"
-    );
-
+    const pages = await config.api.page.listPages("", null);
+    expect(pages._unsafeUnwrap()).eql([
+      {
+        meta: {
+          path: "/home",
+          type: "casual:HomePage",
+        },
+        slug: "home",
+        title: "Welcome Home",
+      },
+    ]);
     await config.api.page.deletePage("", "/home");
   });
 });

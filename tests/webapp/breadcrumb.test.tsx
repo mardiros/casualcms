@@ -3,7 +3,11 @@ import React from "react";
 import { screen } from "@testing-library/react";
 import { renderWithRouter } from "./helpers";
 import { Route } from "react-router-dom";
-import { PageBreadcrumb, SiteBreadcrumb, SnippetBreadcrumb } from "../../src/webapp/ui/layout/breadcrumb";
+import {
+  PageBreadcrumb,
+  SiteBreadcrumb,
+  SnippetBreadcrumb,
+} from "../../src/webapp/ui/layout/breadcrumb";
 import { PageMeta } from "../../src/webapp/casualcms/domain/model";
 
 describe("As a user, I can navigate throw the breadcrumb", () => {
@@ -25,8 +29,8 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       ],
     };
     const page = {
-      meta: meta
-    }
+      meta: meta,
+    };
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageBreadcrumb page={page} />} />
@@ -85,8 +89,12 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
   });
 
   it("Render links using the site of the snippet", async () => {
-
-    const site = { hostname: "www", default: true, secure: false, root_page_path: "" };
+    const site = {
+      hostname: "www",
+      default: true,
+      secure: false,
+      root_page_path: "",
+    };
     renderWithRouter(
       <>
         <Route
@@ -103,7 +111,6 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-
     renderWithRouter(
       <>
         <Route
@@ -114,13 +121,10 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/site/new"
     );
     let link = screen.getByText("new site");
-    expect(link.getAttribute("href")).to.be.equal(
-      "#"
-    );
+    expect(link.getAttribute("href")).to.be.equal("#");
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-
     const snippet = { slug: "header", meta: { type: "Header" } };
     renderWithRouter(
       <>
@@ -138,7 +142,6 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-
     renderWithRouter(
       <>
         <Route
@@ -149,8 +152,6 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/snippet/new"
     );
     let link = screen.getByText("new snippet");
-    expect(link.getAttribute("href")).to.be.equal(
-      "#"
-    );
+    expect(link.getAttribute("href")).to.be.equal("#");
   });
 });

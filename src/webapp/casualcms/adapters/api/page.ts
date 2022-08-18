@@ -5,7 +5,7 @@ import { ApiError, IPageApi } from "casualcms/domain/ports";
 import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialPage, Page } from "casualcms/domain/model";
 
-export class PageApi extends BaseFetchApi implements IPageApi {
+export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async createPage(
     authntoken: string,
     type: string,

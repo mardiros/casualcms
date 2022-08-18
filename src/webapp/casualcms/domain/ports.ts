@@ -7,6 +7,7 @@ import {
   Page,
   PartialSite,
   Site,
+  PartialSnippet,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -67,6 +68,7 @@ export interface ISiteApi {
     hostname: string,
     payload: SiteOption
   ): Promise<Result<PartialSite, ApiError>>;
+  listSites(authntoken: string): Promise<Result<PartialSite[], ApiError>>;
   showSite(
     authntoken: string,
     hostname: string
@@ -75,5 +77,17 @@ export interface ISiteApi {
     authntoken: string,
     hostname: string
   ): Promise<Result<boolean, ApiError>>;
-  listSites(authntoken: string): Promise<Result<PartialSite[], ApiError>>;
+}
+
+export interface ISnippetApi {
+  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
+  createSnippet(
+    authntoken: string,
+    type: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>>;
+  deleteSnippet(
+    authntoken: string,
+    slug: string
+  ): Promise<Result<boolean, ApiError>>;
 }

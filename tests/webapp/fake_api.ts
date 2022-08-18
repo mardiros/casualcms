@@ -7,6 +7,7 @@ import {
   Page,
   PartialSite,
   Site,
+  PartialSnippet,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -16,6 +17,7 @@ import {
   IPageApi,
   ISiteApi,
   SiteOption,
+  ISnippetApi,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
@@ -240,10 +242,10 @@ export class FakeSiteApi implements ISiteApi {
 
     this.sites.filter((site: PartialSite) => {
       if (site.hostname == hostname) {
-        res = ok(site)
+        res = ok(site);
       }
     });
-    return res
+    return res;
   }
 
   async listSites(
@@ -253,16 +255,56 @@ export class FakeSiteApi implements ISiteApi {
   }
 }
 
+export class FakeSnippetApi implements ISnippetApi {
+  snippets: PartialSnippet[];
+
+  constructor() {
+    this.snippets = [];
+  }
+
+  async listSnippets(
+    authntoken: string
+  ): Promise<Result<PartialSnippet[], Map<string, string>>> {
+    return ok(this.snippets);
+  }
+
+  async createSnippet(
+    authntoken: string,
+    type: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>> {
+    let postBody: any = {
+      type: type,
+      payload: payload,
+    };
+    payload["meta"] = { type: type };
+    this.snippets.push(payload);
+    return ok(true);
+  }
+  async deleteSnippet(
+    authntoken: string,
+    slug: string
+  ): Promise<Result<boolean, ApiError>> {
+    const snippets = this.snippets.filter((snippet: PartialSnippet) => {
+      return snippet.slug != slug;
+    });
+    this.snippets = snippets;
+    return ok(true);
+  }
+}
+
 export class FakeApi implements IApi {
   account: IAccountApi;
   template: ITemplateApi;
   page: IPageApi;
   site: ISiteApi;
+  snippet: ISnippetApi;
 
   constructor() {
     this.account = new FakeAccountApi();
     this.template = new FakeTemplateApi();
     this.page = new FakePageApi();
     this.site = new FakeSiteApi();
+    this.snippet = new FakeSnippetApi();
   }
 }

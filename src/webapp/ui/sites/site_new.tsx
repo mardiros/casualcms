@@ -53,7 +53,7 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
 
   return (
     <Box maxW="720px">
-      <SiteBreadcrumb title="New Site"/>
+      <SiteBreadcrumb title="New Site" />
       <Heading>New Site</Heading>
       {/* {<SiteBreadcrumb title="new page" />} */}
       <ApiErrorUI error={error} />

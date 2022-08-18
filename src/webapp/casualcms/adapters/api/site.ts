@@ -4,7 +4,7 @@ import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialSite, Site } from "../../domain/model";
 import { ApiError, SiteOption, ISiteApi } from "../../domain/ports";
 
-export class SiteApi extends BaseFetchApi implements ISiteApi {
+export class FetchSiteApi extends BaseFetchApi implements ISiteApi {
   async createSite(
     authntoken: string,
     hostname: string,

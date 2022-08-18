@@ -53,3 +53,14 @@ export type PartialSite = {
 };
 
 export type Site = PartialSite;
+
+export type PartialSnippetMeta = {
+  type: string;
+};
+
+export type PartialSnippet = {
+  slug: string;
+  meta: PartialSnippetMeta;
+};
+
+export type Snippet = PartialSnippet;

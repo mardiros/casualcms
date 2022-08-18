@@ -16,13 +16,12 @@ type PageBreadcrumbProps = {
 type SiteBreadcrumbProps = {
   site?: Site | null;
   title?: string;
-}
+};
 
 type SnippetBreadcrumbProps = {
   snippet?: Snippet | null;
   title?: string;
-}
-
+};
 
 export const HomeIcon = (): JSX.Element => {
   return (
@@ -47,18 +46,19 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
-      {page && page.meta.breadcrumb.map((item, i) => (
-        <BreadcrumbItem key={i}>
-          <Link
-            to={`/admin/pages/?${new URLSearchParams({
-              parent: item.path,
-            })}`}
-            title={item.title}
-          >
-            {item.slug}
-          </Link>
-        </BreadcrumbItem>
-      ))}
+      {page &&
+        page.meta.breadcrumb.map((item, i) => (
+          <BreadcrumbItem key={i}>
+            <Link
+              to={`/admin/pages/?${new URLSearchParams({
+                parent: item.path,
+              })}`}
+              title={item.title}
+            >
+              {item.slug}
+            </Link>
+          </BreadcrumbItem>
+        ))}
       {title && (
         <BreadcrumbItem>
           <BreadcrumbLink href="#">{title}</BreadcrumbLink>
@@ -67,8 +67,6 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
     </Breadcrumb>
   );
 };
-
-
 
 export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
   props: SiteBreadcrumbProps
@@ -95,17 +93,16 @@ export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
       )}
     </Breadcrumb>
   );
-}
+};
 
-
-export const SnippetBreadcrumb: React.FunctionComponent<SnippetBreadcrumbProps> = (
-  props: SnippetBreadcrumbProps
-) => {
+export const SnippetBreadcrumb: React.FunctionComponent<
+  SnippetBreadcrumbProps
+> = (props: SnippetBreadcrumbProps) => {
   const { snippet, title } = props;
   return (
     <Breadcrumb padding={5}>
       <BreadcrumbItem>
-        <Link to="/admin/sites">
+        <Link to="/admin/snippets">
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
@@ -123,4 +120,4 @@ export const SnippetBreadcrumb: React.FunctionComponent<SnippetBreadcrumbProps> 
       )}
     </Breadcrumb>
   );
-}
+};

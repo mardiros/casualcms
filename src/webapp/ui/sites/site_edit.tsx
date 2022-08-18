@@ -68,7 +68,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
   return (
     site && (
       <Box maxW="720px">
-        <SiteBreadcrumb site={site}/>
+        <SiteBreadcrumb site={site} />
         <Heading>Edit Site</Heading>
         {/* {<SiteBreadcrumb title="new page" />} */}
         <ApiErrorUI error={error} />

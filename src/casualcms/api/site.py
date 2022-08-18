@@ -83,7 +83,7 @@ async def list_sites(
     ]
 
 
-async def get_site(
+async def show_site(
     request: Request,
     hostname: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,

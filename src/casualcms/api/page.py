@@ -97,7 +97,7 @@ async def list_pages(
     ]
 
 
-async def get_page(
+async def show_page(
     request: Request,
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
@@ -106,16 +106,16 @@ async def get_page(
 
     async with app.uow as uow:
         path = path.strip("/")
-        page = await uow.pages.by_path(f"/{path}")
+        rpage = await uow.pages.by_path(f"/{path}")
         await uow.rollback()
 
-    if page.is_err():
+    if rpage.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
+            detail=[{"loc": ["querystring", "path"], "msg": "Unknown page"}],
         )
-    p = page.unwrap()
-    return p.get_data_context()
+    page = rpage.unwrap()
+    return page.get_data_context()
 
 
 async def update_page(

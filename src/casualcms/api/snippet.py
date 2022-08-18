@@ -69,6 +69,25 @@ async def list_snippets(
     ]
 
 
+async def show_snippet(
+    slug: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Any:
+
+    async with app.uow as uow:
+        rsnippet = await uow.snippets.by_slug(slug)
+        await uow.rollback()
+
+    if rsnippet.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["querystring", "slug"], "msg": "Unknown snippet"}],
+        )
+    snippet = rsnippet.unwrap()
+    return snippet.get_data_context()
+
+
 async def update_snippet(
     request: Request,
     app: AppConfig = FastAPIConfigurator.depends,

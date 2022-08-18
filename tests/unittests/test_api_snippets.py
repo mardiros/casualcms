@@ -1,4 +1,5 @@
 from typing import cast
+
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
@@ -101,3 +102,27 @@ async def test_api_patch_snippet(
         snip = await uow.snippets.by_slug("header")
         assert snip.is_err()
         assert snip.unwrap_err().name == "snippet_not_found"
+
+
+async def test_api_get_snippet(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get(
+        "/api/snippets/header",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == {
+        "links": [
+            {"href": "/cats", "title": "cats"},
+            {"href": "/dogs", "title": "dogs"},
+        ],
+        "meta": {"type": "blog:HeaderSnippet"},
+        "slug": "header",
+        "title": "A personal blog",
+    }

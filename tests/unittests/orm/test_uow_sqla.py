@@ -479,7 +479,6 @@ async def test_page_remove(
     assert resp.unwrap() == ...
 
 
-
 @pytest.mark.parametrize(
     "params",
     [
@@ -511,9 +510,9 @@ async def test_snippet_by_slug(
     [
         {
             "snippets": [
-                fake_header_snippet(),
-                fake_header_snippet(),
-                fake_header_snippet(),
+                fake_header_snippet(id="xyz"),
+                fake_header_snippet(id="123"),
+                fake_header_snippet(id="abc"),
             ],
         },
     ],
@@ -522,12 +521,12 @@ async def test_snippet_by_id(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet = await repo.by_id(snippets[1].id)
+    rsnippet = await repo.by_id("123")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.slug == snippets[1].slug
 
-    rsnippet = await repo.by_id(generate_id())
+    rsnippet = await repo.by_id("456")
     assert rsnippet.is_err()
     assert rsnippet.unwrap_err().value == "Snippet not found"
 
@@ -699,7 +698,7 @@ async def test_site_list(
         },
     ],
 )
-async def test_page_by_id(
+async def test_site_by_id(
     params: Any,
     sqla_session: AsyncSession,
     pages: Sequence[Page],

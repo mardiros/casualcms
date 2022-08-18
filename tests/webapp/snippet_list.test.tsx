@@ -25,7 +25,7 @@ describe("As a user, I can list snippet", () => {
   it("Render a row for a snippet", async () => {
     const snippet = {
       slug: "header",
-      meta: { type: "bog:Header" },
+      meta: { type: "blog:Header" },
     };
 
     renderWithRouter(

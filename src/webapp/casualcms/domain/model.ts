@@ -68,3 +68,9 @@ export type Snippet = PartialSnippet;
 export type PartialSnippetType = {
   type: string;
 };
+
+export type SnippetType = {
+  // type:string;
+  schema: JSONSchema7;
+  uiSchema: any;
+};

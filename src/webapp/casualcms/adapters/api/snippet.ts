@@ -31,7 +31,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
       type: type,
       payload: payload,
     };
-    const response = await this.fetch("/api/snippet", {
+    const response = await this.fetch("/api/snippets", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,

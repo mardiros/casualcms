@@ -14,7 +14,7 @@ describe("As a user, I can choose a root templates type", () => {
       <Route
         path="/admin/page/new"
         element={
-          <PageTypesTable isLoading={true} parentPath={null} page_types={[]} />
+          <PageTypesTable isLoading={true} parentPath={null} pageTypes={[]} />
         }
       />,
       "/admin/page/new"
@@ -28,7 +28,11 @@ describe("As a user, I can choose a root templates type", () => {
       <Route
         path="/admin/page/new"
         element={
-          <PageTypesTable isLoading={false} parentPath={null} page_types={tpls} />
+          <PageTypesTable
+            isLoading={false}
+            parentPath={null}
+            pageTypes={tpls}
+          />
         }
       />,
       "/admin/page/new"
@@ -47,7 +51,7 @@ describe("As a user, I can choose a root templates type", () => {
           <PageTypesTable
             isLoading={false}
             parentPath="/home"
-            page_types={[{ type: "casual:One" }]}
+            pageTypes={[{ type: "casual:One" }]}
           />
         }
       />,

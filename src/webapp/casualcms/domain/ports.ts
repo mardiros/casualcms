@@ -8,6 +8,8 @@ import {
   PartialSite,
   Site,
   PartialSnippet,
+  PartialSnippetType,
+  SnippetType,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -90,4 +92,14 @@ export interface ISnippetApi {
     authntoken: string,
     slug: string
   ): Promise<Result<boolean, ApiError>>;
+}
+
+export interface ISnippetTypeApi {
+  listSnippetTypes(
+    authntoken: string
+  ): Promise<Result<PartialSnippetType[], ApiError>>;
+  showSnippetType(
+    authntoken: string,
+    snippet_type: string
+  ): Promise<Result<SnippetType, ApiError>>;
 }

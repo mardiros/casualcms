@@ -15,6 +15,8 @@ import { SiteList } from "./ui/sites/site_list";
 import { SiteNew } from "./ui/sites/site_new";
 import { SiteEdit } from "./ui/sites/site_edit";
 import { SnippetList } from "./ui/snippets/snippet_list";
+import { SnippetTypeList } from "./ui/snippets/snippet_types_list";
+import { SnippetNew } from "./ui/snippets/snippet_new";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -49,6 +51,16 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
               <Route path="site/edit" element={<SiteEdit />} caseSensitive />
 
               <Route path="snippets" element={<SnippetList />} caseSensitive />
+              <Route
+                path="snippet/new"
+                element={<SnippetTypeList />}
+                caseSensitive
+              />
+              <Route
+                path="snippet/new/:snippet_type"
+                element={<SnippetNew />}
+                caseSensitive
+              />
 
               <Route path="*" element={<PageNotFound />} />
             </Routes>

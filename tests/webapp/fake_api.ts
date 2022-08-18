@@ -8,6 +8,8 @@ import {
   PartialSite,
   Site,
   PartialSnippet,
+  PartialSnippetType,
+  SnippetType,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -18,6 +20,7 @@ import {
   ISiteApi,
   SiteOption,
   ISnippetApi,
+  ISnippetTypeApi,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
@@ -293,12 +296,63 @@ export class FakeSnippetApi implements ISnippetApi {
   }
 }
 
+class FakeSnippetTypeApi implements ISnippetTypeApi {
+  async listSnippetTypes(
+    authntoken: string
+  ): Promise<Result<PartialSnippetType[], Map<string, string>>> {
+    return ok([{ type: "blog:HeaderSnippet" }, { type: "blog:FooterSnippet" }]);
+  }
+  async showSnippetType(
+    authntoken: string,
+    snippet_type: string
+  ): Promise<Result<SnippetType, Map<string, string>>> {
+    return ok({
+      schema: {
+        title: "HeaderSnippet",
+        type: "object",
+        properties: {
+          slug: { title: "Slug", type: "string" },
+          title: { title: "Title", type: "string" },
+          links: {
+            title: "Links",
+            type: "array",
+            items: { $ref: "#/definitions/Link" },
+          },
+        },
+        required: ["slug", "title"],
+        definitions: {
+          Link: {
+            title: "Link",
+            type: "object",
+            properties: {
+              title: { title: "Title", type: "string" },
+              href: { title: "Href", type: "string" },
+            },
+            required: ["title", "href"],
+          },
+        },
+      },
+      uiSchema: {
+        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
+        title: { "ui:widget": "text", "ui:placeholder": "title" },
+        links: {
+          items: {
+            title: { "ui:widget": "text", "ui:placeholder": "title" },
+            href: { "ui:widget": "text", "ui:placeholder": "href" },
+          },
+        },
+      },
+    });
+  }
+}
+
 export class FakeApi implements IApi {
   account: IAccountApi;
   page_type: IPageTypeApi;
   page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
+  snippet_type: ISnippetTypeApi;
 
   constructor() {
     this.account = new FakeAccountApi();
@@ -306,5 +360,6 @@ export class FakeApi implements IApi {
     this.page = new FakePageApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
+    this.snippet_type = new FakeSnippetTypeApi();
   }
 }

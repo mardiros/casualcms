@@ -26,7 +26,7 @@ import { PageBreadcrumb } from "../layout/breadcrumb";
 type PageTypesTableProps = {
   isLoading: boolean;
   parentPath: string | null;
-  page_types: PartialPageType[];
+  pageTypes: PartialPageType[];
 };
 export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
   props: PageTypesTableProps
@@ -35,7 +35,7 @@ export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
     return <Loader label="loading page types..." />;
   }
 
-  const page_types = props.page_types;
+  const pageTypes = props.pageTypes;
   const qs = props.parentPath
     ? new URLSearchParams({ parent: props.parentPath })
     : "";
@@ -44,11 +44,11 @@ export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
       <Table variant="simple">
         <Thead>
           <Tr>
-            <Th>Template Type</Th>
+            <Th>Page Type</Th>
           </Tr>
         </Thead>
         <Tbody>
-          {page_types.map((tpl, i) => (
+          {pageTypes.map((tpl, i) => (
             <Tr key={i}>
               <Td>
                 <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
@@ -69,7 +69,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [page_types, setTemplates] = React.useState<PartialPageType[]>([]);
+  const [pageTypes, setTemplates] = React.useState<PartialPageType[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
   const [params, setParams] = useSearchParams();
   const parentType = params.get("type");
@@ -118,14 +118,14 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
     <Container>
       {
         <>
-          <Heading>Choose A Type Of Template</Heading>
+          <Heading>Choose A Type Of Page</Heading>
           {parentPage && (
             <PageBreadcrumb page={parentPage} title="type of template" />
           )}
           <Box paddingLeft={15}>
             <ApiErrorUI error={error} />
             <PageTypesTable
-              page_types={page_types}
+              pageTypes={pageTypes}
               parentPath={parentPath}
               isLoading={isLoading}
             />

@@ -59,12 +59,12 @@ export const SideBar: React.FunctionComponent<{}> = () => {
     >
       <SimpleGrid columns={1} spacing={1}>
         <SideBarItem colors={pagesColor} href="/admin/pages" title="Pages" />
-        <SideBarItem colors={sitesColor} href="/admin/sites" title="Sites" />
         <SideBarItem
           colors={snippetsColor}
           href="/admin/snippets"
           title="Snippets"
         />
+        <SideBarItem colors={sitesColor} href="/admin/sites" title="Sites" />
       </SimpleGrid>
     </Box>
   );

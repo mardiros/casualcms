@@ -12,10 +12,10 @@ describe("As a user, I can list snippet", () => {
   it("render a spinner while loading", async () => {
     renderWithRouter(
       <Route
-        path="/admin/snippet/new"
+        path="/admin/snippets/new"
         element={<SnippetTypesTable isLoading={true} snippetTypes={[]} />}
       />,
-      "/admin/snippet/new"
+      "/admin/snippets/new"
     );
     const spinner = screen.getByText("loading snippet types...");
     expect(spinner).not.equal(null);
@@ -28,25 +28,25 @@ describe("As a user, I can list snippet", () => {
     ];
     renderWithRouter(
       <Route
-        path="/admin/page/new"
+        path="/admin/pages/new"
         element={<SnippetTypesTable isLoading={false} snippetTypes={tpls} />}
       />,
-      "/admin/page/new"
+      "/admin/pages/new"
     );
     let link = screen.getByText("blog:HeaderSnippet", { exact: false });
     expect(link.getAttribute("href")).equal(
-      "/admin/snippet/new/blog:HeaderSnippet"
+      "/admin/snippets/new/blog:HeaderSnippet"
     );
     link = screen.getByText("blog:FooterSnippet", { exact: false });
     expect(link.getAttribute("href")).equal(
-      "/admin/snippet/new/blog:FooterSnippet"
+      "/admin/snippets/new/blog:FooterSnippet"
     );
   });
 
   it("list snippet types", async () => {
     renderWithRouter(
-      <Route path="/admin/snippet/new" element={<SnippetTypeList />} />,
-      "/admin/snippet/new"
+      <Route path="/admin/snippets/new" element={<SnippetTypeList />} />,
+      "/admin/snippets/new"
     );
     await waitForLoadingLabel("loading snippet types...");
     const tpl = screen.getByText("blog:HeaderSnippet");

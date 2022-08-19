@@ -11,10 +11,10 @@ describe("As a user, I can create the root page", () => {
   it("Create the root page from the web form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/page/new/:tpltype" element={<PageNew />}></Route>
+        <Route path="/admin/pages/new/:tpltype" element={<PageNew />}></Route>
         <Route path="/admin/pages" element={<div>Page list</div>}></Route>
       </>,
-      "/admin/page/new/casual:HomePage"
+      "/admin/pages/new/casual:HomePage"
     );
 
     await waitForLoadingLabel("Loading pages list");

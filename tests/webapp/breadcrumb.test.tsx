@@ -98,15 +98,15 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/site/edit"
+          path="/admin/sites/edit"
           element={<SiteBreadcrumb site={site} />}
         />
       </>,
-      "/admin/site/edit"
+      "/admin/sites/edit"
     );
     let link = screen.getByText("www");
     expect(link.getAttribute("href")).to.be.equal(
-      "/admin/site/edit?hostname=www"
+      "/admin/sites/edit?hostname=www"
     );
   });
 
@@ -114,11 +114,11 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/site/new"
+          path="/admin/sites/new"
           element={<SiteBreadcrumb title="new site" />}
         />
       </>,
-      "/admin/site/new"
+      "/admin/sites/new"
     );
     let link = screen.getByText("new site");
     expect(link.getAttribute("href")).to.be.equal("#");
@@ -145,11 +145,11 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippet/new"
+          path="/admin/snippets/new"
           element={<SnippetBreadcrumb title="new snippet" />}
         />
       </>,
-      "/admin/snippet/new"
+      "/admin/snippets/new"
     );
     let link = screen.getByText("new snippet");
     expect(link.getAttribute("href")).to.be.equal("#");

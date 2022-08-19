@@ -53,7 +53,7 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
       <Td>{page.title}</Td>
       <Td>
         <Link
-          to={`/admin/page/edit?${new URLSearchParams({
+          to={`/admin/pages/edit?${new URLSearchParams({
             page: page.meta.path,
           })}`}
         >
@@ -107,7 +107,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
       {qsEdit && (
         <Button
           onClick={() =>
-            navigate(`/admin/page/edit?${qsEdit}`, { replace: true })
+            navigate(`/admin/pages/edit?${qsEdit}`, { replace: true })
           }
           colorScheme="teal"
         >
@@ -117,7 +117,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
       )}
 
       <Button
-        onClick={() => navigate(`/admin/page/new?${qs}`, { replace: true })}
+        onClick={() => navigate(`/admin/pages/new?${qs}`, { replace: true })}
         colorScheme="teal"
       >
         <Icon as={AddIcon} marginEnd={2} />

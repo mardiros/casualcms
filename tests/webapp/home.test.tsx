@@ -14,7 +14,7 @@ describe("As a user, I have to create a first root template", () => {
     await screen.findByText("Welcome bob!");
     let link = screen.getByText("Create my first page");
     expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/page/new");
+    expect(link.getAttribute("href")).equal("/admin/pages/new");
   });
 });
 

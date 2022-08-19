@@ -41,7 +41,7 @@ export const HomePage: React.FunctionComponent<{}> = () => {
     <>
       <Heading>Welcome {auth.authenticatedUser?.username}!</Heading>
       <Box>
-        <Link to="/admin/page/new">Create my first page</Link>.
+        <Link to="/admin/pages/new">Create my first page</Link>.
       </Box>
     </>
   );

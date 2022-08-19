@@ -11,12 +11,12 @@ describe("As a user, I can list snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippet/new/:snippet_type"
+          path="/admin/snippets/new/:snippet_type"
           element={<SnippetNew />}
         ></Route>
         <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>
       </>,
-      "/admin/snippet/new/blog:HeaderSnippet"
+      "/admin/snippets/new/blog:HeaderSnippet"
     );
 
     await waitForLoadingLabel("Loading form...");

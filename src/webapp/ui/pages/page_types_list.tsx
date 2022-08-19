@@ -51,7 +51,7 @@ export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
           {pageTypes.map((tpl, i) => (
             <Tr key={i}>
               <Td>
-                <Link to={`/admin/page/new/${tpl.type}?${qs}`}>
+                <Link to={`/admin/pages/new/${tpl.type}?${qs}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />
                   {tpl.type}
                 </Link>

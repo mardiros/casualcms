@@ -9,11 +9,11 @@ describe("As a user, I can see which entry menu I am in", () => {
   it("render the entry menu in a distinct way", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/page/new" element={<SideBar />} />
+        <Route path="/admin/pages/new" element={<SideBar />} />
         <Route path="/admin/sites" element={<SideBar />} />
         <Route path="/admin/pages" element={<SideBar />} />
       </>,
-      "/admin/page/new"
+      "/admin/pages/new"
     );
     let menuItem = screen.getByText("Pages");
     expect(menuItem.getAttribute("data-selected")).equal("true");

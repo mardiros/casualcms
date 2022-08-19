@@ -32,7 +32,7 @@ describe("As a user, I view a different homepage when I am authenticated or not"
   it("The body display a welcome message after logged in", async () => {
     renderWithRouter(<Route path="/" element={<Body />} />, "/");
     const link = await screen.findByText("Create my first page");
-    expect(link.getAttribute("href")).equal("/admin/page/new");
+    expect(link.getAttribute("href")).equal("/admin/pages/new");
   });
 });
 

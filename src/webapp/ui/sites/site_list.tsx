@@ -45,7 +45,7 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
       <Td>{{ true: "yes", false: "no" }[site.default.toString()]}</Td>
       <Td>
         <Link
-          to={`/admin/site/edit?${new URLSearchParams({
+          to={`/admin/sites/edit?${new URLSearchParams({
             hostname: site.hostname,
           })}`}
         >
@@ -112,7 +112,7 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
     <Stack p={4} spacing={4} direction="row" align="right">
       <Button
         colorScheme="teal"
-        onClick={() => navigate(`/admin/site/new`, { replace: true })}
+        onClick={() => navigate(`/admin/sites/new`, { replace: true })}
       >
         <Icon as={AddIcon} marginEnd={2} />
         Add new site

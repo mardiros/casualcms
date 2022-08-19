@@ -5,7 +5,7 @@ Feature: As a user, I can create and publish snippets
     And a "/home" page of type "blog:HomePage"
     And a "/home/cat" page of type "blog:CategoryPage"
     And a "/home/dog" page of type "blog:CategoryPage"
-    When I visit "/admin/snippet/new"
+    When I visit "/admin/snippets/new"
     Then I see the text "Choose A Type Of Snippet"
     And I see the text "blog:HeaderSnippet"
     And I see the text "casualblog.models:FooterSnippet"

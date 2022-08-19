@@ -12,12 +12,12 @@ describe("As a user, I can choose a root templates type", () => {
   it("render a spinner while loading", async () => {
     renderWithRouter(
       <Route
-        path="/admin/page/new"
+        path="/admin/pages/new"
         element={
           <PageTypesTable isLoading={true} parentPath={null} pageTypes={[]} />
         }
       />,
-      "/admin/page/new"
+      "/admin/pages/new"
     );
     const spinner = screen.getByText("loading page types...");
     expect(spinner).not.equal(null);
@@ -26,7 +26,7 @@ describe("As a user, I can choose a root templates type", () => {
     const tpls = [{ type: "casual:One" }, { type: "casual:Two" }];
     renderWithRouter(
       <Route
-        path="/admin/page/new"
+        path="/admin/pages/new"
         element={
           <PageTypesTable
             isLoading={false}
@@ -35,18 +35,18 @@ describe("As a user, I can choose a root templates type", () => {
           />
         }
       />,
-      "/admin/page/new"
+      "/admin/pages/new"
     );
     let link = screen.getByText("casual:One");
-    expect(link.getAttribute("href")).equal("/admin/page/new/casual:One");
+    expect(link.getAttribute("href")).equal("/admin/pages/new/casual:One");
     link = screen.getByText("casual:Two");
-    expect(link.getAttribute("href")).equal("/admin/page/new/casual:Two");
+    expect(link.getAttribute("href")).equal("/admin/pages/new/casual:Two");
   });
 
   it("set the parent path as link parameter", async () => {
     renderWithRouter(
       <Route
-        path="/admin/page/new"
+        path="/admin/pages/new"
         element={
           <PageTypesTable
             isLoading={false}
@@ -55,18 +55,18 @@ describe("As a user, I can choose a root templates type", () => {
           />
         }
       />,
-      "/admin/page/new"
+      "/admin/pages/new"
     );
     let link = screen.getByText("casual:One");
     expect(link.getAttribute("href")).equal(
-      "/admin/page/new/casual:One?parent=%2Fhome"
+      "/admin/pages/new/casual:One?parent=%2Fhome"
     );
   });
 
   it("list root templates", async () => {
     renderWithRouter(
-      <Route path="/admin/page/new" element={<PageTypeList />} />,
-      "/admin/page/new"
+      <Route path="/admin/pages/new" element={<PageTypeList />} />,
+      "/admin/pages/new"
     );
     await waitForLoadingLabel("loading page types...");
     const tpl = screen.getByText("casual:HomePage");

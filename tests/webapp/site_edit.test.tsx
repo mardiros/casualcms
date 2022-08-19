@@ -29,9 +29,9 @@ describe("As a user, I can edit existing sites", () => {
     renderWithRouter(
       <>
         <Route path="/admin/sites" element={<SiteList />}></Route>
-        <Route path="/admin/site/edit" element={<SiteEdit />}></Route>
+        <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
       </>,
-      "/admin/site/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost"
     );
 
     let input = await screen.findByLabelText("hostname", { exact: false });

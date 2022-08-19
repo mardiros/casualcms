@@ -16,7 +16,7 @@ Feature: As a user, I can create a site
     And a "/home/cat/my-first-article" page of type "blog:BlogPage"
     And a "/home/dog/the-second-one" page of type "blog:BlogPage"
     And a "/home/dog/the-third-one" page of type "blog:BlogPage"
-    When I visit "/admin/site/new"
+    When I visit "/admin/sites/new"
     And I fill the field "hostname" with "www.example.net"
     And I fill the field "/index" with "/home"
     And I click on the "Submit" button

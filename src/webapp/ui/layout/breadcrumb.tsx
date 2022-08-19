@@ -81,7 +81,7 @@ export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
       </BreadcrumbItem>
       {site && (
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/admin/site/edit?hostname=${site.hostname}`}>
+          <BreadcrumbLink href={`/admin/sites/edit?hostname=${site.hostname}`}>
             {site.hostname}
           </BreadcrumbLink>
         </BreadcrumbItem>

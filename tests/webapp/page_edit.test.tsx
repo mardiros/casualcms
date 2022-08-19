@@ -41,9 +41,9 @@ describe("As a user, I can edit existing pages", () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
-        <Route path="/admin/page/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/page/edit?page=/home"
+      "/admin/pages/edit?page=/home"
     );
 
     await waitForLoadingLabel("loading page and page template...");
@@ -59,9 +59,9 @@ describe("As a user, I can edit existing pages", () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
-        <Route path="/admin/page/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/page/edit?page=/home/sub0"
+      "/admin/pages/edit?page=/home/sub0"
     );
 
     await waitForLoadingLabel("loading page and page template...");
@@ -80,9 +80,9 @@ describe("As a user, I can edit existing pages", () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
-        <Route path="/admin/page/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/page/edit?page=/home"
+      "/admin/pages/edit?page=/home"
     );
 
     await waitForLoadingLabel("loading page and page template...");

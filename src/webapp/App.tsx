@@ -27,46 +27,44 @@ export const Body: React.FunctionComponent<{}> = () => {
   }
 };
 
+
+const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
+  return (
+    <RequireAuth>
+      <Routes>
+        <Route path="" element={<Body />} caseSensitive />
+        <Route path="pages" element={<PageList />} caseSensitive />
+        <Route path="pages/new" element={<PageTypeList />} caseSensitive />
+        <Route path="pages/new/:tpltype" element={<PageNew />} caseSensitive />
+        <Route path="pages/edit" element={<PageEdit />} caseSensitive />
+
+        <Route path="snippets" element={<SnippetList />} caseSensitive />
+        <Route
+          path="snippets/new"
+          element={<SnippetTypeList />}
+          caseSensitive
+        />
+        <Route
+          path="snippets/new/:snippet_type"
+          element={<SnippetNew />}
+          caseSensitive
+        />
+
+        <Route path="sites" element={<SiteList />} caseSensitive />
+        <Route path="sites/new" element={<SiteNew />} caseSensitive />
+        <Route path="sites/edit" element={<SiteEdit />} caseSensitive />
+
+        <Route path="*" element={<PageNotFound />} />
+      </Routes>
+    </RequireAuth>
+  );
+};
+
 const AppRoutes: React.FunctionComponent<{}> = () => {
   return (
     <Routes>
       <Route path="login" element={<Login />} caseSensitive />
-      <Route
-        path="*"
-        element={
-          <RequireAuth>
-            <Routes>
-              <Route path="" element={<Body />} caseSensitive />
-              <Route path="pages" element={<PageList />} caseSensitive />
-              <Route path="page/new" element={<PageTypeList />} caseSensitive />
-              <Route
-                path="page/new/:tpltype"
-                element={<PageNew />}
-                caseSensitive
-              />
-              <Route path="page/edit" element={<PageEdit />} caseSensitive />
-
-              <Route path="sites" element={<SiteList />} caseSensitive />
-              <Route path="site/new" element={<SiteNew />} caseSensitive />
-              <Route path="site/edit" element={<SiteEdit />} caseSensitive />
-
-              <Route path="snippets" element={<SnippetList />} caseSensitive />
-              <Route
-                path="snippet/new"
-                element={<SnippetTypeList />}
-                caseSensitive
-              />
-              <Route
-                path="snippet/new/:snippet_type"
-                element={<SnippetNew />}
-                caseSensitive
-              />
-
-              <Route path="*" element={<PageNotFound />} />
-            </Routes>
-          </RequireAuth>
-        }
-      />
+      <Route path="*" element={<AuhtenticatedRoutes />} />
     </Routes>
   );
 };

@@ -109,7 +109,7 @@ export const SnippetListButtons: React.FunctionComponent<{}> = () => {
     <Stack p={4} spacing={4} direction="row" align="right">
       <Button
         colorScheme="teal"
-        onClick={() => navigate("/admin/snippet/new", { replace: true })}
+        onClick={() => navigate("/admin/snippets/new", { replace: true })}
       >
         <Icon as={AddIcon} marginEnd={2} />
         Add new snippet

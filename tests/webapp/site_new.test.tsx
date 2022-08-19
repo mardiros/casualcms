@@ -27,10 +27,10 @@ describe("As a user, I can create a new site", () => {
   it("Create a site", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/site/new" element={<SiteNew />}></Route>
+        <Route path="/admin/sites/new" element={<SiteNew />}></Route>
         <Route path="/admin/sites" element={<h4>Site list</h4>}></Route>
       </>,
-      "/admin/site/new"
+      "/admin/sites/new"
     );
 
     let input = screen.getByLabelText("Hostname", { exact: false });

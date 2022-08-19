@@ -52,7 +52,7 @@ describe("As a user, I can list sites", () => {
     );
 
     let link = await screen.findByText("Edit", { exact: false });
-    expect(link.getAttribute("href")).equal("/admin/site/edit?hostname=*");
+    expect(link.getAttribute("href")).equal("/admin/sites/edit?hostname=*");
   });
 
   it("Render sites table from the API", async () => {
@@ -67,10 +67,10 @@ describe("As a user, I can list sites", () => {
     expect(links.length).equal(3);
     expect(links[0].nodeName).equal("TH");
     expect(links[1].nodeName).equal("A");
-    expect(links[1].getAttribute("href")).equal("/admin/site/edit?hostname=*");
+    expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/site/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost"
     );
   });
 
@@ -83,17 +83,17 @@ describe("As a user, I can list sites", () => {
     expect(links.length).equal(3);
     expect(links[0].nodeName).equal("TH");
     expect(links[1].nodeName).equal("A");
-    expect(links[1].getAttribute("href")).equal("/admin/site/edit?hostname=*");
+    expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/site/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost"
     );
   });
   it("Redirect to the new site while clicking on the add button", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/sites" element={<SiteListButtons />} />
-        <Route path="/admin/site/new" element={<h4>New web site page</h4>} />
+        <Route path="/admin/sites/new" element={<h4>New web site page</h4>} />
       </>,
       "/admin/sites"
     );

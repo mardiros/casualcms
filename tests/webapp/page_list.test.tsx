@@ -87,7 +87,7 @@ describe("As a user, I can list pages", () => {
 
     let link = screen.getByText("Edit", { exact: false });
     expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/page/edit?page=%2Fhome");
+    expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
 
     link = screen.getByText("View", { exact: false });
     expect(link).not.equal(undefined);
@@ -157,7 +157,7 @@ describe("As a user, I can list pages", () => {
           path="/admin/pages"
           element={<PageListButtons curPage={page} subPages={[]} />}
         />
-        <Route path="/admin/page/new" element={<h4>New page page</h4>} />
+        <Route path="/admin/pages/new" element={<h4>New page page</h4>} />
       </>,
       "/admin/pages"
     );

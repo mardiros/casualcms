@@ -29,6 +29,11 @@ def assert_not_text(context: Any, text: str):
     )
 
 
+@then('I see the heading "{text}"')
+def assert_h1(context: Any, text: str):
+    context.browser.find_element_by_xpath(f"//h1[contains(text(), '{text}')]")
+
+
 @then('I see the breadcrumb "{text}"')
 def assert_breadcrumb(context: Any, text: str):
     text_part = [t.strip() for t in text.split("/")]

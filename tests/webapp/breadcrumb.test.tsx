@@ -129,15 +129,15 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippet/edit"
+          path="/admin/snippets/edit"
           element={<SnippetBreadcrumb snippet={snippet} />}
         />
       </>,
-      "/admin/snippet/edit"
+      "/admin/snippets/edit"
     );
     let link = screen.getByText("header");
     expect(link.getAttribute("href")).to.be.equal(
-      "/admin/snippet/edit?slug=header"
+      "/admin/snippets/edit?slug=header"
     );
   });
 

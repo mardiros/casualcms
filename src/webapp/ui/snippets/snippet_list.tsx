@@ -43,7 +43,7 @@ export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
       <Td>{snippet.meta.type}</Td>
       <Td>
         <Link
-          to={`/admin/snippet/edit?${new URLSearchParams({
+          to={`/admin/snippets/edit?${new URLSearchParams({
             slug: snippet.slug,
           })}`}
         >

@@ -1,7 +1,7 @@
 import { Result, ok, err } from "neverthrow";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
-import { PartialSnippet } from "../../domain/model";
+import { PartialSnippet, Snippet } from "../../domain/model";
 import { ApiError, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
@@ -12,7 +12,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
-        "Content-Type": "application/json",
+        Accept: "application/json",
       },
     });
     const jsonData = await (response.json() as unknown);
@@ -20,6 +20,24 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
     return ok(jsonData as PartialSnippet[]);
+  }
+
+  async showSnippet(
+    authntoken: string,
+    slug: string
+  ): Promise<Result<Snippet, ApiError>> {
+    const response = await this.fetch(`/api/snippets/${slug}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        Accept: "application/json",
+      },
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(jsonData as Snippet);
   }
 
   async createSnippet(
@@ -45,6 +63,27 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     }
     return ok(true);
   }
+
+  async updateSnippet(
+    authntoken: string,
+    slug: string,
+    snippet: Snippet
+  ): Promise<Result<boolean, ApiError>> {
+    const response = await this.fetch(`/api/snippets/${slug}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(snippet),
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(true);
+  }
+
   async deleteSnippet(
     authntoken: string,
     slug: string

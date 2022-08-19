@@ -10,6 +10,7 @@ import {
   PartialSnippet,
   PartialSnippetType,
   SnippetType,
+  Snippet,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -192,8 +193,6 @@ class FakePageApi implements IPageApi {
       // FIXME
       return err(new Map());
     }
-
-    return ok(page);
   }
   async deletePage(
     authntoken: string,
@@ -269,6 +268,34 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string
   ): Promise<Result<PartialSnippet[], Map<string, string>>> {
     return ok(this.snippets);
+  }
+
+  async updateSnippet(
+    authntoken: string,
+    slug: string,
+    snippet: Snippet
+  ): Promise<Result<boolean, ApiError>> {
+    let snippets = this.snippets.filter((snippet: PartialSnippet) => {
+      return snippet.slug != slug;
+    });
+    snippets.push(snippet);
+    this.snippets = snippets;
+    return ok(true);
+  }
+
+  async showSnippet(
+    authntoken: string,
+    slug: string
+  ): Promise<Result<Snippet, ApiError>> {
+    const snippets = this.snippets.filter((snippet: PartialSnippet) => {
+      return snippet.slug == slug;
+    });
+    if (snippets.length == 1) {
+      return ok(snippets[0]);
+    }
+    let apiError = new Map();
+    apiError.set("slug", "Snippet not found");
+    return err(apiError);
   }
 
   async createSnippet(

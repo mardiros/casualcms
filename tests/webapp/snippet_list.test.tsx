@@ -47,7 +47,7 @@ describe("As a user, I can list snippet", () => {
     );
 
     let link = await screen.findByText("Edit", { exact: false });
-    expect(link.getAttribute("href")).equal("/admin/snippet/edit?slug=header");
+    expect(link.getAttribute("href")).equal("/admin/snippets/edit?slug=header");
   });
 
   it("Render snippets table from the API", async () => {

@@ -115,6 +115,7 @@ async def update_snippet(
         snippet = rsnippet.unwrap()
 
     new_slug = payload.pop("slug")
+    payload.pop("meta", None)
     cmd = UpdateSnippet(id=snippet.id, slug=new_slug, body=payload)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.account_id

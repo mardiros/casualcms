@@ -17,6 +17,7 @@ import { SiteEdit } from "./ui/sites/site_edit";
 import { SnippetList } from "./ui/snippets/snippet_list";
 import { SnippetTypeList } from "./ui/snippets/snippet_types_list";
 import { SnippetNew } from "./ui/snippets/snippet_new";
+import { SnippetEdit } from "./ui/snippets/snippet_edit";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -26,7 +27,6 @@ export const Body: React.FunctionComponent<{}> = () => {
     return <Link to="/admin/login">Sign In</Link>;
   }
 };
-
 
 const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
   return (
@@ -49,6 +49,7 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
           element={<SnippetNew />}
           caseSensitive
         />
+        <Route path="snippets/edit" element={<SnippetEdit />} caseSensitive />
 
         <Route path="sites" element={<SiteList />} caseSensitive />
         <Route path="sites/new" element={<SiteNew />} caseSensitive />

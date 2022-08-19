@@ -76,7 +76,7 @@ describe("As a user, I can edit existing pages", () => {
     expect(input.getAttribute("value")).equal("first section");
   });
 
-  it("Load the root page in an edition form", async () => {
+  it("Update the root page using the edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>

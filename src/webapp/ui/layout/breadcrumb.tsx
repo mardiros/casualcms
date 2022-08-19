@@ -108,7 +108,7 @@ export const SnippetBreadcrumb: React.FunctionComponent<
       </BreadcrumbItem>
       {snippet && (
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/admin/snippet/edit?slug=${snippet.slug}`}>
+          <BreadcrumbLink href={`/admin/snippets/edit?slug=${snippet.slug}`}>
             {snippet.slug}
           </BreadcrumbLink>
         </BreadcrumbItem>

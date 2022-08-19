@@ -10,6 +10,7 @@ import {
   PartialSnippet,
   PartialSnippetType,
   SnippetType,
+  Snippet,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -82,11 +83,20 @@ export interface ISiteApi {
 }
 
 export interface ISnippetApi {
-  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
   createSnippet(
     authntoken: string,
     type: string,
     payload: any
+  ): Promise<Result<boolean, ApiError>>;
+  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
+  showSnippet(
+    authntoken: string,
+    slug: string
+  ): Promise<Result<Snippet, ApiError>>;
+  updateSnippet(
+    authntoken: string,
+    slug: string,
+    snippet: Snippet
   ): Promise<Result<boolean, ApiError>>;
   deleteSnippet(
     authntoken: string,

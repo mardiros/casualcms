@@ -38,7 +38,7 @@ describe("As a user, I can delete a site", () => {
           path="/admin/popin"
           element={<SiteDeletePopoverForm curSite={site} />}
         />
-        <Route path="/admin/pages" element={<h4>Site list</h4>} />
+        <Route path="/admin/sites" element={<h4>Site list</h4>} />
       </>,
       "/admin/popin"
     );

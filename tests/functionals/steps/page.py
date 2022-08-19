@@ -23,7 +23,6 @@ def create_page(context: Any, path: str, page_type: str) -> None:
         "type": page_type,
         "parent": parent_path,
         "payload": {
-            "id": str(fake.uuid4()),
             "slug": slug,
         },
     }
@@ -33,7 +32,6 @@ def create_page(context: Any, path: str, page_type: str) -> None:
             "type": "blog:HomePage",
             # "parent": parent_path,
             "payload": {
-                "id": str(fake.uuid4()),
                 "slug": slug,
                 "body": [
                     {
@@ -56,7 +54,6 @@ def create_page(context: Any, path: str, page_type: str) -> None:
             "type": "blog:CategoryPage",
             "parent": parent_path,
             "payload": {
-                "id": str(fake.uuid4()),
                 "intro": {"title": fake.name(), "body": fake.paragraph(nb_sentences=1)},
                 "slug": slug,
                 "title": fake.name(),
@@ -70,7 +67,6 @@ def create_page(context: Any, path: str, page_type: str) -> None:
             "type": "blog:BlogPage",
             "parent": parent_path,
             "payload": {
-                "id": str(fake.uuid4()),
                 "slug": slug,
                 "title": fake.name(),
                 "description": fake.paragraph(nb_sentences=1),

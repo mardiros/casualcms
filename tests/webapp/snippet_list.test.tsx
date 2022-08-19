@@ -14,10 +14,10 @@ import {
 
 describe("As a user, I can list snippet", () => {
   before(async () => {
-    await config.api.snippet.createSnippet("", "casual:HeaderSnippet", {
+    await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
       slug: "header",
     });
-    await config.api.snippet.createSnippet("", "casual:FooterSnippet", {
+    await config.api.snippet.createSnippet("", "blog:FooterSnippet", {
       slug: "footer",
     });
   });

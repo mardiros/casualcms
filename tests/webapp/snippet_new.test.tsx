@@ -16,7 +16,7 @@ describe("As a user, I can list snippet", () => {
         ></Route>
         <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>
       </>,
-      "/admin/snippet/new/casual:HeaderSnippet"
+      "/admin/snippet/new/blog:HeaderSnippet"
     );
 
     await waitForLoadingLabel("Loading form...");
@@ -36,7 +36,7 @@ describe("As a user, I can list snippet", () => {
       {
         slug: "header",
         title: "Casual Blog",
-        meta: { type: "casual:HeaderSnippet" },
+        meta: { type: "blog:HeaderSnippet" },
       },
     ]);
     await config.api.snippet.deleteSnippet("", "header");

@@ -21,13 +21,9 @@ TODO
 
 * Tests error format in API
 
-* Do a popup to fillout the root page
-
 * Implement default site
 
 * Ensure we can't delete a page if it is associated to a site
-
-* Implement site update
 
 * Test all unauthenticated calls
 

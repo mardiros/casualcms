@@ -11,6 +11,7 @@ from casualcms.domain.repositories import (
     AbstractPageRepository,
 )
 from casualcms.domain.repositories.authntoken import (
+    AuthnTokenOperationResult,
     AuthnTokenRepositoryError,
     AuthnTokenRepositoryResult,
 )
@@ -129,13 +130,19 @@ class AuthnTokenInMemoryRepository(AbstractAuthnRepository):
             return Ok(self.tokens[token])
         return Err(AuthnTokenRepositoryError.token_not_found)
 
-    async def add(self, model: AuthnToken) -> None:
+    async def add(self, model: AuthnToken) -> AuthnTokenOperationResult:
         """Append a new model to the repository."""
+        if model.token in self.tokens:
+            return Err(AuthnTokenRepositoryError.integrity_error)
         self.tokens[model.token] = model  # type: ignore
+        return Ok(...)
 
-    async def remove(self, token: str) -> None:
+    async def remove(self, token: str) -> AuthnTokenOperationResult:
         """Delete a new model to the repository."""
+        if token not in self.tokens:
+            return Err(AuthnTokenRepositoryError.token_not_found)
         del self.tokens[token]
+        return Ok(...)
 
 
 class SiteInMemoryRepository(AbstractSiteRepository):

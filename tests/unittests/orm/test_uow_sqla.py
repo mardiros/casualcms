@@ -2,7 +2,6 @@ from types import NoneType
 from typing import Any, Sequence
 
 import pytest
-from sqlalchemy import delete  # type: ignore
 from sqlalchemy import text  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
@@ -20,6 +19,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 )
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
+from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -161,15 +161,25 @@ async def test_authntoken_add(
     sqla_session: AsyncSession,
     accounts: NoneType,
 ):
+    authn_token: AuthnToken = params["authn_token"]
     repo = AuthnTokenSQLRepository(sqla_session)
-    await repo.add(params["authn_token"])
-    tok = await repo.by_token(params["authn_token"].token)
-    assert tok.is_ok()
-    token_ok = tok.unwrap()
-    assert token_ok.id == params["authn_token"].id
-    await sqla_session.execute(  # type: ignore
-        delete(orm.authn_tokens).where(orm.authn_tokens.c.id == token_ok.id),
-    )
+    resp = await repo.add(authn_token)
+    assert resp.is_ok()
+
+    qry = select(orm.authn_tokens).filter(orm.authn_tokens.c.id == authn_token.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_token = resp.first()  # type: ignore
+    assert orm_token is not None
+    assert orm_token.id == authn_token.id
+    assert orm_token.token == authn_token.token
+    assert orm_token.created_at == authn_token.created_at
+    assert orm_token.account_id == authn_token.account_id
+    assert orm_token.expires_at == authn_token.expires_at
+    assert orm_token.client_addr == authn_token.client_addr
+    assert orm_token.user_agent == authn_token.user_agent
+
+    resp = await repo.add(authn_token)
+    assert resp.is_err()
 
 
 @pytest.mark.parametrize(
@@ -196,7 +206,8 @@ async def test_authntoken_delete(
     assert tokens_count.first() == (1,)
 
     repo = AuthnTokenSQLRepository(sqla_session)
-    await repo.remove(params["authn_tokens"][0].token)
+    resp = await repo.remove(params["authn_tokens"][0].token)
+    assert resp.is_ok()
 
     tokens_count = await sqla_session.execute(  # type: ignore
         select(func.count(orm.authn_tokens.c.id)).filter_by(
@@ -204,6 +215,10 @@ async def test_authntoken_delete(
         )
     )
     assert tokens_count.first() == (0,)
+
+    resp = await repo.remove(params["authn_tokens"][0].token)
+    assert resp.is_err()
+    assert resp.unwrap_err().value == "Unknown token"
 
 
 @pytest.mark.parametrize(

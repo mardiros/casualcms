@@ -5,6 +5,7 @@ from typing import Any, Callable, Dict, Optional, Type, cast
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
 from sqlalchemy.engine.cursor import CursorResult  # type: ignore
+from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
@@ -20,6 +21,7 @@ from casualcms.domain.repositories import (
     AbstractSiteRepository,
 )
 from casualcms.domain.repositories.authntoken import (
+    AuthnTokenOperationResult,
     AuthnTokenRepositoryError,
     AuthnTokenRepositoryResult,
 )
@@ -399,17 +401,25 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
             )
         return Err(AuthnTokenRepositoryError.token_not_found)
 
-    async def add(self, model: AuthnToken) -> None:
+    async def add(self, model: AuthnToken) -> AuthnTokenOperationResult:
         """Append a new model to the repository."""
-        await self.session.execute(
-            orm.authn_tokens.insert().values(model.dict())  # type: ignore
-        )
+        try:
+            await self.session.execute(
+                orm.authn_tokens.insert().values(model.dict())  # type: ignore
+            )
+        except IntegrityError:
+            return Err(AuthnTokenRepositoryError.integrity_error)
 
-    async def remove(self, token: str) -> None:
+        return Ok(...)
+
+    async def remove(self, token: str) -> AuthnTokenOperationResult:
         """Delete a new model to the repository."""
-        await self.session.execute(
+        cursor: CursorResult = await self.session.execute(
             delete(orm.authn_tokens).where(orm.authn_tokens.c.token == token),
         )
+        if cursor.rowcount == 0:
+            return Err(AuthnTokenRepositoryError.token_not_found)
+        return Ok(...)
 
 
 class SiteSQLRepository(AbstractSiteRepository):

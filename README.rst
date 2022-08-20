@@ -27,8 +27,6 @@ TODO
 
 * Test all unauthenticated calls
 
-* Refactor service to return only result[T|...] for commands
-
 * Add widget to choose a snippet (browse snippet popup)
 
 * Add widget to edit text using a wysiwyg

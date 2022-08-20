@@ -147,7 +147,7 @@ async def update_page(
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
         )
     page = rpage.unwrap()
-
+    payload.pop("meta", None)
     cmd = UpdatePage(
         id=page.id,
         payload=payload,

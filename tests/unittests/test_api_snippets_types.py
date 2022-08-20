@@ -14,6 +14,7 @@ async def test_list_types(client: TestClient, authntoken: AuthnToken):
     assert resp.status_code == 200
     assert resp.json() == [
         {"type": "blog:HeaderSnippet"},
+        {"type": "blog:RelatedPostSnippet"},
         {"type": "tests.casualblog.models:FooterSnippet"},
     ]
 

@@ -17,8 +17,6 @@ TODO
 
 * settings
 
-* snippets
-
 * Display Errors in forms
 
 * Tests error format in API
@@ -34,3 +32,11 @@ TODO
 * Test all unauthenticated calls
 
 * Refactor service to return only result[T|...] for commands
+
+* Add widget to choose a snippet (browse snippet popup)
+
+* Add widget to edit text using a wysiwyg
+
+* Add widget to choose a page while doing page links (bwrowse page popup)
+
+

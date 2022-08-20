@@ -31,6 +31,14 @@ class FooterSnippet(AbstractFooterSnippet):
         template = "footer.jinja2"
 
 
+class RelatedPostSnippet(AbstractFooterSnippet):
+    links: list[Link] = Field(default_factory=list)
+
+    class Meta:
+        template = "replated_post_snippet.jinja2"
+        type = "blog:RelatedPostSnippet"
+
+
 class Paragraph(BaseModel):
     title: Optional[str] = Field()
     body: str = Field(widget="textarea")
@@ -75,6 +83,7 @@ class SectionPage(AbstractPage):
 class BlogPage(AbstractPage):
 
     body: list[Paragraph] = []
+    related_post_snippet: str = ""
 
     class Meta:
         parent_types = [CategoryPage, "blog:BlogPage"]

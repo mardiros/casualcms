@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 
-from casualcms.domain.messages.commands import CreateAccount
-from casualcms.domain.model.account import AuthnToken
+from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -15,29 +14,12 @@ def test_api_authenticate_failed(client: TestClient):
 
 
 async def test_api_authenticate_success(
-    client: TestClient, messagebus: MessageRegistry, uow: AbstractUnitOfWork
+    client: TestClient,
+    messagebus: MessageRegistry,
+    bob_account: Account,
+    alice_account: Account,
+    uow: AbstractUnitOfWork,
 ):
-    bob = CreateAccount(
-        username="bob",
-        password="secret",
-        email="bob@email.net",
-        lang="en",
-    )
-    async with uow as uow:
-        await messagebus.handle(
-            bob,
-            uow,
-        )
-        await messagebus.handle(
-            CreateAccount(
-                username="alice",
-                password="othersecret",
-                email="alice@email.net",
-                lang="en",
-            ),
-            uow,
-        )
-
     resp = client.post(
         "/api/authntokens", json={"username": "bob", "password": "secret"}
     )
@@ -47,7 +29,7 @@ async def test_api_authenticate_success(
         "expires_at": data["expires_at"],
         "lang": "en",
         "token": data["token"],
-        "user_id": bob.id,
+        "user_id": bob_account.id,
         "username": "bob",
     }
 

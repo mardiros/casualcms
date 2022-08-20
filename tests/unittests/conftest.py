@@ -9,6 +9,7 @@ from fastapi.testclient import TestClient
 from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import (
+    CreateAccount,
     CreateAccountCipheredPassword,
     CreateAuthnToken,
     CreatePage,
@@ -74,7 +75,7 @@ async def admin_account(
             ),
             uow,
         )
-    yield account
+    yield account.unwrap()
 
 
 @pytest.fixture()
@@ -236,6 +237,40 @@ async def default_site(
             uow,
         )
     yield site
+
+
+@pytest.fixture
+async def bob_account(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Account, None]:
+    bob = CreateAccount(
+        username="bob",
+        password="secret",
+        email="bob@email.net",
+        lang="en",
+    )
+    async with uow as uow:
+        account = await messagebus.handle(bob, uow)
+    yield account.unwrap()
+
+
+@pytest.fixture
+async def alice_account(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Account, None]:
+    alice = CreateAccount(
+        username="alice",
+        password="othersecret",
+        email="alice@email.net",
+        lang="en",
+    )
+    async with uow as uow:
+        account = await messagebus.handle(alice, uow)
+    yield account.unwrap()
 
 
 @pytest.fixture

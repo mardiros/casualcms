@@ -1,10 +1,12 @@
 import bcrypt
+from result import Err, Ok
 
 from casualcms.domain.messages.commands import (
     CreateAccount,
     CreateAccountCipheredPassword,
 )
 from casualcms.domain.model import Account
+from casualcms.domain.repositories.user import AccountRepositoryResult
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -13,7 +15,7 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_account(
     cmd: CreateAccount,
     uow: AbstractUnitOfWork,
-) -> Account:
+) -> AccountRepositoryResult:
 
     password = bcrypt.hashpw(cmd.password.encode("utf-8"), bcrypt.gensalt()).decode(
         "utf-8"
@@ -27,15 +29,18 @@ async def create_account(
         lang=cmd.lang,
     )
 
-    await uow.accounts.add(account)
-    return account
+    resp = await uow.accounts.add(account)
+    if resp.is_err():
+        return Err(resp.unwrap_err())
+
+    return Ok(account)
 
 
 @listen
 async def create_account_ciphered_password(
     cmd: CreateAccountCipheredPassword,
     uow: AbstractUnitOfWork,
-) -> Account:
+) -> AccountRepositoryResult:
     account = Account(
         id=cmd.id,
         created_at=cmd.created_at,
@@ -45,5 +50,7 @@ async def create_account_ciphered_password(
         lang=cmd.lang,
     )
 
-    await uow.accounts.add(account)
-    return account
+    resp = await uow.accounts.add(account)
+    if resp.is_err():
+        return Err(resp.unwrap_err())
+    return Ok(account)

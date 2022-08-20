@@ -183,9 +183,12 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
     def __init__(self) -> None:
         self.seen = set()
 
-    async def list(self) -> SnippetSequenceRepositoryResult:
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
         """Fetch one snippet by its unique slug."""
-        return Ok(sorted(self.snippets.values(), key=lambda s: s.slug))
+        values = self.snippets.values()
+        if type:
+            values = filter(lambda s: s.__meta__.type == type, values)
+        return Ok(sorted(values, key=lambda s: s.slug))
 
     async def by_id(self, id: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique id."""

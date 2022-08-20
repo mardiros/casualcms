@@ -326,12 +326,14 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         )
         return await self._format_response(orm_snippets)
 
-    async def list(self) -> SnippetSequenceRepositoryResult:
-        """Fetch one snippet by its unique slug."""
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
+        """List all snippets, optionally filters on their types."""
 
-        orm_snippets: CursorResult = await self.session.execute(
-            select(orm.snippets).order_by(orm.snippets.c.slug)
-        )
+        qry = select(orm.snippets)
+        if type:
+            qry = qry.filter_by(type=type)
+        qry = qry.order_by(orm.snippets.c.slug)
+        orm_snippets: CursorResult = await self.session.execute(qry)
         orm_snippet: Any
         snippets: list[Snippet] = []
         for orm_snippet in orm_snippets:

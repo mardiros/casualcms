@@ -28,6 +28,7 @@ from ...casualblog.models import HeaderSnippet, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
+    fake_footer_snippet,
     fake_header_snippet,
     fake_page,
     fake_site,
@@ -589,6 +590,30 @@ async def test_snippet_remove(
         {
             "snippets": [
                 fake_header_snippet(slug="snip-this"),
+                fake_footer_snippet(slug="snip-it"),
+                fake_header_snippet(slug="snip-that"),
+            ],
+        },
+    ],
+)
+async def test_snippet_list_filter_type(
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+):
+    repo = SnippetSQLRepository(sqla_session)
+    rsnippets = await repo.list(type="blog:HeaderSnippet")
+    assert rsnippets.is_ok()
+    snips = rsnippets.unwrap()
+    ss = [s.slug for s in snips]
+    assert ss == ["snip-that", "snip-this"]
+
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "snippets": [
+                fake_header_snippet(slug="snip-this"),
                 fake_header_snippet(slug="snip-it"),
                 fake_header_snippet(slug="snip-that"),
             ],
@@ -604,7 +629,6 @@ async def test_snippet_list(
     snips = rsnippets.unwrap()
     ss = [s.slug for s in snips]
     assert ss == ["snip-it", "snip-that", "snip-this"]
-
 
 @pytest.mark.parametrize(
     "params",

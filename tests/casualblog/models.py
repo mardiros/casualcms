@@ -25,6 +25,8 @@ class AbstractFooterSnippet(Snippet):
 
 
 class FooterSnippet(AbstractFooterSnippet):
+    links: list[Link] = Field(default_factory=list)
+
     class Meta:
         template = "footer.jinja2"
 

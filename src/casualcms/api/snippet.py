@@ -1,4 +1,4 @@
-from typing import Any, MutableMapping, Sequence
+from typing import Any, MutableMapping, Optional, Sequence
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -68,10 +68,11 @@ async def list_snippets(
     request: Request,
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
+    type: Optional[str] = None,
 ) -> Sequence[PartialSnippet]:
 
     async with app.uow as uow:
-        snippets = await uow.snippets.list()
+        snippets = await uow.snippets.list(type=type)
         await uow.rollback()
     if snippets.is_err():
         raise HTTPException(status_code=500, detail=[{"msg": "Internal Server Error"}])

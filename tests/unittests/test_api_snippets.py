@@ -5,7 +5,7 @@ from fastapi.testclient import TestClient
 from casualcms.domain.model.account import AuthnToken
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from ..casualblog.models import HeaderSnippet
+from ..casualblog.models import FooterSnippet, HeaderSnippet
 
 
 async def test_api_create_snippet_unauthenticated(
@@ -62,7 +62,11 @@ async def test_api_list_snippet_unauthenticated(
 
 
 async def test_api_list_snippet(
-    client: TestClient, authntoken: AuthnToken, header_snippet: HeaderSnippet
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    alt_header_snippet: HeaderSnippet,
+    footer_snippet: FooterSnippet,
 ):
     resp = client.get(
         "/api/snippets",
@@ -71,7 +75,30 @@ async def test_api_list_snippet(
         },
     )
     assert resp.status_code == 200
-    assert resp.json() == [{"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"}]
+    assert resp.json() == [
+        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "alt-header"},
+        {"meta": {"type": "tests.casualblog.models:FooterSnippet"}, "slug": "footer"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"},
+    ]
+
+
+async def test_api_list_snippet_filter(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    footer_snippet: FooterSnippet,
+):
+    resp = client.get(
+        "/api/snippets?type=blog:HeaderSnippet",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json() == [
+        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "alt-header"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"},
+    ]
 
 
 async def test_api_patch_snippet(

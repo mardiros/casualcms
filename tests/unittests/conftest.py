@@ -173,6 +173,52 @@ async def header_snippet(
 
 
 @pytest.fixture
+async def alt_header_snippet(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Snippet, None]:
+    async with uow as uow:
+        snippet = await messagebus.handle(
+            CreateSnippet(
+                type="blog:HeaderSnippet",
+                slug="alt-header",
+                body={
+                    "title": "Alternative title",
+                    "links": [
+                        {"title": "cats", "href": "/cats"},
+                        {"title": "dogs", "href": "/dogs"},
+                    ],
+                },
+            ),
+            uow,
+        )
+    yield snippet.unwrap()
+
+
+@pytest.fixture
+async def footer_snippet(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Snippet, None]:
+    async with uow as uow:
+        snippet = await messagebus.handle(
+            CreateSnippet(
+                type="tests.casualblog.models:FooterSnippet",
+                slug="footer",
+                body={
+                    "links": [
+                        {"title": "about", "href": "/about"},
+                    ],
+                },
+            ),
+            uow,
+        )
+    yield snippet.unwrap()
+
+
+@pytest.fixture
 async def default_site(
     app: FastAPI,
     uow: AbstractUnitOfWork,

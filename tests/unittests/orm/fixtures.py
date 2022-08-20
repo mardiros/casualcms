@@ -93,3 +93,12 @@ def fake_header_snippet(**kwargs: Any):
     }
     snippet.update(kwargs)
     return fake_snippet("blog:HeaderSnippet", **snippet)
+
+
+
+def fake_footer_snippet(**kwargs: Any):
+    snippet: Dict[str, Any] = {
+        "links": [{"title": fake.paragraph(nb_sentences=1), "href": fake.url()}],
+    }
+    snippet.update(kwargs)
+    return fake_snippet("tests.casualblog.models:FooterSnippet", **snippet)

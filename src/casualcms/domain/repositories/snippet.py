@@ -2,7 +2,7 @@
 import abc
 import enum
 from types import EllipsisType
-from typing import Sequence
+from typing import Optional, Sequence
 
 from ..model import Snippet
 from .base import AbstractRepository, RepositoryResult
@@ -23,8 +23,8 @@ class AbstractSnippetRepository(AbstractRepository):
     seen: set[Snippet]
 
     @abc.abstractmethod
-    async def list(self) -> SnippetSequenceRepositoryResult:
-        """list all snippets."""
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
+        """List all snippets, optionally filters on their types."""
 
     @abc.abstractmethod
     async def by_id(self, id: str) -> SnippetRepositoryResult:

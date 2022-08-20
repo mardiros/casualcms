@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
-import { screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { SiteEdit } from "../../src/webapp/ui/sites/site_edit";
 import { SiteList } from "../../src/webapp/ui/sites/site_list";
 import { renderWithRouter, waitForLoadingLabel } from "./helpers";
@@ -36,5 +36,43 @@ describe("As a user, I can edit existing sites", () => {
 
     let input = await screen.findByLabelText("hostname", { exact: false });
     expect(input.getAttribute("value")).equal("www.localhost");
+  });
+
+  it("Update the site using the edition form", async () => {
+    renderWithRouter(
+      <>
+        <Route path="/admin/sites" element={<SiteList />}></Route>
+        <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
+      </>,
+      "/admin/sites/edit?hostname=www.localhost"
+    );
+
+    let input = await screen.findByLabelText("hostname", { exact: false });
+    fireEvent.change(input, { target: { value: "www2.localhost" } });
+
+    input = await screen.findByLabelText("Root Page", { exact: false });
+    fireEvent.change(input, { target: { value: "/new-index" } });
+
+    let button = screen.getByText("Submit");
+    fireEvent.click(button);
+
+    const sites = await config.api.site.listSites("");
+    expect(sites.isOk()).equal(true);
+    expect(sites._unsafeUnwrap()).eql([
+      {
+        hostname: "*",
+        default: true,
+        secure: false,
+        root_page_path: "/root",
+      },
+      {
+        hostname: "www2.localhost",
+        root_page_path: "/new-index",
+        default: false,
+        secure: false,
+      },
+    ]);
+    // delete per hostname...
+    await config.api.site.deleteSite("", "www2.localhost");
   });
 });

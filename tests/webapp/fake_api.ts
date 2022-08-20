@@ -234,6 +234,19 @@ export class FakeSiteApi implements ISiteApi {
     return ok(true);
   }
 
+  async updateSite(
+    authntoken: string,
+    hostname: string,
+    site: Site
+  ): Promise<Result<boolean, ApiError>> {
+    const sites = this.sites.filter((site: PartialSite) => {
+      return site.hostname != hostname;
+    });
+    sites.push(site);
+    this.sites = sites;
+    return ok(true);
+  }
+
   async showSite(
     authntoken: string,
     hostname: string

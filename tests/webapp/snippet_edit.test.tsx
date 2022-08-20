@@ -48,10 +48,7 @@ describe("As a user, I can edit existing snippet", () => {
   it("Update snippet using the edition form", async () => {
     renderWithRouter(
       <>
-        <Route
-          path="/admin/snippets"
-          element={<SnippetList />}
-        ></Route>
+        <Route path="/admin/snippets" element={<SnippetList />}></Route>
         <Route
           path="/admin/snippets/edit/:snippetType/:snippetSlug"
           element={<SnippetEdit />}

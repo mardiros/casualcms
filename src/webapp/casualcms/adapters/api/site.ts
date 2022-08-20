@@ -42,6 +42,26 @@ export class FetchSiteApi extends BaseFetchApi implements ISiteApi {
     }
     return ok(jsonData as Site);
   }
+  async updateSite(
+    authntoken: string,
+    hostname: string,
+    site: Site
+  ): Promise<Result<boolean, ApiError>> {
+    const response = await this.fetch(`/api/sites/${hostname}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(site),
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+
+    return ok(true);
+  }
 
   async deleteSite(
     authntoken: string,

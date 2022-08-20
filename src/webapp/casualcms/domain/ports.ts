@@ -76,6 +76,11 @@ export interface ISiteApi {
     authntoken: string,
     hostname: string
   ): Promise<Result<Site, ApiError>>;
+  updateSite(
+    authntoken: string,
+    hostname: string,
+    site: Site
+  ): Promise<Result<boolean, ApiError>>;
   deleteSite(
     authntoken: string,
     hostname: string

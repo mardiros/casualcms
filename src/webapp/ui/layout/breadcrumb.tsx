@@ -13,7 +13,6 @@ type SiteBreadcrumbProps = {
 };
 
 type SnippetBreadcrumbProps = {
-  snippetType?: string | null;
   snippet?: Snippet | null;
   title?: string;
 };
@@ -94,7 +93,6 @@ export const SnippetBreadcrumb: React.FunctionComponent<
   SnippetBreadcrumbProps
 > = (props: SnippetBreadcrumbProps) => {
   const { snippet, title } = props;
-  let snippetType = props.snippetType || snippet?.meta.type;
   return (
     <Breadcrumb padding={5}>
       <BreadcrumbItem>
@@ -102,11 +100,6 @@ export const SnippetBreadcrumb: React.FunctionComponent<
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
-      {snippetType && (
-        <BreadcrumbItem>
-          <Link to={`/admin/snippets/${snippetType}`}>{snippetType}</Link>
-        </BreadcrumbItem>
-      )}
       {snippet && (
         <BreadcrumbItem>
           <Link

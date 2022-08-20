@@ -47,7 +47,7 @@ export const SnippetTypesTable: React.FunctionComponent<
           {snippetTypes.map((tpl, i) => (
             <Tr key={i}>
               <Td>
-                <Link to={`/admin/snippets/${tpl.type}`}>
+                <Link to={`/admin/snippets/new/${tpl.type}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />
                   {tpl.type}
                 </Link>

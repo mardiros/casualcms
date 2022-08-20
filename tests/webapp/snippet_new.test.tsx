@@ -30,11 +30,8 @@ describe("As a user, I can list snippet", () => {
     let button = screen.getByText("Submit");
     fireEvent.click(button);
 
-    await waitForPath("/admin/snippets/blog:HeaderSnippet");
-    const snippets = await config.api.snippet.listSnippets(
-      "",
-      "blog:HeaderSnippet"
-    );
+    await waitForPath("/admin/snippets");
+    const snippets = await config.api.snippet.listSnippets("");
     expect(snippets._unsafeUnwrap()).eql([
       {
         slug: "header",

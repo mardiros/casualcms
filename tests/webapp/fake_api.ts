@@ -257,22 +257,17 @@ export class FakeSiteApi implements ISiteApi {
   }
 }
 
-type snippetRecords = {
-  [k: string]: PartialSnippet[];
-};
-
 export class FakeSnippetApi implements ISnippetApi {
-  snippets: snippetRecords;
+  snippets: PartialSnippet[];
 
   constructor() {
-    this.snippets = {};
+    this.snippets = [];
   }
 
   async listSnippets(
-    authntoken: string,
-    type: string
+    authntoken: string
   ): Promise<Result<PartialSnippet[], Map<string, string>>> {
-    return ok(this.snippets[type] || []);
+    return ok(this.snippets || []);
   }
 
   async updateSnippet(
@@ -281,11 +276,11 @@ export class FakeSnippetApi implements ISnippetApi {
     snippet: Snippet
   ): Promise<Result<boolean, ApiError>> {
     const typ = snippet.meta.type;
-    let snippets = this.snippets[typ].filter((snippet: PartialSnippet) => {
+    let snippets = this.snippets.filter((snippet: PartialSnippet) => {
       return snippet.slug != slug;
     });
     snippets.push(snippet);
-    this.snippets[typ] = snippets;
+    this.snippets = snippets;
     return ok(true);
   }
 
@@ -293,13 +288,11 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string,
     slug: string
   ): Promise<Result<Snippet, ApiError>> {
-    for (const [type, snippets] of Object.entries(this.snippets)) {
-      const filteredDnippets = snippets.filter((snippet: PartialSnippet) => {
-        return snippet.slug == slug;
-      });
-      if (filteredDnippets.length == 1) {
-        return ok(filteredDnippets[0]);
-      }
+    const snippets = this.snippets.filter((snippet: PartialSnippet) => {
+      return snippet.slug == slug;
+    });
+    if (snippets.length == 1) {
+      return ok(snippets[0]);
     }
     let apiError = new Map();
     apiError.set("slug", "Snippet not found");
@@ -316,10 +309,7 @@ export class FakeSnippetApi implements ISnippetApi {
       payload: payload,
     };
     payload["meta"] = { type: type };
-    if (!this.snippets[type]) {
-      this.snippets[type] = [];
-    }
-    this.snippets[type].push(payload);
+    this.snippets.push(payload);
     return ok(true);
   }
   async deleteSnippet(
@@ -327,10 +317,10 @@ export class FakeSnippetApi implements ISnippetApi {
     snippet: Snippet
   ): Promise<Result<boolean, ApiError>> {
     const typ = snippet.meta.type;
-    const snippets = this.snippets[typ].filter((s: PartialSnippet) => {
+    const snippets = this.snippets.filter((s: PartialSnippet) => {
       return s.slug != snippet.slug;
     });
-    this.snippets[typ] = snippets;
+    this.snippets = snippets;
     return ok(true);
   }
 }

@@ -21,7 +21,6 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const [snippet, setSnippet] = React.useState<Snippet | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const params = useParams();
-  const snippetType = params.snippetType || "";
   const snippetSlug = params.snippetSlug || "";
 
   const [template, setTemplate] = React.useState<SnippetType | null>(null);
@@ -30,9 +29,12 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplate() {
+      if (!snippet) {
+        return;
+      }
       const template = await config.api.snippetType.showSnippetType(
         token,
-        snippetType
+        snippet.meta.type
       );
       template
         .map((tpl: SnippetType) => setTemplate(tpl))
@@ -45,7 +47,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       setError(null);
       setTemplate(null);
     };
-  }, [snippetType]);
+  }, [snippet]);
 
   React.useEffect(() => {
     async function loadSnippet() {
@@ -68,7 +70,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
     await config.api.snippet.updateSnippet(token, snippetSlug, snippet);
-    navigate(`/admin/snippets/${snippetType}`, { replace: true });
+    navigate(`/admin/snippets`, { replace: true });
   };
 
   return (

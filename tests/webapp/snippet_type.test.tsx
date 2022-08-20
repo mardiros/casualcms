@@ -35,11 +35,11 @@ describe("As a user, I can list snippet", () => {
     );
     let link = screen.getByText("blog:HeaderSnippet", { exact: false });
     expect(link.getAttribute("href")).equal(
-      "/admin/snippets/blog:HeaderSnippet"
+      "/admin/snippets/new/blog:HeaderSnippet"
     );
     link = screen.getByText("blog:FooterSnippet", { exact: false });
     expect(link.getAttribute("href")).equal(
-      "/admin/snippets/blog:FooterSnippet"
+      "/admin/snippets/new/blog:FooterSnippet"
     );
   });
 

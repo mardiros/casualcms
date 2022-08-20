@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Iterable, Optional
 
 from result import Err, Ok
 
@@ -184,8 +184,8 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         self.seen = set()
 
     async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
-        """Fetch one snippet by its unique slug."""
-        values = self.snippets.values()
+        """List all snippets, optionally filters on their types."""
+        values: Iterable[Snippet] = self.snippets.values()
         if type:
             values = filter(lambda s: s.__meta__.type == type, values)
         return Ok(sorted(values, key=lambda s: s.slug))

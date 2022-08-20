@@ -6,11 +6,9 @@ import { ApiError, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async listSnippets(
-    authntoken: string,
-    type: string
+    authntoken: string
   ): Promise<Result<PartialSnippet[], ApiError>> {
-    const qs = new URLSearchParams({ type: type });
-    const response = await this.fetch(`/api/snippets?${qs}`, {
+    const response = await this.fetch(`/api/snippets`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

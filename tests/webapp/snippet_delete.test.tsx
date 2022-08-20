@@ -47,10 +47,7 @@ describe("As a user, I can delete a snippet", () => {
     let link = screen.getByText("Delete this snippet");
     fireEvent.click(link);
 
-    let subList = await config.api.snippet.listSnippets(
-      "",
-      "blog:HeaderSnippet"
-    );
+    let subList = await config.api.snippet.listSnippets("");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {
@@ -69,7 +66,7 @@ describe("As a user, I can delete a snippet", () => {
     link = screen.getByText("Confirm Deletion");
     fireEvent.click(link);
 
-    subList = await config.api.snippet.listSnippets("", "blog:HeaderSnippet");
+    subList = await config.api.snippet.listSnippets("");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {

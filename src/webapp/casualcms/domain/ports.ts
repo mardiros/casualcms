@@ -88,10 +88,7 @@ export interface ISnippetApi {
     type: string,
     payload: any
   ): Promise<Result<boolean, ApiError>>;
-  listSnippets(
-    authntoken: string,
-    type: string
-  ): Promise<Result<PartialSnippet[], ApiError>>;
+  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
   showSnippet(
     authntoken: string,
     slug: string

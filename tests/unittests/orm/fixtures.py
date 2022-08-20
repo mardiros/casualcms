@@ -95,7 +95,6 @@ def fake_header_snippet(**kwargs: Any):
     return fake_snippet("blog:HeaderSnippet", **snippet)
 
 
-
 def fake_footer_snippet(**kwargs: Any):
     snippet: Dict[str, Any] = {
         "links": [{"title": fake.paragraph(nb_sentences=1), "href": fake.url()}],

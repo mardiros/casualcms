@@ -607,7 +607,6 @@ async def test_snippet_list_filter_type(
     assert ss == ["snip-that", "snip-this"]
 
 
-
 @pytest.mark.parametrize(
     "params",
     [
@@ -629,6 +628,7 @@ async def test_snippet_list(
     snips = rsnippets.unwrap()
     ss = [s.slug for s in snips]
     assert ss == ["snip-it", "snip-that", "snip-this"]
+
 
 @pytest.mark.parametrize(
     "params",

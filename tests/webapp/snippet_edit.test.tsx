@@ -49,7 +49,7 @@ describe("As a user, I can edit existing snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippets/:snippetType"
+          path="/admin/snippets"
           element={<SnippetList />}
         ></Route>
         <Route
@@ -69,7 +69,7 @@ describe("As a user, I can edit existing snippet", () => {
     expect(button).not.equal(null);
     fireEvent.click(button);
 
-    await waitForPath("/admin/snippets/blog:HeaderSnippet");
+    await waitForPath("/admin/snippets");
 
     const snippet = await config.api.snippet.showSnippet("", "header");
     expect(snippet.isOk()).equal(true);

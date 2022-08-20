@@ -48,9 +48,14 @@ async def create_site(
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
-        site = await app.bus.handle(cmd, uow)
+        rsite = await app.bus.handle(cmd, uow)
+        if rsite.is_err():
+            raise HTTPException(
+                status_code=500,
+                detail=[{"loc": ["path", "hostname"], "msg": rsite.unwrap_err().value}],
+            )
         await uow.commit()
-
+    site = rsite.unwrap()
     return PartialSite(
         hostname=site.hostname,
         default=site.default,

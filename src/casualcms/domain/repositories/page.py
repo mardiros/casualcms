@@ -1,11 +1,10 @@
 """Account repository."""
 import abc
 import enum
-from types import EllipsisType
 from typing import Optional, Sequence
 
 from ..model import Page
-from .base import AbstractRepository, RepositoryResult
+from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class PageRepositoryError(enum.Enum):
@@ -16,7 +15,7 @@ class PageRepositoryError(enum.Enum):
 
 PageRepositoryResult = RepositoryResult[Page, PageRepositoryError]
 PageSequenceRepositoryResult = RepositoryResult[Sequence[Page], PageRepositoryError]
-PageOperationResult = RepositoryResult[EllipsisType, PageRepositoryError]
+PageOperationResult = OperationResult[PageRepositoryError]
 
 
 class AbstractPageRepository(AbstractRepository):

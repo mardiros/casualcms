@@ -36,6 +36,7 @@ from casualcms.domain.repositories.snippet import (
     SnippetSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
+    AccountOperationResult,
     AccountRepositoryError,
     AccountRepositoryResult,
 )
@@ -54,10 +55,11 @@ class AccountInMemoryRepository(AbstractAccountRepository):
             return Ok(self.accounts[username])
         return Err(AccountRepositoryError.user_not_found)
 
-    async def add(self, model: Account) -> None:
+    async def add(self, model: Account) -> AccountOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.accounts[model.username] = model  # type: ignore
+        return Ok(...)
 
 
 class PageInMemoryRepository(AbstractPageRepository):

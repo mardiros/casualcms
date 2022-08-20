@@ -1,9 +1,8 @@
 import abc
 import enum
-from types import EllipsisType
 
 from ..model import AuthnToken
-from .base import AbstractRepository, RepositoryResult
+from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class AuthnTokenRepositoryError(enum.Enum):
@@ -12,7 +11,7 @@ class AuthnTokenRepositoryError(enum.Enum):
 
 
 AuthnTokenRepositoryResult = RepositoryResult[AuthnToken, AuthnTokenRepositoryError]
-AuthnTokenOperationResult = RepositoryResult[EllipsisType, AuthnTokenRepositoryError]
+AuthnTokenOperationResult = OperationResult[AuthnTokenRepositoryError]
 
 
 class AbstractAuthnRepository(AbstractRepository):

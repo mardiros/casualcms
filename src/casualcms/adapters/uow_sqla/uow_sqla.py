@@ -45,6 +45,7 @@ from casualcms.domain.repositories.snippet import (
     SnippetSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.user import (
+    AccountOperationResult,
     AccountRepositoryError,
     AccountRepositoryResult,
 )
@@ -78,12 +79,16 @@ class AccountSQLRepository(AbstractAccountRepository):
             )
         return Err(AccountRepositoryError.user_not_found)
 
-    async def add(self, model: Account) -> None:
+    async def add(self, model: Account) -> AccountOperationResult:
         """Append a new model to the repository."""
-        await self.session.execute(  # type: ignore
-            orm.accounts.insert().values(model.dict())  # type: ignore
-        )
+        try:
+            await self.session.execute(  # type: ignore
+                orm.accounts.insert().values(model.dict())  # type: ignore
+            )
+        except IntegrityError:
+            return Err(AccountRepositoryError.integrity_error)
         self.seen.add(model)
+        return Ok(...)
 
 
 def format_page(page: Page) -> Dict[str, Any]:

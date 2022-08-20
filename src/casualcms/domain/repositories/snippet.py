@@ -1,11 +1,10 @@
 """Account repository."""
 import abc
 import enum
-from types import EllipsisType
 from typing import Optional, Sequence
 
 from ..model import Snippet
-from .base import AbstractRepository, RepositoryResult
+from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class SnippetRepositoryError(enum.Enum):
@@ -16,7 +15,7 @@ SnippetRepositoryResult = RepositoryResult[Snippet, SnippetRepositoryError]
 SnippetSequenceRepositoryResult = RepositoryResult[
     Sequence[Snippet], SnippetRepositoryError
 ]
-SnippetOperationResult = RepositoryResult[EllipsisType, SnippetRepositoryError]
+SnippetOperationResult = OperationResult[SnippetRepositoryError]
 
 
 class AbstractSnippetRepository(AbstractRepository):

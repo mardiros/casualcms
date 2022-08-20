@@ -1,12 +1,11 @@
 """Account repository."""
 import abc
 import enum
-from types import EllipsisType
 from typing import Sequence
 
 from casualcms.domain.model import Site
 
-from .base import AbstractRepository, RepositoryResult
+from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class SiteRepositoryError(enum.Enum):
@@ -16,7 +15,7 @@ class SiteRepositoryError(enum.Enum):
 
 SiteRepositoryResult = RepositoryResult[Site, SiteRepositoryError]
 SiteSequenceRepositoryResult = RepositoryResult[Sequence[Site], SiteRepositoryError]
-SiteOperationResult = RepositoryResult[EllipsisType, SiteRepositoryError]
+SiteOperationResult = OperationResult[SiteRepositoryError]
 
 
 class AbstractSiteRepository(AbstractRepository):

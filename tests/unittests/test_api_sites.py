@@ -91,6 +91,42 @@ def test_get_site_404(
     }
 
 
+async def test_update_site(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    sub_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    old_hostname = default_site.hostname
+    resp = client.patch(
+        f"/api/sites/{old_hostname}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json={
+            "hostname": "new.example.net",
+            "root_page_path": sub_page.path,
+            "secure": True,
+        },
+    )
+    assert resp.status_code == 202
+    assert resp.json() == {"message": "Resource Updated"}
+
+    async with uow as uow:
+        rsaved_site = await uow.sites.by_hostname("new.example.net")
+    assert rsaved_site.is_ok()
+    saved_site = rsaved_site.unwrap()
+    assert saved_site.id == default_site.id
+    assert saved_site.page_id == default_site.page_id
+    assert saved_site.secure is True
+
+    async with uow as uow:
+        old_site = await uow.sites.by_hostname(old_hostname)
+    assert old_site.is_err()
+    assert old_site.unwrap_err().name == "site_not_found"
+
+
 async def test_delete_site(
     client: TestClient,
     authntoken: AuthnToken,

@@ -5,10 +5,15 @@ from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
-from casualcms.domain.messages.commands import CreateSite, DeleteSite, generate_id
+from casualcms.domain.messages.commands import (
+    CreateSite,
+    DeleteSite,
+    UpdateSite,
+    generate_id,
+)
 from casualcms.domain.model import AuthnToken
 
-from .base import get_token_info
+from .base import RESOURCE_UPDATED, HTTPMessage, get_token_info
 
 
 class PartialSite(BaseModel):
@@ -52,6 +57,46 @@ async def create_site(
         root_page_path=site.root_page_path,
         secure=site.secure,
     )
+
+
+async def update_site(
+    request: Request,
+    current_hostname: str = Field(...),
+    default: bool | None = Body(None),
+    secure: bool | None = Body(None),
+    hostname: str | None = Body(None),
+    root_page_path: str | None = Body(None),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> HTTPMessage:
+
+    async with app.uow as uow:
+        rsite = await uow.sites.by_hostname(current_hostname)
+        if rsite.is_err():
+            raise HTTPException(
+                status_code=422,
+                detail=[
+                    {
+                        "loc": ["path", "current_hostname"],
+                        "msg": rsite.unwrap_err().value,
+                    }
+                ],
+            )
+        site = rsite.unwrap()
+        cmd = UpdateSite(
+            id=site.id,
+            hostname=hostname,
+            default=default,
+            root_page_path=root_page_path,
+            secure=secure,
+        )
+        cmd.metadata.clientAddr = request.client.host
+        cmd.metadata.userId = token.account_id
+
+        site = await app.bus.handle(cmd, uow)
+        await uow.commit()
+
+    return RESOURCE_UPDATED
 
 
 async def list_sites(

@@ -2,7 +2,7 @@ from typing import cast
 
 from result import Err
 
-from casualcms.domain.messages.commands import CreateSite, DeleteSite
+from casualcms.domain.messages.commands import CreateSite, DeleteSite, UpdateSite
 from casualcms.domain.model import Site
 from casualcms.domain.repositories.site import SiteOperationResult, SiteRepositoryError
 from casualcms.service.messagebus import listen
@@ -25,6 +25,29 @@ async def create_site(
     )
     await uow.sites.add(site)
     return site
+
+
+@listen
+async def update_site(
+    cmd: UpdateSite,
+    uow: AbstractUnitOfWork,
+) -> SiteOperationResult:
+    async with uow as uow:
+        rsite = await uow.sites.by_id(cmd.id)
+        if rsite.is_err():
+            return Err(rsite.unwrap_err())
+
+    site = rsite.unwrap()
+    if cmd.hostname:
+        site.hostname = cmd.hostname
+    if cmd.root_page_path:
+        site.root_page_path = cmd.root_page_path
+    if cmd.default:
+        site.default = cmd.default
+    if cmd.secure:
+        site.secure = cmd.secure
+    resp = await uow.sites.update(site)
+    return resp
 
 
 @listen

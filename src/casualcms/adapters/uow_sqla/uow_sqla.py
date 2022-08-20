@@ -262,10 +262,10 @@ class PageSQLRepository(AbstractPageRepository):
         """Update model in the repository."""
         page = format_page(model)
         page.pop("id")
-        rcurs: CursorResult = await self.session.execute(
+        cursor: CursorResult = await self.session.execute(
             orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
         )
-        if rcurs.rowcount == 0:
+        if cursor.rowcount == 0:
             return Err(PageRepositoryError.page_not_found)
         self.seen.add(model)
         return Ok(...)
@@ -442,16 +442,21 @@ class SiteSQLRepository(AbstractSiteRepository):
             )
         return Ok(sites)
 
-    async def add(self, model: Site) -> None:
+    async def add(self, model: Site) -> SiteOperationResult:
         """Append a new model to the repository."""
         data = model.dict()
         data["created_at"] = model.created_at
-        page = await PageSQLRepository(self.session).by_path(data.pop("root_page_path"))
+        rpage = await PageSQLRepository(self.session).by_path(
+            data.pop("root_page_path")
+        )
+        if rpage.is_err():
+            return Err(SiteRepositoryError.root_page_not_found)
 
-        page_ok = page.unwrap()  # FIXME, should return Ok(...)
-        data["page_id"] = page_ok.id
+        page = rpage.unwrap()  # FIXME, should return Ok(...)
+        data["page_id"] = page.id
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
         self.seen.add(model)
+        return Ok(...)
 
     async def _to_site_result(self, orm_sites: CursorResult) -> SiteRepositoryResult:
         orm_site = orm_sites.first()
@@ -488,7 +493,25 @@ class SiteSQLRepository(AbstractSiteRepository):
         )
         return await self._to_site_result(orm_sites)
 
+    async def update(self, model: Site) -> SiteOperationResult:
+        """Update given model into the repository."""
+        site = model.dict(exclude={"id", "page_id", "root_page_path"})
+
+        rpage = await PageSQLRepository(self.session).by_path(model.root_page_path)
+        if rpage.is_err():
+            return Err(SiteRepositoryError.root_page_not_found)
+        page = rpage.unwrap()  # FIXME, should return Ok(...)
+        site["page_id"] = page.id
+        cursor: CursorResult = await self.session.execute(
+            orm.sites.update(orm.sites.c.id == model.id, values=site)  # type: ignore
+        )
+        if cursor.rowcount == 0:
+            return Err(SiteRepositoryError.site_not_found)
+
+        return Ok(...)
+
     async def remove(self, model: Site) -> SiteOperationResult:
+        """Remove given model from the repository."""
         await self.session.execute(delete(orm.sites).where(orm.sites.c.id == model.id))
         return Ok(...)
 

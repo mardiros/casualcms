@@ -95,6 +95,16 @@ class CreateSite(Command):
     metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)
 
 
+class UpdateSite(Command):
+    id: str = Field(default_factory=generate_id)
+    hostname: str | None = Field(...)
+    root_page_path: str | None = Field(...)
+    default: bool | None = Field(...)
+    secure: bool | None = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)
+
+
 class DeleteSite(Command):
     id: str = Field(...)
     deleted_at: datetime = Field(default_factory=datetime.now)

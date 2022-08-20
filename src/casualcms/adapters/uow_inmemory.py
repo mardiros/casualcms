@@ -144,11 +144,12 @@ class SiteInMemoryRepository(AbstractSiteRepository):
     def __init__(self) -> None:
         self.seen = set()
 
-    async def add(self, model: Site) -> None:
+    async def add(self, model: Site) -> SiteOperationResult:
         """Append a new model to the repository."""
         self.sites.append(model)
         self.sites.sort(key=lambda s: s.hostname)
         self.seen.add(model)
+        return Ok(...)
 
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch all sites."""
@@ -168,7 +169,18 @@ class SiteInMemoryRepository(AbstractSiteRepository):
                 return Ok(site)
         return Err(SiteRepositoryError.site_not_found)
 
+    async def update(self, model: Site) -> SiteOperationResult:
+        """Update given model into the repository."""
+        sites: list[Site] = []
+        for site in self.sites:
+            if site.id != model.id:
+                sites.append(site)
+        sites.append(model)
+        self.sites = sites
+        return Ok(...)
+
     async def remove(self, model: Site) -> SiteOperationResult:
+        """Remove given model from the repository."""
         sites: list[Site] = []
         for site in self.sites:
             if site.id != model.id:

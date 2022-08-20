@@ -226,7 +226,7 @@ async def default_site(
     home_page: Page,
 ) -> AsyncGenerator[Site, None]:
     async with uow as uow:
-        page = await messagebus.handle(
+        site = await messagebus.handle(
             CreateSite(
                 hostname="www.example.net",
                 default=True,
@@ -235,7 +235,7 @@ async def default_site(
             ),
             uow,
         )
-    yield page
+    yield site
 
 
 @pytest.fixture

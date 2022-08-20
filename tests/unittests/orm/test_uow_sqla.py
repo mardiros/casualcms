@@ -19,6 +19,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     SQLUnitOfWorkBySession,
 )
 from casualcms.config import Settings
+from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -764,6 +765,66 @@ async def test_site_by_hostname(
     assert site_ok.root_page_path == "/root/tech"
 
     rsite = await repo.by_hostname("www3")
+    assert rsite.is_err()
+    site_err = rsite.unwrap_err()
+    assert site_err.name == "site_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(cat_page, hostname="www1"),
+                fake_site(cat2_page, hostname="www2"),
+            ],
+        },
+    ],
+)
+async def test_site_update(
+    params: Any,
+    sqla_session: AsyncSession,
+    pages: Sequence[Page],
+    sites: Sequence[Site],
+):
+
+    site = sites[1]
+    site.hostname = "www"
+    site.root_page_path = "/root"
+    site.default = True
+    repo = SiteSQLRepository(sqla_session)
+    rsite = await repo.update(site)
+    assert rsite.is_ok()
+
+    qry = select(orm.sites).filter(orm.sites.c.id == site.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    updated_site: orm.sites = resp.first()  # type: ignore
+    assert updated_site.hostname == "www"
+    assert updated_site.default is True
+    assert updated_site.page_id == home_page.id
+
+    qry = select(orm.sites).filter(orm.sites.c.id == sites[0].id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    not_updated_site: orm.sites = resp.first()  # type: ignore
+    assert not_updated_site.hostname == "www1"
+    assert not_updated_site.page_id == cat_page.id
+
+    site.root_page_path = "/e404"
+    rsite = await repo.update(site)
+    assert rsite.is_err()
+    site_err = rsite.unwrap_err()
+    assert site_err.name == "root_page_not_found"
+
+    site = Site(
+        id=generate_id(),
+        page_id=None,
+        hostname="x",
+        root_page_path="/root",
+        default=False,
+        secure=False,
+    )
+    rsite = await repo.update(site)
     assert rsite.is_err()
     site_err = rsite.unwrap_err()
     assert site_err.name == "site_not_found"

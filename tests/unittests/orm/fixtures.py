@@ -34,7 +34,7 @@ def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
         "id": fake.uuid4(),
         "token": generate_secret(),
         "created_at": fake.past_datetime(),
-        # "account_id": account.id,  FK !
+        # "user_id": account.id,  FK !
         "expires_at": fake.past_datetime(),
         "username": fake.user_name(),
         "client_addr": "1.2.3.4",

@@ -36,7 +36,7 @@ async def authenticate(
 
     client_addr: str = request.client.host
     cmd = CreateAuthnToken(
-        account_id=authenticated_user.id,
+        user_id=authenticated_user.id,
         user_agent=user_agent,
         client_addr=client_addr,
     )
@@ -44,16 +44,19 @@ async def authenticate(
     cmd.metadata.userId = authenticated_user.id
 
     async with app.uow as uow:
-        await app.bus.handle(cmd, uow)
+        resp = await app.bus.handle(cmd, uow)
+        if resp.is_err():
+            raise HTTPException(
+                status_code=500,
+                detail=[{"loc": ["body", "username"], "msg": "Unknown Error"}],
+            )
         await uow.commit()
 
-    return {
-        "token": cmd.token,
-        "user_id": authenticated_user.id,
-        "username": authenticated_user.username,
-        "expires_at": cmd.expires_at,
-        "lang": authenticated_user.lang,
-    }
+    token: AuthnToken = resp.unwrap()
+    token_dict = token.dict(exclude={"id", "created_at", "client_addr", "user_agent"})
+    token_dict["username"] = authenticated_user.username
+    token_dict["lang"] = authenticated_user.lang
+    return token_dict
 
 
 async def logout(
@@ -65,12 +68,12 @@ async def logout(
     client_addr: str = request.client.host
     cmd = DeleteAuthnToken(
         token=token.token,
-        account_id=token.account_id,
+        user_id=token.user_id,
         user_agent=user_agent,
         client_addr=client_addr,
     )
     cmd.metadata.clientAddr = client_addr
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
         await app.bus.handle(cmd, uow)

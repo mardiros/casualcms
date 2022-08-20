@@ -18,7 +18,7 @@ def test_account_password_match(admin_account: Account):
 def test_authn_token_has_expired(params: dict[str, Any]):
     tok = AuthnToken(
         id="",
-        account_id="",
+        user_id="",
         created_at=datetime.utcnow(),
         token="",
         expires_at=datetime.utcnow() + timedelta(seconds=params["timedelta"]),

@@ -64,7 +64,7 @@ async def create_page(
 
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
         rpage = await app.bus.handle(cmd, uow)
@@ -153,7 +153,7 @@ async def update_page(
         payload=payload,
     )
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         rpage = await app.bus.handle(cmd, uow)
         if rpage.is_err():
@@ -191,7 +191,7 @@ async def delete_page(
         path=p.path,
     )
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
         if resp.is_err():

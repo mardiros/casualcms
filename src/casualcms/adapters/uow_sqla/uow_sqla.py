@@ -397,7 +397,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
                 AuthnToken(
                     id=orm_token.id,
                     token=orm_token.token,
-                    account_id=orm_token.account_id,
+                    user_id=orm_token.user_id,
                     created_at=orm_token.created_at,
                     expires_at=orm_token.expires_at,
                     client_addr=str(orm_token.client_addr),

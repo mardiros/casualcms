@@ -88,13 +88,13 @@ async def authntoken(
     async with uow as uow:
         token = await messagebus.handle(
             CreateAuthnToken(
-                account_id=admin_account.id,
+                user_id=admin_account.id,
                 user_agent="Bot/2.0",
                 client_addr="1.2.3.4",
             ),
             uow,
         )
-    yield token
+    yield token.unwrap()
 
 
 @pytest.fixture
@@ -236,7 +236,7 @@ async def default_site(
             ),
             uow,
         )
-    yield site
+    yield site.unwrap()
 
 
 @pytest.fixture

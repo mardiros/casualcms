@@ -41,13 +41,13 @@ class CreateAccountCipheredPassword(Command):
 
 
 class CreateAuthnToken(Command):
-    account_id: str = Field(...)  # UUID
+    user_id: str = Field(...)  # UUID
     user_agent: str = Field(...)
     client_addr: str = Field(...)
     expires_at: datetime = Field(
         default_factory=lambda: datetime.now() + timedelta(minutes=30)
     )
-    created_at: datetime = Field(default_factory=datetime.now)
+    created_at: datetime = Field(default_factory=datetime.now, exclude=True)
     id: str = Field(default_factory=generate_id)
     token: str = Field(default_factory=generate_secret)
     metadata: Metadata = Metadata(category="user", name="authenticate", schemaVersion=1)
@@ -55,7 +55,7 @@ class CreateAuthnToken(Command):
 
 class DeleteAuthnToken(Command):
     token: str = Field(default_factory=generate_secret)
-    account_id: str = Field(...)  # UUID
+    user_id: str = Field(...)  # UUID
     user_agent: str = Field(...)
     client_addr: str = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)

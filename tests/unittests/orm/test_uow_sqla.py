@@ -120,7 +120,7 @@ async def test_account_add(sqla_session: AsyncSession):
     [
         {
             "accounts": [alice, bob, dylan],  # type: ignore
-            "authn_tokens": [fake_authn_tokens(account_id=bob.id)],
+            "authn_tokens": [fake_authn_tokens(user_id=bob.id)],
         },
     ],
 )
@@ -137,7 +137,7 @@ async def test_authntoken_by_token(
     assert tok_ok.id == params["authn_tokens"][0].id
     assert tok_ok.created_at == params["authn_tokens"][0].created_at
     assert tok_ok.expires_at == params["authn_tokens"][0].expires_at
-    assert tok_ok.account_id == bob.id
+    assert tok_ok.user_id == bob.id
     assert tok_ok.client_addr == "1.2.3.4"
     assert tok_ok.user_agent == "Mozilla/5"
 
@@ -152,7 +152,7 @@ async def test_authntoken_by_token(
     [
         {
             "accounts": [bob],  # type: ignore
-            "authn_token": fake_authn_tokens(account_id=bob.id),
+            "authn_token": fake_authn_tokens(user_id=bob.id),
         },
     ],
 )
@@ -173,7 +173,7 @@ async def test_authntoken_add(
     assert orm_token.id == authn_token.id
     assert orm_token.token == authn_token.token
     assert orm_token.created_at == authn_token.created_at
-    assert orm_token.account_id == authn_token.account_id
+    assert orm_token.user_id == authn_token.user_id
     assert orm_token.expires_at == authn_token.expires_at
     assert orm_token.client_addr == authn_token.client_addr
     assert orm_token.user_agent == authn_token.user_agent
@@ -187,7 +187,7 @@ async def test_authntoken_add(
     [
         {
             "accounts": [alice, bob, dylan],  # type: ignore
-            "authn_tokens": [fake_authn_tokens(account_id=bob.id)],
+            "authn_tokens": [fake_authn_tokens(user_id=bob.id)],
         },
     ],
 )

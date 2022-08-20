@@ -40,7 +40,7 @@ class AuthnToken(BaseModel):
 
     id: uuid = Field(...)
     token: str = Field(...)
-    account_id: uuid = Field(...)
+    user_id: uuid = Field(...)
     created_at: datetime = Field(...)
     expires_at: datetime = Field(...)
     client_addr: str = Field(...)

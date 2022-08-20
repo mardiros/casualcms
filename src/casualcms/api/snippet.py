@@ -43,7 +43,7 @@ async def create_snippet(
     slug = payload.pop("slug")
     cmd = CreateSnippet(type=type, slug=slug, body=payload)
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
         rsnippet = await app.bus.handle(cmd, uow)
@@ -119,7 +119,7 @@ async def update_snippet(
     payload.pop("meta", None)
     cmd = UpdateSnippet(id=snippet.id, slug=new_slug, body=payload)
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
         if resp.is_err():
@@ -160,7 +160,7 @@ async def delete_snippet(
         slug=snippet.slug,
     )
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
         if resp.is_err():

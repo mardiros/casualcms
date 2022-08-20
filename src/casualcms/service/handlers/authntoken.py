@@ -1,5 +1,11 @@
+from result import Err, Ok
+
 from casualcms.domain.messages import commands
 from casualcms.domain.model import AuthnToken
+from casualcms.domain.repositories.authntoken import (
+    AuthnTokenOperationResult,
+    AuthnTokenRepositoryResult,
+)
 
 from .. import unit_of_work
 from ..messagebus import listen
@@ -9,24 +15,25 @@ from ..messagebus import listen
 async def create_authn_token(
     cmd: commands.CreateAuthnToken,
     uow: unit_of_work.AbstractUnitOfWork,
-) -> AuthnToken:
+) -> AuthnTokenRepositoryResult:
     token = AuthnToken(
         id=cmd.id,
         token=cmd.token,
         created_at=cmd.created_at,
         expires_at=cmd.expires_at,
-        account_id=cmd.account_id,
+        user_id=cmd.user_id,
         client_addr=cmd.client_addr,
         user_agent=cmd.user_agent,
     )
-    await uow.authn_tokens.add(token)
-    return token
+    resp = await uow.authn_tokens.add(token)
+    if resp.is_err():
+        return Err(resp.unwrap_err())
+    return Ok(token)
 
 
 @listen
 async def delete_authn_token(
     cmd: commands.DeleteAuthnToken,
     uow: unit_of_work.AbstractUnitOfWork,
-) -> None:
-    await uow.authn_tokens.remove(cmd.token)
-    return
+) -> AuthnTokenOperationResult:
+    return await uow.authn_tokens.remove(cmd.token)

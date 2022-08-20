@@ -45,7 +45,7 @@ async def create_site(
         secure=secure,
     )
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
         site = await app.bus.handle(cmd, uow)
@@ -91,7 +91,7 @@ async def update_site(
             secure=secure,
         )
         cmd.metadata.clientAddr = request.client.host
-        cmd.metadata.userId = token.account_id
+        cmd.metadata.userId = token.user_id
 
         site = await app.bus.handle(cmd, uow)
         await uow.commit()
@@ -180,7 +180,7 @@ async def delete_site(
         hostname=s.hostname,
     )
     cmd.metadata.clientAddr = request.client.host
-    cmd.metadata.userId = token.account_id
+    cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
         if resp.is_err():

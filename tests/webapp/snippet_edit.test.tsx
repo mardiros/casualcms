@@ -15,16 +15,25 @@ describe("As a user, I can edit existing snippet", () => {
     });
   });
   after(async () => {
-    await config.api.snippet.deleteSnippet("", "header");
+    await config.api.snippet.deleteSnippet("", {
+      slug: "header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
   });
 
   it("Load the snippet in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/snippets" element={<SnippetList />}></Route>
-        <Route path="/admin/snippets/edit" element={<SnippetEdit />}></Route>
+        <Route
+          path="/admin/snippets/:snippetType"
+          element={<SnippetList />}
+        ></Route>
+        <Route
+          path="/admin/snippets/edit/:snippetType/:snippetSlug"
+          element={<SnippetEdit />}
+        ></Route>
       </>,
-      "/admin/snippets/edit?slug=header"
+      "/admin/snippets/edit/blog:HeaderSnippet/header"
     );
 
     await waitForLoadingLabel("Loading form...");
@@ -39,10 +48,16 @@ describe("As a user, I can edit existing snippet", () => {
   it("Update snippet using the edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/snippets" element={<SnippetList />}></Route>
-        <Route path="/admin/snippets/edit" element={<SnippetEdit />}></Route>
+        <Route
+          path="/admin/snippets/:snippetType"
+          element={<SnippetList />}
+        ></Route>
+        <Route
+          path="/admin/snippets/edit/:snippetType/:snippetSlug"
+          element={<SnippetEdit />}
+        ></Route>
       </>,
-      "/admin/snippets/edit?slug=header"
+      "/admin/snippets/edit/blog:HeaderSnippet/header"
     );
 
     await waitForLoadingLabel("Loading form...");
@@ -54,7 +69,7 @@ describe("As a user, I can edit existing snippet", () => {
     expect(button).not.equal(null);
     fireEvent.click(button);
 
-    await waitForPath("/admin/snippets");
+    await waitForPath("/admin/snippets/blog:HeaderSnippet");
 
     const snippet = await config.api.snippet.showSnippet("", "header");
     expect(snippet.isOk()).equal(true);

@@ -15,27 +15,27 @@ import { FetchSnippetTypeApi } from "../adapters/api/snippet_type";
 
 export interface IApi {
   account: IAccountApi;
-  page_type: IPageTypeApi;
+  pageType: IPageTypeApi;
   page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
-  snippet_type: ISnippetTypeApi;
+  snippetType: ISnippetTypeApi;
 }
 
 export class Api implements IApi {
   account: IAccountApi;
   page: IPageApi;
-  page_type: IPageTypeApi;
+  pageType: IPageTypeApi;
   site: ISiteApi;
   snippet: ISnippetApi;
-  snippet_type: ISnippetTypeApi;
+  snippetType: ISnippetTypeApi;
 
   constructor() {
     this.account = new FetchAccountApi();
     this.page = new FetchPageApi();
-    this.page_type = new FetchPageTypeApi();
+    this.pageType = new FetchPageTypeApi();
     this.site = new FetchSiteApi();
     this.snippet = new FetchSnippetApi();
-    this.snippet_type = new FetchSnippetTypeApi();
+    this.snippetType = new FetchSnippetTypeApi();
   }
 }

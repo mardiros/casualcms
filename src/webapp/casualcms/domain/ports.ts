@@ -32,7 +32,7 @@ export interface IPageTypeApi {
   ): Promise<Result<PartialPageType[], ApiError>>;
   showPageType(
     authntoken: string,
-    tpltype: string
+    pageType: string
   ): Promise<Result<PageType, ApiError>>;
 }
 
@@ -88,7 +88,10 @@ export interface ISnippetApi {
     type: string,
     payload: any
   ): Promise<Result<boolean, ApiError>>;
-  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
+  listSnippets(
+    authntoken: string,
+    type: string
+  ): Promise<Result<PartialSnippet[], ApiError>>;
   showSnippet(
     authntoken: string,
     slug: string
@@ -100,7 +103,7 @@ export interface ISnippetApi {
   ): Promise<Result<boolean, ApiError>>;
   deleteSnippet(
     authntoken: string,
-    slug: string
+    snippet: Snippet
   ): Promise<Result<boolean, ApiError>>;
 }
 
@@ -110,6 +113,6 @@ export interface ISnippetTypeApi {
   ): Promise<Result<PartialSnippetType[], ApiError>>;
   showSnippetType(
     authntoken: string,
-    snippet_type: string
+    snippetType: string
   ): Promise<Result<SnippetType, ApiError>>;
 }

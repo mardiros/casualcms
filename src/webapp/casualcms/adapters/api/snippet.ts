@@ -6,9 +6,11 @@ import { ApiError, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async listSnippets(
-    authntoken: string
+    authntoken: string,
+    type: string
   ): Promise<Result<PartialSnippet[], ApiError>> {
-    const response = await this.fetch("/api/snippets", {
+    const qs = new URLSearchParams({ type: type });
+    const response = await this.fetch(`/api/snippets?${qs}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -86,9 +88,9 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
 
   async deleteSnippet(
     authntoken: string,
-    slug: string
+    snippet: Snippet
   ): Promise<Result<boolean, ApiError>> {
-    const response = await this.fetch(`/api/snippets/${slug}`, {
+    const response = await this.fetch(`/api/snippets/${snippet.slug}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${authntoken}`,

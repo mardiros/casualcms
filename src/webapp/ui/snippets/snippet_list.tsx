@@ -17,7 +17,7 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 
 import { useAuth } from "../login/hooks";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../layout/loader";
@@ -31,6 +31,7 @@ type SnippetRowProps = {
 type SnippetListTableProps = {
   config: AppConfig;
   token: string;
+  snippetType: string;
 };
 
 export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
@@ -42,11 +43,7 @@ export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
       <Td>{snippet.slug}</Td>
       <Td>{snippet.meta.type}</Td>
       <Td>
-        <Link
-          to={`/admin/snippets/edit?${new URLSearchParams({
-            slug: snippet.slug,
-          })}`}
-        >
+        <Link to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.slug}`}>
           <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Link>
@@ -58,8 +55,7 @@ export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
 export const SnippetListTable: React.FunctionComponent<
   SnippetListTableProps
 > = (props: SnippetListTableProps) => {
-  const config = props.config;
-  const token = props.token;
+  const { config, token, snippetType } = props;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [snippets, setSnippets] = React.useState<PartialSnippet[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
@@ -67,7 +63,7 @@ export const SnippetListTable: React.FunctionComponent<
   React.useEffect(() => {
     async function loadSubSites() {
       let snippets: Result<PartialSnippet[], ApiError>;
-      snippets = await config.api.snippet.listSnippets(token);
+      snippets = await config.api.snippet.listSnippets(token, snippetType);
       snippets
         .map((snippets: PartialSnippet[]) => setSnippets(snippets))
         .mapErr((err: ApiError) => setError(err)); // FIXME
@@ -103,13 +99,21 @@ export const SnippetListTable: React.FunctionComponent<
   );
 };
 
-export const SnippetListButtons: React.FunctionComponent<{}> = () => {
+type SnippetListButtonsProps = {
+  snippetType: string;
+};
+export const SnippetListButtons: React.FunctionComponent<
+  SnippetListButtonsProps
+> = (props: SnippetListButtonsProps) => {
+  const snippetType = props.snippetType;
   let navigate = useNavigate();
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
       <Button
         colorScheme="teal"
-        onClick={() => navigate("/admin/snippets/new", { replace: true })}
+        onClick={() =>
+          navigate(`/admin/snippets/new/${snippetType}`, { replace: true })
+        }
       >
         <Icon as={AddIcon} marginEnd={2} />
         Add new snippet
@@ -122,12 +126,18 @@ export const SnippetList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
+  const params = useParams();
+  const snippetType = params.snippetType || "";
 
   return (
     <Box>
-      <SnippetBreadcrumb />
-      <SnippetListTable config={config} token={token} />
-      <SnippetListButtons />
+      <SnippetBreadcrumb snippetType={snippetType} />
+      <SnippetListTable
+        config={config}
+        token={token}
+        snippetType={snippetType}
+      />
+      <SnippetListButtons snippetType={snippetType} />
     </Box>
   );
 };

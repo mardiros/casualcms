@@ -11,7 +11,7 @@ describe("As a user, I can list snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippets/new/:snippet_type"
+          path="/admin/snippets/new/:snippetType"
           element={<SnippetNew />}
         ></Route>
         <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>
@@ -30,8 +30,11 @@ describe("As a user, I can list snippet", () => {
     let button = screen.getByText("Submit");
     fireEvent.click(button);
 
-    await waitForPath("/admin/snippets");
-    const snippets = await config.api.snippet.listSnippets("");
+    await waitForPath("/admin/snippets/blog:HeaderSnippet");
+    const snippets = await config.api.snippet.listSnippets(
+      "",
+      "blog:HeaderSnippet"
+    );
     expect(snippets._unsafeUnwrap()).eql([
       {
         slug: "header",
@@ -39,6 +42,9 @@ describe("As a user, I can list snippet", () => {
         meta: { type: "blog:HeaderSnippet" },
       },
     ]);
-    await config.api.snippet.deleteSnippet("", "header");
+    await config.api.snippet.deleteSnippet("", {
+      slug: "header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
   });
 });

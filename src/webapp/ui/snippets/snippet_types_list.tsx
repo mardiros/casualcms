@@ -47,7 +47,7 @@ export const SnippetTypesTable: React.FunctionComponent<
           {snippetTypes.map((tpl, i) => (
             <Tr key={i}>
               <Td>
-                <Link to={`/admin/snippets/new/${tpl.type}`}>
+                <Link to={`/admin/snippets/${tpl.type}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />
                   {tpl.type}
                 </Link>
@@ -71,7 +71,7 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTypes() {
-      const snippetTemplates = await config.api.snippet_type.listSnippetTypes(
+      const snippetTemplates = await config.api.snippetType.listSnippetTypes(
         token
       );
       snippetTemplates

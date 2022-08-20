@@ -11,13 +11,19 @@ describe("As a user, I can delete a snippet", () => {
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
       slug: "header",
     });
-    await config.api.snippet.createSnippet("", "blog:FooterSnippet", {
-      slug: "footer",
+    await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
+      slug: "alt-header",
     });
   });
   after(async () => {
-    await config.api.snippet.deleteSnippet("", "footer");
-    await config.api.snippet.deleteSnippet("", "header");
+    await config.api.snippet.deleteSnippet("", {
+      slug: "alt-header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
+    await config.api.snippet.deleteSnippet("", {
+      slug: "header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
   });
 
   it("Delete a snippet", async () => {
@@ -41,7 +47,10 @@ describe("As a user, I can delete a snippet", () => {
     let link = screen.getByText("Delete this snippet");
     fireEvent.click(link);
 
-    let subList = await config.api.snippet.listSnippets("");
+    let subList = await config.api.snippet.listSnippets(
+      "",
+      "blog:HeaderSnippet"
+    );
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {
@@ -51,22 +60,22 @@ describe("As a user, I can delete a snippet", () => {
       },
       {
         meta: {
-          type: "blog:FooterSnippet",
+          type: "blog:HeaderSnippet",
         },
-        slug: "footer",
+        slug: "alt-header",
       },
     ]);
 
     link = screen.getByText("Confirm Deletion");
     fireEvent.click(link);
 
-    subList = await config.api.snippet.listSnippets("");
+    subList = await config.api.snippet.listSnippets("", "blog:HeaderSnippet");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {
-          type: "blog:FooterSnippet",
+          type: "blog:HeaderSnippet",
         },
-        slug: "footer",
+        slug: "alt-header",
       },
     ]);
   });

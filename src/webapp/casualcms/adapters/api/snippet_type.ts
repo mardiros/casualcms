@@ -27,10 +27,10 @@ export class FetchSnippetTypeApi
 
   async showSnippetType(
     authntoken: string,
-    snippet_type: string
+    snippetType: string
   ): Promise<Result<SnippetType, ApiError>> {
     // FIXME: snippet_type should be urlencoded
-    const response = await this.fetch(`/api/snippets-types/${snippet_type}`, {
+    const response = await this.fetch(`/api/snippets-types/${snippetType}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

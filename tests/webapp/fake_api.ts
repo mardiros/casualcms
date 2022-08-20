@@ -57,9 +57,9 @@ class FakePageTypeApi implements IPageTypeApi {
   }
   async showPageType(
     authntoken: string,
-    tpltype: string
+    pageType: string
   ): Promise<Result<PageType, ApiError>> {
-    if (tpltype == "casual:HomePage") {
+    if (pageType == "casual:HomePage") {
       return ok({
         uiSchema: {
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
@@ -80,7 +80,7 @@ class FakePageTypeApi implements IPageTypeApi {
       });
     }
 
-    if (tpltype == "casual:SectionPage") {
+    if (pageType == "casual:SectionPage") {
       return ok({
         uiSchema: {
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
@@ -102,7 +102,7 @@ class FakePageTypeApi implements IPageTypeApi {
     }
 
     let m = new Map();
-    m.set("detail", `${tpltype} is undefined`);
+    m.set("detail", `${pageType} is undefined`);
     return err(m);
   }
 }
@@ -257,17 +257,22 @@ export class FakeSiteApi implements ISiteApi {
   }
 }
 
+type snippetRecords = {
+  [k: string]: PartialSnippet[];
+};
+
 export class FakeSnippetApi implements ISnippetApi {
-  snippets: PartialSnippet[];
+  snippets: snippetRecords;
 
   constructor() {
-    this.snippets = [];
+    this.snippets = {};
   }
 
   async listSnippets(
-    authntoken: string
+    authntoken: string,
+    type: string
   ): Promise<Result<PartialSnippet[], Map<string, string>>> {
-    return ok(this.snippets);
+    return ok(this.snippets[type] || []);
   }
 
   async updateSnippet(
@@ -275,11 +280,12 @@ export class FakeSnippetApi implements ISnippetApi {
     slug: string,
     snippet: Snippet
   ): Promise<Result<boolean, ApiError>> {
-    let snippets = this.snippets.filter((snippet: PartialSnippet) => {
+    const typ = snippet.meta.type;
+    let snippets = this.snippets[typ].filter((snippet: PartialSnippet) => {
       return snippet.slug != slug;
     });
     snippets.push(snippet);
-    this.snippets = snippets;
+    this.snippets[typ] = snippets;
     return ok(true);
   }
 
@@ -287,11 +293,13 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string,
     slug: string
   ): Promise<Result<Snippet, ApiError>> {
-    const snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.slug == slug;
-    });
-    if (snippets.length == 1) {
-      return ok(snippets[0]);
+    for (const [type, snippets] of Object.entries(this.snippets)) {
+      const filteredDnippets = snippets.filter((snippet: PartialSnippet) => {
+        return snippet.slug == slug;
+      });
+      if (filteredDnippets.length == 1) {
+        return ok(filteredDnippets[0]);
+      }
     }
     let apiError = new Map();
     apiError.set("slug", "Snippet not found");
@@ -308,17 +316,21 @@ export class FakeSnippetApi implements ISnippetApi {
       payload: payload,
     };
     payload["meta"] = { type: type };
-    this.snippets.push(payload);
+    if (!this.snippets[type]) {
+      this.snippets[type] = [];
+    }
+    this.snippets[type].push(payload);
     return ok(true);
   }
   async deleteSnippet(
     authntoken: string,
-    slug: string
+    snippet: Snippet
   ): Promise<Result<boolean, ApiError>> {
-    const snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.slug != slug;
+    const typ = snippet.meta.type;
+    const snippets = this.snippets[typ].filter((s: PartialSnippet) => {
+      return s.slug != snippet.slug;
     });
-    this.snippets = snippets;
+    this.snippets[typ] = snippets;
     return ok(true);
   }
 }
@@ -375,18 +387,18 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
 
 export class FakeApi implements IApi {
   account: IAccountApi;
-  page_type: IPageTypeApi;
+  pageType: IPageTypeApi;
   page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
-  snippet_type: ISnippetTypeApi;
+  snippetType: ISnippetTypeApi;
 
   constructor() {
     this.account = new FakeAccountApi();
-    this.page_type = new FakePageTypeApi();
+    this.pageType = new FakePageTypeApi();
     this.page = new FakePageApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
-    this.snippet_type = new FakeSnippetTypeApi();
+    this.snippetType = new FakeSnippetTypeApi();
   }
 }

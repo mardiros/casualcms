@@ -78,7 +78,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplates() {
-      const pageTemplates = await config.api.page_type.listPageTypes(
+      const pageTemplates = await config.api.pageType.listPageTypes(
         token,
         parentType
       );

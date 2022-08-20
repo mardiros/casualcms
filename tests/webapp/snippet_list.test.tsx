@@ -17,19 +17,25 @@ describe("As a user, I can list snippet", () => {
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
       slug: "header",
     });
-    await config.api.snippet.createSnippet("", "blog:FooterSnippet", {
-      slug: "footer",
+    await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
+      slug: "alt-header",
     });
   });
   after(async () => {
-    await config.api.snippet.deleteSnippet("", "footer");
-    await config.api.snippet.deleteSnippet("", "header");
+    await config.api.snippet.deleteSnippet("", {
+      slug: "alt-header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
+    await config.api.snippet.deleteSnippet("", {
+      slug: "header",
+      meta: { type: "blog:HeaderSnippet" },
+    });
   });
 
   it("Render a row for a snippet", async () => {
     const snippet = {
       slug: "header",
-      meta: { type: "blog:Header" },
+      meta: { type: "blog:HeaderSnippet" },
     };
 
     renderWithRouter(
@@ -47,16 +53,24 @@ describe("As a user, I can list snippet", () => {
     );
 
     let link = await screen.findByText("Edit", { exact: false });
-    expect(link.getAttribute("href")).equal("/admin/snippets/edit?slug=header");
+    expect(link.getAttribute("href")).equal(
+      "/admin/snippets/edit/blog:HeaderSnippet/header"
+    );
   });
 
   it("Render snippets table from the API", async () => {
     renderWithRouter(
       <Route
-        path="/admin/snippets"
-        element={<SnippetListTable config={config} token="" />}
+        path="/admin/snippets/:snippetType"
+        element={
+          <SnippetListTable
+            config={config}
+            token=""
+            snippetType="blog:HeaderSnippet"
+          />
+        }
       />,
-      "/admin/snippets"
+      "/admin/snippets/blog:HeaderSnippet"
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -64,8 +78,8 @@ describe("As a user, I can list snippet", () => {
 
   it("Render snippet lists from the API", async () => {
     renderWithRouter(
-      <Route path="/admin/snippets" element={<SnippetList />} />,
-      "/admin/snippets"
+      <Route path="/admin/snippets/:snippetType" element={<SnippetList />} />,
+      "/admin/snippets/blog:HeaderSnippet"
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -73,10 +87,16 @@ describe("As a user, I can list snippet", () => {
   it("Redirect to the new snippet while clicking on the add button", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/snippets" element={<SnippetListButtons />} />
-        <Route path="/admin/snippets/new" element={<h4>New snippet page</h4>} />
+        <Route
+          path="/admin/snippets/:snippetType"
+          element={<SnippetListButtons snippetType="blog:HeaderSnippet" />}
+        />
+        <Route
+          path="/admin/snippets/new/:snippetType"
+          element={<h4>New snippet page</h4>}
+        />
       </>,
-      "/admin/snippets"
+      "/admin/snippets/blog:HeaderSnippet"
     );
     let link = screen.getByText("Add new snippet", { exact: false });
     fireEvent.click(link);

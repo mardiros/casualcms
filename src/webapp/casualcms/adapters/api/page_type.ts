@@ -27,10 +27,10 @@ export class FetchPageTypeApi extends BaseFetchApi implements IPageTypeApi {
 
   async showPageType(
     authntoken: string,
-    tpltype: string
+    pageType: string
   ): Promise<Result<PageType, ApiError>> {
-    // FIXME: tpltype should be urlencoded
-    const response = await this.fetch(`/api/pages-types/${tpltype}`, {
+    // FIXME: pageType should be urlencoded
+    const response = await this.fetch(`/api/pages-types/${pageType}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

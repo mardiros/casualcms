@@ -39,7 +39,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       if (!page) {
         return;
       }
-      const template = await config.api.page_type.showPageType(
+      const template = await config.api.pageType.showPageType(
         token,
         page.meta.type
       );

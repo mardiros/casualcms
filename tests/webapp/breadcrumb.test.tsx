@@ -84,8 +84,8 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/pages/?parent=%2Fhome%2Fcat"
     );
 
-    let title = screen.getByText("New page");
-    expect(title).to.not.be.equal(undefined);
+    const title = screen.getByText("New page");
+    expect(title.nodeName).to.be.equal("SPAN");
   });
 
   it("Render links using the site of the snippet", async () => {
@@ -120,24 +120,24 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       </>,
       "/admin/sites/new"
     );
-    let link = screen.getByText("new site");
-    expect(link.getAttribute("href")).to.be.equal("#");
+    const title = screen.getByText("new site");
+    expect(title.nodeName).to.be.equal("SPAN");
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-    const snippet = { slug: "header", meta: { type: "Header" } };
+    const snippet = { slug: "header", meta: { type: "HeaderSnippet" } };
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippets/edit"
+          path="/admin/snippets/edit/-"
           element={<SnippetBreadcrumb snippet={snippet} />}
         />
       </>,
-      "/admin/snippets/edit"
+      "/admin/snippets/edit/-"
     );
     let link = screen.getByText("header");
     expect(link.getAttribute("href")).to.be.equal(
-      "/admin/snippets/edit?slug=header"
+      "/admin/snippets/edit/HeaderSnippet/header"
     );
   });
 
@@ -151,7 +151,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       </>,
       "/admin/snippets/new"
     );
-    let link = screen.getByText("new snippet");
-    expect(link.getAttribute("href")).to.be.equal("#");
+    const title = screen.getByText("new snippet");
+    expect(title.nodeName).to.be.equal("SPAN");
   });
 });

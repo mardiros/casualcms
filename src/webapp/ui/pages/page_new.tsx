@@ -16,7 +16,7 @@ const Form = withTheme(ChakraUITheme);
 export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("-------------------------------------------")
   // console.log("# Rendering page new")
-  let { tpltype } = useParams<string>();
+  let { pageType } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
@@ -31,9 +31,9 @@ export const PageNew: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplate() {
-      const template = await config.api.page_type.showPageType(
+      const template = await config.api.pageType.showPageType(
         token,
-        tpltype || ""
+        pageType || ""
       );
       template
         .map((tpl: PageType) => setTemplate(tpl))
@@ -46,7 +46,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
       setError(null);
       setTemplate(null);
     };
-  }, [tpltype]);
+  }, [pageType]);
 
   React.useEffect(() => {
     async function loadPage() {
@@ -72,7 +72,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    await config.api.page.createPage(token, tpltype || "", page, parentPath);
+    await config.api.page.createPage(token, pageType || "", page, parentPath);
     navigate(`/admin/pages?${params}`, { replace: true });
   };
 

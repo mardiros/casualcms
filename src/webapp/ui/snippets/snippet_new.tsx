@@ -14,7 +14,7 @@ import { SnippetBreadcrumb } from "../layout/breadcrumb";
 const Form = withTheme(ChakraUITheme);
 
 export const SnippetNew: React.FunctionComponent<{}> = () => {
-  let { snippet_type } = useParams<string>();
+  let { snippetType } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
@@ -25,9 +25,9 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplate() {
-      const template = await config.api.snippet_type.showSnippetType(
+      const template = await config.api.snippetType.showSnippetType(
         token,
-        snippet_type || ""
+        snippetType || ""
       );
       template
         .map((tpl: SnippetType) => setTemplate(tpl))
@@ -40,15 +40,15 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
       setError(null);
       setTemplate(null);
     };
-  }, [snippet_type]);
+  }, [snippetType]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
-    await config.api.snippet.createSnippet(token, snippet_type || "", snippet);
-    navigate("/admin/snippets", { replace: true });
+    await config.api.snippet.createSnippet(token, snippetType || "", snippet);
+    navigate(`/admin/snippets/${snippetType}`, { replace: true });
   };
 
   const data = {};

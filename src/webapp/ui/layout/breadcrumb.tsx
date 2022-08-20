@@ -1,10 +1,4 @@
-import { AtSignIcon } from "@chakra-ui/icons";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  Icon,
-} from "@chakra-ui/react";
+import { Breadcrumb, BreadcrumbItem, Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { Page, Site, Snippet } from "../../casualcms/domain/model";
 
@@ -19,6 +13,7 @@ type SiteBreadcrumbProps = {
 };
 
 type SnippetBreadcrumbProps = {
+  snippetType?: string | null;
   snippet?: Snippet | null;
   title?: string;
 };
@@ -61,7 +56,7 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
         ))}
       {title && (
         <BreadcrumbItem>
-          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+          <span>{title}</span>
         </BreadcrumbItem>
       )}
     </Breadcrumb>
@@ -81,14 +76,14 @@ export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
       </BreadcrumbItem>
       {site && (
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/admin/sites/edit?hostname=${site.hostname}`}>
+          <Link to={`/admin/sites/edit?hostname=${site.hostname}`}>
             {site.hostname}
-          </BreadcrumbLink>
+          </Link>
         </BreadcrumbItem>
       )}
       {title && (
         <BreadcrumbItem>
-          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+          <span>{title}</span>
         </BreadcrumbItem>
       )}
     </Breadcrumb>
@@ -99,6 +94,7 @@ export const SnippetBreadcrumb: React.FunctionComponent<
   SnippetBreadcrumbProps
 > = (props: SnippetBreadcrumbProps) => {
   const { snippet, title } = props;
+  let snippetType = props.snippetType || snippet?.meta.type;
   return (
     <Breadcrumb padding={5}>
       <BreadcrumbItem>
@@ -106,16 +102,23 @@ export const SnippetBreadcrumb: React.FunctionComponent<
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
+      {snippetType && (
+        <BreadcrumbItem>
+          <Link to={`/admin/snippets/${snippetType}`}>{snippetType}</Link>
+        </BreadcrumbItem>
+      )}
       {snippet && (
         <BreadcrumbItem>
-          <BreadcrumbLink href={`/admin/snippets/edit?slug=${snippet.slug}`}>
+          <Link
+            to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.slug}`}
+          >
             {snippet.slug}
-          </BreadcrumbLink>
+          </Link>
         </BreadcrumbItem>
       )}
       {title && (
         <BreadcrumbItem>
-          <BreadcrumbLink href="#">{title}</BreadcrumbLink>
+          <span>{title}</span>
         </BreadcrumbItem>
       )}
     </Breadcrumb>

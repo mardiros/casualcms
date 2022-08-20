@@ -35,21 +35,25 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
         <Route path="" element={<Body />} caseSensitive />
         <Route path="pages" element={<PageList />} caseSensitive />
         <Route path="pages/new" element={<PageTypeList />} caseSensitive />
-        <Route path="pages/new/:tpltype" element={<PageNew />} caseSensitive />
+        <Route path="pages/new/:pageType" element={<PageNew />} caseSensitive />
         <Route path="pages/edit" element={<PageEdit />} caseSensitive />
 
-        <Route path="snippets" element={<SnippetList />} caseSensitive />
+        <Route path="snippets" element={<SnippetTypeList />} caseSensitive />
         <Route
-          path="snippets/new"
-          element={<SnippetTypeList />}
+          path="snippets/:snippetType"
+          element={<SnippetList />}
           caseSensitive
         />
         <Route
-          path="snippets/new/:snippet_type"
+          path="snippets/:snippetType/new"
           element={<SnippetNew />}
           caseSensitive
         />
-        <Route path="snippets/edit" element={<SnippetEdit />} caseSensitive />
+        <Route
+          path="snippets/edit/:snippetType/:snippetSlug"
+          element={<SnippetEdit />}
+          caseSensitive
+        />
 
         <Route path="sites" element={<SiteList />} caseSensitive />
         <Route path="sites/new" element={<SiteNew />} caseSensitive />

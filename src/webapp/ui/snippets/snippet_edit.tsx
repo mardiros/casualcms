@@ -20,8 +20,9 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
   const [snippet, setSnippet] = React.useState<Snippet | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [params, setParams] = useSearchParams();
-  const snippetSlug = params.get("slug") || "";
+  const params = useParams();
+  const snippetType = params.snippetType || "";
+  const snippetSlug = params.snippetSlug || "";
 
   const [template, setTemplate] = React.useState<SnippetType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
@@ -29,12 +30,9 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTemplate() {
-      if (!snippet) {
-        return;
-      }
-      const template = await config.api.snippet_type.showSnippetType(
+      const template = await config.api.snippetType.showSnippetType(
         token,
-        snippet.meta.type || ""
+        snippetType
       );
       template
         .map((tpl: SnippetType) => setTemplate(tpl))
@@ -47,14 +45,11 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       setError(null);
       setTemplate(null);
     };
-  }, [snippet]);
+  }, [snippetType]);
 
   React.useEffect(() => {
     async function loadSnippet() {
-      const page = await config.api.snippet.showSnippet(
-        token,
-        snippetSlug || ""
-      );
+      const page = await config.api.snippet.showSnippet(token, snippetSlug);
       // console.log(page)
       page
         .map((page: Snippet) => setSnippet(page))
@@ -73,13 +68,13 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
     await config.api.snippet.updateSnippet(token, snippetSlug, snippet);
-    navigate("/admin/snippets", { replace: true });
+    navigate(`/admin/snippets/${snippetType}`, { replace: true });
   };
 
   return (
     <Box maxW="720px">
-      <Heading>New Snippet</Heading>
-      <SnippetBreadcrumb title="new snippet" />
+      <Heading>Edit Snippet</Heading>
+      <SnippetBreadcrumb snippet={snippet} />
       <ApiErrorUI error={error} />
       {snippet && template && (
         <>

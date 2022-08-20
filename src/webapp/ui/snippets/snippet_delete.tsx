@@ -16,16 +16,16 @@ export const SnippetDeletePopoverForm: React.FunctionComponent<
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const curSnippet = props.curSnippet;
-
+  const snippetType = curSnippet.meta.type;
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {
-    await config.api.snippet.deleteSnippet(token, curSnippet.slug);
+    await config.api.snippet.deleteSnippet(token, curSnippet);
     setConfirmed(true);
   };
 
   if (confirmed) {
-    return <Navigate to="/admin/snippets" replace />;
+    return <Navigate to={`/admin/snippets/${snippetType}`} replace />;
   }
 
   return (

@@ -25,8 +25,6 @@ TODO
 
 * Ensure we can't delete a page if it is associated to a site
 
-* Test all unauthenticated calls
-
 * Add widget to choose a snippet (browse snippet popup)
 
 * Add widget to edit text using a wysiwyg

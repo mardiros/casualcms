@@ -469,6 +469,7 @@ class SiteSQLRepository(AbstractSiteRepository):
 
         page = rpage.unwrap()  # FIXME, should return Ok(...)
         data["page_id"] = page.id
+        model.page_id = page.id  # patch if someone use this model
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
         self.seen.add(model)
         return Ok(...)

@@ -184,6 +184,10 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         for site in self.sites:
             if site.id != model.id:
                 sites.append(site)
+        rpage = await PageInMemoryRepository().by_path(model.root_page_path)
+        if rpage.is_err():
+            return Err(SiteRepositoryError.root_page_not_found)
+        model.page_id = rpage.unwrap().id
         sites.append(model)
         self.sites = sites
         return Ok(...)

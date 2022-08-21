@@ -164,7 +164,8 @@ async def test_update_site(
     assert rsaved_site.is_ok()
     saved_site = rsaved_site.unwrap()
     assert saved_site.id == default_site.id
-    assert saved_site.page_id == default_site.page_id
+    assert saved_site.root_page_path == sub_page.path
+    assert saved_site.page_id == sub_page.id
     assert saved_site.secure is True
 
     async with uow as uow:

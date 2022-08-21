@@ -539,6 +539,7 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
         self.authn_tokens = AuthnTokenSQLRepository(session)
         self.pages = PageSQLRepository(session)
         self.sites = SiteSQLRepository(session)
+        self.snippets = SnippetSQLRepository(session)
 
     async def commit(self) -> None:
         await self.session.commit()

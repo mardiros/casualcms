@@ -6,6 +6,7 @@ import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
+from casualcms.adapters.fastapi import FastAPIConfigurator
 from casualcms.adapters.uow_inmemory import InMemoryUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import (
@@ -48,13 +49,27 @@ def messagebus() -> MessageRegistry:
     return MessageRegistry()
 
 
+class ConfiguredOnce:
+    app: FastAPI | None = None
+
+
 @pytest.fixture()
 async def app(
     app_settings: Settings, uow: AbstractUnitOfWork, messagebus: MessageRegistry
 ) -> FastAPI:
 
     settings = Settings(unit_of_work=uow, messagebus=messagebus)  # type: ignore
-    app = await bootstrap(settings)
+    if ConfiguredOnce.app:
+        with FastAPIConfigurator(settings) as configurator:
+            await configurator.initialize()
+            configurator.app = ConfiguredOnce.app
+            import casualcms.service.handlers
+
+            configurator.scan(casualcms.service.handlers, categories=["messagebus"])
+        app = ConfiguredOnce.app
+    else:
+        app = await bootstrap(settings)
+        ConfiguredOnce.app = app
     return app
 
 

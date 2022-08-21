@@ -253,7 +253,7 @@ async def test_update_home_page_content(
     assert saved_home.title == payload["title"]
     assert saved_home.description == payload["description"]
     assert saved_home.hero_title == payload["hero_title"]
-    assert saved_home.body == payload["body"]
+    assert saved_home.body == payload["body"]  # XXX should be a list[Paragraph] here
 
 
 async def test_update_sub_page_content(

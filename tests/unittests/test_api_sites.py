@@ -1,4 +1,3 @@
-
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken

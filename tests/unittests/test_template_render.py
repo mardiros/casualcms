@@ -28,7 +28,8 @@ async def test_render_template_with_snippet(
     app_settings: Settings,
     header_snippet: Snippet,
 ):
-    renderer = Jinja2TemplateRender(uow, app_settings.template_search_path)
+    async with uow as uow:
+        renderer = Jinja2TemplateRender(uow, app_settings.template_search_path)
     data = await renderer.render_template("test_with_snippet.jinja2", {})
     assert (
         data

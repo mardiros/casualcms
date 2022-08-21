@@ -45,12 +45,14 @@ def test_api_logout_failed(client: TestClient):
     assert resp.json() == {"detail": "Not authenticated"}
 
 
-def test_api_logout(
+async def test_api_logout(
     client: TestClient,
     authntoken: AuthnToken,
     uow: AbstractUnitOfWork,
 ):
-    assert authntoken.token in uow.authn_tokens.tokens  # type: ignore
+    async with uow as uow:
+        res = await uow.authn_tokens.by_token(authntoken.token)
+    assert res.is_ok()
     resp = client.delete(
         "/api/authntokens",
         headers={
@@ -59,4 +61,7 @@ def test_api_logout(
     )
     assert resp.status_code == 204
     assert resp.text == ""
-    assert authntoken.token not in uow.authn_tokens.tokens  # type: ignore
+    async with uow as uow:
+        res = await uow.authn_tokens.by_token(authntoken.token)
+    assert res.is_err()
+    assert res.unwrap_err().value == "Unknown token"

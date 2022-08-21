@@ -18,7 +18,8 @@ async def test_accounts_repository(uow: AbstractUnitOfWork):
         email="bob@alice.net",
         lang="en",
     )
-    await uow.accounts.add(bob)
+    async with uow as uow:
+        await uow.accounts.add(bob)
     bob_fetched = await uow.accounts.by_username("bob")
     assert bob_fetched.is_ok()
     assert bob_fetched.unwrap().id == bob.id
@@ -27,7 +28,7 @@ async def test_accounts_repository(uow: AbstractUnitOfWork):
     assert alice.is_err()
 
 
-def test_account_message(uow: AbstractUnitOfWork):
+async def test_account_message(uow: AbstractUnitOfWork):
     account = Account(
         id="abc",
         created_at=datetime.now(),
@@ -38,9 +39,10 @@ def test_account_message(uow: AbstractUnitOfWork):
     )
     evt = DummyEvent()
     account.events.append(evt)
-    uow.accounts.seen.add(account)
-    events = list(uow.collect_new_events())
-    assert events == [evt]
+    async with uow as uow:
+        uow.accounts.seen.add(account)
+        events = list(uow.collect_new_events())
+        assert events == [evt]
 
 
 async def test_rollback(uow: AbstractUnitOfWork):

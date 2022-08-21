@@ -1,3 +1,4 @@
+
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
@@ -5,6 +6,15 @@ from casualcms.domain.model.page import Page
 from casualcms.domain.model.site import Site
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.unittests.orm.fixtures import fake_site
+
+
+async def test_api_create_site_403(
+    client: TestClient,
+    home_page: Page,
+):
+    site = fake_site(home_page)
+    resp = client.post("/api/sites", json=site.dict())
+    assert resp.status_code == 403
 
 
 async def test_api_create_site(
@@ -29,6 +39,15 @@ async def test_api_create_site(
     }
 
 
+async def test_api_list_sites_403(
+    client: TestClient,
+    home_page: Page,
+    default_site: Site,
+):
+    resp = client.get("/api/sites")
+    assert resp.status_code == 403
+
+
 async def test_api_list_sites(
     client: TestClient,
     authntoken: AuthnToken,
@@ -50,6 +69,15 @@ async def test_api_list_sites(
             "root_page_path": home_page.path,
         }
     ]
+
+
+def test_get_site_403(
+    client: TestClient,
+    default_site: Site,
+    home_page: Page,
+):
+    resp = client.get(f"/api/sites/{default_site.hostname}")
+    assert resp.status_code == 403
 
 
 def test_get_site(
@@ -91,6 +119,24 @@ def test_get_site_404(
     }
 
 
+async def test_update_site_403(
+    client: TestClient,
+    default_site: Site,
+    sub_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    old_hostname = default_site.hostname
+    resp = client.patch(
+        f"/api/sites/{old_hostname}",
+        json={
+            "hostname": "new.example.net",
+            "root_page_path": sub_page.path,
+            "secure": True,
+        },
+    )
+    assert resp.status_code == 403
+
+
 async def test_update_site(
     client: TestClient,
     authntoken: AuthnToken,
@@ -125,6 +171,16 @@ async def test_update_site(
         old_site = await uow.sites.by_hostname(old_hostname)
     assert old_site.is_err()
     assert old_site.unwrap_err().name == "site_not_found"
+
+
+async def test_delete_site_403(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(f"/api/sites/{default_site.hostname}")
+    assert resp.status_code == 403
 
 
 async def test_delete_site(

@@ -3,6 +3,12 @@ from fastapi.testclient import TestClient
 from casualcms.domain.model.account import AuthnToken
 
 
+async def test_list_types_403(client: TestClient):
+
+    resp = client.get("/api/snippets-types")
+    assert resp.status_code == 403
+
+
 async def test_list_types(client: TestClient, authntoken: AuthnToken):
 
     resp = client.get(
@@ -19,6 +25,12 @@ async def test_list_types(client: TestClient, authntoken: AuthnToken):
     ]
 
 
+async def test_get_type_403(client: TestClient):
+
+    resp = client.get("/api/snippets-types/blog:HeaderSnippet")
+    assert resp.status_code == 403
+
+
 async def test_get_type(client: TestClient, authntoken: AuthnToken):
 
     resp = client.get(
@@ -27,7 +39,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    # assert resp.status_code == 200
+    assert resp.status_code == 200
     assert resp.json() == {
         "schema": {
             "definitions": {

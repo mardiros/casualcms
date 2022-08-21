@@ -8,9 +8,7 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 from ..casualblog.models import FooterSnippet, HeaderSnippet
 
 
-async def test_api_create_snippet_unauthenticated(
-    client: TestClient, uow: AbstractUnitOfWork
-):
+async def test_api_create_snippet_403(client: TestClient, uow: AbstractUnitOfWork):
     resp = client.post(
         "/api/snippets",
         headers={},
@@ -49,9 +47,7 @@ async def test_api_create_snippet(
         }
 
 
-async def test_api_list_snippet_unauthenticated(
-    client: TestClient, uow: AbstractUnitOfWork
-):
+async def test_api_list_snippet_403(client: TestClient, uow: AbstractUnitOfWork):
     resp = client.get(
         "/api/snippets",
         headers={},
@@ -86,6 +82,7 @@ async def test_api_list_snippet_filter(
     client: TestClient,
     authntoken: AuthnToken,
     header_snippet: HeaderSnippet,
+    alt_header_snippet: HeaderSnippet,
     footer_snippet: FooterSnippet,
 ):
     resp = client.get(
@@ -99,6 +96,22 @@ async def test_api_list_snippet_filter(
         {"meta": {"type": "blog:HeaderSnippet"}, "slug": "alt-header"},
         {"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"},
     ]
+
+
+async def test_api_patch_snippet_403(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.patch(
+        "/api/snippets/header",
+        json={
+            "slug": "new-slug",
+            "title": "new title",
+        },
+    )
+    assert resp.status_code == 403
 
 
 async def test_api_patch_snippet(
@@ -131,6 +144,15 @@ async def test_api_patch_snippet(
         assert snip.unwrap_err().name == "snippet_not_found"
 
 
+async def test_api_get_snippet_403(
+    client: TestClient,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get("/api/snippets/header")
+    assert resp.status_code == 403
+
+
 async def test_api_get_snippet(
     client: TestClient,
     authntoken: AuthnToken,
@@ -153,6 +175,16 @@ async def test_api_get_snippet(
         "slug": "header",
         "title": "A personal blog",
     }
+
+
+async def test_api_delete_snippet_403(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete("/api/snippets/header")
+    assert resp.status_code == 403
 
 
 async def test_api_delete_snippet(

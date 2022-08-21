@@ -54,6 +54,11 @@ async def test_api_create_page(
         }
 
 
+async def test_api_list_page_403(client: TestClient, home_page: Page):
+    resp = client.get("/api/pages")
+    assert resp.status_code == 403
+
+
 async def test_api_list_root_page(
     client: TestClient, authntoken: AuthnToken, home_page: Page
 ):
@@ -122,6 +127,15 @@ async def test_create_subpage(
                 "intro": None,
             }
         ]
+
+
+async def test_get_page_403(
+    client: TestClient,
+    home_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get("/api/pages/home")
+    assert resp.status_code == 403
 
 
 @pytest.mark.parametrize(
@@ -193,6 +207,21 @@ async def test_get_page(
     assert resp.json() == params["response"]
 
 
+async def test_update_home_page_content_403(client: TestClient, home_page: Page):
+    payload = {
+        "slug": "new-home",
+        "title": "new title",
+        "description": "new description",
+        "hero_title": "New hero title",
+        "body": [{"body": "my new body"}],
+    }
+    resp = client.patch(
+        f"/api/pages/{home_page.path}",
+        json=payload,
+    )
+    assert resp.status_code == 403
+
+
 async def test_update_home_page_content(
     client: TestClient,
     authntoken: AuthnToken,
@@ -253,6 +282,15 @@ async def test_update_sub_page_content(
         )
     assert saved_home.slug == "new-slug"
     assert saved_home.title == payload["title"]
+
+
+async def test_delete_page_403(
+    client: TestClient,
+    home_page: Page,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(f"/api/pages/{home_page.path}")
+    assert resp.status_code == 403
 
 
 async def test_delete_page(

@@ -39,6 +39,12 @@ async def test_api_authenticate_success(
     assert resp.status_code == 401
 
 
+def test_api_logout_failed(client: TestClient):
+    resp = client.delete("/api/authntokens")
+    assert resp.status_code == 403
+    assert resp.json() == {"detail": "Not authenticated"}
+
+
 def test_api_logout(
     client: TestClient,
     authntoken: AuthnToken,

@@ -268,6 +268,8 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
         self.accounts.accounts.clear()  # type: ignore
         self.pages.pages.clear()  # type: ignore
         self.sites.sites.clear()  # type: ignore
+        self.snippets.snippets.clear()  # type: ignore
+        self.authn_tokens.tokens.clear()  # type: ignore
 
     async def commit(self) -> None:
         self.committed = True

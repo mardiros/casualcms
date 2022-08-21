@@ -79,7 +79,6 @@ async def create_page(
 
 
 async def list_pages(
-    request: Request,
     parent: Optional[str] = None,
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),

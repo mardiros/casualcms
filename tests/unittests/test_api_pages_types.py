@@ -5,6 +5,13 @@ from casualcms.domain.model.account import AuthnToken
 from ..casualblog.models import HomePage
 
 
+async def test_list_page_types_403(client: TestClient, authntoken: AuthnToken):
+
+    resp = client.get("/api/pages-types", headers={})
+    assert resp.status_code == 403
+    assert resp.json() == {"detail": "Not authenticated"}
+
+
 async def test_list_page_types(client: TestClient, authntoken: AuthnToken):
 
     resp = client.get(
@@ -33,6 +40,12 @@ async def test_list_page_types_for_childs(client: TestClient, authntoken: AuthnT
         {"type": "blog:CategoryPage"},
         {"type": "blog:SectionPage"},
     ]
+
+
+async def test_show_template_403(client: TestClient, authntoken: AuthnToken):
+    resp = client.get(f"/api/pages-types/{HomePage.__meta__.type}")
+    assert resp.status_code == 403
+    assert resp.json() == {"detail": "Not authenticated"}
 
 
 async def test_show_template(client: TestClient, authntoken: AuthnToken):

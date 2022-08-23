@@ -4,6 +4,7 @@ from result import Err, Ok
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
@@ -20,6 +21,13 @@ from casualcms.domain.repositories.page import (
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.setting import (
+    AbstractSettingRepository,
+    SettingOperationResult,
+    SettingRepositoryError,
+    SettingRepositoryResult,
+    SettingSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.site import (
     AbstractSiteRepository,
@@ -255,13 +263,69 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         return Ok(...)
 
 
+class SettingInMemoryRepository(AbstractSettingRepository):
+    settings: dict[tuple[str, str], Setting] = {}
+
+    def __init__(self) -> None:
+        self.seen = set()
+
+    async def list(
+        self, hostname: Optional[str] = None
+    ) -> SettingSequenceRepositoryResult:
+        """List all settings, optionally filters on their types."""
+        values: Iterable[Setting] = self.settings.values()
+        if hostname:
+            values = filter(lambda s: s.hostname == hostname, values)
+        return Ok(sorted(values, key=lambda s: (s.hostname, s.__meta__.key)))
+
+    async def by_id(self, id: str) -> SettingRepositoryResult:
+        """Fetch one setting by its unique id."""
+        for setting in self.settings.values():
+            if setting.id == id:
+                return Ok(setting)
+        return Err(SettingRepositoryError.setting_not_found)
+
+    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
+        """Fetch one setting by its unique slug."""
+        try:
+            return Ok(self.settings[(hostname, key)])
+        except KeyError:
+            return Err(SettingRepositoryError.setting_not_found)
+
+    async def add(self, model: Setting) -> SettingOperationResult:
+        """Append a new model to the repository."""
+        self.seen.add(model)
+        self.settings[(model.hostname, model.__meta__.key)] = model
+        return Ok(...)
+
+    async def remove(self, model: Setting) -> SettingOperationResult:
+        """Remove the model from the repository."""
+        self.seen.add(model)
+        del self.settings[(model.hostname, model.__meta__.key)]
+        return Ok(...)
+
+    async def update(self, model: Setting) -> SettingOperationResult:
+        """Update a model from the repository."""
+        self.seen.add(model)
+        k = None
+        for key, setting in self.settings.items():
+            if setting.id == model.id:
+                k = key
+                break
+        if k:
+            del self.settings[k]
+        self.settings[(model.hostname, model.__meta__.key)] = model
+        return Ok(...)
+
+
 class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self, settings: Settings) -> None:
         self.accounts = AccountInMemoryRepository()
+        self.authn_tokens = AuthnTokenInMemoryRepository()
         self.pages = PageInMemoryRepository()
         self.snippets = SnippetInMemoryRepository()
         self.sites = SiteInMemoryRepository()
-        self.authn_tokens = AuthnTokenInMemoryRepository()
+        self.settings = SettingInMemoryRepository()
         self.committed: bool | None = None
         self.initialized = False
 

@@ -10,6 +10,7 @@ from casualcms.domain.model import (
     Site,
     Snippet,
     resolve_page_type,
+    resolve_setting_type,
     resolve_snippet_type,
 )
 
@@ -101,3 +102,20 @@ def fake_footer_snippet(**kwargs: Any):
     }
     snippet.update(kwargs)
     return fake_snippet("tests.casualblog.models:FooterSnippet", **snippet)
+
+
+def fake_setting(key: str, hostname: str = "www", **kwargs: Any):
+    typ = resolve_setting_type(key)
+    return typ(hostname=hostname, **kwargs)
+
+
+def fake_ff_setting(hostname: str = "www", **kwargs: Any):
+    settings = {"use_stuff": True, "use_another_stuff": False}
+    settings.update(kwargs)  # type: ignore
+    return fake_setting("ff", hostname=hostname, **settings)
+
+
+def fake_contact_setting(hostname: str = "www", **kwargs: Any):
+    settings = {"email": "bob@alice.net"}
+    settings.update(kwargs)  # type: ignore
+    return fake_setting("contact", hostname=hostname, **settings)

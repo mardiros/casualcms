@@ -1,5 +1,5 @@
 from types import NoneType
-from typing import Any, Sequence
+from typing import Any, Sequence, cast
 
 import pytest
 from sqlalchemy import text  # type: ignore
@@ -12,6 +12,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
     PageSQLRepository,
+    SettingSQLRepository,
     SiteSQLRepository,
     SnippetSQLRepository,
     SQLUnitOfWork,
@@ -21,14 +22,17 @@ from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.page import Page
+from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from ...casualblog.models import HeaderSnippet, Link
+from ...casualblog.models import FeatureFlagSetting, HeaderSnippet, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
+    fake_contact_setting,
+    fake_ff_setting,
     fake_footer_snippet,
     fake_header_snippet,
     fake_page,
@@ -872,6 +876,256 @@ async def test_site_remove(
     assert rsite.is_err()
     site_err = rsite.unwrap_err()
     assert site_err.name == "site_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "setting": fake_ff_setting(title="Blog"),
+        },
+    ],
+)
+async def test_setting_add(params: Any, sqla_session: AsyncSession, sites: list[Site]):
+    repo = SettingSQLRepository(sqla_session)
+    resp = await repo.add(params["setting"])
+    assert resp.is_ok()
+    qry = select(orm.settings).filter(orm.settings.c.id == params["setting"].id)
+
+    resp = await sqla_session.execute(qry)  # type: ignore
+    setting: orm.settings = resp.first()  # type: ignore
+    assert setting.value == {"use_stuff": True, "use_another_stuff": False}
+    assert setting.site_id == sites[0].id
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_list(
+    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+):
+    repo = SettingSQLRepository(sqla_session)
+    rsettings = await repo.list()
+    assert rsettings.is_ok()
+    sets = rsettings.unwrap()
+    ss = [s.dict() for s in sets]
+    ss = [s.dict() for s in sets]
+    assert ss == [
+        {"email": "bob@alice.net", "hostname": "www"},
+        {"hostname": "www", "use_another_stuff": False, "use_stuff": True},
+        {"hostname": "www2", "use_another_stuff": False, "use_stuff": True},
+    ]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_list_filter_hostname(
+    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+):
+    repo = SettingSQLRepository(sqla_session)
+    rsettings = await repo.list(hostname="www")
+    assert rsettings.is_ok()
+    sets = rsettings.unwrap()
+    ss = [s.dict() for s in sets]
+    assert ss == [
+        {"email": "bob@alice.net", "hostname": "www"},
+        {"hostname": "www", "use_another_stuff": False, "use_stuff": True},
+    ]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_by_id(
+    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+):
+    repo = SettingSQLRepository(sqla_session)
+    rsetting = await repo.by_id(settings[0].id)
+    assert rsetting.is_ok()
+    setting = rsetting.unwrap()
+    assert setting.__meta__.key == "ff"
+    assert setting.hostname == "www"
+
+    rsetting = await repo.by_id("456")
+    assert rsetting.is_err()
+    assert rsetting.unwrap_err().value == "Setting not found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_by_key(
+    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+):
+    repo = SettingSQLRepository(sqla_session)
+    rsetting = await repo.by_key("www", "ff")
+    assert rsetting.is_ok()
+    setting = rsetting.unwrap()
+    assert setting.id == settings[0].id
+
+    rsetting = await repo.by_key("www2", "contact")
+    assert rsetting.is_err()
+    assert rsetting.unwrap_err().value == "Setting not found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_update(
+    params: Any, sqla_session: AsyncSession, sites: list[Site], settings: list[Setting]
+):
+    setting: FeatureFlagSetting = cast(FeatureFlagSetting, settings[0])
+    setting.use_another_stuff = True
+    repo = SettingSQLRepository(sqla_session)
+    rsetting = await repo.update(setting)
+    assert rsetting.is_ok()
+
+    qry = (
+        select(orm.settings)
+        .filter(orm.settings.c.key == "ff")
+        .filter(orm.settings.c.site_id == sites[0].id)
+    )
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_setting: orm.settings = resp.first()  # type: ignore
+    assert orm_setting.value == {"use_another_stuff": True, "use_stuff": True}
+
+    qry = (
+        select(orm.settings)
+        .filter(orm.settings.c.key == "ff")
+        .filter(orm.settings.c.site_id == sites[1].id)
+    )
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_setting: orm.settings = resp.first()  # type: ignore
+    assert orm_setting.value == {"use_another_stuff": False, "use_stuff": True}
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "pages": [home_page, cat_page, cat2_page],
+            "sites": [
+                fake_site(home_page, hostname="www"),
+                fake_site(home_page, hostname="www2"),
+            ],
+            "settings": [
+                fake_ff_setting("www"),
+                fake_contact_setting("www"),
+                fake_ff_setting("www2"),
+            ],
+        },
+    ],
+)
+async def test_setting_remove(
+    params: Any, sqla_session: AsyncSession, sites: list[Site], settings: list[Setting]
+):
+    setting = settings[0]
+    repo = SettingSQLRepository(sqla_session)
+    rsetting = await repo.remove(setting)
+    assert rsetting.is_ok()
+
+    qry = (
+        select(orm.settings)
+        .filter(orm.settings.c.key == "ff")
+        .filter(orm.settings.c.site_id == sites[0].id)
+    )
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_setting: orm.settings = resp.first()  # type: ignore
+    assert orm_setting is None
+
+    qry = (
+        select(orm.settings)
+        .filter(orm.settings.c.key == "contact")
+        .filter(orm.settings.c.site_id == sites[0].id)
+    )
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_setting: orm.settings = resp.first()  # type: ignore
+    assert orm_setting is not None
+
+    qry = (
+        select(orm.settings)
+        .filter(orm.settings.c.key == "ff")
+        .filter(orm.settings.c.site_id == sites[1].id)
+    )
+    resp = await sqla_session.execute(qry)  # type: ignore
+    orm_setting: orm.settings = resp.first()  # type: ignore
+    assert orm_setting is not None
 
 
 async def test_sql_uow_by_session_commit(dummy_session: AsyncSession):

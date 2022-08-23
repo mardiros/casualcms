@@ -1,9 +1,19 @@
+from collections import defaultdict
 from pathlib import Path
-from typing import Any, AsyncGenerator, Dict, Iterator, Mapping, Sequence
+from typing import (
+    Any,
+    AsyncGenerator,
+    Dict,
+    Iterator,
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 
 import pytest
 import pytest_asyncio
-from sqlalchemy import delete, text  # type: ignore
+from sqlalchemy import delete, select, text  # type: ignore
+from sqlalchemy.engine.cursor import CursorResult  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
@@ -13,6 +23,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.domain.model.page import Page
+from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
 
@@ -82,6 +93,7 @@ async def accounts(
 @pytest_asyncio.fixture()
 async def sites(
     sqla_session: AsyncSession,
+    pages: list[Page],
     params: Mapping[str, Any],
 ) -> AsyncGenerator[Sequence[Site], None]:
 
@@ -229,6 +241,47 @@ async def snippets(
 
     await sqla_session.execute(  # type: ignore
         delete(orm.snippets).where(orm.snippets.c.id.in_([s.id for s in snippets])),
+    )
+    await sqla_session.commit()
+
+
+@pytest_asyncio.fixture()
+async def settings(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+    sites: list[Site],
+) -> AsyncGenerator[Sequence[Setting], None]:
+    def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
+        s: Dict[str, Any] = setting.dict(exclude={"hostname"})
+        formated_setting: Dict[str, Any] = {
+            "id": setting.id,
+            "key": setting.__meta__.key,
+            "created_at": setting.created_at,
+            "site_id": site_id,
+        }
+        formated_setting["value"] = s
+        return formated_setting
+
+    settings: Sequence[Setting] = params["settings"]
+    settings_per_hosts: MutableMapping[str, list[Setting]] = defaultdict(list)
+    for s in settings:
+        settings_per_hosts[s.hostname].append(s)
+    for hostname, hsettings in settings_per_hosts.items():
+        orm_sites: CursorResult = await sqla_session.execute(
+            select(orm.sites).filter_by(hostname=hostname).limit(1)  # type: ignore
+        )
+        orm_site: Any = orm_sites.first()
+
+        await sqla_session.execute(  # type: ignore
+            orm.settings.insert(),  # type: ignore
+            [format_setting(orm_site.id, p) for p in hsettings],
+        )
+        await sqla_session.commit()
+
+    yield settings
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.settings).where(orm.settings.c.id.in_([s.id for s in settings])),
     )
     await sqla_session.commit()
 

@@ -39,8 +39,8 @@ async def test_api_create_snippet(
     assert resp.status_code == 201
     assert resp.json() == {"slug": "header", "meta": {"type": "blog:HeaderSnippet"}}
     async with uow as uow:
-        page = (await uow.snippets.by_slug("header")).unwrap()
-        assert page.dict() == {
+        snippet = (await uow.snippets.by_slug("header")).unwrap()
+        assert snippet.dict() == {
             "slug": "header",
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],

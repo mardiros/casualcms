@@ -14,11 +14,13 @@ from casualcms.domain.messages.commands import (
     CreateAccountCipheredPassword,
     CreateAuthnToken,
     CreatePage,
+    CreateSetting,
     CreateSite,
     CreateSnippet,
     generate_id,
 )
 from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.snippet import Snippet
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
@@ -252,6 +254,48 @@ async def default_site(
             uow,
         )
     yield site.unwrap()
+
+
+@pytest.fixture
+async def ff_setting(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    default_site: Site,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Setting, None]:
+    async with uow as uow:
+        setting = await messagebus.handle(
+            CreateSetting(
+                key="ff",
+                hostname=default_site.hostname,
+                body={
+                    "use_stuff": True,
+                },
+            ),
+            uow,
+        )
+    yield setting.unwrap()
+
+
+@pytest.fixture
+async def contact_setting(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    default_site: Site,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Setting, None]:
+    async with uow as uow:
+        setting = await messagebus.handle(
+            CreateSetting(
+                key="contact",
+                hostname=default_site.hostname,
+                body={
+                    "email": "email@example.net",
+                },
+            ),
+            uow,
+        )
+    yield setting.unwrap()
 
 
 @pytest.fixture

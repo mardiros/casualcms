@@ -1,6 +1,15 @@
 from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 
-from . import authntoken, page, page_type, site, snippet, snippet_type
+from . import (
+    authntoken,
+    page,
+    page_type,
+    setting,
+    setting_type,
+    site,
+    snippet,
+    snippet_type,
+)
 from .base import router
 
 
@@ -53,6 +62,33 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route("/snippets-types", snippet_type.list_types, methods=["GET"])
     router.add_api_route(
         "/snippets-types/{type}", snippet_type.show_type, methods=["GET"]
+    )
+
+    router.add_api_route(
+        "/settings/{hostname}",
+        setting.create_setting,
+        methods=["POST"],
+        status_code=201,
+    )
+    router.add_api_route("/settings/{hostname}", setting.list_settings, methods=["GET"])
+    router.add_api_route(
+        "/settings/{hostname}/{key}", setting.show_setting, methods=["GET"]
+    )
+    router.add_api_route(
+        "/settings/{hostname}/{key}",
+        setting.delete_setting,
+        methods=["DELETE"],
+        status_code=204,
+    )
+    router.add_api_route(
+        "/settings/{hostname}/{key}",
+        setting.update_setting,
+        methods=["PATCH"],
+        status_code=202,
+    )
+    router.add_api_route("/settings-types", setting_type.list_types, methods=["GET"])
+    router.add_api_route(
+        "/settings-types/{key}", setting_type.show_type, methods=["GET"]
     )
 
     app.include_router(router, prefix="/api")

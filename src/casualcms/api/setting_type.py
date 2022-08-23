@@ -3,33 +3,34 @@ from typing import Any
 from fastapi import Depends
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AuthnToken, list_snippet_types, resolve_snippet_type
+from casualcms.domain.model import AuthnToken, list_setting_types, resolve_setting_type
 
 from .base import get_token_info
 
 
-class PartialSnippetType(BaseModel):
-    type: str = Field(...)
+class PartialSettingType(BaseModel):
+    key: str = Field(...)
 
 
 async def list_types(
     token: AuthnToken = Depends(get_token_info),
-) -> list[PartialSnippetType]:
-    stypes = list_snippet_types()
+) -> list[PartialSettingType]:
+    stypes = list_setting_types()
     return sorted(
-        [PartialSnippetType(type=s.__meta__.type) for s in stypes],
-        key=lambda s: s.type,
+        [PartialSettingType(key=s.__meta__.key) for s in stypes],
+        key=lambda s: s.key,
     )
 
 
 async def show_type(
-    type: str,
+    key: str,
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
-    ptype = resolve_snippet_type(type)
+    ptype = resolve_setting_type(key)
     jsonschema = ptype.schema()
+    jsonschema["required"] = [r for r in jsonschema["required"] if r != "hostname"]
     jsonschema["definitions"].pop("Event", None)
-    for key in ("id", "events", "created_at"):
+    for key in ("id", "events", "created_at", "hostname"):
         jsonschema["properties"].pop(key, None)
     return {
         "schema": jsonschema,

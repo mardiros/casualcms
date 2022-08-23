@@ -139,3 +139,34 @@ class DeleteSnippet(Command):
     metadata: Metadata = Metadata(
         category="snippet", name="update_snippet", schemaVersion=1
     )
+
+
+class CreateSetting(Command):
+    key: str = Field(...)
+    hostname: str = Field(...)
+    body: dict[str, Any] = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(default_factory=generate_id)
+    metadata: Metadata = Metadata(
+        category="setting", name="create_setting", schemaVersion=1
+    )
+
+
+class UpdateSetting(Command):
+    hostname: str = Field(...)
+    key: str = Field(...)
+    body: dict[str, Any] | None = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    id: str = Field(...)
+    metadata: Metadata = Metadata(
+        category="setting", name="update_setting", schemaVersion=1
+    )
+
+
+class DeleteSetting(Command):
+    hostname: str = Field(...)
+    key: str = Field(...)
+    id: str = Field(...)
+    metadata: Metadata = Metadata(
+        category="setting", name="update_setting", schemaVersion=1
+    )

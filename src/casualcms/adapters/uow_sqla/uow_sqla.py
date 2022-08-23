@@ -13,6 +13,7 @@ from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, Page, Site, resolve_page_type
+from casualcms.domain.model.setting import Setting, SettingType, resolve_setting_type
 from casualcms.domain.model.snippet import Snippet, SnippetType, resolve_snippet_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
@@ -30,6 +31,13 @@ from casualcms.domain.repositories.page import (
     PageRepositoryError,
     PageRepositoryResult,
     PageSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.setting import (
+    AbstractSettingRepository,
+    SettingOperationResult,
+    SettingRepositoryError,
+    SettingRepositoryResult,
+    SettingSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.site import (
     SiteOperationResult,
@@ -115,6 +123,17 @@ def format_snippet(snippet: Snippet) -> Dict[str, Any]:
         "body": snippet.dict(exclude={"slug"}),
     }
     return formated_snippet
+
+
+def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
+    formated_setting: Dict[str, Any] = {
+        "id": setting.id,
+        "key": setting.__meta__.key,
+        "created_at": setting.created_at,
+        "site_id": site_id,
+        "value": setting.dict(exclude={"hostname", "slug"}),
+    }
+    return formated_setting
 
 
 class PageSQLRepository(AbstractPageRepository):
@@ -382,6 +401,126 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         return Ok(...)
 
 
+class SettingSQLRepository(AbstractSettingRepository):
+    def __init__(self, session: AsyncSession) -> None:
+        self.session = session
+        self.seen = set()
+
+    async def _format_response(
+        self, orm_settings: CursorResult
+    ) -> SettingRepositoryResult:
+        resp = orm_settings.first()
+        if resp:
+            typ: SettingType = resolve_setting_type(resp.key)  # type: ignore
+            return Ok(
+                typ(
+                    id=resp.id,  # type: ignore
+                    hostname=resp.hostname,  # type: ignore
+                    **resp.value,  # type: ignore
+                )
+            )
+        return Err(SettingRepositoryError.setting_not_found)
+
+    async def by_id(self, id: str) -> SettingRepositoryResult:
+        """Fetch one setting by its unique id."""
+        qry = (
+            select(orm.settings, orm.sites.c.hostname)
+            .select_from(orm.settings)
+            .join(
+                orm.sites,
+                # orm.sites.c.id == orm.settings.c.site_id,
+            )
+            .filter(orm.settings.c.id == id)
+            .limit(1)
+        )
+        orm_settings: CursorResult = await self.session.execute(qry)
+        return await self._format_response(orm_settings)
+
+    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
+        """Fetch one setting by its unique key."""
+
+        orm_settings: CursorResult = await self.session.execute(
+            select(orm.settings, orm.sites.c.hostname)
+            .select_from(orm.settings)
+            .join(
+                orm.sites,
+                and_(
+                    orm.sites.c.id == orm.settings.c.site_id,
+                    orm.sites.c.hostname == hostname,
+                ),
+            )
+            .filter(orm.settings.c.key == key)
+            .limit(1)
+        )
+        return await self._format_response(orm_settings)
+
+    async def list(
+        self, hostname: Optional[str] = None
+    ) -> SettingSequenceRepositoryResult:
+        """List all settings, optionally filters on their types."""
+
+        qry = select(orm.settings, orm.sites.c.hostname)
+        qry = qry.join(
+            orm.sites,
+            orm.sites.c.id == orm.settings.c.site_id,
+        )
+        if hostname:
+            qry = qry.filter(orm.sites.c.hostname == hostname)
+        qry = qry.order_by(orm.sites.c.hostname, orm.settings.c.key)
+        orm_settings: CursorResult = await self.session.execute(qry)
+        orm_setting: Any
+        settings: list[Setting] = []
+
+        for orm_setting in orm_settings:
+            typ: SettingType = resolve_setting_type(orm_setting.key)  # type: ignore
+            settings.append(
+                typ(
+                    id=orm_setting.id,
+                    key=orm_setting.key,
+                    hostname=orm_setting.hostname,
+                    **orm_setting.value,  # type: ignore
+                )
+            )
+        return Ok(settings)
+
+    async def add(self, model: Setting) -> SettingOperationResult:
+        """Append a new model to the repository."""
+        rsite = await SiteSQLRepository(self.session).by_hostname(model.hostname)
+        if rsite.is_err():
+            return Err(SettingRepositoryError.site_not_found)
+        site_id = rsite.unwrap().id
+        qry: Any = orm.settings.insert().values(format_setting(site_id, model))
+        await self.session.execute(qry)
+        self.seen.add(model)
+        return Ok(...)
+
+    async def remove(self, model: Setting) -> SettingOperationResult:
+        """Remove the model from the repository."""
+        cursor: CursorResult = await self.session.execute(
+            delete(orm.settings).where(orm.settings.c.id == model.id),
+        )
+        if cursor.rowcount == 0:
+            return Err(SettingRepositoryError.setting_not_found)
+        self.seen.add(model)
+        return Ok(...)
+
+    async def update(self, model: Setting) -> SettingOperationResult:
+        """Update a model from the repository."""
+        self.seen.add(model)
+        rsite = await SiteSQLRepository(self.session).by_hostname(model.hostname)
+        if rsite.is_err():
+            return Err(SettingRepositoryError.site_not_found)
+        site_id = rsite.unwrap().id
+        setting = format_setting(site_id, model)
+        setting.pop("id")
+        qry = orm.settings.update(  # type: ignore
+            orm.settings.c.id == model.id,  # type: ignore
+            values=setting,
+        )
+        await self.session.execute(qry)  # type: ignore
+        return Ok(...)
+
+
 class AuthnTokenSQLRepository(AbstractAuthnRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -540,6 +679,7 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
         self.pages = PageSQLRepository(session)
         self.sites = SiteSQLRepository(session)
         self.snippets = SnippetSQLRepository(session)
+        self.settings = SettingSQLRepository(session)
 
     async def commit(self) -> None:
         await self.session.commit()
@@ -574,18 +714,18 @@ async def create_async_session(engine: AsyncEngine) -> Type[AsyncSession]:
 
 class SQLUnitOfWork(AbstractUnitOfWork):
     def __init__(self, settings: Settings) -> None:
-        self.settings = settings
+        self.app_settings = settings
         self.uow: SQLUnitOfWorkBySession | None = None
         self.create_session: Callable[[], AsyncSession] | None = None
         self.engine: AsyncEngine | None = None
 
     async def initialize(self) -> None:
         self.engine = create_async_engine(
-            self.settings.database_url,
+            self.app_settings.database_url,
             future=True,
             echo=False,
         )
-        if self.settings.create_database_schema:
+        if self.app_settings.create_database_schema:
             async with self.engine.begin() as conn:  # type: ignore
                 await conn.run_sync(orm.metadata.create_all)
         self.create_session = await create_async_session(self.engine)

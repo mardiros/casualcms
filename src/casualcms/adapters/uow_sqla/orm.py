@@ -130,3 +130,21 @@ sites = Table(
     Index("idx_sites_created_at", "created_at", unique=False),
     Index("idx_sites_hostname", "hostname", unique=True),
 )
+
+
+settings = Table(
+    "settings",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("created_at", DateTime(), nullable=False),
+    Column("key", String(72), nullable=False),
+    Column(
+        "site_id",
+        UUID,
+        ForeignKey("sites.id", name="fk_settings_site_id"),
+        nullable=False,
+    ),
+    Column("value", JSON, nullable=False),
+    Index("idx_settings_key_site_id", "key", "site_id", unique=True),
+    Index("idx_settings_created_at", "created_at", unique=False),
+)

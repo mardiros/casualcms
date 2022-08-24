@@ -2,6 +2,7 @@ import json
 import os
 import time
 import uuid
+from functools import partial
 from multiprocessing import Process
 from pathlib import Path
 from typing import Any, Callable, Iterator, Optional
@@ -9,6 +10,7 @@ from typing import Any, Callable, Iterator, Optional
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
 
 from casualcms.entrypoint import main
@@ -39,18 +41,24 @@ class Browser:
                 time.sleep(interval)
 
     def find_element_by_xpath(self, path: str):
-        return self.wait_for(self.browser.find_element_by_xpath, path)  # type: ignore
+        return self.wait_for(
+            partial(self.browser.find_element, By.XPATH),  # type: ignore
+            path,
+        )
 
     def dont_find_element_by_xpath(self, path: str):
         try:
-            self.browser.find_element_by_xpath(path)
+            self.browser.find_element(By.XPATH, path)  # type: ignore
         except NoSuchElementException:
             return
         else:
             raise ValueError(f"Element {path} exists")
 
     def find_elements_by_xpath(self, path: str):
-        return self.wait_for(self.browser.find_elements_by_xpath, path)  # type: ignore
+        return self.wait_for(
+            partial(self.browser.find_elements, By.XPATH),  # type: ignore
+            path,
+        )
 
     def get(self, path: str):
         if path.startswith("/"):
@@ -97,7 +105,10 @@ class Browser:
             key,
             log_id,
         )
-        ret = self.wait_for(self.browser.find_element_by_id, log_id)  # type: ignore
+        ret = self.wait_for(
+            partial(self.browser.find_element, By.ID),  # type: ignore
+            log_id,
+        )
         data = json.loads(ret.text)
 
         self.browser.execute_script(

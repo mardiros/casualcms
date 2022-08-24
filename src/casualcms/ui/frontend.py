@@ -16,25 +16,25 @@ async def serve_pages(
                 status_code=302,
                 headers={"location": "/admin/"},
             )
-        host = request.url.hostname or ""
+        hostname = request.url.hostname or ""
         if request.url.port:
-            host += f":{request.url.port}"
-        site = await uow.sites.by_hostname(host)
-        if site.is_err():
+            hostname += f":{request.url.port}"
+        rsite = await uow.sites.by_hostname(hostname)
+        if rsite.is_err():
             root_page_path = ""
             # raise HTTPException(
             #     status_code=404,
             #     detail=[{"msg": f"Host {request.url.hostname} not found"}],
             # )
         else:
-            site_ok = site.unwrap()
-            if site_ok.secure and request.url.scheme == "http":
+            site = rsite.unwrap()
+            if site.secure and request.url.scheme == "http":
                 return Response(
                     status_code=302,
-                    headers={"location": f"https://{host}/{request.url.path}"},
+                    headers={"location": f"https://{hostname}/{request.url.path}"},
                 )
 
-            root_page_path = site.unwrap().root_page_path
+            root_page_path = site.root_page_path
         page = await uow.pages.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if page.is_err():
             raise HTTPException(
@@ -42,7 +42,9 @@ async def serve_pages(
                 detail=[{"msg": f"Page {path} not found"}],
             )
         rpage = page.unwrap()
-        renderer = Jinja2TemplateRender(uow, app.settings.template_search_path)
+        renderer = Jinja2TemplateRender(
+            uow, app.settings.template_search_path, hostname
+        )
         data = await renderer.render_template(
             rpage.get_template(),
             rpage.get_context(),

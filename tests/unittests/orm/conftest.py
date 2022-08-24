@@ -11,7 +11,6 @@ from typing import (
 )
 
 import pytest
-import pytest_asyncio
 from sqlalchemy import delete, select, text  # type: ignore
 from sqlalchemy.engine.cursor import CursorResult  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
@@ -48,7 +47,7 @@ def app_settings_sqlite() -> Iterator[Settings]:
     )
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def sqla_engine(
     bared_sqla_engine: AsyncEngine,
 ) -> AsyncGenerator[AsyncEngine, None]:
@@ -67,7 +66,7 @@ def sqla_session(sqla_engine: AsyncEngine) -> Iterator[AsyncSession]:
     yield async_session()  # type: ignore
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def accounts(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
@@ -90,7 +89,7 @@ async def accounts(
     await sqla_session.commit()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def sites(
     sqla_session: AsyncSession,
     pages: list[Page],
@@ -112,7 +111,7 @@ async def sites(
     await sqla_session.commit()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def authn_tokens(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
@@ -135,7 +134,7 @@ async def authn_tokens(
     await sqla_session.commit()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def pages(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
@@ -213,7 +212,7 @@ async def pages(
     await sqla_session.commit()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def snippets(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
@@ -245,7 +244,7 @@ async def snippets(
     await sqla_session.commit()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def settings(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
@@ -308,7 +307,7 @@ def dummy_session():
     return DummyAsyncSession()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def sql_uow(app_settings_sqlite: Settings) -> AsyncGenerator[SQLUnitOfWork, None]:
     uow = SQLUnitOfWork(app_settings_sqlite)
     await uow.initialize()
@@ -316,7 +315,7 @@ async def sql_uow(app_settings_sqlite: Settings) -> AsyncGenerator[SQLUnitOfWork
     await uow.dispose()
 
 
-@pytest_asyncio.fixture()
+@pytest.fixture()
 async def accounts_uow(
     sql_uow: SQLUnitOfWork,
     params: Mapping[str, Any],

@@ -6,13 +6,12 @@ import { renderWithRouter } from "./helpers";
 import config from "./config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
-  SiteList,
-  SiteListButtons,
+  SettingSiteList,
   SiteListTable,
   SiteRow,
-} from "../../src/webapp/ui/sites/site_list";
+} from "../../src/webapp/ui/settings/settings_sites_list";
 
-describe("As a user, I can list settings per sites", () => {
+describe("As a user, I can list sites in settings", () => {
   before(async () => {
     await config.api.site.createSite("", "*", {
       default: true,
@@ -52,7 +51,7 @@ describe("As a user, I can list settings per sites", () => {
     );
 
     let link = await screen.findByText("Edit", { exact: false });
-    expect(link.getAttribute("href")).equal("/admin/sites/edit?hostname=*");
+    expect(link.getAttribute("href")).equal("/admin/settings/*");
   });
 
   it("Render sites table from the API", async () => {
@@ -67,39 +66,26 @@ describe("As a user, I can list settings per sites", () => {
     expect(links.length).equal(3);
     expect(links[0].nodeName).equal("TH");
     expect(links[1].nodeName).equal("A");
-    expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
+    expect(links[1].getAttribute("href")).equal("/admin/settings/*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/settings/www.localhost"
     );
   });
 
   it("Render sites lists from the API", async () => {
     renderWithRouter(
-      <Route path="/admin/sites" element={<SiteList />} />,
+      <Route path="/admin/sites" element={<SettingSiteList />} />,
       "/admin/sites"
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
     expect(links[0].nodeName).equal("TH");
     expect(links[1].nodeName).equal("A");
-    expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
+    expect(links[1].getAttribute("href")).equal("/admin/settings/*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/settings/www.localhost"
     );
-  });
-  it("Redirect to the new site while clicking on the add button", async () => {
-    renderWithRouter(
-      <>
-        <Route path="/admin/sites" element={<SiteListButtons />} />
-        <Route path="/admin/sites/new" element={<h4>New web site page</h4>} />
-      </>,
-      "/admin/sites"
-    );
-    let link = screen.getByText("Add new site", { exact: false });
-    fireEvent.click(link);
-    const newPage = screen.getByText("New web site page");
-    expect(newPage.nodeName).equal("H4");
   });
 });

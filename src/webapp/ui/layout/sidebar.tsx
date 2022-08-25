@@ -36,16 +36,19 @@ export const SideBar: React.FunctionComponent<{}> = () => {
   let pagesColor = ["teal.500", "white", "false"];
   let sitesColor = ["teal.500", "white", "false"];
   let snippetsColor = ["teal.500", "white", "false"];
+  let settingsColor = ["teal.500", "white", "false"];
   const location = useLocation();
   if (
-    location.pathname.startsWith("/admin/page") ||
+    location.pathname.startsWith("/admin/pages") ||
     location.pathname == "/admin/"
   ) {
     pagesColor = selectedColor;
-  } else if (location.pathname.startsWith("/admin/site")) {
+  } else if (location.pathname.startsWith("/admin/sites")) {
     sitesColor = selectedColor;
-  } else if (location.pathname.startsWith("/admin/snippet")) {
+  } else if (location.pathname.startsWith("/admin/snippets")) {
     snippetsColor = selectedColor;
+  } else if (location.pathname.startsWith("/admin/settings")) {
+    settingsColor = selectedColor;
   } else {
     return <></>;
   }
@@ -65,6 +68,11 @@ export const SideBar: React.FunctionComponent<{}> = () => {
           title="Snippets"
         />
         <SideBarItem colors={sitesColor} href="/admin/sites" title="Sites" />
+        <SideBarItem
+          colors={settingsColor}
+          href="/admin/settings"
+          title="Settings"
+        />
       </SimpleGrid>
     </Box>
   );

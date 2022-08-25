@@ -18,6 +18,8 @@ import { SnippetList } from "./ui/snippets/snippet_list";
 import { SnippetTypeList } from "./ui/snippets/snippet_types_list";
 import { SnippetNew } from "./ui/snippets/snippet_new";
 import { SnippetEdit } from "./ui/snippets/snippet_edit";
+import { SettingSiteList } from "./ui/settings/settings_sites_list";
+import { SettingList } from "./ui/settings/settings_list";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -58,6 +60,13 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
         <Route path="sites" element={<SiteList />} caseSensitive />
         <Route path="sites/new" element={<SiteNew />} caseSensitive />
         <Route path="sites/edit" element={<SiteEdit />} caseSensitive />
+
+        <Route path="settings" element={<SettingSiteList />} caseSensitive />
+        <Route
+          path="settings/:hostname"
+          element={<SettingList />}
+          caseSensitive
+        />
 
         <Route path="*" element={<PageNotFound />} />
       </Routes>

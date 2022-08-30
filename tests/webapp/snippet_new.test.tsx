@@ -11,7 +11,7 @@ describe("As a user, I can list snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippets/new/:snippetType"
+          path="/admin/snippets/new/:snippetTypeName"
           element={<SnippetNew />}
         ></Route>
         <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>

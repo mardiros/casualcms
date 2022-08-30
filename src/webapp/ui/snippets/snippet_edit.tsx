@@ -23,7 +23,9 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const params = useParams();
   const snippetSlug = params.snippetSlug || "";
 
-  const [template, setTemplate] = React.useState<SnippetType | null>(null);
+  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(
+    null
+  );
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
@@ -32,12 +34,12 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       if (!snippet) {
         return;
       }
-      const template = await config.api.snippetType.showSnippetType(
+      const rtyp = await config.api.snippetType.showSnippetType(
         token,
         snippet.meta.type
       );
-      template
-        .map((tpl: SnippetType) => setTemplate(tpl))
+      rtyp
+        .map((typ: SnippetType) => setSnippetType(typ))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
@@ -45,7 +47,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
     return () => {
       setIsLoading(true);
       setError(null);
-      setTemplate(null);
+      setSnippetType(null);
     };
   }, [snippet]);
 
@@ -78,11 +80,11 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       <Heading>Edit Snippet</Heading>
       <SnippetBreadcrumb snippet={snippet} />
       <ApiErrorUI error={error} />
-      {snippet && template && (
+      {snippet && snippetType && (
         <>
           <Form
-            schema={template.schema}
-            uiSchema={template.uiSchema}
+            schema={snippetType.schema}
+            uiSchema={snippetType.uiSchema}
             formData={snippet}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}

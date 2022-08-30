@@ -25,11 +25,11 @@ describe("As a user, I can edit existing snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/snippets/:snippetType"
+          path="/admin/snippets/snippetTypeName"
           element={<SnippetList />}
         ></Route>
         <Route
-          path="/admin/snippets/edit/:snippetType/:snippetSlug"
+          path="/admin/snippets/edit/:snippetTypeName/:snippetSlug"
           element={<SnippetEdit />}
         ></Route>
       </>,
@@ -50,7 +50,7 @@ describe("As a user, I can edit existing snippet", () => {
       <>
         <Route path="/admin/snippets" element={<SnippetList />}></Route>
         <Route
-          path="/admin/snippets/edit/:snippetType/:snippetSlug"
+          path="/admin/snippets/edit/:snippetTypeName/:snippetSlug"
           element={<SnippetEdit />}
         ></Route>
       </>,

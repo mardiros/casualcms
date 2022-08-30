@@ -16,12 +16,12 @@ const Form = withTheme(ChakraUITheme);
 export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("-------------------------------------------")
   // console.log("# Rendering page new")
-  let { pageType } = useParams<string>();
+  let { pageTypeName } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [template, setTemplate] = React.useState<PageType | null>(null);
+  const [pageType, setPageType] = React.useState<PageType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
   const [params, setParams] = useSearchParams();
@@ -30,23 +30,23 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const [parentPage, setParentPage] = React.useState<Page | null>(null);
 
   React.useEffect(() => {
-    async function loadTemplate() {
-      const template = await config.api.pageType.showPageType(
+    async function loadPageType() {
+      const rtyp = await config.api.pageType.showPageType(
         token,
-        pageType || ""
+        pageTypeName || ""
       );
-      template
-        .map((tpl: PageType) => setTemplate(tpl))
+      rtyp
+        .map((typ: PageType) => setPageType(typ))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTemplate();
+    loadPageType();
     return () => {
       setIsLoading(true);
       setError(null);
-      setTemplate(null);
+      setPageType(null);
     };
-  }, [pageType]);
+  }, [pageTypeName]);
 
   React.useEffect(() => {
     async function loadPage() {
@@ -72,7 +72,12 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    await config.api.page.createPage(token, pageType || "", page, parentPath);
+    await config.api.page.createPage(
+      token,
+      pageTypeName || "",
+      page,
+      parentPath
+    );
     navigate(`/admin/pages?${params}`, { replace: true });
   };
 
@@ -82,10 +87,10 @@ export const PageNew: React.FunctionComponent<{}> = () => {
       <Heading>New Page</Heading>
       {parentPage && <PageBreadcrumb page={parentPage} title="new page" />}
       <ApiErrorUI error={error} />
-      {template && (
+      {pageType && (
         <Form
-          schema={template.schema}
-          uiSchema={template.uiSchema}
+          schema={pageType.schema}
+          uiSchema={pageType.uiSchema}
           formData={data}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}

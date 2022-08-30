@@ -14,40 +14,46 @@ import { SnippetBreadcrumb } from "../layout/breadcrumb";
 const Form = withTheme(ChakraUITheme);
 
 export const SnippetNew: React.FunctionComponent<{}> = () => {
-  let { snippetType } = useParams<string>();
+  let { snippetTypeName } = useParams<string>();
   let auth = useAuth();
   const config = React.useContext(AppContext);
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [template, setTemplate] = React.useState<SnippetType | null>(null);
+  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(
+    null
+  );
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
   React.useEffect(() => {
-    async function loadTemplate() {
-      const template = await config.api.snippetType.showSnippetType(
+    async function loadType() {
+      const rtyp = await config.api.snippetType.showSnippetType(
         token,
-        snippetType || ""
+        snippetTypeName || ""
       );
-      template
-        .map((tpl: SnippetType) => setTemplate(tpl))
+      rtyp
+        .map((typ: SnippetType) => setSnippetType(typ))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTemplate();
+    loadType();
     return () => {
       setIsLoading(true);
       setError(null);
-      setTemplate(null);
+      setSnippetType(null);
     };
-  }, [snippetType]);
+  }, [snippetTypeName]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
-    await config.api.snippet.createSnippet(token, snippetType || "", snippet);
+    await config.api.snippet.createSnippet(
+      token,
+      snippetTypeName || "",
+      snippet
+    );
     navigate(`/admin/snippets`, { replace: true });
   };
 
@@ -57,10 +63,10 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
       <Heading>New Snippet</Heading>
       <SnippetBreadcrumb title="new snippet" />
       <ApiErrorUI error={error} />
-      {template && (
+      {snippetType && (
         <Form
-          schema={template.schema}
-          uiSchema={template.uiSchema}
+          schema={snippetType.schema}
+          uiSchema={snippetType.uiSchema}
           formData={data}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}

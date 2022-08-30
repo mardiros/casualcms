@@ -12,7 +12,7 @@ describe("As a user, I can list snippet", () => {
   it("render a spinner while loading", async () => {
     renderWithRouter(
       <Route
-        path="/admin/snippets/new/:snippetType"
+        path="/admin/snippets/new/:snippetTypeName"
         element={<SnippetTypesTable isLoading={true} snippetTypes={[]} />}
       />,
       "/admin/snippets/new/blog:HeaderSnippet"

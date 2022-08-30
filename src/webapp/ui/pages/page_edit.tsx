@@ -17,7 +17,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
-  const [template, setTemplate] = React.useState<PageType | null>(null);
+  const [pageType, setPageType] = React.useState<PageType | null>(null);
   const [page, setPage] = React.useState<Page | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -35,26 +35,26 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   let navigate = useNavigate();
 
   React.useEffect(() => {
-    async function loadTemplate() {
+    async function loadPageType() {
       if (!page) {
         return;
       }
-      const template = await config.api.pageType.showPageType(
+      const rtyp = await config.api.pageType.showPageType(
         token,
         page.meta.type
       );
-      // console.log(template);
-      template
-        .map((tpl: PageType) => setTemplate(tpl))
+      // console.log(rtyp);
+      rtyp
+        .map((typ: PageType) => setPageType(typ))
         .mapErr((err: ApiError) => setError(err));
       // console.log("setIsLoading");
       setIsLoading(false);
     }
     if (page) {
-      loadTemplate();
+      loadPageType();
     }
     return () => {
-      setTemplate(null);
+      setPageType(null);
       setError(null);
       setIsLoading(true);
     };
@@ -85,7 +85,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   };
 
   if (isLoading) {
-    return <Loader label="loading page and page template..." />;
+    return <Loader label="loading page and page type..." />;
   }
 
   return (
@@ -99,10 +99,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
       <ApiErrorUI error={error} />
 
-      {template && page && (
+      {pageType && page && (
         <Form
-          schema={template.schema}
-          uiSchema={template.uiSchema}
+          schema={pageType.schema}
+          uiSchema={pageType.uiSchema}
           formData={page}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}

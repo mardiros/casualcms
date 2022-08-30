@@ -46,9 +46,7 @@ describe("As a user, I can edit existing pages", () => {
       "/admin/pages/edit?page=/home"
     );
 
-    await waitForLoadingLabel("loading page and page template...");
-
-    let input = screen.getByLabelText("Slug", { exact: false });
+    let input = await screen.findByLabelText("Slug", { exact: false });
     expect(input.getAttribute("value")).equal("home");
 
     input = screen.getByLabelText("Title", { exact: false });
@@ -64,9 +62,7 @@ describe("As a user, I can edit existing pages", () => {
       "/admin/pages/edit?page=/home/sub0"
     );
 
-    await waitForLoadingLabel("loading page and page template...");
-
-    let input = screen.getByLabelText("Slug", { exact: false });
+    let input = await screen.findByLabelText("Slug", { exact: false });
     expect(input.getAttribute("value")).equal("sub0");
 
     input = screen.getByLabelText("Title", { exact: false });
@@ -85,9 +81,7 @@ describe("As a user, I can edit existing pages", () => {
       "/admin/pages/edit?page=/home"
     );
 
-    await waitForLoadingLabel("loading page and page template...");
-
-    let input = screen.getByLabelText("Title", { exact: false });
+    let input = await screen.findByLabelText("Title", { exact: false });
     fireEvent.change(input, { target: { value: "New Value" } });
 
     input = screen.getByLabelText("Body", { exact: false });

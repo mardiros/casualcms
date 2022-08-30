@@ -43,7 +43,10 @@ async def test_api_create_setting(
         },
     )
     assert resp.status_code == 201
-    assert resp.json() == {"meta": {"key": "ff"}}
+    assert resp.json() == {
+        "meta": {"key": "ff"},
+        "hostname": default_site.hostname,
+    }
     async with uow as uow:
         setting = (await uow.settings.by_key(default_site.hostname, "ff")).unwrap()
         assert setting.__meta__.key == "ff"
@@ -79,8 +82,8 @@ async def test_api_list_setting(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"meta": {"key": "contact"}},
-        {"meta": {"key": "ff"}},
+        {"meta": {"key": "contact"}, "hostname": default_site.hostname},
+        {"meta": {"key": "ff"}, "hostname": default_site.hostname},
     ]
 
 
@@ -118,7 +121,10 @@ async def test_api_patch_setting(
         },
     )
     assert resp.status_code == 202
-    assert resp.json() == {"meta": {"key": "ff"}}
+    assert resp.json() == {
+        "meta": {"key": "ff"},
+        "hostname": default_site.hostname,
+    }
 
     async with uow as uow:
         rsetting = await uow.settings.by_key(default_site.hostname, "ff")
@@ -153,6 +159,7 @@ async def test_api_get_setting(
     assert resp.status_code == 200
     assert resp.json() == {
         "meta": {"key": "ff"},
+        "hostname": default_site.hostname,
         "use_stuff": True,
         "use_another_stuff": None,
     }

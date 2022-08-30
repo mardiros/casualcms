@@ -21,6 +21,7 @@ class PartialSettingMeta(BaseModel):
 
 class PartialSetting(BaseModel):
     meta: PartialSettingMeta = Field(...)
+    hostname: str = Field(...)
 
 
 async def create_setting(
@@ -59,6 +60,7 @@ async def create_setting(
 
     return PartialSetting(
         meta=PartialSettingMeta(key=setting.__meta__.key),
+        hostname=hostname,
     )
 
 
@@ -76,7 +78,11 @@ async def list_settings(
     setting = settings.unwrap()
 
     return [
-        PartialSetting(meta=PartialSettingMeta(key=s.__meta__.key)) for s in setting
+        PartialSetting(
+            meta=PartialSettingMeta(key=s.__meta__.key),
+            hostname=hostname,
+        )
+        for s in setting
     ]
 
 
@@ -131,6 +137,7 @@ async def update_setting(
 
     return PartialSetting(
         meta=PartialSettingMeta(key=setting.__meta__.key),
+        hostname=hostname,
     )
 
 

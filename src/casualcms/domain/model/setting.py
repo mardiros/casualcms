@@ -108,7 +108,7 @@ class Setting(AbstractSetting):
             "meta": {
                 "key": self.__meta__.key,
             },
-            **self.dict(exclude={"hostname"}),
+            **self.dict(),
         }
 
     def get_context(self) -> MutableMapping[str, Any]:

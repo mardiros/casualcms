@@ -20,6 +20,8 @@ import { SnippetNew } from "./ui/snippets/snippet_new";
 import { SnippetEdit } from "./ui/snippets/snippet_edit";
 import { SettingSiteList } from "./ui/settings/settings_sites_list";
 import { SettingList } from "./ui/settings/settings_list";
+import { SettingNew } from "./ui/settings/setting_new";
+import { SettingEdit } from "./ui/settings/setting_edit";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -65,6 +67,16 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
         <Route
           path="settings/:hostname"
           element={<SettingList />}
+          caseSensitive
+        />
+        <Route
+          path="settings/:hostname/:key/new"
+          element={<SettingNew />}
+          caseSensitive
+        />
+        <Route
+          path="settings/:hostname/:key/edit"
+          element={<SettingEdit />}
           caseSensitive
         />
 

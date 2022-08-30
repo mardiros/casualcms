@@ -11,6 +11,9 @@ import {
   PartialSnippetType,
   SnippetType,
   Snippet,
+  PartialSettingType,
+  PartialSetting,
+  Setting,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -117,4 +120,27 @@ export interface ISnippetTypeApi {
     authntoken: string,
     snippetType: string
   ): Promise<Result<SnippetType, ApiError>>;
+}
+
+export interface ISettingTypeApi {
+  listSettingTypes(
+    authntoken: string
+  ): Promise<Result<PartialSettingType[], ApiError>>;
+}
+
+export interface ISettingApi {
+  listSettings(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<PartialSetting[], ApiError>>;
+  createSetting(
+    authntoken: string,
+    hostname: string,
+    type: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>>;
+  deleteSetting(
+    authntoken: string,
+    setting: Setting
+  ): Promise<Result<boolean, ApiError>>;
 }

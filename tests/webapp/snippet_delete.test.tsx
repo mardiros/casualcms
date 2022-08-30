@@ -37,12 +37,12 @@ describe("As a user, I can delete a snippet", () => {
     renderWithRouter(
       <>
         <Route
-          path="/admin/popin"
+          path="/admin/snippets/blog:HeaderSnippet"
           element={<SnippetDeletePopoverForm curSnippet={snippet} />}
         />
         <Route path="/admin/snippets" element={<h4>Snippet list</h4>} />
       </>,
-      "/admin/popin"
+      "/admin/snippets/blog:HeaderSnippet"
     );
     let link = screen.getByText("Delete this snippet");
     fireEvent.click(link);

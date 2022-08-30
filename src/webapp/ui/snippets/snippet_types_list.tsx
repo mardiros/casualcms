@@ -44,12 +44,12 @@ export const SnippetTypesTable: React.FunctionComponent<
           </Tr>
         </Thead>
         <Tbody>
-          {snippetTypes.map((tpl, i) => (
+          {snippetTypes.map((typ, i) => (
             <Tr key={i}>
               <Td>
-                <Link to={`/admin/snippets/new/${tpl.type}`}>
+                <Link to={`/admin/snippets/new/${typ.type}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />
-                  {tpl.type}
+                  {typ.type}
                 </Link>
               </Td>
             </Tr>
@@ -65,9 +65,10 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [snippetTypes, setTemplates] = React.useState<PartialSnippetType[]>([]);
+  const [snippetTypes, setSnippetTypes] = React.useState<PartialSnippetType[]>(
+    []
+  );
   const [error, setError] = React.useState<ApiError>(null);
-  const [params, setParams] = useSearchParams();
 
   React.useEffect(() => {
     async function loadTypes() {
@@ -75,7 +76,7 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
         token
       );
       snippetTemplates
-        .map((tpls: PartialSnippetType[]) => setTemplates(tpls))
+        .map((tpls: PartialSnippetType[]) => setSnippetTypes(tpls))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
@@ -83,7 +84,7 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
     return () => {
       setIsLoading(true);
       setError(null);
-      setTemplates([]);
+      setSnippetTypes([]);
     };
   }, []);
 

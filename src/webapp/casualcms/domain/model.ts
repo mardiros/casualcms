@@ -74,3 +74,18 @@ export type SnippetType = {
   schema: JSONSchema7;
   uiSchema: any;
 };
+
+export type PartialSettingType = {
+  key: string;
+};
+
+export type PartialSetting = {
+  meta: PartialSettingType;
+  hostname: string;
+};
+
+export type Setting = {
+  meta: PartialSettingType;
+  hostname: string;
+  [k: string]: any;
+};

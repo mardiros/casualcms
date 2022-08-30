@@ -20,25 +20,23 @@ import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
 import { useAuth } from "../login/hooks";
 
-type SiteRowProps = {
+type SettingSiteRowProps = {
   site: PartialSite;
 };
 
-type SiteListTableProps = {
+type SettingSiteListTableProps = {
   config: AppConfig;
   token: string;
 };
 
-export const SiteRow: React.FunctionComponent<SiteRowProps> = (
-  props: SiteRowProps
+export const SettingSiteRow: React.FunctionComponent<SettingSiteRowProps> = (
+  props: SettingSiteRowProps
 ) => {
   const site = props.site;
   return (
     <Tr>
       <Td>
-        <Link to={`/admin/settings/${site.hostname}`}>
-          {site.hostname}
-        </Link>
+        <Link to={`/admin/settings/${site.hostname}`}>{site.hostname}</Link>
       </Td>
       <Td>
         <Link to={`/admin/settings/${site.hostname}`}>
@@ -50,9 +48,9 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
   );
 };
 
-export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
-  props: SiteListTableProps
-) => {
+export const SettingSiteListTable: React.FunctionComponent<
+  SettingSiteListTableProps
+> = (props: SettingSiteListTableProps) => {
   const config = props.config;
   const token = props.token;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -89,7 +87,7 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
         </Thead>
         <Tbody>
           {sites.map((site, i) => (
-            <SiteRow site={site} key={i} />
+            <SettingSiteRow site={site} key={i} />
           ))}
         </Tbody>
       </Table>
@@ -104,7 +102,7 @@ export const SettingSiteList: React.FunctionComponent<{}> = () => {
 
   return (
     <Box>
-      <SiteListTable config={config} token={token} />
+      <SettingSiteListTable config={config} token={token} />
     </Box>
   );
 };

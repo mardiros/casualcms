@@ -69,7 +69,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [pageTypes, setTemplates] = React.useState<PartialPageType[]>([]);
+  const [pageTypes, setTypes] = React.useState<PartialPageType[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
   const [params, setParams] = useSearchParams();
   const parentType = params.get("type");
@@ -77,21 +77,21 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   const [parentPage, setParentPage] = React.useState<Page | null>(null);
 
   React.useEffect(() => {
-    async function loadTemplates() {
-      const pageTemplates = await config.api.pageType.listPageTypes(
+    async function loadTypes() {
+      const pageTypes = await config.api.pageType.listPageTypes(
         token,
         parentType
       );
-      pageTemplates
-        .map((tpls: PartialPageType[]) => setTemplates(tpls))
+      pageTypes
+        .map((tpls: PartialPageType[]) => setTypes(tpls))
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTemplates();
+    loadTypes();
     return () => {
       setIsLoading(true);
       setError(null);
-      setTemplates([]);
+      setTypes([]);
     };
   }, [parentType]);
 

@@ -11,6 +11,9 @@ import {
   PartialSnippetType,
   SnippetType,
   Snippet,
+  PartialSettingType,
+  PartialSetting,
+  Setting,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -22,6 +25,8 @@ import {
   SiteOption,
   ISnippetApi,
   ISnippetTypeApi,
+  ISettingTypeApi,
+  ISettingApi,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
@@ -388,6 +393,61 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
   }
 }
 
+export class FakeSettingApi implements ISettingApi {
+  settings: Setting[];
+
+  constructor() {
+    this.settings = [];
+  }
+
+  async listSettings(
+    authntoken: string,
+    hostname: string
+  ): Promise<Result<PartialSetting[], ApiError>> {
+    const settings: PartialSetting[] = [];
+    this.settings.map((s) => {
+      if (s.hostname == hostname) {
+        settings.push({ hostname: hostname, meta: s.meta });
+      }
+    });
+    return ok(settings);
+  }
+
+  async createSetting(
+    authntoken: string,
+    hostname: string,
+    type: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>> {
+    const setting = {
+      hostname: hostname,
+      meta: { key: type },
+      ...payload,
+    };
+    this.settings.push(setting);
+    return ok(true);
+  }
+  async deleteSetting(
+    authntoken: string,
+    setting: Setting
+  ): Promise<Result<boolean, ApiError>> {
+    const key = setting.meta.key;
+    const settings = this.settings.filter((s: any) => {
+      return s.hostname != setting.hostname || s.meta.key != key;
+    });
+    this.settings = settings;
+    return ok(true);
+  }
+}
+
+export class FakeSettingTypeApi implements ISettingTypeApi {
+  async listSettingTypes(
+    authntoken: string
+  ): Promise<Result<PartialSettingType[], ApiError>> {
+    return ok([{ key: "blog:ff" }, { key: "blog:contact" }]);
+  }
+}
+
 export class FakeApi implements IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
@@ -395,6 +455,8 @@ export class FakeApi implements IApi {
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
+  setting: ISettingApi;
+  settingType: ISettingTypeApi;
 
   constructor() {
     this.account = new FakeAccountApi();
@@ -403,5 +465,7 @@ export class FakeApi implements IApi {
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
     this.snippetType = new FakeSnippetTypeApi();
+    this.setting = new FakeSettingApi();
+    this.settingType = new FakeSettingTypeApi();
   }
 }

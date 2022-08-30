@@ -7,8 +7,8 @@ import config from "./config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SettingSiteList,
-  SiteListTable,
-  SiteRow,
+  SettingSiteListTable,
+  SettingSiteRow,
 } from "../../src/webapp/ui/settings/settings_sites_list";
 
 describe("As a user, I can list sites in settings", () => {
@@ -29,7 +29,7 @@ describe("As a user, I can list sites in settings", () => {
     await config.api.site.deleteSite("", "*");
   });
 
-  it("Render a row for a page", async () => {
+  it("Render a row for a site setting", async () => {
     const site = {
       hostname: "*",
       default: true,
@@ -42,7 +42,7 @@ describe("As a user, I can list sites in settings", () => {
         element={
           <Table>
             <Tbody>
-              <SiteRow site={site} />
+              <SettingSiteRow site={site} />
             </Tbody>
           </Table>
         }
@@ -58,7 +58,7 @@ describe("As a user, I can list sites in settings", () => {
     renderWithRouter(
       <Route
         path="/admin/sites"
-        element={<SiteListTable config={config} token="" />}
+        element={<SettingSiteListTable config={config} token="" />}
       />,
       "/admin/sites"
     );

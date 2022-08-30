@@ -1,7 +1,5 @@
-import { EditIcon } from "@chakra-ui/icons";
+import React from "react";
 import {
-  Box,
-  Icon,
   Table,
   TableContainer,
   Tbody,
@@ -10,20 +8,143 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Result } from "neverthrow";
-import React from "react";
-import { Link } from "react-router-dom";
-import { PartialSite } from "../../casualcms/domain/model";
+import { Link, useParams } from "react-router-dom";
+import {
+  PartialSetting,
+  PartialSettingType,
+} from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
-import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
 import { useAuth } from "../login/hooks";
+
+type SettingRowProps = {
+  settingUrl: string | undefined;
+  settingType: PartialSettingType;
+};
+
+type SettingsTableProps = {
+  config: AppConfig;
+  token: string;
+  hostname: string;
+  settingTypes: PartialSettingType[];
+};
+
+export const SettingRow: React.FunctionComponent<SettingRowProps> = (
+  props: SettingRowProps
+) => {
+  const { settingUrl, settingType } = props;
+  return (
+    <Tr>
+      <Td>
+        <Link to={settingUrl || "#broken"}>{settingType.key}</Link>
+      </Td>
+    </Tr>
+  );
+};
+
+export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
+  props: SettingsTableProps
+) => {
+  const { config, token, hostname, settingTypes } = props;
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [settingsUrl, setSettingsUrl] = React.useState<{
+    [key: string]: string;
+  }>({});
+  const [error, setError] = React.useState<ApiError>(null);
+
+  React.useEffect(() => {
+    async function loadSettings() {
+      const settings = await config.api.setting.listSettings(token, hostname);
+      settings
+        .map((typ: PartialSetting[]) => {
+          const settingsObj: { [key: string]: string } = {};
+          settingTypes.map(
+            (val) =>
+              (settingsObj[
+                val.key
+              ] = `/admin/settings/${hostname}/${val.key}/new`)
+          );
+          typ.map((val) => {
+            settingsObj[
+              val.meta.key
+            ] = `/admin/settings/${hostname}/${val.meta.key}/edit`;
+          });
+          setSettingsUrl(settingsObj);
+        })
+        .mapErr((err: ApiError) => setError(err));
+      setIsLoading(false);
+    }
+    loadSettings();
+    return () => {
+      setIsLoading(true);
+      setError(null);
+      setSettingsUrl({});
+    };
+  }, []);
+
+  if (isLoading) {
+    return <Loader label="loading setting..." />;
+  }
+  return (
+    <TableContainer>
+      <Table variant="simple">
+        <Thead>
+          <Tr>
+            <Th>Setting Type</Th>
+          </Tr>
+        </Thead>
+        <Tbody>
+          {settingTypes.map((typ, i) => (
+            <SettingRow
+              settingType={typ}
+              settingUrl={settingsUrl[typ.key]}
+              key={i}
+            />
+          ))}
+        </Tbody>
+      </Table>
+    </TableContainer>
+  );
+};
 
 export const SettingList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
+  let { hostname, settingType } = useParams<string>();
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [settingTypes, setSettingTypes] = React.useState<PartialSettingType[]>(
+    []
+  );
+  const [error, setError] = React.useState<ApiError>(null);
 
-  return <Box>TODO</Box>;
+  React.useEffect(() => {
+    async function loadTypes() {
+      const types = await config.api.settingType.listSettingTypes(token);
+      types
+        .map((typ: PartialSettingType[]) => setSettingTypes(typ))
+        .mapErr((err: ApiError) => setError(err));
+      setIsLoading(false);
+    }
+    loadTypes();
+    return () => {
+      setIsLoading(true);
+      setError(null);
+      setSettingTypes([]);
+    };
+  }, [settingType]);
+
+  if (isLoading) {
+    return <Loader label="loading setting types..." />;
+  }
+
+  return (
+    <SettingsTable
+      config={config}
+      token={token}
+      hostname={hostname || ""}
+      settingTypes={settingTypes}
+    />
+  );
 };

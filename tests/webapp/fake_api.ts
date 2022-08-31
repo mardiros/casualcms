@@ -446,6 +446,24 @@ export class FakeSettingApi implements ISettingApi {
     return err(errMap);
   }
 
+  async updateSetting(
+    authntoken: string,
+    hostname: string,
+    setting: Setting
+  ): Promise<Result<boolean, ApiError>> {
+    const settings: Setting[] = [];
+    this.settings.map((s) => {
+      if (s.hostname != hostname || s.meta.key != setting.meta.key) {
+        console.log(s.hostname);
+        console.log(s.s.meta.key);
+        settings.push(s);
+      }
+    });
+    settings.push(setting);
+    this.settings = settings;
+    return ok(true);
+  }
+
   async deleteSetting(
     authntoken: string,
     setting: Setting

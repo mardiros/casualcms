@@ -71,7 +71,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
           formData={data}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
-        // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
         />
       )}
     </Box>

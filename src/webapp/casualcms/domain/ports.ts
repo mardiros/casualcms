@@ -129,7 +129,7 @@ export interface ISettingTypeApi {
   ): Promise<Result<PartialSettingType[], ApiError>>;
   showSettingType(
     authntoken: string,
-    key: string,
+    key: string
   ): Promise<Result<SettingType, ApiError>>;
 }
 
@@ -147,9 +147,13 @@ export interface ISettingApi {
   showSetting(
     authntoken: string,
     hostname: string,
-    key: string,
+    key: string
   ): Promise<Result<Setting, ApiError>>;
-
+  updateSetting(
+    authntoken: string,
+    hostname: string,
+    setting: Setting
+  ): Promise<Result<boolean, ApiError>>;
   deleteSetting(
     authntoken: string,
     setting: Setting

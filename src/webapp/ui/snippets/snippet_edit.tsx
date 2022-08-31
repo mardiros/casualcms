@@ -30,7 +30,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   let navigate = useNavigate();
 
   React.useEffect(() => {
-    async function loadTemplate() {
+    async function loadSnippetType() {
       if (!snippet) {
         return;
       }
@@ -43,7 +43,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTemplate();
+    loadSnippetType();
     return () => {
       setIsLoading(true);
       setError(null);
@@ -53,10 +53,10 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadSnippet() {
-      const page = await config.api.snippet.showSnippet(token, snippetSlug);
-      // console.log(page)
-      page
-        .map((page: Snippet) => setSnippet(page))
+      const rsnippet = await config.api.snippet.showSnippet(token, snippetSlug);
+      // console.log(rsnippet)
+      rsnippet
+        .map((snippet: Snippet) => setSnippet(snippet))
         .mapErr((err: ApiError) => setError(err));
     }
     loadSnippet();

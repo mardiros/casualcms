@@ -49,9 +49,8 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
   async showSetting(
     authntoken: string,
     hostname: string,
-    key: string,
+    key: string
   ): Promise<Result<Setting, ApiError>> {
-
     const response = await this.fetch(`/api/settings/${hostname}/${key}`, {
       method: "GET",
       headers: {
@@ -64,6 +63,29 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
     return ok(jsonData as Setting);
+  }
+
+  async updateSetting(
+    authntoken: string,
+    hostname: string,
+    setting: Setting
+  ): Promise<Result<boolean, ApiError>> {
+    const response = await this.fetch(
+      `/api/settings/${hostname}/${setting.meta.key}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${authntoken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(setting),
+      }
+    );
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(true);
   }
 
   async deleteSetting(

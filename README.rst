@@ -32,3 +32,5 @@ TODO
 * Add widget to choose a page while doing page links (bwrowse page popup)
 
 * Define and implement errors on reserved word for page, snippet, and settings
+
+* rename snippet slug by key

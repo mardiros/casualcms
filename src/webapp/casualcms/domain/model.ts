@@ -92,6 +92,5 @@ export type PartialSetting = {
 
 export type Setting = {
   meta: PartialSettingType;
-  hostname: string;
   [k: string]: any;
 };

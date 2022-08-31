@@ -7,6 +7,7 @@ import {
   PageBreadcrumb,
   SiteBreadcrumb,
   SnippetBreadcrumb,
+  SettingBreadcrumb,
 } from "../../src/webapp/ui/layout/breadcrumb";
 import { PageMeta } from "../../src/webapp/casualcms/domain/model";
 
@@ -152,6 +153,24 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       "/admin/snippets/new"
     );
     const title = screen.getByText("new snippet");
+    expect(title.nodeName).to.be.equal("SPAN");
+  });
+
+  it("Render links using the breadcrumb of the settings", async () => {
+    renderWithRouter(
+      <>
+        <Route
+          path="/admin/settings/:hostname/:settingKey/edit"
+          element={<SettingBreadcrumb hostname="www" title="contact" />}
+        />
+      </>,
+      "/admin/settings/www/contact/edit"
+    );
+    const link = screen.getByText("www");
+    expect(link.nodeName).to.be.equal("A");
+    expect(link.getAttribute("href")).to.be.equal("/admin/settings/www");
+
+    const title = screen.getByText("contact");
     expect(title.nodeName).to.be.equal("SPAN");
   });
 });

@@ -36,7 +36,7 @@ describe("As a user, I can list setting", () => {
     });
   });
 
-  it.only("Update the setting using the web form", async () => {
+  it("Update the setting using the web form", async () => {
     renderWithRouter(
       <>
         <Route

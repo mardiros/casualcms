@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 import { PartialSite } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
+import { SettingBreadcrumb } from "../layout/breadcrumb";
 import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
 import { useAuth } from "../login/hooks";
@@ -102,6 +103,7 @@ export const SettingSiteList: React.FunctionComponent<{}> = () => {
 
   return (
     <Box>
+      <SettingBreadcrumb />
       <SettingSiteListTable config={config} token={token} />
     </Box>
   );

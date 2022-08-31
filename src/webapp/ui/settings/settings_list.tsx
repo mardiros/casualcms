@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  Box,
   Table,
   TableContainer,
   Tbody,
@@ -17,6 +18,7 @@ import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 import { Loader } from "../layout/loader";
 import { useAuth } from "../login/hooks";
+import { SettingBreadcrumb } from "../layout/breadcrumb";
 
 type SettingRowProps = {
   settingUrl: string | undefined;
@@ -140,11 +142,14 @@ export const SettingList: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <SettingsTable
-      config={config}
-      token={token}
-      hostname={hostname || ""}
-      settingTypes={settingTypes}
-    />
+    <Box>
+      <SettingBreadcrumb hostname={hostname} />
+      <SettingsTable
+        config={config}
+        token={token}
+        hostname={hostname || ""}
+        settingTypes={settingTypes}
+      />
+    </Box>
   );
 };

@@ -9,6 +9,7 @@ import { AppContext } from "../../config";
 import { SettingType } from "../../casualcms/domain/model";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
+import { SettingBreadcrumb } from "../layout/breadcrumb";
 // import { SettingBreadcrumb } from "../layout/breadcrumb";
 
 const Form = withTheme(ChakraUITheme);
@@ -61,6 +62,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
   const data = {};
   return (
     <Box maxW="720px">
+      <SettingBreadcrumb hostname={hostname} title={settingKey} />
       <Heading>New Setting</Heading>
       {/* <SettingBreadcrumb title="new setting" /> */}
       <ApiErrorUI error={error} />

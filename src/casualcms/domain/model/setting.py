@@ -144,6 +144,6 @@ class Setting(AbstractSetting):
                 return ret
 
         return {
-            "ui:widget": {bool: "radio"}.get(field.type_, "text"),
+            "ui:widget": {bool: "select"}.get(field.type_, "text"),
             "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
         }

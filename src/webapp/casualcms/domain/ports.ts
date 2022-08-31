@@ -14,6 +14,7 @@ import {
   PartialSettingType,
   PartialSetting,
   Setting,
+  SettingType,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -126,19 +127,29 @@ export interface ISettingTypeApi {
   listSettingTypes(
     authntoken: string
   ): Promise<Result<PartialSettingType[], ApiError>>;
+  showSettingType(
+    authntoken: string,
+    key: string,
+  ): Promise<Result<SettingType, ApiError>>;
 }
 
 export interface ISettingApi {
+  createSetting(
+    authntoken: string,
+    hostname: string,
+    key: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>>;
   listSettings(
     authntoken: string,
     hostname: string
   ): Promise<Result<PartialSetting[], ApiError>>;
-  createSetting(
+  showSetting(
     authntoken: string,
     hostname: string,
-    type: string,
-    payload: any
-  ): Promise<Result<boolean, ApiError>>;
+    key: string,
+  ): Promise<Result<Setting, ApiError>>;
+
   deleteSetting(
     authntoken: string,
     setting: Setting

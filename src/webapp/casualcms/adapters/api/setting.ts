@@ -5,6 +5,30 @@ import { PartialSetting, Setting } from "../../domain/model";
 import { ApiError, ISettingApi } from "../../domain/ports";
 
 export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
+  async createSetting(
+    authntoken: string,
+    hostname: string,
+    key: string,
+    payload: any
+  ): Promise<Result<boolean, ApiError>> {
+    const setting: any = {
+      key: key,
+      payload: payload,
+    };
+    const response = await this.fetch(`/api/settings/${hostname}`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(setting),
+    });
+    const jsonData = await (response.json() as unknown);
+    if (!response.ok) {
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok(true);
+  }
   async listSettings(
     authntoken: string,
     hostname: string
@@ -22,30 +46,26 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     }
     return ok(jsonData as PartialSetting[]);
   }
-  async createSetting(
+  async showSetting(
     authntoken: string,
     hostname: string,
-    type: string,
-    payload: any
-  ): Promise<Result<boolean, ApiError>> {
-    const setting: any = {
-      meta: { type: type },
-      ...payload,
-    };
-    const response = await this.fetch(`/api/settings/${hostname}`, {
-      method: "POST",
+    key: string,
+  ): Promise<Result<Setting, ApiError>> {
+
+    const response = await this.fetch(`/api/settings/${hostname}/${key}`, {
+      method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
         Accept: "application/json",
       },
-      body: JSON.stringify(setting),
     });
     const jsonData = await (response.json() as unknown);
     if (!response.ok) {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
-    return ok(true);
+    return ok(jsonData as Setting);
   }
+
   async deleteSetting(
     authntoken: string,
     setting: Setting

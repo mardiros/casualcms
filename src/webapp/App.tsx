@@ -74,12 +74,12 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
           caseSensitive
         />
         <Route
-          path="settings/:hostname/:key/new"
+          path="settings/:hostname/:settingKey/new"
           element={<SettingNew />}
           caseSensitive
         />
         <Route
-          path="settings/:hostname/:key/edit"
+          path="settings/:hostname/:settingKey/edit"
           element={<SettingEdit />}
           caseSensitive
         />

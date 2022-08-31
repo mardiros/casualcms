@@ -79,6 +79,12 @@ export type PartialSettingType = {
   key: string;
 };
 
+export type SettingType = {
+  // key:string;
+  schema: JSONSchema7;
+  uiSchema: any;
+};
+
 export type PartialSetting = {
   meta: PartialSettingType;
   hostname: string;

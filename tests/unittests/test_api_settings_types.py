@@ -50,8 +50,8 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
         "uiSchema": {
             "use_another_stuff": {
                 "ui:placeholder": "use_another_stuff",
-                "ui:widget": "radio",
+                "ui:widget": "select",
             },
-            "use_stuff": {"ui:placeholder": "use_stuff", "ui:widget": "radio"},
+            "use_stuff": {"ui:placeholder": "use_stuff", "ui:widget": "select"},
         },
     }

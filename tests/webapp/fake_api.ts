@@ -14,6 +14,7 @@ import {
   PartialSettingType,
   PartialSetting,
   Setting,
+  SettingType,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -416,17 +417,35 @@ export class FakeSettingApi implements ISettingApi {
   async createSetting(
     authntoken: string,
     hostname: string,
-    type: string,
+    key: string,
     payload: any
   ): Promise<Result<boolean, ApiError>> {
     const setting = {
       hostname: hostname,
-      meta: { key: type },
+      meta: { key: key },
       ...payload,
     };
     this.settings.push(setting);
     return ok(true);
   }
+  async showSetting(
+    authntoken: string,
+    hostname: string,
+    key: string
+  ): Promise<Result<Setting, ApiError>> {
+    const settings = this.settings.map((s) => {
+      if (s.hostname == hostname && s.meta.key == key) {
+        return ok(s);
+      }
+    });
+    if (settings && settings[0]) {
+      return settings[0];
+    }
+    let errMap = new Map();
+    errMap.set("key", "Setting not found for this key on this hostname");
+    return err(errMap);
+  }
+
   async deleteSetting(
     authntoken: string,
     setting: Setting
@@ -445,6 +464,22 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
     authntoken: string
   ): Promise<Result<PartialSettingType[], ApiError>> {
     return ok([{ key: "blog:ff" }, { key: "blog:contact" }]);
+  }
+  async showSettingType(
+    authntoken: string,
+    key: string
+  ): Promise<Result<SettingType, ApiError>> {
+    const resp: SettingType = {
+      schema: {
+        title: "ContactSetting",
+        type: "object",
+        properties: { email: { title: "Email", type: "string" } },
+        required: ["email"],
+        definitions: {},
+      },
+      uiSchema: { email: { "ui:widget": "text", "ui:placeholder": "email" } },
+    };
+    return ok(resp);
   }
 }
 

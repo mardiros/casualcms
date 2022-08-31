@@ -15,7 +15,7 @@ async def test_api_create_setting_403(
     default_site: Site,
 ):
     resp = client.post(
-        "/api/settings/{default_site.hostname",
+        f"/api/settings/{default_site.hostname}",
         headers={},
         json={"type": "blog:FeatureFlagSetting", "payload": {}},
     )

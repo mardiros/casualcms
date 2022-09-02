@@ -193,4 +193,4 @@ def apicli(context: Any, port: int, **kwargs: Any) -> Iterator[None]:
 
 
 if __name__ == "__main__":
-    run_server(8000, use_reloader="true")
+    run_server(6556, use_reloader="true")

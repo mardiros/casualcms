@@ -11,5 +11,7 @@ Feature: As a developper, I want a browser open with a session
     And a "/home/dog/the-third-one" page of type "blog:BlogPage"
     And a "header" snippet of type "blog:HeaderSnippet"
     And a "127.0.0.1:6556" site with "/home" root page
+    And a "localhost" site with "/home" root page
+    And a "contact" setting on site "localhost"
     When I visit "/admin/pages?parent=/home"
     And I wait

@@ -34,3 +34,9 @@ TODO
 * Define and implement errors on reserved word for page, snippet, and settings
 
 * rename snippet slug by key
+
+* Add tests for 422 errors
+
+* Fix 500 errors when an invalid payload is posted on page/snippet/settings
+
+* Open tickes for buggy feature with bool in react-jsonschema-form

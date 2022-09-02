@@ -20,7 +20,7 @@ class HeaderSnippet(Snippet):
 
 
 class FeatureFlagSetting(Setting):
-    use_stuff: bool
+    use_stuff: bool = False
     use_another_stuff: bool | None
 
     class Meta:

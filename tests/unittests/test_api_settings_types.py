@@ -41,17 +41,21 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
             "definitions": {},
             "properties": {
                 "use_another_stuff": {"title": "Use Another Stuff", "type": "boolean"},
-                "use_stuff": {"title": "Use Stuff", "type": "boolean"},
+                "use_stuff": {
+                    "title": "Use Stuff",
+                    "type": "boolean",
+                    "default": False,
+                },
             },
-            "required": ["use_stuff"],
+            "required": [],
             "title": "FeatureFlagSetting",
             "type": "object",
         },
         "uiSchema": {
             "use_another_stuff": {
                 "ui:placeholder": "use_another_stuff",
-                "ui:widget": "select",
+                "ui:widget": "checkbox",
             },
-            "use_stuff": {"ui:placeholder": "use_stuff", "ui:widget": "select"},
+            "use_stuff": {"ui:placeholder": "use_stuff", "ui:widget": "checkbox"},
         },
     }

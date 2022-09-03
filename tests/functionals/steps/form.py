@@ -59,3 +59,11 @@ def click_link(context: Any, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(f'//a[contains(text(), "{text}")]')
     el.click()
+
+
+@when('I click on the "{position}" link "{text}"')
+def click_link_pos(context: Any, position: str, text: str):
+    pos = POSITIONS[position]
+    text = text.replace('"', '\\"')
+    el = context.browser.find_elements_by_xpath(f'//a[contains(text(), "{text}")]')
+    el[pos].click()

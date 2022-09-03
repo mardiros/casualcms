@@ -1,6 +1,15 @@
 from typing import Any, Dict
 
-from blacksmith import PathInfoField, PostBodyField, Request, register
+from blacksmith import PathInfoField, PostBodyField, Request, register, Response
+
+
+class GetContactSetting(Request):
+    hostname: str = PathInfoField(...)
+    key: str = PathInfoField(...)
+
+
+class ContactSetting(Response):
+    email: str
 
 
 class CreateSetting(Request):
@@ -14,8 +23,20 @@ register(
     resource="setting",
     service="casualcms",
     version=None,
-    path="/settings/{hostname}",
-    contract={
+    collection_path="/settings/{hostname}",
+    collection_contract={
         "POST": (CreateSetting, None),
+    }
+)
+
+
+register(
+    client_name="casualcms",
+    resource="contact_setting",
+    service="casualcms",
+    version=None,
+    path="/settings/{hostname}/contact",
+    contract={
+        "GET": (GetContactSetting, ContactSetting),
     },
 )

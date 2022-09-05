@@ -2,6 +2,7 @@ from typing import Any, Dict
 
 from behave import given, then  # type: ignore
 from blacksmith import HTTPError, SyncClient, SyncHTTPBearerMiddleware
+from hamcrest import assert_that, equal_to
 
 
 @given('a "{key}" setting on site "{hostname}"')
@@ -45,4 +46,4 @@ def assert_settings(context: Any, key: str, hostname: str):
         raise
 
     data = context.table[0]
-    assert data.as_dict() == setting.response.dict()
+    assert_that(data.as_dict(), equal_to(setting.response.dict()))

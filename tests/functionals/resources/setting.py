@@ -1,6 +1,6 @@
 from typing import Any, Dict
 
-from blacksmith import PathInfoField, PostBodyField, Request, register, Response
+from blacksmith import PathInfoField, PostBodyField, Request, Response, register
 
 
 class GetContactSetting(Request):
@@ -26,7 +26,7 @@ register(
     collection_path="/settings/{hostname}",
     collection_contract={
         "POST": (CreateSetting, None),
-    }
+    },
 )
 
 

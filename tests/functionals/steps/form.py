@@ -10,6 +10,7 @@ def fill_input(context: Any, placeholder: str, value: str):
     field = context.browser.find_element_by_xpath(
         f"//input[@placeholder='{placeholder}']"
     )
+    field.clear()
     field.send_keys(value)
 
 
@@ -18,6 +19,7 @@ def fill_textarea(context: Any, placeholder: str, value: str):
     field = context.browser.find_element_by_xpath(
         f"//textarea[@placeholder='{placeholder}']"
     )
+    field.clear()
     field.send_keys(value)
 
 
@@ -27,6 +29,7 @@ def fill_textarea_pos(context: Any, position: str, placeholder: str, value: str)
     field = context.browser.find_elements_by_xpath(
         f"//textarea[@placeholder='{placeholder}']"
     )
+    field.clear()
     field[pos].send_keys(value)
 
 
@@ -36,6 +39,7 @@ def fill_input_pos(context: Any, position: str, placeholder: str, value: str):
     field = context.browser.find_elements_by_xpath(
         f"//input[@placeholder='{placeholder}']"
     )
+    field.clear()
     field[pos].send_keys(value)
 
 

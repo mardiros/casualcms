@@ -28,3 +28,19 @@ Feature: As a user, I can create a site
     And the setting "contact" on "localhost" contains
       | email         |
       | bob@alice.net |
+
+  Scenario: Create a Setting
+    Given user on the admin page
+    And a "/home" page of type "blog:HomePage"
+    And a "127.0.0.1:6556" site with "/home" root page
+    And a "localhost" site with "/home" root page
+    And a "contact" setting on site "localhost"
+    When I visit "/admin/settings/localhost/contact/edit"
+    Then I see the text "Edit Setting"
+    And I see the input "email" contains "alice@alice.net"
+    When I fill the field "email" with "bob@alice.net"
+    And I click on the "Submit" button
+    Then I see the text "Setting Type"
+    And the setting "contact" on "localhost" contains
+      | email         |
+      | bob@alice.net |

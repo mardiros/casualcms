@@ -1,6 +1,7 @@
 from typing import Any
 
 from behave import then  # type: ignore
+from hamcrest import assert_that, equal_to
 
 """
 Debug in the devtools of firefox
@@ -42,3 +43,11 @@ def assert_breadcrumb(context: Any, text: str):
         context.browser.find_element_by_xpath(
             f"//nav[@aria-label='breadcrumb']//a[contains(text(), '{text}')]"
         )
+
+
+@then('I see the input "{placeholder}" contains "{text}"')
+def assert_input(context: Any, placeholder: str, text: str):
+    input = context.browser.find_element_by_xpath(
+        f"//input[@placeholder='{placeholder}']"
+    )
+    assert_that(input.get_attribute("value"), equal_to(text))

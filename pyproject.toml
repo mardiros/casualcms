@@ -35,6 +35,7 @@ selenium = "^4.2.0"
 types-setuptools = "^57.4.11"
 aiosqlite = "^0.17.0"
 Faker = "^13.15.1"
+PyHamcrest = "^2.0.4"
 
 [tool.pyright]
 include = ["src", "tests"]

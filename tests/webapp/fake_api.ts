@@ -454,8 +454,6 @@ export class FakeSettingApi implements ISettingApi {
     const settings: Setting[] = [];
     this.settings.map((s) => {
       if (s.hostname != hostname || s.meta.key != setting.meta.key) {
-        console.log(s.hostname);
-        console.log(s.s.meta.key);
         settings.push(s);
       }
     });
@@ -466,11 +464,12 @@ export class FakeSettingApi implements ISettingApi {
 
   async deleteSetting(
     authntoken: string,
+    hostname: string,
     setting: Setting
   ): Promise<Result<boolean, ApiError>> {
     const key = setting.meta.key;
     const settings = this.settings.filter((s: any) => {
-      return s.hostname != setting.hostname || s.meta.key != key;
+      return s.hostname != hostname || s.meta.key != key;
     });
     this.settings = settings;
     return ok(true);

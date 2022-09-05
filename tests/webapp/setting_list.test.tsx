@@ -35,8 +35,7 @@ describe("As a user, I can list settings of a given site", () => {
   after(async () => {
     await config.api.site.deleteSite("", "www.localhost");
     await config.api.site.deleteSite("", "*");
-    await config.api.setting.deleteSetting("", {
-      hostname: "www.localhost",
+    await config.api.setting.deleteSetting("", "www.localhost", {
       meta: { key: "blog:contact" },
     });
   });

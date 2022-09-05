@@ -46,8 +46,7 @@ describe("As a user, I can list setting", () => {
       email: "alice@example.net",
       meta: { key: "blog:contact" },
     });
-    await config.api.setting.deleteSetting("", {
-      hostname: "www.localhost",
+    await config.api.setting.deleteSetting("", "www.localhost", {
       meta: { key: "blog:contact" },
     });
   });

@@ -10,6 +10,7 @@ import { Setting, SettingType } from "../../casualcms/domain/model";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
 import { SettingBreadcrumb } from "../layout/breadcrumb";
+import { SettingDeletePopoverForm } from "./settings_delete";
 // import { SettingBreadcrumb } from "../layout/breadcrumb";
 
 const Form = withTheme(ChakraUITheme);
@@ -99,7 +100,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
             onSubmit={onsubmit}
             // onError={() => console.log("errors")}
           />
-          {/* <SettingDeletePopoverForm curSetting={setting} /> */}
+          <SettingDeletePopoverForm hostname={hostname} curSetting={setting} />
         </>
       )}
     </Box>

@@ -156,6 +156,7 @@ export interface ISettingApi {
   ): Promise<Result<boolean, ApiError>>;
   deleteSetting(
     authntoken: string,
+    hostname: string,
     setting: Setting
   ): Promise<Result<boolean, ApiError>>;
 }

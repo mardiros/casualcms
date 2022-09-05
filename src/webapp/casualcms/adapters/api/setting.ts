@@ -90,10 +90,11 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
 
   async deleteSetting(
     authntoken: string,
+    hostname: string,
     setting: Setting
   ): Promise<Result<boolean, ApiError>> {
     const response = await this.fetch(
-      `/api/settings/${setting.hostname}/${setting.meta.key}`,
+      `/api/settings/${hostname}/${setting.meta.key}`,
       {
         method: "DELETE",
         headers: {
@@ -101,8 +102,8 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
         },
       }
     );
-    const jsonData = await (response.json() as unknown);
     if (!response.ok) {
+      const jsonData = await (response.json() as unknown);
       return err(castError(jsonData as FastApiError) as ApiError);
     }
     return ok(true);

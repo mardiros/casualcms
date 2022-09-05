@@ -15,8 +15,6 @@ TODO
 
 * Historic
 
-* settings
-
 * Display Errors in forms
 
 * Tests error format in API

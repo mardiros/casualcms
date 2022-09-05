@@ -33,7 +33,9 @@ def app_settings() -> Iterator[Settings]:
     os.environ["casualcms_template_search_path"] = str(
         (Path(__file__).parent / "templates").resolve()
     )
-
+    os.environ["casualcms_assets_path"] = str(
+        (Path(__file__).parent / "assets").resolve()
+    )
     yield Settings()  # type: ignore
     del os.environ["casualcms_template_search_path"]
 

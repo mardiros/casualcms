@@ -11,7 +11,10 @@ class Settings(BaseSettings):
     # Jinja2 config
     template_search_path: str = Field(...)
 
+    # Page models
     import_models: Sequence[str] = Field([])
+
+    assets_path: str = Field("")
 
     # HTTP server Config
     bind: str = "0.0.0.0:8000"

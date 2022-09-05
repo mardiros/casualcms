@@ -29,6 +29,7 @@ services:
       - python
       - src/casualcms/entrypoint.py
     environment:
+      - "CASUALCMS_ASSETS_PATH=/app/casualblog/assets"
       - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/templates"
       - "PYTHONPATH=/app"
       - 'CASUALCMS_IMPORT_MODELS=["casualblog"]'

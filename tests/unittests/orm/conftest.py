@@ -39,6 +39,7 @@ def bared_sqla_engine() -> Iterator[AsyncEngine]:
 def app_settings_sqlite() -> Iterator[Settings]:
     template_search_path = str((Path(__file__).parent.parent / "templates").resolve())
     yield Settings(
+        assets_path=str((Path(__file__).parent.parent / "assets").resolve()),
         template_search_path=template_search_path,
         unit_of_work="casualcms.adapters.uow_sqla:SQLUnitOfWork",
         database_url=DATABASE_URL,

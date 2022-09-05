@@ -1,4 +1,5 @@
 from fastapi import HTTPException, Request, Response
+from fastapi.staticfiles import StaticFiles
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
@@ -55,4 +56,11 @@ async def serve_pages(
 
 @configure
 def includeme(app: FastAPIConfigurator) -> None:
+    assets = app.config.settings.assets_path
+    if assets:
+        app.mount(
+            "/assets",
+            StaticFiles(directory=app.config.settings.assets_path),
+            name="assets",
+        )
     app.add_api_route("/{path:path}", serve_pages, methods=["GET"])

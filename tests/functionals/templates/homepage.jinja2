@@ -1,6 +1,10 @@
 {% extends "layout.jinja2" %}
 {% block body %}
-  <h1>{{hero_title}}</h1>
+  <section class="hero is-small is-primary">
+    <div class="hero-body">
+      <h1 class="title">{{hero_title}}</h1>
+    </div>
+  </section>
   {% for p in body %}
     <h2>{{p.title}}</h2>
     {{ p.body | safe }}

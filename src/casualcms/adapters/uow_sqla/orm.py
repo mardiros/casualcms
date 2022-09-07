@@ -123,7 +123,7 @@ sites = Table(
         ForeignKey("pages.id", name="fk_sites_page_id"),
         nullable=False,
     ),
-    Column("hostname", String(253), primary_key=True),
+    Column("hostname", String(253)),
     Column("default", Boolean, nullable=False),
     Column("secure", Boolean, nullable=False),
     Index("idx_sites_page_id", "page_id", unique=False),

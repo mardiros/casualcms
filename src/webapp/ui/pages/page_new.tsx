@@ -6,7 +6,7 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
-import { Page, PageType } from "../../casualcms/domain/model";
+import { Draft, PageType } from "../../casualcms/domain/model";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";
 import { PageBreadcrumb } from "../layout/breadcrumb";
@@ -27,7 +27,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   const [params, setParams] = useSearchParams();
 
   const parentPath = params.get("parent");
-  const [parentPage, setParentPage] = React.useState<Page | null>(null);
+  const [parentPage, setParentPage] = React.useState<Draft | null>(null);
 
   React.useEffect(() => {
     async function loadPageType() {
@@ -51,10 +51,10 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPage() {
       if (parentPath) {
-        const page = await config.api.page.showPage(token, parentPath || "");
+        const page = await config.api.draft.showDraft(token, parentPath || "");
         // console.log(page)
         page
-          .map((page: Page) => setParentPage(page))
+          .map((page: Draft) => setParentPage(page))
           .mapErr((err: ApiError) => setError(err));
       } else {
         setParentPage({ meta: { path: "", type: "", breadcrumb: [] } });
@@ -72,7 +72,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       token,
       pageTypeName || "",
       page,

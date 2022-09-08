@@ -22,7 +22,7 @@ export type PartialPageMeta = {
   type: string;
 };
 
-export type PartialPage = {
+export type PartialDraft = {
   slug: string;
   title: string;
   meta: PartialPageMeta;
@@ -40,7 +40,7 @@ export type PageMeta = {
   breadcrumb: BreadCrumbItem[];
 };
 
-export type Page = {
+export type Draft = {
   meta: PageMeta;
   [k: string]: any;
 };

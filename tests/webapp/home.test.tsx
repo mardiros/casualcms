@@ -20,7 +20,7 @@ describe("As a user, I have to create a first root template", () => {
 
 describe("As a user, I am redirected to the root list if one exists", () => {
   before(async function () {
-    const resp = await config.api.page.createPage(
+    const resp = await config.api.draft.createDraft(
       "",
       "casual:HomePage",
       {
@@ -35,7 +35,7 @@ describe("As a user, I am redirected to the root list if one exists", () => {
     });
   });
   after(async function () {
-    const resp = await config.api.page.deletePage("", "/root");
+    const resp = await config.api.draft.deleteDraft("", "/root");
     resp.mapErr((err: ApiError) => {
       throw err;
     });

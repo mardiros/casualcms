@@ -3,8 +3,8 @@ import {
   Account,
   PartialPageType,
   PageType,
-  PartialPage,
-  Page,
+  PartialDraft,
+  Draft,
   PartialSite,
   Site,
   PartialSnippet,
@@ -21,7 +21,7 @@ import {
   IAccountApi,
   Credentials,
   IPageTypeApi,
-  IPageApi,
+  IDraftApi,
   ISiteApi,
   SiteOption,
   ISnippetApi,
@@ -113,13 +113,13 @@ class FakePageTypeApi implements IPageTypeApi {
   }
 }
 
-class FakePageApi implements IPageApi {
+class FakeDraftApi implements IDraftApi {
   pages: Array<any>;
 
   constructor() {
     this.pages = [];
   }
-  async createPage(
+  async createDraft(
     authntoken: string,
     type: string,
     payload: any,
@@ -134,11 +134,11 @@ class FakePageApi implements IPageApi {
     return ok(true);
   }
 
-  async showPage(
+  async showDraft(
     authntoken: string,
     path: string | null
-  ): Promise<Result<Page, Map<string, string>>> {
-    let pages: Page[] = [];
+  ): Promise<Result<Draft, Map<string, string>>> {
+    let pages: Draft[] = [];
     this.pages
       .filter((page) => {
         return page.meta.path == path;
@@ -153,14 +153,14 @@ class FakePageApi implements IPageApi {
       return err(errors);
     }
   }
-  async listPages(
+  async listDrafts(
     authntoken: string,
     parent: string | null
-  ): Promise<Result<PartialPage[], Map<string, string>>> {
-    let pages: PartialPage[] = [];
+  ): Promise<Result<PartialDraft[], Map<string, string>>> {
+    let pages: PartialDraft[] = [];
 
     this.pages
-      .filter((page: PartialPage) => {
+      .filter((page: PartialDraft) => {
         let starter = parent || "";
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
@@ -179,11 +179,11 @@ class FakePageApi implements IPageApi {
       );
     return ok(pages);
   }
-  async updatePage(
+  async updateDraft(
     authntoken: string,
     path: string,
-    page: Page
-  ): Promise<Result<Page, ApiError>> {
+    page: Draft
+  ): Promise<Result<Draft, ApiError>> {
     let oldPage: any | null = null;
     const pages: any[] = [];
     this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
@@ -200,11 +200,11 @@ class FakePageApi implements IPageApi {
       return err(new Map());
     }
   }
-  async deletePage(
+  async deleteDraft(
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>> {
-    const pages = this.pages.filter((page: PartialPage) => {
+    const pages = this.pages.filter((page: PartialDraft) => {
       return page.meta.path != path;
     });
     this.pages = pages;
@@ -503,7 +503,7 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
 export class FakeApi implements IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
-  page: IPageApi;
+  draft: IDraftApi;
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
@@ -513,7 +513,7 @@ export class FakeApi implements IApi {
   constructor() {
     this.account = new FakeAccountApi();
     this.pageType = new FakePageTypeApi();
-    this.page = new FakePageApi();
+    this.draft = new FakeDraftApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
     this.snippetType = new FakeSnippetTypeApi();

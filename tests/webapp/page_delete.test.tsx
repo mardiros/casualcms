@@ -8,7 +8,7 @@ import { PageDeletePopoverForm } from "../../src/webapp/ui/pages/page_delete";
 
 describe("As a user, I can delete a page", () => {
   before(async () => {
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:HomePage",
       {
@@ -18,7 +18,7 @@ describe("As a user, I can delete a page", () => {
       },
       null
     );
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -28,7 +28,7 @@ describe("As a user, I can delete a page", () => {
       },
       "/home"
     );
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -40,9 +40,9 @@ describe("As a user, I can delete a page", () => {
     );
   });
   after(async () => {
-    await config.api.page.deletePage("", "/home/sub1");
-    await config.api.page.deletePage("", "/home/sub0");
-    await config.api.page.deletePage("", "/home");
+    await config.api.draft.deleteDraft("", "/home/sub1");
+    await config.api.draft.deleteDraft("", "/home/sub0");
+    await config.api.draft.deleteDraft("", "/home");
   });
 
   it("Delete a page", async () => {
@@ -81,7 +81,7 @@ describe("As a user, I can delete a page", () => {
     let link = screen.getByText("Delete this page");
     fireEvent.click(link);
 
-    let subList = await config.api.page.listPages("", "/home");
+    let subList = await config.api.draft.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {
@@ -104,7 +104,7 @@ describe("As a user, I can delete a page", () => {
     link = screen.getByText("Confirm Deletion");
     fireEvent.click(link);
 
-    subList = await config.api.page.listPages("", "/home");
+    subList = await config.api.draft.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {

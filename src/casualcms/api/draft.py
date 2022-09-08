@@ -33,7 +33,7 @@ class PartialPage(BaseModel):
     meta: PartialPageMeta = Field(...)
 
 
-async def create_page(
+async def create_draft(
     request: Request,
     type: str = Body(...),
     payload: dict[str, Any] = Body(...),
@@ -78,7 +78,7 @@ async def create_page(
     return RESOURCE_CREATED
 
 
-async def list_pages(
+async def list_drafts(
     parent: Optional[str] = None,
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
@@ -107,7 +107,7 @@ async def list_pages(
     ]
 
 
-async def show_page(
+async def show_draft(
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
@@ -127,7 +127,7 @@ async def show_page(
     return page.get_data_context()
 
 
-async def update_page(
+async def update_draft(
     request: Request,
     path: str = Field(...),
     payload: dict[str, Any] = Body(...),
@@ -168,7 +168,7 @@ async def update_page(
     return RESOURCE_UPDATED
 
 
-async def delete_page(
+async def delete_draft(
     request: Request,
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,

@@ -9,7 +9,7 @@ import config from "./config";
 
 describe("As a user, I can create a new site", () => {
   before(async () => {
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:HomePage",
       {
@@ -21,7 +21,7 @@ describe("As a user, I can create a new site", () => {
     );
   });
   after(async () => {
-    await config.api.page.deletePage("", "/index");
+    await config.api.draft.deleteDraft("", "/index");
   });
 
   it("Create a site", async () => {

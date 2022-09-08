@@ -1,12 +1,12 @@
 import { Result, ok, err } from "neverthrow";
 
-import { ApiError, IPageApi } from "casualcms/domain/ports";
+import { ApiError, IDraftApi } from "casualcms/domain/ports";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
-import { PartialPage, Page } from "casualcms/domain/model";
+import { PartialDraft, Draft } from "casualcms/domain/model";
 
-export class FetchPageApi extends BaseFetchApi implements IPageApi {
-  async createPage(
+export class FetchDraftApi extends BaseFetchApi implements IDraftApi {
+  async createDraft(
     authntoken: string,
     type: string,
     payload: any,
@@ -19,7 +19,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     if (parent) {
       postBody.parent = parent;
     }
-    const response = await this.fetch("/api/pages", {
+    const response = await this.fetch("/api/drafts", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -33,11 +33,11 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(true);
   }
-  async showPage(
+  async showDraft(
     authntoken: string,
     path: string
-  ): Promise<Result<Page, ApiError>> {
-    const response = await this.fetch(`/api/pages/${path}`, {
+  ): Promise<Result<Draft, ApiError>> {
+    const response = await this.fetch(`/api/drafts/${path}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -48,14 +48,14 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     if (!response.ok) {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
-    return ok(jsonData as Page);
+    return ok(jsonData as Draft);
   }
-  async listPages(
+  async listDrafts(
     authntoken: string,
     parent: string | null
-  ): Promise<Result<PartialPage[], ApiError>> {
+  ): Promise<Result<PartialDraft[], ApiError>> {
     const qs = parent ? new URLSearchParams({ parent: parent }) : "";
-    const response = await this.fetch(`/api/pages?${qs}`, {
+    const response = await this.fetch(`/api/drafts?${qs}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -66,19 +66,19 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     if (!response.ok) {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
-    return ok(jsonData as PartialPage[]);
+    return ok(jsonData as PartialDraft[]);
   }
-  async updatePage(
+  async updateDraft(
     authntoken: string,
     path: string,
-    page: Page
-  ): Promise<Result<Page, ApiError>> {
-    // console.log(page);
-    const payload = { ...page };
+    draft: Draft
+  ): Promise<Result<Draft, ApiError>> {
+    // console.log(draft);
+    const payload = { ...draft };
     delete payload.type;
     delete payload.path;
     // console.log(payload);
-    const response = await this.fetch(`/api/pages${path}`, {
+    const response = await this.fetch(`/api/drafts${path}`, {
       method: "PATCH",
       headers: {
         Authorization: `Bearer ${authntoken}`,
@@ -90,13 +90,13 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     if (!response.ok) {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
-    return ok(jsonData as Page);
+    return ok(jsonData as Draft);
   }
-  async deletePage(
+  async deleteDraft(
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>> {
-    const response = await this.fetch(`/api/pages${path}`, {
+    const response = await this.fetch(`/api/drafts${path}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${authntoken}`,

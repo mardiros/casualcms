@@ -77,7 +77,7 @@ def create_page(context: Any, path: str, page_type: str) -> None:
 
     print(payload)
     try:
-        api.page.post(payload)
+        api.draft.post(payload)
     except HTTPError as exc:
         print(exc.response.json)
         raise

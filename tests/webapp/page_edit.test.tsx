@@ -9,7 +9,7 @@ import config from "./config";
 
 describe("As a user, I can edit existing pages", () => {
   before(async () => {
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:HomePage",
       {
@@ -20,7 +20,7 @@ describe("As a user, I can edit existing pages", () => {
       },
       null
     );
-    await config.api.page.createPage(
+    await config.api.draft.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -33,8 +33,8 @@ describe("As a user, I can edit existing pages", () => {
     );
   });
   after(async () => {
-    await config.api.page.deletePage("", "/home/sub0");
-    await config.api.page.deletePage("", "/home");
+    await config.api.draft.deleteDraft("", "/home/sub0");
+    await config.api.draft.deleteDraft("", "/home");
   });
 
   it("Load the root page in an edition form", async () => {
@@ -93,7 +93,7 @@ describe("As a user, I can edit existing pages", () => {
 
     await waitForPath("/admin/pages");
 
-    const page = await config.api.page.showPage("", "/home");
+    const page = await config.api.draft.showDraft("", "/home");
     expect(page.isOk()).equal(true);
     expect(page.unwrapOr({ title: "" }).title).equal("New Value");
   });

@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 from blacksmith import PostBodyField, Request, register
 
 
-class CreatePage(Request):
+class CreateDraft(Request):
     type: str = PostBodyField(...)
     parent: Optional[str] = PostBodyField(None)
     payload: Dict[str, Any] = PostBodyField(...)
@@ -11,11 +11,11 @@ class CreatePage(Request):
 
 register(
     client_name="casualcms",
-    resource="page",
+    resource="draft",
     service="casualcms",
     version=None,
-    path="/pages",
+    path="/drafts",
     contract={
-        "POST": (CreatePage, None),
+        "POST": (CreateDraft, None),
     },
 )

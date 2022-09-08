@@ -12,7 +12,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Page, PartialPageType } from "../../casualcms/domain/model";
+import { Draft, PartialPageType } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
 
@@ -74,7 +74,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   const [params, setParams] = useSearchParams();
   const parentType = params.get("type");
   const parentPath = params.get("parent");
-  const [parentPage, setParentPage] = React.useState<Page | null>(null);
+  const [parentPage, setParentPage] = React.useState<Draft | null>(null);
 
   React.useEffect(() => {
     async function loadTypes() {
@@ -98,10 +98,10 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPage() {
       if (parentPath) {
-        const page = await config.api.page.showPage(token, parentPath || "");
+        const page = await config.api.draft.showDraft(token, parentPath || "");
         // console.log(page)
         page
-          .map((page: Page) => setParentPage(page))
+          .map((page: Draft) => setParentPage(page))
           .mapErr((err: ApiError) => setError(err));
       } else {
         setParentPage({ meta: { path: "", type: "", breadcrumb: [] } });

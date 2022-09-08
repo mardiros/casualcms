@@ -6,7 +6,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { useConfig } from "../../config";
-import { Page, PageType } from "../../casualcms/domain/model";
+import { Draft, PageType } from "../../casualcms/domain/model";
 import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
 import { PageBreadcrumb } from "../layout/breadcrumb";
@@ -18,7 +18,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [pageType, setPageType] = React.useState<PageType | null>(null);
-  const [page, setPage] = React.useState<Page | null>(null);
+  const [page, setPage] = React.useState<Draft | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [params, setParams] = useSearchParams();
@@ -62,10 +62,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadPage() {
-      const page = await config.api.page.showPage(token, pagePath || "");
+      const page = await config.api.draft.showDraft(token, pagePath || "");
       // console.log(page)
       page
-        .map((page: Page) => setPage(page))
+        .map((page: Draft) => setPage(page))
         .mapErr((err: ApiError) => setError(err));
     }
     loadPage();
@@ -80,7 +80,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       return;
     }
     const newPage = data.formData;
-    await config.api.page.updatePage(token, page.meta.path, newPage);
+    await config.api.draft.updateDraft(token, page.meta.path, newPage);
     navigate(`/admin/pages?${q}`, { replace: true });
   };
 

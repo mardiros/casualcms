@@ -1,6 +1,6 @@
 import {
   IAccountApi,
-  IPageApi,
+  IDraftApi,
   ISiteApi,
   ISnippetApi,
   IPageTypeApi,
@@ -10,7 +10,7 @@ import {
 } from "../domain/ports";
 import { FetchAccountApi } from "../adapters/api/account";
 import { FetchPageTypeApi } from "../adapters/api/page_type";
-import { FetchPageApi } from "../adapters/api/page";
+import { FetchDraftApi } from "../adapters/api/draft";
 import { FetchSiteApi } from "../adapters/api/site";
 import { FetchSnippetApi } from "../adapters/api/snippet";
 import { FetchSnippetTypeApi } from "../adapters/api/snippet_type";
@@ -20,7 +20,7 @@ import { FetchSettingTypeApi } from "../adapters/api/setting_type";
 export interface IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
-  page: IPageApi;
+  draft: IDraftApi;
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
@@ -30,7 +30,7 @@ export interface IApi {
 
 export class Api implements IApi {
   account: IAccountApi;
-  page: IPageApi;
+  draft: IDraftApi;
   pageType: IPageTypeApi;
   site: ISiteApi;
   snippet: ISnippetApi;
@@ -40,7 +40,7 @@ export class Api implements IApi {
 
   constructor() {
     this.account = new FetchAccountApi();
-    this.page = new FetchPageApi();
+    this.draft = new FetchDraftApi();
     this.pageType = new FetchPageTypeApi();
     this.site = new FetchSiteApi();
     this.snippet = new FetchSnippetApi();

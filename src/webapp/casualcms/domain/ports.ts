@@ -3,8 +3,8 @@ import {
   Account,
   PartialPageType,
   PageType,
-  PartialPage,
-  Page,
+  PartialDraft,
+  Draft,
   PartialSite,
   Site,
   PartialSnippet,
@@ -40,24 +40,24 @@ export interface IPageTypeApi {
   ): Promise<Result<PageType, ApiError>>;
 }
 
-export interface IPageApi {
-  createPage(
+export interface IDraftApi {
+  createDraft(
     authntoken: string,
     type: string,
     payload: any,
     parent: string | null
   ): Promise<Result<boolean, ApiError>>;
-  listPages(
+  listDrafts(
     authntoken: string,
     parent: string | null
-  ): Promise<Result<PartialPage[], ApiError>>;
-  showPage(authntoken: string, path: string): Promise<Result<Page, ApiError>>;
-  updatePage(
+  ): Promise<Result<PartialDraft[], ApiError>>;
+  showDraft(authntoken: string, path: string): Promise<Result<Draft, ApiError>>;
+  updateDraft(
     authntoken: string,
     path: string,
-    page: Page
-  ): Promise<Result<Page, ApiError>>;
-  deletePage(
+    page: Draft
+  ): Promise<Result<Draft, ApiError>>;
+  deleteDraft(
     authntoken: string,
     path: string
   ): Promise<Result<boolean, ApiError>>;

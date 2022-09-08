@@ -1,9 +1,9 @@
 import { Breadcrumb, BreadcrumbItem, Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
-import { Page, Setting, Site, Snippet } from "../../casualcms/domain/model";
+import { Draft, Setting, Site, Snippet } from "../../casualcms/domain/model";
 
 type PageBreadcrumbProps = {
-  page?: Page | null;
+  page?: Draft | null;
   title?: string;
 };
 

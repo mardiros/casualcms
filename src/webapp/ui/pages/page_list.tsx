@@ -13,7 +13,7 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Page, PartialPage } from "../../casualcms/domain/model";
+import { Draft, PartialDraft } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppConfig, AppContext } from "../../config";
 
@@ -33,14 +33,14 @@ import { PageBreadcrumb } from "../layout/breadcrumb";
 import { PageDeletePopoverForm } from "./page_delete";
 
 type PageRowProps = {
-  page: PartialPage;
+  page: PartialDraft;
 };
 
 type PageListTableProps = {
   parentPath: string | null;
   config: AppConfig;
   token: string;
-  curPage: Page | null;
+  curPage: Draft | null;
 };
 
 export const PageRow: React.FunctionComponent<PageRowProps> = (
@@ -82,8 +82,8 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
 };
 
 type PageListButtonsProps = {
-  curPage: Page | null;
-  subPages: PartialPage[];
+  curPage: Draft | null;
+  subPages: PartialDraft[];
 };
 
 export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
@@ -136,15 +136,15 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
 ) => {
   const { config, parentPath, token } = props;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [subPages, setSubPages] = React.useState<PartialPage[]>([]);
+  const [subPages, setSubPages] = React.useState<PartialDraft[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
 
   React.useEffect(() => {
     async function loadSubPages() {
-      let pages: Result<PartialPage[], ApiError>;
-      pages = await config.api.page.listPages(token, parentPath);
+      let pages: Result<PartialDraft[], ApiError>;
+      pages = await config.api.draft.listDrafts(token, parentPath);
       pages
-        .map((pages: PartialPage[]) => setSubPages(pages))
+        .map((pages: PartialDraft[]) => setSubPages(pages))
         .mapErr((err: ApiError) => setError(err)); // FIXME
       setIsLoading(false);
     }
@@ -189,7 +189,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
-  const [curPage, setCurPage] = React.useState<Page | null>(null);
+  const [curPage, setCurPage] = React.useState<Draft | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [params, setParams] = useSearchParams();
@@ -197,11 +197,11 @@ export const PageList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadCurPage() {
-      let page: Result<Page, ApiError>;
+      let page: Result<Draft, ApiError>;
       if (parentPath) {
-        page = await config.api.page.showPage(token, parentPath);
+        page = await config.api.draft.showDraft(token, parentPath);
         page
-          .map((page: Page) => setCurPage(page))
+          .map((page: Draft) => setCurPage(page))
           .mapErr((err: ApiError) => setError(err));
       }
       setIsLoading(false);

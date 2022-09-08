@@ -1,12 +1,12 @@
 import React from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { Page } from "../../casualcms/domain/model";
+import { useNavigate } from "react-router-dom";
+import { Draft } from "../../casualcms/domain/model";
 import { AppContext } from "../../config";
 import { DeletePopoverForm } from "../layout/confirm";
 import { useAuth } from "../login/hooks";
 
 type PageDeletePopoverFormProps = {
-  curPage: Page;
+  curPage: Draft;
 };
 
 export const PageDeletePopoverForm: React.FunctionComponent<
@@ -22,7 +22,7 @@ export const PageDeletePopoverForm: React.FunctionComponent<
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {
-    await config.api.page.deletePage(token, curPage.meta.path);
+    await config.api.draft.deleteDraft(token, curPage.meta.path);
     setConfirmed(true);
   };
 

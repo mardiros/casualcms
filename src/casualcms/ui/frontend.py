@@ -36,7 +36,7 @@ async def serve_pages(
                 )
 
             root_page_path = site.root_page_path
-        page = await uow.pages.by_path(f"{root_page_path}/{path}".rstrip("/"))
+        page = await uow.drafts.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if page.is_err():
             raise HTTPException(
                 status_code=404,

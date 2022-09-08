@@ -10,7 +10,7 @@ uuid = str
 class Site(BaseModel):
     id: uuid = Field(..., description="Unique identifier of the website")
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)
-    page_id: uuid | None = Field(
+    draft_id: uuid | None = Field(
         ..., description="Root page id, None only for creational purpose"
     )
     hostname: str = Field(..., description="hostname of this website")

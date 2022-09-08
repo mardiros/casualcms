@@ -18,7 +18,7 @@ from casualcms.domain.model.snippet import Snippet, SnippetType, resolve_snippet
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
-    AbstractPageRepository,
+    AbstractDraftRepository,
     AbstractSiteRepository,
 )
 from casualcms.domain.repositories.authntoken import (
@@ -27,10 +27,10 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
-    PageOperationResult,
+    DraftOperationResult,
+    DraftRepositoryResult,
+    DraftSequenceRepositoryResult,
     PageRepositoryError,
-    PageRepositoryResult,
-    PageSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.setting import (
     AbstractSettingRepository,
@@ -100,7 +100,7 @@ class AccountSQLRepository(AbstractAccountRepository):
 
 
 def format_page(page: Page) -> Dict[str, Any]:
-    """Format the page to a dict ready to be inserted in the orm.pages."""
+    """Format the page to a dict ready to be inserted in the orm.drafts."""
     p: Dict[str, Any] = page.dict()
     formated_page: Dict[str, Any] = {
         "id": page.id,
@@ -136,23 +136,23 @@ def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
     return formated_setting
 
 
-class PageSQLRepository(AbstractPageRepository):
+class DraftSQLRepository(AbstractDraftRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.seen = set()
         self.session = session
 
-    async def by_id(self, id: str) -> PageRepositoryResult:
+    async def by_id(self, id: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         qry = (
-            select(orm.pages)
+            select(orm.drafts)
             .join(
-                orm.pages_treepath,
+                orm.drafts_treepath,
                 and_(
-                    orm.pages_treepath.c.ancestor_id == orm.pages.c.id,
-                    orm.pages_treepath.c.descendant_id == id,
+                    orm.drafts_treepath.c.ancestor_id == orm.drafts.c.id,
+                    orm.drafts_treepath.c.descendant_id == id,
                 ),
             )
-            .order_by(orm.pages_treepath.c.length.desc())
+            .order_by(orm.drafts_treepath.c.length.desc())
         )
         orm_pages: CursorResult = await self.session.execute(qry)
         page: Page | None = None
@@ -181,23 +181,23 @@ class PageSQLRepository(AbstractPageRepository):
         # If we don't have a page here, it means that the tree path is broken
         return Err(PageRepositoryError.page_broken_treepath)  # coverage: ignore
 
-    async def by_path(self, path: str) -> PageRepositoryResult:
+    async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         slugs = enumerate(reversed(path.strip("/").split("/")))
-        qry = select(orm.pages)
+        qry = select(orm.drafts)
         for idx, slug in slugs:
-            parent = alias(orm.pages)
+            parent = alias(orm.drafts)
             sub = (
-                select(orm.pages_treepath)
+                select(orm.drafts_treepath)
                 .join(
                     parent,
                     and_(
-                        parent.c.id == orm.pages_treepath.c.ancestor_id,
+                        parent.c.id == orm.drafts_treepath.c.ancestor_id,
                         parent.c.slug == slug,
                     ),
                 )
-                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
-                .filter(orm.pages_treepath.c.length == idx)
+                .filter(orm.drafts.c.id == orm.drafts_treepath.c.descendant_id)
+                .filter(orm.drafts_treepath.c.length == idx)
             )
             qry = qry.filter(sub.exists())
 
@@ -207,15 +207,15 @@ class PageSQLRepository(AbstractPageRepository):
             return await self.by_id(p.id)
         return Err(PageRepositoryError.page_not_found)
 
-    async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
+    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch one page by its unique path."""
 
         if not path:
             # we want roots page here
             sub = ~(
-                select(orm.pages_treepath.c.ancestor_id)
-                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
-                .filter(orm.pages_treepath.c.length > 0)
+                select(orm.drafts_treepath.c.ancestor_id)
+                .filter(orm.drafts.c.id == orm.drafts_treepath.c.descendant_id)
+                .filter(orm.drafts_treepath.c.length > 0)
             ).exists()
             parent = None
         else:
@@ -224,12 +224,12 @@ class PageSQLRepository(AbstractPageRepository):
                 return cast(Err[PageRepositoryError], parent_res)
             parent = parent_res.unwrap()
             sub = (
-                select(orm.pages_treepath.c.ancestor_id)
-                .filter(orm.pages.c.id == orm.pages_treepath.c.descendant_id)
-                .filter(orm.pages_treepath.c.length == 1)
-                .filter(orm.pages_treepath.c.ancestor_id == parent.id)
+                select(orm.drafts_treepath.c.ancestor_id)
+                .filter(orm.drafts.c.id == orm.drafts_treepath.c.descendant_id)
+                .filter(orm.drafts_treepath.c.length == 1)
+                .filter(orm.drafts_treepath.c.ancestor_id == parent.id)
             ).exists()
-        qry = select(orm.pages).filter(sub).order_by(orm.pages.c.slug)
+        qry = select(orm.drafts).filter(sub).order_by(orm.drafts.c.slug)
         pages: CursorResult = await self.session.execute(qry)
 
         ret: list[Page] = [
@@ -245,16 +245,16 @@ class PageSQLRepository(AbstractPageRepository):
         ]
         return Ok(ret)
 
-    async def add(self, model: Page) -> PageOperationResult:
+    async def add(self, model: Page) -> DraftOperationResult:
         """Append a new model to the repository."""
 
         await self.session.execute(  # type: ignore
-            orm.pages.insert(),  # type: ignore
+            orm.drafts.insert(),  # type: ignore
             [format_page(model)],
         )
 
         await self.session.execute(  # type: ignore
-            orm.pages_treepath.insert(),  # type: ignore
+            orm.drafts_treepath.insert(),  # type: ignore
             [
                 {
                     "ancestor_id": model.id,
@@ -270,33 +270,33 @@ class PageSQLRepository(AbstractPageRepository):
             await self.session.execute(
                 text(
                     """
-                    INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
+                    INSERT INTO drafts_treepath(ancestor_id, descendant_id, length)
                     SELECT
-                        pages_treepath.ancestor_id,
-                        :page_id,
-                        pages_treepath.length + 1
-                    FROM pages_treepath
-                    WHERE pages_treepath.descendant_id = :parent_id
+                        drafts_treepath.ancestor_id,
+                        :draft_id,
+                        drafts_treepath.length + 1
+                    FROM drafts_treepath
+                    WHERE drafts_treepath.descendant_id = :parent_id
                     """
                 ),
-                {"page_id": model.id, "parent_id": model.parent.id},
+                {"draft_id": model.id, "parent_id": model.parent.id},
             )
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Page) -> PageOperationResult:
+    async def update(self, model: Page) -> DraftOperationResult:
         """Update model in the repository."""
         page = format_page(model)
         page.pop("id")
         cursor: CursorResult = await self.session.execute(
-            orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
+            orm.drafts.update(orm.drafts.c.id == model.id, values=page)  # type: ignore
         )
         if cursor.rowcount == 0:
             return Err(PageRepositoryError.page_not_found)
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: Page) -> PageOperationResult:
+    async def remove(self, model: Page) -> DraftOperationResult:
         """Remove the model from the repository."""
         child_pages = await self.by_parent(model.path)
         if child_pages.is_err():
@@ -306,12 +306,12 @@ class PageSQLRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_has_children)
 
         await self.session.execute(
-            delete(orm.pages_treepath).where(
-                orm.pages_treepath.c.descendant_id == model.id
+            delete(orm.drafts_treepath).where(
+                orm.drafts_treepath.c.descendant_id == model.id
             ),
         )
         await self.session.execute(
-            delete(orm.pages).where(orm.pages.c.id == model.id),
+            delete(orm.drafts).where(orm.drafts.c.id == model.id),
         )
         self.seen.add(model)
         return Ok(...)
@@ -579,15 +579,15 @@ class SiteSQLRepository(AbstractSiteRepository):
         sites: list[Site] = []
         for orm_site in orm_sites:  # type: ignore
             s = cast(Site, orm_site)
-            page = await PageSQLRepository(self.session).by_id(
-                s.page_id  # type: ignore
+            page = await DraftSQLRepository(self.session).by_id(
+                s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
 
             sites.append(
                 Site(
                     id=s.id,
-                    page_id=page_ok.id,
+                    draft_id=page_ok.id,
                     root_page_path=page_ok.path,
                     hostname=s.hostname,
                     default=s.default,
@@ -600,15 +600,15 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Append a new model to the repository."""
         data = model.dict()
         data["created_at"] = model.created_at
-        rpage = await PageSQLRepository(self.session).by_path(
+        rpage = await DraftSQLRepository(self.session).by_path(
             data.pop("root_page_path")
         )
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
 
         page = rpage.unwrap()  # FIXME, should return Ok(...)
-        data["page_id"] = page.id
-        model.page_id = page.id  # patch if someone use this model
+        data["draft_id"] = page.id
+        model.draft_id = page.id  # patch if someone use this model
         await self.session.execute(orm.sites.insert().values(data))  # type: ignore
         self.seen.add(model)
         return Ok(...)
@@ -617,14 +617,14 @@ class SiteSQLRepository(AbstractSiteRepository):
         orm_site = orm_sites.first()
         if orm_site:
             s = cast(Site, orm_site)
-            page = await PageSQLRepository(self.session).by_id(
-                s.page_id  # type: ignore
+            page = await DraftSQLRepository(self.session).by_id(
+                s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
             return Ok(
                 Site(
                     id=s.id,
-                    page_id=page_ok.id,
+                    draft_id=page_ok.id,
                     root_page_path=page_ok.path,
                     hostname=s.hostname,
                     default=s.default,
@@ -650,13 +650,13 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def update(self, model: Site) -> SiteOperationResult:
         """Update given model into the repository."""
-        site = model.dict(exclude={"id", "page_id", "root_page_path"})
+        site = model.dict(exclude={"id", "draft_id", "root_page_path"})
 
-        rpage = await PageSQLRepository(self.session).by_path(model.root_page_path)
+        rpage = await DraftSQLRepository(self.session).by_path(model.root_page_path)
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
         page = rpage.unwrap()  # FIXME, should return Ok(...)
-        site["page_id"] = page.id
+        site["draft_id"] = page.id
         cursor: CursorResult = await self.session.execute(
             orm.sites.update(orm.sites.c.id == model.id, values=site)  # type: ignore
         )
@@ -676,7 +676,7 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
         self.session = session
         self.accounts = AccountSQLRepository(session)
         self.authn_tokens = AuthnTokenSQLRepository(session)
-        self.pages = PageSQLRepository(session)
+        self.pages = DraftSQLRepository(session)
         self.sites = SiteSQLRepository(session)
         self.snippets = SnippetSQLRepository(session)
         self.settings = SettingSQLRepository(session)

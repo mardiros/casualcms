@@ -137,7 +137,7 @@ async def home_page(
             ),
             uow,
         )
-        page = await uow.pages.by_id(page_id)
+        page = await uow.drafts.by_id(page_id)
         yield page.unwrap()
 
 
@@ -164,7 +164,7 @@ async def sub_page(
             ),
             uow,
         )
-        page = await uow.pages.by_id(page_id)
+        page = await uow.drafts.by_id(page_id)
         yield page.unwrap()
 
 

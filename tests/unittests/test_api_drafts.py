@@ -44,7 +44,7 @@ async def test_api_create_draft(
     assert resp.status_code == 201
     assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
-        page = (await uow.pages.by_path("/index")).unwrap()
+        page = (await uow.drafts.by_path("/index")).unwrap()
         assert page.dict() == {
             "slug": "index",
             "title": "Root Page",
@@ -106,7 +106,7 @@ async def test_create_draft_subpages(
     assert resp.status_code == 201
     assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
-        page = (await uow.pages.by_path("/home/test")).unwrap()
+        page = (await uow.drafts.by_path("/home/test")).unwrap()
         assert page.dict() == {
             "slug": "test",
             "title": "sub Page",
@@ -116,7 +116,7 @@ async def test_create_draft_subpages(
         }
 
     async with uow as uow:
-        pages = (await uow.pages.by_parent("/home")).unwrap()
+        pages = (await uow.drafts.by_parent("/home")).unwrap()
         pages_dict = [page.dict() for page in pages]
         assert pages_dict == [
             {
@@ -247,7 +247,7 @@ async def test_update_home_draft_content(
     async with uow as uow:
         saved_home = cast(
             HomePage,
-            (await uow.pages.by_path("/new-home")).unwrap(),
+            (await uow.drafts.by_path("/new-home")).unwrap(),
         )
     assert saved_home.slug == "new-home"
     assert saved_home.title == payload["title"]
@@ -278,7 +278,7 @@ async def test_update_sub_draft_content(
     async with uow as uow:
         saved_home = cast(
             HomePage,
-            (await uow.pages.by_path("/home/new-slug")).unwrap(),
+            (await uow.drafts.by_path("/home/new-slug")).unwrap(),
         )
     assert saved_home.slug == "new-slug"
     assert saved_home.title == payload["title"]
@@ -308,7 +308,7 @@ async def test_delete_page(
     assert resp.status_code == 204
 
     async with uow as uow:
-        saved_home = await uow.pages.by_path("/home")
+        saved_home = await uow.drafts.by_path("/home")
 
     assert saved_home.is_err()
     assert saved_home.unwrap_err().name == "page_not_found"

@@ -11,7 +11,7 @@ from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
-    PageSQLRepository,
+    DraftSQLRepository,
     SettingSQLRepository,
     SiteSQLRepository,
     SnippetSQLRepository,
@@ -248,10 +248,10 @@ async def test_authntoken_delete(
         },
     ],
 )
-async def test_page_by_id(
+async def test_draft_by_id(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     root_page = await repo.by_id(params["id"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
@@ -259,8 +259,8 @@ async def test_page_by_id(
     assert rok.path == params["expected_path"]
 
 
-async def test_page_by_id_err(sqla_session: AsyncSession):
-    repo = PageSQLRepository(sqla_session)
+async def test_draft_by_id_err(sqla_session: AsyncSession):
+    repo = DraftSQLRepository(sqla_session)
     root_page = await repo.by_id(home_page.id)
     assert root_page.is_err()
     err = root_page.unwrap_err()
@@ -293,7 +293,7 @@ async def test_page_by_id_err(sqla_session: AsyncSession):
 async def test_page_by_path(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     root_page = await repo.by_path(params["path"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
@@ -315,7 +315,7 @@ async def test_page_by_path(
 async def test_page_by_path_err(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     root_page = await repo.by_path("/e404")
     assert root_page.is_err()
     err = root_page.unwrap_err()
@@ -358,7 +358,7 @@ async def test_page_by_path_err(
 async def test_page_by_parent(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     child_pages = await repo.by_parent(params["parent"])
     assert child_pages.is_ok()
     ps = child_pages.unwrap()
@@ -382,7 +382,7 @@ async def test_page_by_parent(
 async def test_page_by_parent_err(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     child_pages = await repo.by_parent(params["parent"])
     assert child_pages.is_err()
     err = child_pages.unwrap_err()
@@ -407,10 +407,10 @@ async def test_page_by_parent_err(
     ],
 )
 async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence[Page]):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     await repo.add(params["page"])
 
-    qry = select(orm.pages).filter(orm.pages.c.id == params["page"].id)
+    qry = select(orm.drafts).filter(orm.drafts.c.id == params["page"].id)
 
     resp = await sqla_session.execute(qry)  # type: ignore
     page = resp.first()  # type: ignore
@@ -418,18 +418,18 @@ async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence
     assert page.id == params["page"].id
 
     qry = (
-        select(orm.pages_treepath.c.ancestor_id, orm.pages_treepath.c.length)
-        .filter(orm.pages_treepath.c.descendant_id == params["page"].id)
-        .order_by(orm.pages_treepath.c.length.desc())
+        select(orm.drafts_treepath.c.ancestor_id, orm.drafts_treepath.c.length)
+        .filter(orm.drafts_treepath.c.descendant_id == params["page"].id)
+        .order_by(orm.drafts_treepath.c.length.desc())
     )
 
     resp = await sqla_session.execute(qry)  # type: ignore
     assert list(resp) == params["expected_ancestors"]  # type: ignore
 
     qry = (
-        select(orm.pages_treepath.c.descendant_id, orm.pages_treepath.c.length)
-        .filter(orm.pages_treepath.c.ancestor_id == params["page"].id)
-        .order_by(orm.pages_treepath.c.length)
+        select(orm.drafts_treepath.c.descendant_id, orm.drafts_treepath.c.length)
+        .filter(orm.drafts_treepath.c.ancestor_id == params["page"].id)
+        .order_by(orm.drafts_treepath.c.length)
     )
 
     resp = await sqla_session.execute(qry)  # type: ignore
@@ -460,13 +460,13 @@ async def test_page_add(params: Any, sqla_session: AsyncSession, pages: Sequence
 async def test_page_update(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
     await repo.update(params["update_page"])
 
-    qry = select(orm.pages).filter(orm.pages.c.id == params["page"].id)
+    qry = select(orm.drafts).filter(orm.drafts.c.id == params["page"].id)
 
     resp = await sqla_session.execute(qry)  # type: ignore
-    page: orm.pages = resp.first()  # type: ignore
+    page: orm.drafts = resp.first()  # type: ignore
     assert page.slug == params["expected_slug"]
     assert page.title == params["expected_title"]
     assert page.description == params["expected_description"]
@@ -484,7 +484,7 @@ async def test_page_update(
 async def test_page_remove(
     params: Any, sqla_session: AsyncSession, pages: Sequence[Page]
 ):
-    repo = PageSQLRepository(sqla_session)
+    repo = DraftSQLRepository(sqla_session)
 
     resp = await repo.remove(home_page)
     assert resp.is_err()
@@ -821,13 +821,13 @@ async def test_site_update(
     updated_site: orm.sites = resp.first()  # type: ignore
     assert updated_site.hostname == "www"
     assert updated_site.default is True
-    assert updated_site.page_id == home_page.id
+    assert updated_site.draft_id == home_page.id
 
     qry = select(orm.sites).filter(orm.sites.c.id == sites[0].id)
     resp = await sqla_session.execute(qry)  # type: ignore
     not_updated_site: orm.sites = resp.first()  # type: ignore
     assert not_updated_site.hostname == "www1"
-    assert not_updated_site.page_id == cat_page.id
+    assert not_updated_site.draft_id == cat_page.id
 
     site.root_page_path = "/e404"
     rsite = await repo.update(site)
@@ -837,7 +837,7 @@ async def test_site_update(
 
     site = Site(
         id=generate_id(),
-        page_id=None,
+        draft_id=None,
         hostname="x",
         root_page_path="/root",
         default=False,

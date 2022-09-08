@@ -15,14 +15,14 @@ from casualcms.domain.messages import Event
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
-    AbstractPageRepository,
+    AbstractDraftRepository,
     AbstractSnippetRepository,
 )
 
 
 class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
-    pages: AbstractPageRepository
+    drafts: AbstractDraftRepository
     snippets: AbstractSnippetRepository
     authn_tokens: AbstractAuthnRepository
     sites: AbstractSiteRepository
@@ -37,7 +37,7 @@ class AbstractUnitOfWork(abc.ABC):
             while account.events:
                 yield account.events.pop(0)
 
-        for page in self.pages.seen:
+        for page in self.drafts.seen:
             while page.events:
                 yield page.events.pop(0)
 

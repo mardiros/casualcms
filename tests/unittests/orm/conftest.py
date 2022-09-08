@@ -156,12 +156,12 @@ async def pages(
     pages: Sequence[Page] = params["pages"]
     if pages:
         await sqla_session.execute(  # type: ignore
-            orm.pages.insert(),  # type: ignore
+            orm.drafts.insert(),  # type: ignore
             [format_page(p) for p in pages],
         )
 
         await sqla_session.execute(  # type: ignore
-            orm.pages_treepath.insert(),  # type: ignore
+            orm.drafts_treepath.insert(),  # type: ignore
             [
                 {
                     "ancestor_id": p.id,
@@ -179,16 +179,16 @@ async def pages(
                 await sqla_session.execute(
                     text(
                         """
-                        INSERT INTO pages_treepath(ancestor_id, descendant_id, length)
+                        INSERT INTO drafts_treepath(ancestor_id, descendant_id, length)
                         SELECT
-                            pages_treepath.ancestor_id,
-                            :page_id,
-                            pages_treepath.length + 1
-                        FROM pages_treepath
-                        WHERE pages_treepath.descendant_id = :parent_id
+                            drafts_treepath.ancestor_id,
+                            :draft_id,
+                            drafts_treepath.length + 1
+                        FROM drafts_treepath
+                        WHERE drafts_treepath.descendant_id = :parent_id
                         """
                     ),
-                    {"page_id": page.id, "parent_id": page.parent.id},
+                    {"draft_id": page.id, "parent_id": page.parent.id},
                 )
 
         await sqla_session.commit()
@@ -196,19 +196,19 @@ async def pages(
     yield pages
 
     await sqla_session.execute(  # type: ignore
-        delete(orm.pages_treepath).where(
-            orm.pages_treepath.c.descendant_id.in_([p.id for p in pages])
+        delete(orm.drafts_treepath).where(
+            orm.drafts_treepath.c.descendant_id.in_([p.id for p in pages])
         ),
     )
 
     await sqla_session.execute(  # type: ignore
-        delete(orm.pages_treepath).where(
-            orm.pages_treepath.c.ancestor_id.in_([p.id for p in pages])
+        delete(orm.drafts_treepath).where(
+            orm.drafts_treepath.c.ancestor_id.in_([p.id for p in pages])
         ),
     )
 
     await sqla_session.execute(  # type: ignore
-        delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),
+        delete(orm.drafts).where(orm.drafts.c.id.in_([p.id for p in pages])),
     )
     await sqla_session.commit()
 

@@ -59,8 +59,8 @@ authn_tokens = Table(
 )
 
 
-pages = Table(
-    "pages",
+drafts = Table(
+    "drafts",
     metadata,
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
@@ -69,29 +69,29 @@ pages = Table(
     Column("title", CIText, nullable=False),
     Column("description", CIText, nullable=False),
     Column("body", JSON, nullable=False),
-    Index("idx_pages_type", "type", unique=False),
-    Index("idx_pages_slug", "slug", unique=False),
-    Index("idx_pages_created_at", "created_at", unique=False),
+    Index("idx_drafts_type", "type", unique=False),
+    Index("idx_drafts_slug", "slug", unique=False),
+    Index("idx_drafts_created_at", "created_at", unique=False),
 )
 
-pages_treepath = Table(
-    "pages_treepath",
+drafts_treepath = Table(
+    "drafts_treepath",
     metadata,
     Column(
         "ancestor_id",
         UUID,
-        ForeignKey("pages.id", name="fk_pages_ancestor_id"),
+        ForeignKey("drafts.id", name="fk_drafts_ancestor_id"),
         primary_key=True,
     ),
     Column(
         "descendant_id",
         UUID,
-        ForeignKey("pages.id", name="fk_pages_descendant_id"),
+        ForeignKey("drafts.id", name="fk_drafts_descendant_id"),
         primary_key=True,
     ),
     Column("length", Integer),
     Index(
-        "idx_pages_treepath_descendant_id",
+        "idx_drafts_treepath_descendant_id",
         "descendant_id",
         "length",
         unique=False,
@@ -118,15 +118,15 @@ sites = Table(
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
     Column(
-        "page_id",
+        "draft_id",
         UUID,
-        ForeignKey("pages.id", name="fk_sites_page_id"),
+        ForeignKey("drafts.id", name="fk_sites_draft_id"),
         nullable=False,
     ),
     Column("hostname", String(253)),
     Column("default", Boolean, nullable=False),
     Column("secure", Boolean, nullable=False),
-    Index("idx_sites_page_id", "page_id", unique=False),
+    Index("idx_sites_draft_id", "draft_id", unique=False),
     Index("idx_sites_created_at", "created_at", unique=False),
     Index("idx_sites_hostname", "hostname", unique=True),
 )

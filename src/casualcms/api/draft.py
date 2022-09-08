@@ -52,7 +52,7 @@ async def create_draft(
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {"id": generate_id(), **payload}
         if parent:
-            parent_page = await uow.pages.by_path(parent)
+            parent_page = await uow.drafts.by_path(parent)
             if parent_page.is_err():
                 raise HTTPException(
                     status_code=422,
@@ -85,7 +85,7 @@ async def list_drafts(
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
-        pages = await uow.pages.by_parent(parent)
+        pages = await uow.drafts.by_parent(parent)
         await uow.rollback()
 
     if pages.is_err():
@@ -115,7 +115,7 @@ async def show_draft(
 
     async with app.uow as uow:
         path = path.strip("/")
-        rpage = await uow.pages.by_path(f"/{path}")
+        rpage = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
 
     if rpage.is_err():
@@ -137,7 +137,7 @@ async def update_draft(
 
     async with app.uow as uow:
         path = path.strip("/")
-        rpage = await uow.pages.by_path(f"/{path}")
+        rpage = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
 
     if rpage.is_err():
@@ -177,7 +177,7 @@ async def delete_draft(
 
     async with app.uow as uow:
         path = path.strip("/")
-        page = await uow.pages.by_path(f"/{path}")
+        page = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
 
     if page.is_err():

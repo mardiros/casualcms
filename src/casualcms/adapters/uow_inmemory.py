@@ -9,7 +9,7 @@ from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
-    AbstractPageRepository,
+    AbstractDraftRepository,
 )
 from casualcms.domain.repositories.authntoken import (
     AuthnTokenOperationResult,
@@ -17,10 +17,10 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
-    PageOperationResult,
+    DraftOperationResult,
+    DraftRepositoryResult,
+    DraftSequenceRepositoryResult,
     PageRepositoryError,
-    PageRepositoryResult,
-    PageSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.setting import (
     AbstractSettingRepository,
@@ -70,13 +70,13 @@ class AccountInMemoryRepository(AbstractAccountRepository):
         return Ok(...)
 
 
-class PageInMemoryRepository(AbstractPageRepository):
+class DraftInMemoryRepository(AbstractDraftRepository):
     pages: dict[str, Page] = {}
 
     def __init__(self) -> None:
         self.seen = set()
 
-    async def by_id(self, id: str) -> PageRepositoryResult:
+    async def by_id(self, id: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         for page in self.pages.values():
             if page.id == id:
@@ -84,13 +84,13 @@ class PageInMemoryRepository(AbstractPageRepository):
 
         return Err(PageRepositoryError.page_not_found)
 
-    async def by_path(self, path: str) -> PageRepositoryResult:
+    async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         if path in self.pages:
             return Ok(self.pages[path])
         return Err(PageRepositoryError.page_not_found)
 
-    async def by_parent(self, path: Optional[str]) -> PageSequenceRepositoryResult:
+    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch one page by its unique path."""
         ret: list[Page] = []
         if path:
@@ -103,19 +103,19 @@ class PageInMemoryRepository(AbstractPageRepository):
 
         return Ok(ret)
 
-    async def add(self, model: Page) -> PageOperationResult:
+    async def add(self, model: Page) -> DraftOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
         return Ok(...)
 
-    async def remove(self, model: Page) -> PageOperationResult:
+    async def remove(self, model: Page) -> DraftOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.pages[model.path]
         return Ok(...)
 
-    async def update(self, model: Page) -> PageOperationResult:
+    async def update(self, model: Page) -> DraftOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -192,10 +192,10 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         for site in self.sites:
             if site.id != model.id:
                 sites.append(site)
-        rpage = await PageInMemoryRepository().by_path(model.root_page_path)
+        rpage = await DraftInMemoryRepository().by_path(model.root_page_path)
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
-        model.page_id = rpage.unwrap().id
+        model.draft_id = rpage.unwrap().id
         sites.append(model)
         self.sites = sites
         return Ok(...)
@@ -322,7 +322,7 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
     def __init__(self, settings: Settings) -> None:
         self.accounts = AccountInMemoryRepository()
         self.authn_tokens = AuthnTokenInMemoryRepository()
-        self.pages = PageInMemoryRepository()
+        self.drafts = DraftInMemoryRepository()
         self.snippets = SnippetInMemoryRepository()
         self.sites = SiteInMemoryRepository()
         self.settings = SettingInMemoryRepository()
@@ -334,7 +334,7 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
 
     async def dispose(self) -> None:
         self.accounts.accounts.clear()  # type: ignore
-        self.pages.pages.clear()  # type: ignore
+        self.drafts.pages.clear()  # type: ignore
         self.sites.sites.clear()  # type: ignore
         self.snippets.snippets.clear()  # type: ignore
         self.authn_tokens.tokens.clear()  # type: ignore

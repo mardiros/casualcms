@@ -17,9 +17,10 @@ from casualcms.domain.messages.commands import (
     CreateSetting,
     CreateSite,
     CreateSnippet,
+    PublishPage,
     generate_id,
 )
-from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model import Account, AuthnToken, DraftPage, Page, Site
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.snippet import Snippet
 from casualcms.entrypoint import bootstrap
@@ -117,11 +118,11 @@ async def authntoken(
 
 
 @pytest.fixture
-async def home_page(
+async def draft_hp(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Page, None]:
+) -> AsyncGenerator[DraftPage, None]:
     async with uow as uow:
         page_id = generate_id()
         await messagebus.handle(
@@ -142,12 +143,12 @@ async def home_page(
 
 
 @pytest.fixture
-async def sub_page(
+async def draft_subpage(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-    home_page: HomePage,
-) -> AsyncGenerator[Page, None]:
+    draft_hp: HomePage,
+) -> AsyncGenerator[DraftPage, None]:
     async with uow as uow:
         page_id = generate_id()
         await messagebus.handle(
@@ -155,7 +156,7 @@ async def sub_page(
                 type="blog:CategoryPage",
                 payload={
                     "id": page_id,
-                    "parent": home_page,
+                    "parent": draft_hp,
                     "slug": "sub",
                     "title": "a sub page",
                     "description": "I am so glad to be a sub page",
@@ -243,19 +244,37 @@ async def default_site(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-    home_page: Page,
+    draft_hp: DraftPage,
 ) -> AsyncGenerator[Site, None]:
     async with uow as uow:
         site = await messagebus.handle(
             CreateSite(
                 hostname="www.example.net",
                 default=True,
-                root_page_path=home_page.path,
+                root_page_path=draft_hp.path,
                 secure=False,
             ),
             uow,
         )
     yield site.unwrap()
+
+
+@pytest.fixture
+async def draft_hp_published(
+    app: FastAPI,
+    draft_hp: Page,
+    default_site: Site,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Page, None]:
+
+    async with uow as uow:
+        await messagebus.handle(
+            PublishPage(id=draft_hp.id, site_id=default_site.id),
+            uow,
+        )
+        ppage = await uow.pages.by_page_and_site(draft_hp.id, default_site.id)
+        yield ppage.unwrap()
 
 
 @pytest.fixture

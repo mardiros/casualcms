@@ -5,9 +5,9 @@ from casualcms.domain.model import Site
 from ..casualblog.models import HeaderSnippet, HomePage
 
 
-async def test_get_home_page(
+async def test_get_draft_hp(
     client: TestClient,
-    home_page: HomePage,
+    draft_hp: HomePage,
     default_site: Site,
     header_snippet: HeaderSnippet,
 ):

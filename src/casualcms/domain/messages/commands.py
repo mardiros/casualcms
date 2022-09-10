@@ -78,6 +78,13 @@ class UpdatePage(Command):
     metadata: Metadata = Metadata(category="page", name="update_page", schemaVersion=1)
 
 
+class PublishPage(Command):
+    id: str = Field(...)
+    site_id: str = Field(...)
+    created_at: datetime = Field(default_factory=datetime.now)
+    metadata: Metadata = Metadata(category="page", name="publish_page", schemaVersion=1)
+
+
 class DeletePage(Command):
     id: str = Field(...)
     deleted_at: datetime = Field(default_factory=datetime.now)

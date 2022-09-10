@@ -6,7 +6,7 @@ from casualcms.domain.messages.commands import generate_secret
 from casualcms.domain.model import (
     Account,
     AuthnToken,
-    Page,
+    DraftPage,
     Site,
     Snippet,
     resolve_page_type,
@@ -45,7 +45,7 @@ def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
     return AuthnToken(**token)
 
 
-def fake_page(type: str, **kwargs: Any) -> Page:
+def fake_page(type: str, **kwargs: Any) -> DraftPage:
     page: Dict[str, Any] = {
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),
@@ -60,7 +60,7 @@ def fake_page(type: str, **kwargs: Any) -> Page:
     return typ(**page)
 
 
-def fake_site(page: Page, **kwargs: Any) -> Site:
+def fake_site(page: DraftPage, **kwargs: Any) -> Site:
     site = {
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),

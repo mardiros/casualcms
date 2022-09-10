@@ -21,7 +21,7 @@ from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.draft import DraftPage
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -93,7 +93,7 @@ async def accounts(
 @pytest.fixture()
 async def sites(
     sqla_session: AsyncSession,
-    pages: list[Page],
+    drafts: list[DraftPage],
     params: Mapping[str, Any],
 ) -> AsyncGenerator[Sequence[Site], None]:
 
@@ -136,11 +136,11 @@ async def authn_tokens(
 
 
 @pytest.fixture()
-async def pages(
+async def drafts(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
-) -> AsyncGenerator[Sequence[Page], None]:
-    def format_page(page: Page) -> Dict[str, Any]:
+) -> AsyncGenerator[Sequence[DraftPage], None]:
+    def format_page(page: DraftPage) -> Dict[str, Any]:
         p: Dict[str, Any] = page.dict()
         formated_page: Dict[str, Any] = {
             "id": page.id,
@@ -153,7 +153,7 @@ async def pages(
         formated_page["body"] = p
         return formated_page
 
-    pages: Sequence[Page] = params["pages"]
+    pages: Sequence[DraftPage] = params["pages"]
     if pages:
         await sqla_session.execute(  # type: ignore
             orm.drafts.insert(),  # type: ignore

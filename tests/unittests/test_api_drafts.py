@@ -4,7 +4,7 @@ import pytest
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.draft import DraftPage
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.casualblog.models import HomePage
 
@@ -54,13 +54,13 @@ async def test_api_create_draft(
         }
 
 
-async def test_api_list_draft_403(client: TestClient, home_page: Page):
+async def test_api_list_draft_403(client: TestClient, draft_hp: DraftPage):
     resp = client.get("/api/drafts")
     assert resp.status_code == 403
 
 
 async def test_api_list_root_draft_pages(
-    client: TestClient, authntoken: AuthnToken, home_page: Page
+    client: TestClient, authntoken: AuthnToken, draft_hp: DraftPage
 ):
     resp = client.get(
         "/api/drafts",
@@ -71,11 +71,11 @@ async def test_api_list_root_draft_pages(
     assert resp.status_code == 200
     assert resp.json() == [
         {
-            "slug": home_page.slug,
-            "title": home_page.title,
+            "slug": draft_hp.slug,
+            "title": draft_hp.title,
             "meta": {
-                "path": home_page.path,
-                "type": home_page.__meta__.type,
+                "path": draft_hp.path,
+                "type": draft_hp.__meta__.type,
             },
         }
     ]
@@ -84,7 +84,7 @@ async def test_api_list_root_draft_pages(
 async def test_create_draft_subpages(
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
+    draft_hp: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     resp = client.post(
@@ -131,7 +131,7 @@ async def test_create_draft_subpages(
 
 async def test_get_draft_403(
     client: TestClient,
-    home_page: Page,
+    draft_hp: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     resp = client.get("/api/drafts/home")
@@ -194,8 +194,8 @@ async def test_get_draft(
     params: Mapping[str, Any],
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
-    sub_page: Page,
+    draft_hp: DraftPage,
+    draft_subpage: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     resp = client.get(
@@ -207,7 +207,7 @@ async def test_get_draft(
     assert resp.json() == params["response"]
 
 
-async def test_update_home_draft_content_403(client: TestClient, home_page: Page):
+async def test_update_home_draft_content_403(client: TestClient, draft_hp: DraftPage):
     payload = {
         "slug": "new-home",
         "title": "new title",
@@ -216,7 +216,7 @@ async def test_update_home_draft_content_403(client: TestClient, home_page: Page
         "body": [{"body": "my new body"}],
     }
     resp = client.patch(
-        f"/api/drafts/{home_page.path}",
+        f"/api/drafts/{draft_hp.path}",
         json=payload,
     )
     assert resp.status_code == 403
@@ -225,7 +225,7 @@ async def test_update_home_draft_content_403(client: TestClient, home_page: Page
 async def test_update_home_draft_content(
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
+    draft_hp: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     payload = {
@@ -236,7 +236,7 @@ async def test_update_home_draft_content(
         "body": [{"body": "my new body"}],
     }
     resp = client.patch(
-        f"/api/drafts/{home_page.path}",
+        f"/api/drafts/{draft_hp.path}",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
@@ -259,7 +259,7 @@ async def test_update_home_draft_content(
 async def test_update_sub_draft_content(
     client: TestClient,
     authntoken: AuthnToken,
-    sub_page: Page,
+    draft_subpage: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     payload = {
@@ -267,7 +267,7 @@ async def test_update_sub_draft_content(
         "title": "new title",
     }
     resp = client.patch(
-        f"/api/drafts/{sub_page.path}",
+        f"/api/drafts/{draft_subpage.path}",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
@@ -286,21 +286,21 @@ async def test_update_sub_draft_content(
 
 async def test_delete_draft_403(
     client: TestClient,
-    home_page: Page,
+    draft_hp: DraftPage,
     uow: AbstractUnitOfWork,
 ):
-    resp = client.delete(f"/api/drafts/{home_page.path}")
+    resp = client.delete(f"/api/drafts/{draft_hp.path}")
     assert resp.status_code == 403
 
 
 async def test_delete_page(
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
+    draft_hp: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     resp = client.delete(
-        f"/api/drafts/{home_page.path}",
+        f"/api/drafts/{draft_hp.path}",
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },

@@ -1,8 +1,14 @@
-from result import Err
+from result import Err, Ok
 
-from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
-from casualcms.domain.model.page import resolve_page_type
-from casualcms.domain.repositories.page import DraftOperationResult
+from casualcms.domain.messages.commands import (
+    CreatePage,
+    DeletePage,
+    PublishPage,
+    UpdatePage,
+)
+from casualcms.domain.model import Page, resolve_page_type
+from casualcms.domain.repositories.draft import DraftOperationResult
+from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -43,3 +49,43 @@ async def delete_page(
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
     return await uow.drafts.remove(page)
+
+
+@listen
+async def publish_page(
+    cmd: PublishPage,
+    uow: AbstractUnitOfWork,
+) -> PageOperationResult:
+    rpage = await uow.drafts.by_id(cmd.id)
+    if rpage.is_err():
+        return Err(PageRepositoryError.draft_not_found)
+    page = rpage.unwrap()
+
+    rsite = await uow.sites.by_id(cmd.site_id)
+    if rsite.is_err():
+        return Err(PageRepositoryError.site_not_found)
+
+    page = rpage.unwrap()
+    site = rsite.unwrap()
+    rpublished_page = await uow.pages.by_page_and_site(page.id, site.id)
+    if rpublished_page.is_ok():
+        published_page = rpublished_page.unwrap()
+        published_page.template = page.get_template()
+        published_page.title = page.title
+        published_page.path = page.path
+        published_page.body = page.get_context()
+        rok = await uow.pages.update(rpublished_page.unwrap())
+    else:
+        published_page = Page(
+            site=site,
+            page=page,
+            type=page.__meta__.type,
+            template=page.get_template(),
+            title=page.title,
+            path=page.path,
+            body=page.get_context(),
+        )
+        rok = await uow.pages.add(published_page)
+    if rok.is_err():
+        return Err(PageRepositoryError.publication_error)
+    return Ok(...)

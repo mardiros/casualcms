@@ -16,6 +16,7 @@ from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
     AbstractDraftRepository,
+    AbstractPageRepository,
     AbstractSnippetRepository,
 )
 
@@ -23,6 +24,7 @@ from casualcms.domain.repositories import (
 class AbstractUnitOfWork(abc.ABC):
     accounts: AbstractAccountRepository
     drafts: AbstractDraftRepository
+    pages: AbstractPageRepository
     snippets: AbstractSnippetRepository
     authn_tokens: AbstractAuthnRepository
     sites: AbstractSiteRepository

@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import Page, Setting, Snippet
+from casualcms.domain.model import DraftPage, Setting, Snippet
 
 
 class Link(BaseModel):
@@ -64,7 +64,7 @@ class Paragraph(BaseModel):
     body: str = Field(widget="textarea")
 
 
-class AbstractPage(Page):
+class AbstractPage(DraftPage):
     hero_title: str = Field(description="Title of the hero section")
 
     class Meta:

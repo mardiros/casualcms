@@ -3,7 +3,7 @@ from typing import Any, Dict
 import pytest
 
 from casualcms.domain.model import AbstractPageError, get_available_subtypes
-from casualcms.domain.model.page import UnregisterType, resolve_page_type
+from casualcms.domain.model.draft import UnregisterType, resolve_page_type
 
 from ..casualblog.models import (
     AbstractPage,

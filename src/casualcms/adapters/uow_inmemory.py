@@ -3,7 +3,7 @@ from typing import Iterable, Optional
 from result import Err, Ok
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account, AuthnToken, Page, Site
+from casualcms.domain.model import Account, AuthnToken, DraftPage, Page, Site
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories import (
@@ -16,11 +16,17 @@ from casualcms.domain.repositories.authntoken import (
     AuthnTokenRepositoryError,
     AuthnTokenRepositoryResult,
 )
-from casualcms.domain.repositories.page import (
+from casualcms.domain.repositories.draft import (
     DraftOperationResult,
+    DraftRepositoryError,
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.page import (
+    AbstractPageRepository,
+    PageOperationResult,
     PageRepositoryError,
+    PageRepositoryResult,
 )
 from casualcms.domain.repositories.setting import (
     AbstractSettingRepository,
@@ -71,7 +77,7 @@ class AccountInMemoryRepository(AbstractAccountRepository):
 
 
 class DraftInMemoryRepository(AbstractDraftRepository):
-    pages: dict[str, Page] = {}
+    pages: dict[str, DraftPage] = {}
 
     def __init__(self) -> None:
         self.seen = set()
@@ -82,17 +88,17 @@ class DraftInMemoryRepository(AbstractDraftRepository):
             if page.id == id:
                 return Ok(page)
 
-        return Err(PageRepositoryError.page_not_found)
+        return Err(DraftRepositoryError.page_not_found)
 
     async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         if path in self.pages:
             return Ok(self.pages[path])
-        return Err(PageRepositoryError.page_not_found)
+        return Err(DraftRepositoryError.page_not_found)
 
     async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch one page by its unique path."""
-        ret: list[Page] = []
+        ret: list[DraftPage] = []
         if path:
             cnt = len(path.strip("/").split("/")) + 1
         else:
@@ -103,19 +109,19 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Ok(ret)
 
-    async def add(self, model: Page) -> DraftOperationResult:
+    async def add(self, model: DraftPage) -> DraftOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
         return Ok(...)
 
-    async def remove(self, model: Page) -> DraftOperationResult:
+    async def remove(self, model: DraftPage) -> DraftOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.pages[model.path]
         return Ok(...)
 
-    async def update(self, model: Page) -> DraftOperationResult:
+    async def update(self, model: DraftPage) -> DraftOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -124,10 +130,34 @@ class DraftInMemoryRepository(AbstractDraftRepository):
                 k = key
                 break
         else:
-            Err(PageRepositoryError.page_not_found)
+            Err(DraftRepositoryError.page_not_found)
         if k:
             del self.pages[k]
         self.pages[model.path] = model
+        return Ok(...)
+
+
+class PageInMemoryRepository(AbstractPageRepository):
+    pages: dict[tuple[str, str], Page] = {}
+
+    async def by_page_and_site(
+        self, page_id: str, site_id: str
+    ) -> PageRepositoryResult:
+        """Fetch one page by its unique id."""
+        try:
+            ppage = self.pages[page_id, site_id]
+        except KeyError:
+            return Err(PageRepositoryError.page_not_found)
+        return Ok(ppage)
+
+    async def add(self, model: Page) -> PageOperationResult:
+        """Append a new model to the repository."""
+        self.pages[model.page.id, model.site.id] = model
+        return Ok(...)
+
+    async def update(self, model: Page) -> PageOperationResult:
+        """Update a model to the repository."""
+        self.pages[model.page.id, model.site.id] = model
         return Ok(...)
 
 
@@ -323,6 +353,7 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
         self.accounts = AccountInMemoryRepository()
         self.authn_tokens = AuthnTokenInMemoryRepository()
         self.drafts = DraftInMemoryRepository()
+        self.pages = PageInMemoryRepository()
         self.snippets = SnippetInMemoryRepository()
         self.sites = SiteInMemoryRepository()
         self.settings = SettingInMemoryRepository()

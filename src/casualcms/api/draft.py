@@ -11,7 +11,7 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import resolve_page_type
+from casualcms.domain.model.draft import resolve_page_type
 
 from .base import (
     RESOURCE_CREATED,

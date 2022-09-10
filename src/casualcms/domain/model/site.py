@@ -23,3 +23,8 @@ class Site(BaseModel):
 
     def __hash__(self) -> int:
         return hash(self.id)  # type: ignore
+
+    @property
+    def url(self) -> str:
+        protocol = "https" if self.secure else "http"
+        return f"{protocol}://{self.hostname}"

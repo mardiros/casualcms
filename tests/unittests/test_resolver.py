@@ -1,13 +1,13 @@
 import pytest
 
 from casualcms.adapters.resolver import resolve
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.draft import DraftPage
 
 
 def test_resolve_ok():
-    hp = resolve("casualcms.domain.model.page:Page")
+    hp = resolve("casualcms.domain.model.draft:DraftPage")
     assert hp.is_ok()
-    assert hp.unwrap() is Page
+    assert hp.unwrap() is DraftPage
 
 
 @pytest.mark.parametrize(

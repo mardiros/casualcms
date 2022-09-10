@@ -1,7 +1,7 @@
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.draft import DraftPage
 from casualcms.domain.model.site import Site
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.unittests.orm.fixtures import fake_site
@@ -9,9 +9,9 @@ from tests.unittests.orm.fixtures import fake_site
 
 async def test_api_create_site_403(
     client: TestClient,
-    home_page: Page,
+    draft_hp: DraftPage,
 ):
-    site = fake_site(home_page)
+    site = fake_site(draft_hp)
     resp = client.post("/api/sites", json=site.dict())
     assert resp.status_code == 403
 
@@ -19,9 +19,9 @@ async def test_api_create_site_403(
 async def test_api_create_site(
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
+    draft_hp: DraftPage,
 ):
-    site = fake_site(home_page)
+    site = fake_site(draft_hp)
     resp = client.post(
         "/api/sites",
         headers={
@@ -34,13 +34,13 @@ async def test_api_create_site(
         "hostname": site.hostname,
         "default": site.default,
         "secure": site.secure,
-        "root_page_path": home_page.path,
+        "root_page_path": draft_hp.path,
     }
 
 
 async def test_api_list_sites_403(
     client: TestClient,
-    home_page: Page,
+    draft_hp: DraftPage,
     default_site: Site,
 ):
     resp = client.get("/api/sites")
@@ -50,7 +50,7 @@ async def test_api_list_sites_403(
 async def test_api_list_sites(
     client: TestClient,
     authntoken: AuthnToken,
-    home_page: Page,
+    draft_hp: DraftPage,
     default_site: Site,
 ):
     resp = client.get(
@@ -65,7 +65,7 @@ async def test_api_list_sites(
             "hostname": default_site.hostname,
             "default": True,
             "secure": False,
-            "root_page_path": home_page.path,
+            "root_page_path": draft_hp.path,
         }
     ]
 
@@ -73,7 +73,7 @@ async def test_api_list_sites(
 def test_get_site_403(
     client: TestClient,
     default_site: Site,
-    home_page: Page,
+    draft_hp: DraftPage,
 ):
     resp = client.get(f"/api/sites/{default_site.hostname}")
     assert resp.status_code == 403
@@ -83,7 +83,7 @@ def test_get_site(
     client: TestClient,
     authntoken: AuthnToken,
     default_site: Site,
-    home_page: Page,
+    draft_hp: DraftPage,
 ):
     resp = client.get(
         f"/api/sites/{default_site.hostname}",
@@ -96,7 +96,7 @@ def test_get_site(
         "hostname": default_site.hostname,
         "default": True,
         "secure": False,
-        "root_page_path": home_page.path,
+        "root_page_path": draft_hp.path,
     }
 
 
@@ -104,7 +104,7 @@ def test_get_site_404(
     client: TestClient,
     authntoken: AuthnToken,
     default_site: Site,
-    home_page: Page,
+    draft_hp: DraftPage,
 ):
     resp = client.get(
         "/api/sites/www.e404.net",
@@ -121,7 +121,7 @@ def test_get_site_404(
 async def test_update_site_403(
     client: TestClient,
     default_site: Site,
-    sub_page: Page,
+    draft_subpage: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     old_hostname = default_site.hostname
@@ -129,7 +129,7 @@ async def test_update_site_403(
         f"/api/sites/{old_hostname}",
         json={
             "hostname": "new.example.net",
-            "root_page_path": sub_page.path,
+            "root_page_path": draft_subpage.path,
             "secure": True,
         },
     )
@@ -140,7 +140,7 @@ async def test_update_site(
     client: TestClient,
     authntoken: AuthnToken,
     default_site: Site,
-    sub_page: Page,
+    draft_subpage: DraftPage,
     uow: AbstractUnitOfWork,
 ):
     old_hostname = default_site.hostname
@@ -151,7 +151,7 @@ async def test_update_site(
         },
         json={
             "hostname": "new.example.net",
-            "root_page_path": sub_page.path,
+            "root_page_path": draft_subpage.path,
             "secure": True,
         },
     )
@@ -163,8 +163,8 @@ async def test_update_site(
     assert rsaved_site.is_ok()
     saved_site = rsaved_site.unwrap()
     assert saved_site.id == default_site.id
-    assert saved_site.root_page_path == sub_page.path
-    assert saved_site.draft_id == sub_page.id
+    assert saved_site.root_page_path == draft_subpage.path
+    assert saved_site.draft_id == draft_subpage.id
     assert saved_site.secure is True
 
     async with uow as uow:

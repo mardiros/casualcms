@@ -62,9 +62,14 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
         </Link>
       </Td>
       <Td>
-        <a href={`${page.meta.path}`}>
+        <a
+          href={`/admin/pages/preview?${new URLSearchParams({
+            page: page.meta.path,
+          })}`}
+          target="preview"
+        >
           <Icon as={ViewIcon} marginEnd={2} />
-          View
+          Preview
         </a>
       </Td>
       <Td>

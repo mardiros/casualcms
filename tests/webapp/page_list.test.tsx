@@ -91,7 +91,7 @@ describe("As a user, I can list pages", () => {
 
     link = screen.getByText("View", { exact: false });
     expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/home");
+    expect(link.getAttribute("href")).equal("/admin/pages/preview?page=%2Fhome");
 
     link = screen.getByTestId("View child pages");
     expect(link).not.equal(undefined);

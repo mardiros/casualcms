@@ -134,25 +134,6 @@ class FakePageApi implements IPageApi {
     return ok(true);
   }
 
-  async showDraft(
-    authntoken: string,
-    path: string | null
-  ): Promise<Result<Draft, Map<string, string>>> {
-    let pages: Draft[] = [];
-    this.pages
-      .filter((page) => {
-        return page.meta.path == path;
-      })
-      .map((page) => pages.push(page));
-    if (pages.length) {
-      return ok(pages[0]);
-    } else {
-      // FIXME
-      const errors = new Map();
-      errors.set("page", "Page does not exists");
-      return err(errors);
-    }
-  }
   async listDrafts(
     authntoken: string,
     parent: string | null
@@ -179,6 +160,34 @@ class FakePageApi implements IPageApi {
       );
     return ok(pages);
   }
+
+  async showDraft(
+    authntoken: string,
+    path: string | null
+  ): Promise<Result<Draft, Map<string, string>>> {
+    let pages: Draft[] = [];
+    this.pages
+      .filter((page) => {
+        return page.meta.path == path;
+      })
+      .map((page) => pages.push(page));
+    if (pages.length) {
+      return ok(pages[0]);
+    } else {
+      // FIXME
+      const errors = new Map();
+      errors.set("page", "Page does not exists");
+      return err(errors);
+    }
+  }
+
+  async previewDraft(
+    authntoken: string,
+    path: string | null
+  ): Promise<Result<string, Map<string, string>>> {
+    return ok(`I preview ${path}`);
+  }
+
   async updateDraft(
     authntoken: string,
     path: string,
@@ -199,6 +208,13 @@ class FakePageApi implements IPageApi {
       // FIXME
       return err(new Map());
     }
+  }
+  async publishPage(
+    authntoken: string,
+    hostname: string,
+    path: string
+  ): Promise<Result<boolean, Map<string, string>>> {
+    throw new Error("Method not implemented.");
   }
   async deleteDraft(
     authntoken: string,

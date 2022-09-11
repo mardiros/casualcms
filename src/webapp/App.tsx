@@ -22,6 +22,7 @@ import { SettingSiteList } from "./ui/settings/settings_sites_list";
 import { SettingList } from "./ui/settings/settings_list";
 import { SettingNew } from "./ui/settings/setting_new";
 import { SettingEdit } from "./ui/settings/setting_edit";
+import { PagePreview } from "./ui/pages/page_preview";
 
 export const Body: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -102,6 +103,12 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
 const ThemedLayout: React.FunctionComponent<{}> = () => {
   return (
     <>
+      <RequireAuth>
+        <Routes>
+          <Route path="pages/preview" element={<PagePreview />} caseSensitive />
+        </Routes>
+      </RequireAuth>
+
       <ThemeProvider theme={theme}>
         <ColorModeProvider>
           <CSSReset />

@@ -52,11 +52,20 @@ export interface IPageApi {
     parent: string | null
   ): Promise<Result<PartialDraft[], ApiError>>;
   showDraft(authntoken: string, path: string): Promise<Result<Draft, ApiError>>;
+  previewDraft(
+    authntoken: string,
+    path: string
+  ): Promise<Result<string, ApiError>>;
   updateDraft(
     authntoken: string,
     path: string,
     page: Draft
   ): Promise<Result<Draft, ApiError>>;
+  publishPage(
+    authntoken: string,
+    hostname: string,
+    path: string
+  ): Promise<Result<boolean, ApiError>>;
   deleteDraft(
     authntoken: string,
     path: string

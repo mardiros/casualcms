@@ -50,6 +50,23 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     }
     return ok(jsonData as Draft);
   }
+  async previewDraft(
+    authntoken: string,
+    path: string
+  ): Promise<Result<string, ApiError>> {
+    const response = await this.fetch(`/api/previews/${path}`, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${authntoken}`,
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      const jsonData = await (response.json() as unknown);
+      return err(castError(jsonData as FastApiError) as ApiError);
+    }
+    return ok((await response.text()) as unknown as string);
+  }
   async listDrafts(
     authntoken: string,
     parent: string | null
@@ -91,6 +108,13 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
       return err(castError(jsonData as FastApiError) as ApiError);
     }
     return ok(jsonData as Draft);
+  }
+  async publishPage(
+    authntoken: string,
+    hostname: string,
+    path: string
+  ): Promise<Result<boolean, Map<string, string>>> {
+    throw new Error("Method not implemented.");
   }
   async deleteDraft(
     authntoken: string,

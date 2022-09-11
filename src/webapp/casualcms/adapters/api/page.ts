@@ -1,11 +1,11 @@
 import { Result, ok, err } from "neverthrow";
 
-import { ApiError, IDraftApi } from "casualcms/domain/ports";
+import { ApiError, IPageApi } from "casualcms/domain/ports";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialDraft, Draft } from "casualcms/domain/model";
 
-export class FetchDraftApi extends BaseFetchApi implements IDraftApi {
+export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async createDraft(
     authntoken: string,
     type: string,

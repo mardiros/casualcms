@@ -21,7 +21,7 @@ import {
   IAccountApi,
   Credentials,
   IPageTypeApi,
-  IDraftApi,
+  IPageApi,
   ISiteApi,
   SiteOption,
   ISnippetApi,
@@ -113,7 +113,7 @@ class FakePageTypeApi implements IPageTypeApi {
   }
 }
 
-class FakeDraftApi implements IDraftApi {
+class FakePageApi implements IPageApi {
   pages: Array<any>;
 
   constructor() {
@@ -503,7 +503,7 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
 export class FakeApi implements IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
-  draft: IDraftApi;
+  draft: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
@@ -513,7 +513,7 @@ export class FakeApi implements IApi {
   constructor() {
     this.account = new FakeAccountApi();
     this.pageType = new FakePageTypeApi();
-    this.draft = new FakeDraftApi();
+    this.draft = new FakePageApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
     this.snippetType = new FakeSnippetTypeApi();

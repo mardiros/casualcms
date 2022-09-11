@@ -40,7 +40,7 @@ export interface IPageTypeApi {
   ): Promise<Result<PageType, ApiError>>;
 }
 
-export interface IDraftApi {
+export interface IPageApi {
   createDraft(
     authntoken: string,
     type: string,

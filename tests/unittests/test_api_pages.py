@@ -18,7 +18,7 @@ async def test_publish(
         json={"path": draft_hp.path, "hostname": default_site.hostname},
     )
     assert resp.status_code == 201
-    assert resp.json() == {"href": "/"}
+    assert resp.json() == {"message": "Resource Created"}
 
 
 async def test_publish_422(client: TestClient, authntoken: AuthnToken):

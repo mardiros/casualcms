@@ -1,4 +1,4 @@
-from fastapi import Depends
+from fastapi import Body, Depends
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AuthnToken
@@ -12,5 +12,7 @@ class PartialPublishPage(BaseModel):
 
 async def publish_page(
     token: AuthnToken = Depends(get_token_info),
+    hostname: str = Body(...),
+    path: str = Body(...),
 ) -> PartialPublishPage:
     return PartialPublishPage(href="/")

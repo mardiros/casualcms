@@ -127,6 +127,14 @@ async def show_draft(
     return page.get_data_context()
 
 
+async def preview_draft(
+    path: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> Any:
+    return {}
+
+
 async def update_draft(
     request: Request,
     path: str = Field(...),

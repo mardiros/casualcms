@@ -31,6 +31,7 @@ def includeme(app: FastAPIConfigurator) -> None:
     )
     router.add_api_route("/drafts", draft.list_drafts, methods=["GET"])
     router.add_api_route("/drafts/{path:path}", draft.show_draft, methods=["GET"])
+    router.add_api_route("/previews/{path:path}", draft.preview_draft, methods=["GET"])
     router.add_api_route(
         "/drafts/{path:path}", draft.update_draft, methods=["PATCH"], status_code=202
     )

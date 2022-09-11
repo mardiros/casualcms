@@ -69,7 +69,8 @@ async def publish_page(
     site = rsite.unwrap()
     if not page.path.startswith(site.root_page_path):
         return Err(PageRepositoryError.publication_error)
-    path = page.path[len(site.root_page_path) :]
+    lprefix = len(site.root_page_path)
+    path = page.path[lprefix:]
     path = f"//{site.hostname}/{path}"
     rpublished_page = await uow.pages.by_page_and_site(page.id, site.id)
     if rpublished_page.is_ok():

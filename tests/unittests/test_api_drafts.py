@@ -207,6 +207,41 @@ async def test_get_draft(
     assert resp.json() == params["response"]
 
 
+async def test_preview_draft_403(
+    client: TestClient,
+    draft_hp: DraftPage,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get("/api/previews/home")
+    assert resp.status_code == 403
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "path": "/api/previews/home",
+            "response": {},
+        },
+    ],
+)
+async def test_preview_draft(
+    params: Mapping[str, Any],
+    client: TestClient,
+    authntoken: AuthnToken,
+    draft_hp: DraftPage,
+    draft_subpage: DraftPage,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.get(
+        params["path"],
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.json() == {}
+
+
 async def test_update_home_draft_content_403(client: TestClient, draft_hp: DraftPage):
     payload = {
         "slug": "new-home",

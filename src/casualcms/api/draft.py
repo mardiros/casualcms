@@ -4,6 +4,7 @@ from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
+from casualcms.adapters.jinja2 import Jinja2TemplateRender
 from casualcms.domain.messages.commands import (
     CreatePage,
     DeletePage,
@@ -128,11 +129,25 @@ async def show_draft(
 
 
 async def preview_draft(
+    request: Request,
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
-) -> Any:
-    return {}
+) -> Response:
+
+    context = await show_draft(path, app, token)
+    async with app.uow as uow:
+        hostname = request.url.hostname or ""
+        if request.url.port:
+            hostname += f":{request.url.port}"
+
+        renderer = Jinja2TemplateRender(
+            uow, app.settings.template_search_path, hostname
+        )
+        page = (await uow.drafts.by_path(context["meta"]["path"])).unwrap()
+        data = await renderer.render_template(page.get_template(), context)
+        await uow.rollback()
+    return Response(data)
 
 
 async def update_draft(

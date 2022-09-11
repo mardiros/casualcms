@@ -239,7 +239,8 @@ async def test_preview_draft(
             "Authorization": f"Bearer {authntoken.token}",
         },
     )
-    assert resp.json() == {}
+    assert "<title>hello world - casualcms</title>" in resp.text
+    assert "<h2>Welcome aboard!</h2>" in resp.text
 
 
 async def test_update_home_draft_content_403(client: TestClient, draft_hp: DraftPage):

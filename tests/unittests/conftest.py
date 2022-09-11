@@ -260,7 +260,7 @@ async def default_site(
 
 
 @pytest.fixture
-async def draft_hp_published(
+async def home_page(
     app: FastAPI,
     draft_hp: Page,
     default_site: Site,

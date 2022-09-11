@@ -3,6 +3,7 @@ from casualcms.adapters.fastapi import FastAPIConfigurator, configure
 from . import (
     authntoken,
     draft,
+    page,
     page_type,
     setting,
     setting_type,
@@ -21,6 +22,10 @@ def includeme(app: FastAPIConfigurator) -> None:
         authntoken.logout,
         methods=["DELETE"],
     )
+    router.add_api_route("/pages-types", page_type.list_templates, methods=["GET"])
+    router.add_api_route(
+        "/pages-types/{type}", page_type.show_template, methods=["GET"]
+    )
     router.add_api_route(
         "/drafts", draft.create_draft, methods=["POST"], status_code=201
     )
@@ -32,10 +37,7 @@ def includeme(app: FastAPIConfigurator) -> None:
     router.add_api_route(
         "/drafts/{path:path}", draft.delete_draft, methods=["DELETE"], status_code=204
     )
-    router.add_api_route("/pages-types", page_type.list_templates, methods=["GET"])
-    router.add_api_route(
-        "/pages-types/{type}", page_type.show_template, methods=["GET"]
-    )
+    router.add_api_route("/pages", page.publish_page, methods=["POST"], status_code=201)
 
     router.add_api_route("/sites", site.create_site, methods=["POST"], status_code=201)
     router.add_api_route("/sites", site.list_sites, methods=["GET"])

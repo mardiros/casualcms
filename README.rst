@@ -27,13 +27,15 @@ TODO
 
 * Add widget to edit text using a wysiwyg
 
-* Add widget to choose a page while doing page links (bwrowse page popup)
+* Add widget to choose a page while doing page links (browse page popup)
 
 * Define and implement errors on reserved word for page, snippet, and settings
 
 * rename snippet slug by key
 
 * Add tests for 422 errors
+
+* Fix 401 Unauthorized (Not authenticated) / 403 Forbidden (Authenticated)
 
 * Fix 500 errors when an invalid payload is posted on page/snippet/settings
 

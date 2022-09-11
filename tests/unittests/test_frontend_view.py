@@ -1,14 +1,11 @@
 from fastapi.testclient import TestClient
 
-from casualcms.domain.model import Site
-
 from ..casualblog.models import HeaderSnippet, HomePage
 
 
 async def test_get_draft_hp(
     client: TestClient,
-    draft_hp: HomePage,
-    default_site: Site,
+    home_page: HomePage,
     header_snippet: HeaderSnippet,
 ):
     resp = client.get("/", headers={"Host": "www.example.net"})

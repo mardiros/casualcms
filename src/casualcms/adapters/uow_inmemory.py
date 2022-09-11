@@ -1,4 +1,5 @@
 from typing import Iterable, Optional
+from urllib.parse import urlparse
 
 from result import Err, Ok
 
@@ -149,6 +150,16 @@ class PageInMemoryRepository(AbstractPageRepository):
         except KeyError:
             return Err(PageRepositoryError.page_not_found)
         return Ok(ppage)
+
+    async def by_url(self, url: str) -> PageRepositoryResult:
+        url_ = urlparse(url)
+        hostname, path = url_.netloc, url_.path
+        path = f"//{hostname}/{path}"
+        page = [p for p in self.pages.values() if p.path == path]
+
+        if not page:
+            return Err(PageRepositoryError.page_not_found)
+        return Ok(page[0])
 
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
@@ -366,6 +377,7 @@ class InMemoryUnitOfWork(AbstractUnitOfWork):
     async def dispose(self) -> None:
         self.accounts.accounts.clear()  # type: ignore
         self.drafts.pages.clear()  # type: ignore
+        self.pages.pages.clear()  # type: ignore
         self.sites.sites.clear()  # type: ignore
         self.snippets.snippets.clear()  # type: ignore
         self.authn_tokens.tokens.clear()  # type: ignore

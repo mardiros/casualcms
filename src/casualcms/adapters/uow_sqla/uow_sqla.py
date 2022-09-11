@@ -695,6 +695,10 @@ class PageSQLRepository(AbstractPageRepository):
         """Fetch one page by its unique id."""
         return Err(PageRepositoryError.page_not_found)
 
+    async def by_url(self, url: str) -> PageRepositoryResult:
+        """Fetch one page by its unique id."""
+        return Err(PageRepositoryError.page_not_found)
+
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
         return Err(PageRepositoryError.page_not_found)

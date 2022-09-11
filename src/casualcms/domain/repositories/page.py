@@ -28,6 +28,10 @@ class AbstractPageRepository(AbstractRepository):
         """Fetch one page by its unique id."""
 
     @abc.abstractmethod
+    async def by_url(self, url: str) -> PageRepositoryResult:
+        """Fetch one page by its url."""
+
+    @abc.abstractmethod
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
 

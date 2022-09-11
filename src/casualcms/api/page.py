@@ -1,8 +1,8 @@
 from fastapi import Body, Depends, HTTPException
 from result import Result
+
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import PublishPage
-
 from casualcms.domain.model import AuthnToken, Page
 
 from .base import RESOURCE_CREATED, HTTPMessage, get_token_info

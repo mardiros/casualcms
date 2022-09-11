@@ -67,12 +67,16 @@ async def publish_page(
 
     page = rpage.unwrap()
     site = rsite.unwrap()
+    if not page.path.startswith(site.root_page_path):
+        return Err(PageRepositoryError.publication_error)
+    path = page.path[len(site.root_page_path) :]
+    path = f"//{site.hostname}/{path}"
     rpublished_page = await uow.pages.by_page_and_site(page.id, site.id)
     if rpublished_page.is_ok():
         published_page = rpublished_page.unwrap()
         published_page.template = page.get_template()
         published_page.title = page.title
-        published_page.path = page.path
+        published_page.path = path
         published_page.body = page.get_context()
         rok = await uow.pages.update(rpublished_page.unwrap())
     else:
@@ -82,7 +86,7 @@ async def publish_page(
             type=page.__meta__.type,
             template=page.get_template(),
             title=page.title,
-            path=page.path,
+            path=path,
             body=page.get_context(),
         )
         rok = await uow.pages.add(published_page)

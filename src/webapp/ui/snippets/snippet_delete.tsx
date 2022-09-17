@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Snippet } from "../../casualcms/domain/model";
 import { AppContext } from "../../config";
 import { DeletePopoverForm } from "../layout/confirm";
@@ -12,6 +12,7 @@ type SnippetDeletePopoverFormProps = {
 export const SnippetDeletePopoverForm: React.FunctionComponent<
   SnippetDeletePopoverFormProps
 > = (props: SnippetDeletePopoverFormProps) => {
+  const navigate = useNavigate();
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
@@ -24,9 +25,11 @@ export const SnippetDeletePopoverForm: React.FunctionComponent<
     setConfirmed(true);
   };
 
-  if (confirmed) {
-    return <Navigate to={`/admin/snippets/${snippetType}`} replace />;
-  }
+  React.useEffect(() => {
+    if (confirmed) {
+      navigate(`/admin/snippets/${snippetType}`)
+    }
+  }, [confirmed])
 
   return (
     <DeletePopoverForm button_label="Delete this snippet" onSubmit={onSubmit} />

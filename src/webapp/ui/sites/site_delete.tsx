@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Site } from "../../casualcms/domain/model";
 import { AppContext } from "../../config";
 import { DeletePopoverForm } from "../layout/confirm";
@@ -12,6 +12,7 @@ type SiteDeletePopoverFormProps = {
 export const SiteDeletePopoverForm: React.FunctionComponent<
   SiteDeletePopoverFormProps
 > = (props: SiteDeletePopoverFormProps) => {
+  const navigate = useNavigate();
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
@@ -24,9 +25,11 @@ export const SiteDeletePopoverForm: React.FunctionComponent<
     setConfirmed(true);
   };
 
-  if (confirmed) {
-    return <Navigate to="/admin/sites" replace />;
-  }
+  React.useEffect(() => {
+    if (confirmed) {
+      navigate("/admin/sites")
+    }
+  }, [confirmed])
 
   return (
     <DeletePopoverForm button_label="Delete this site" onSubmit={onSubmit} />

@@ -23,11 +23,11 @@ pytest test_suite=default_test_suite:
     poetry run pytest -sxv {{test_suite}}
 
 jscov:
-    NODE_ENV=dev npm run cov
+    npm run cov
     firefox coverage/index.html
 
 jstest:
-    NODE_ENV=dev npm run test
+    npm run test
 
 watch:
     NODE_ENV=dev npm run watch

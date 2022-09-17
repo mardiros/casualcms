@@ -28,7 +28,6 @@
     "@types/react-dom": "^18.0.6",
     "@types/uuid": "^8.3.4",
     "chai": "^4.3.6",
-    "global-jsdom": "^8.5.0",
     "jsdom": "^20.0.0",
     "mocha": "^10.0.0",
     "nyc": "^15.1.0",

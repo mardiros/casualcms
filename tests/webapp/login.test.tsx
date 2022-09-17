@@ -15,39 +15,41 @@ import {
 } from "../../src/webapp/ui/login/components";
 import { AppContext } from "../../src/webapp/config";
 import config from "./config";
-import { waitForPath, LocationDisplay } from "./helpers";
+import { waitForPath, LocationDisplay, ErrorBoundary } from "./helpers";
 
 export const renderLogin = async (): Promise<RenderResult> => {
   let ret = render(
-    <AppContext.Provider value={config}>
-      <AuthProvider>
-        <MemoryRouter>
-          <Routes>
-            <Route
-              path="admin/*"
-              element={
-                <Routes>
-                  <Route path="login" element={<Login />} />
-                  <Route
-                    path="*"
-                    element={
-                      <RequireAuth>
-                        <Routes>
-                          <Route path="" element={<div>Welcome bob</div>} />
-                          <Route path="*" element={<div>not found</div>} />
-                        </Routes>
-                      </RequireAuth>
-                    }
-                  />
-                </Routes>
-              }
-            />
-            <Route path="*" element={<Navigate to="/admin" replace />} />
-          </Routes>
-          <LocationDisplay />
-        </MemoryRouter>
-      </AuthProvider>
-    </AppContext.Provider>
+    <ErrorBoundary>
+      <AppContext.Provider value={config}>
+        <AuthProvider>
+          <MemoryRouter>
+            <Routes>
+              <Route
+                path="admin/*"
+                element={
+                  <Routes>
+                    <Route path="login" element={<Login />} />
+                    <Route
+                      path="*"
+                      element={
+                        <RequireAuth>
+                          <Routes>
+                            <Route path="" element={<div>Welcome bob</div>} />
+                            <Route path="*" element={<div>not found</div>} />
+                          </Routes>
+                        </RequireAuth>
+                      }
+                    />
+                  </Routes>
+                }
+              />
+              <Route path="*" element={<Navigate to="/admin" replace />} />
+            </Routes>
+            <LocationDisplay />
+          </MemoryRouter>
+        </AuthProvider>
+      </AppContext.Provider>
+    </ErrorBoundary>
   );
   return ret;
 };

@@ -40,7 +40,7 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register -r global-jsdom/register tests/webapp/**/*.test.ts*",
+    "test": "mocha -r ts-node/register -r tests/webapp/hook/register tests/webapp/**/*.test.ts*",
     "cov": "nyc mocha -r ts-node/register -r global-jsdom/register tests/webapp/**/*.test.ts*",
     "watch": "parcel watch src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled  --log-level info",
     "build_dev": "parcel build src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled --no-optimize --log-level info",

@@ -3,7 +3,6 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageNew } from "../../src/webapp/ui/pages/page_new";
-import { PageList } from "../../src/webapp/ui/pages/page_list";
 import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 

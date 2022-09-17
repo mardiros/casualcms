@@ -139,7 +139,7 @@ describe("As a user, I can list pages", () => {
     expect(links.length).equal(3);
   });
 
-  it("Redirect to the new site while clicking on the add button", async () => {
+  it("Redirect to the new page while clicking on the add button", async () => {
     const page = {
       meta: {
         path: "/home",

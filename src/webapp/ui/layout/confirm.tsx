@@ -50,17 +50,14 @@ export const DeletePopoverForm: React.FunctionComponent<
   DeletePopoverFormProps
 > = (props: DeletePopoverFormProps) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
-  const firstFieldRef = React.useRef(null);
 
   return (
     <>
       <Popover
         isOpen={isOpen}
-        initialFocusRef={firstFieldRef}
         onOpen={onOpen}
         onClose={onClose}
         placement="right"
-        closeOnBlur={false}
       >
         <PopoverTrigger>
           <Button colorScheme="red">

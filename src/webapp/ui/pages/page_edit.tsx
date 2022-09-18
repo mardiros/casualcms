@@ -10,6 +10,7 @@ import { Draft, PageType } from "../../casualcms/domain/model";
 import { ApiErrorUI } from "../layout/error_api";
 import { Loader } from "../layout/loader";
 import { PageBreadcrumb } from "../layout/breadcrumb";
+import { PageEditButtons } from "./page_publish";
 
 const Form = withTheme(ChakraUITheme);
 
@@ -111,6 +112,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
           // onError={() => console.log("errors")}
         />
       )}
+      <PageEditButtons token={token} pagePath={pagePath} />
     </Box>
   );
 };

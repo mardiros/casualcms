@@ -59,7 +59,7 @@ export const SettingSiteListTable: React.FunctionComponent<
   const [error, setError] = React.useState<ApiError>(null);
 
   React.useEffect(() => {
-    async function loadSubSites() {
+    async function loadSites() {
       let sites: Result<PartialSite[], ApiError>;
       sites = await config.api.site.listSites(token);
       sites
@@ -68,7 +68,7 @@ export const SettingSiteListTable: React.FunctionComponent<
       setIsLoading(false);
     }
     if (token) {
-      loadSubSites();
+      loadSites();
     }
     return function cleanup() {};
   }, [token]);

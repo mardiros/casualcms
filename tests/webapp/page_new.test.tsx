@@ -39,7 +39,7 @@ describe("As a user, I can create the root page", () => {
     fireEvent.click(button);
 
     await waitForPath("/admin/pages");
-    const pages = await config.api.draft.listDrafts("", null);
+    const pages = await config.api.page.listDrafts("", null);
     expect(pages._unsafeUnwrap()).eql([
       {
         meta: {
@@ -50,6 +50,6 @@ describe("As a user, I can create the root page", () => {
         title: "Welcome Home",
       },
     ]);
-    await config.api.draft.deleteDraft("", "/home");
+    await config.api.page.deleteDraft("", "/home");
   });
 });

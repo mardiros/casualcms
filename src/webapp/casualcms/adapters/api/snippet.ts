@@ -1,13 +1,11 @@
-import { Result, ok, err } from "neverthrow";
+import { ok, err } from "neverthrow";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialSnippet, Snippet } from "../../domain/model";
-import { ApiError, ISnippetApi } from "../../domain/ports";
+import { ApiError, AsyncApiResult, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
-  async listSnippets(
-    authntoken: string
-  ): Promise<Result<PartialSnippet[], ApiError>> {
+  async listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]> {
     const response = await this.fetch(`/api/snippets`, {
       method: "GET",
       headers: {
@@ -22,10 +20,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     return ok(jsonData as PartialSnippet[]);
   }
 
-  async showSnippet(
-    authntoken: string,
-    slug: string
-  ): Promise<Result<Snippet, ApiError>> {
+  async showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet> {
     const response = await this.fetch(`/api/snippets/${slug}`, {
       method: "GET",
       headers: {
@@ -44,7 +39,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     authntoken: string,
     type: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     let postBody: any = {
       type: type,
       payload: payload,
@@ -68,7 +63,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     authntoken: string,
     slug: string,
     snippet: Snippet
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/snippets/${slug}`, {
       method: "PATCH",
       headers: {
@@ -87,7 +82,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async deleteSnippet(
     authntoken: string,
     snippet: Snippet
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/snippets/${snippet.slug}`, {
       method: "DELETE",
       headers: {

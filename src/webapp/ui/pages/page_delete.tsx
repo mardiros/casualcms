@@ -21,7 +21,7 @@ export const PageDeletePopoverForm: React.FunctionComponent<
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {
-    await config.api.draft.deleteDraft(token, curPage.meta.path);
+    await config.api.page.deleteDraft(token, curPage.meta.path);
     setConfirmed(true);
   };
 

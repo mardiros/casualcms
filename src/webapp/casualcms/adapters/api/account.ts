@@ -1,12 +1,17 @@
-import { Result, ok, err } from "neverthrow";
+import { ok, err } from "neverthrow";
 
-import { ApiError, Credentials, IAccountApi } from "casualcms/domain/ports";
+import {
+  ApiError,
+  AsyncApiResult,
+  Credentials,
+  IAccountApi,
+} from "casualcms/domain/ports";
 import { Account } from "casualcms/domain/model";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
 
 export class FetchAccountApi extends BaseFetchApi implements IAccountApi {
-  async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
+  async byCredentials(creds: Credentials): AsyncApiResult<Account> {
     const response = await this.fetch("/api/authntokens", {
       method: "POST",
       headers: {

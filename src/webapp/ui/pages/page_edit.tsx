@@ -62,7 +62,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadPage() {
-      const page = await config.api.draft.showDraft(token, pagePath || "");
+      const page = await config.api.page.showDraft(token, pagePath || "");
       // console.log(page)
       page
         .map((page: Draft) => setPage(page))
@@ -82,7 +82,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       return;
     }
     const newPage = data.formData;
-    await config.api.draft.updateDraft(token, page.meta.path, newPage);
+    await config.api.page.updateDraft(token, page.meta.path, newPage);
     navigate(`/admin/pages?${q}`, { replace: true });
   };
 

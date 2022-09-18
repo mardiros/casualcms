@@ -53,7 +53,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPage() {
       if (parentPath) {
-        const page = await config.api.draft.showDraft(token, parentPath || "");
+        const page = await config.api.page.showDraft(token, parentPath || "");
         // console.log(page)
         page
           .map((page: Draft) => setParentPage(page))
@@ -74,7 +74,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: any) => {
     const page = data.formData;
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       token,
       pageTypeName || "",
       page,

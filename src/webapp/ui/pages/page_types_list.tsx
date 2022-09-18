@@ -100,7 +100,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPage() {
       if (parentPath) {
-        const page = await config.api.draft.showDraft(token, parentPath || "");
+        const page = await config.api.page.showDraft(token, parentPath || "");
         // console.log(page)
         page
           .map((page: Draft) => setParentPage(page))

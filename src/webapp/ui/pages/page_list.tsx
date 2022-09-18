@@ -147,7 +147,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
   React.useEffect(() => {
     async function loadSubPages() {
       let pages: Result<PartialDraft[], ApiError>;
-      pages = await config.api.draft.listDrafts(token, parentPath);
+      pages = await config.api.page.listDrafts(token, parentPath);
       pages
         .map((pages: PartialDraft[]) => setSubPages(pages))
         .mapErr((err: ApiError) => setError(err)); // FIXME
@@ -206,7 +206,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
     async function loadCurPage() {
       let page: Result<Draft, ApiError>;
       if (parentPath) {
-        page = await config.api.draft.showDraft(token, parentPath);
+        page = await config.api.page.showDraft(token, parentPath);
         page
           .map((page: Draft) => setCurPage(page))
           .mapErr((err: ApiError) => setError(err));

@@ -1,8 +1,8 @@
-import { Result, ok, err } from "neverthrow";
+import { ok, err } from "neverthrow";
 
 import { BaseFetchApi, castError, FastApiError } from "./base";
 import { PartialSetting, Setting } from "../../domain/model";
-import { ApiError, ISettingApi } from "../../domain/ports";
+import { ApiError, AsyncApiResult, ISettingApi } from "../../domain/ports";
 
 export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
   async createSetting(
@@ -10,7 +10,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     hostname: string,
     key: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const setting: any = {
       key: key,
       payload: payload,
@@ -32,7 +32,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
   async listSettings(
     authntoken: string,
     hostname: string
-  ): Promise<Result<PartialSetting[], ApiError>> {
+  ): AsyncApiResult<PartialSetting[]> {
     const response = await this.fetch(`/api/settings/${hostname}`, {
       method: "GET",
       headers: {
@@ -50,7 +50,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string
-  ): Promise<Result<Setting, ApiError>> {
+  ): AsyncApiResult<Setting> {
     const response = await this.fetch(`/api/settings/${hostname}/${key}`, {
       method: "GET",
       headers: {
@@ -69,7 +69,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const response = await this.fetch(
       `/api/settings/${hostname}/${setting.meta.key}`,
       {
@@ -92,7 +92,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const response = await this.fetch(
       `/api/settings/${hostname}/${setting.meta.key}`,
       {

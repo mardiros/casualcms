@@ -20,7 +20,7 @@ import { FetchSettingTypeApi } from "../adapters/api/setting_type";
 export interface IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
-  draft: IPageApi;
+  page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
@@ -30,7 +30,7 @@ export interface IApi {
 
 export class Api implements IApi {
   account: IAccountApi;
-  draft: IPageApi;
+  page: IPageApi;
   pageType: IPageTypeApi;
   site: ISiteApi;
   snippet: ISnippetApi;
@@ -40,7 +40,7 @@ export class Api implements IApi {
 
   constructor() {
     this.account = new FetchAccountApi();
-    this.draft = new FetchPageApi();
+    this.page = new FetchPageApi();
     this.pageType = new FetchPageTypeApi();
     this.site = new FetchSiteApi();
     this.snippet = new FetchSnippetApi();

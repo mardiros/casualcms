@@ -1,6 +1,6 @@
-import { Result, ok, err } from "neverthrow";
+import { ok, err } from "neverthrow";
 
-import { ApiError, IPageTypeApi } from "casualcms/domain/ports";
+import { ApiError, AsyncApiResult, IPageTypeApi } from "casualcms/domain/ports";
 import { PartialPageType, PageType } from "casualcms/domain/model";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
@@ -9,7 +9,7 @@ export class FetchPageTypeApi extends BaseFetchApi implements IPageTypeApi {
   async listPageTypes(
     authntoken: string,
     parentType: string | null
-  ): Promise<Result<Array<PartialPageType>, ApiError>> {
+  ): AsyncApiResult<PartialPageType[]> {
     const qs = parentType ? new URLSearchParams({ type: parentType }) : "";
     const response = await this.fetch(`/api/pages-types?${qs}`, {
       method: "GET",
@@ -28,7 +28,7 @@ export class FetchPageTypeApi extends BaseFetchApi implements IPageTypeApi {
   async showPageType(
     authntoken: string,
     pageType: string
-  ): Promise<Result<PageType, ApiError>> {
+  ): AsyncApiResult<PageType> {
     // FIXME: pageType should be urlencoded
     const response = await this.fetch(`/api/pages-types/${pageType}`, {
       method: "GET",

@@ -15,5 +15,5 @@ Feature: As a developper, I want a browser open with a session
     And a "contact" setting on site "localhost"
     And publish the "/home" page on "localhost:6556"
     When I visit "/admin/pages?parent=/home"
-    When I visit "/"
+    # When I visit "/"
     And I wait

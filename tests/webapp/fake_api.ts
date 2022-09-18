@@ -28,11 +28,12 @@ import {
   ISnippetTypeApi,
   ISettingTypeApi,
   ISettingApi,
+  AsyncApiResult,
 } from "../../src/webapp/casualcms/domain/ports";
 import { IApi } from "../../src/webapp/casualcms/service/api";
 
 class FakeAccountApi implements IAccountApi {
-  async byCredentials(creds: Credentials): Promise<Result<Account, ApiError>> {
+  async byCredentials(creds: Credentials): AsyncApiResult<Account> {
     if (creds.password != "itsmysecret") {
       let errMap = new Map();
       errMap.set("username", "Invalid username or password");
@@ -54,7 +55,7 @@ class FakePageTypeApi implements IPageTypeApi {
   async listPageTypes(
     authntoken: string,
     parentType: string | null
-  ): Promise<Result<Array<PartialPageType>, ApiError>> {
+  ): AsyncApiResult<PartialPageType[]> {
     return ok([
       {
         type: parentType ? "casual:Page" : "casual:HomePage",
@@ -64,7 +65,7 @@ class FakePageTypeApi implements IPageTypeApi {
   async showPageType(
     authntoken: string,
     pageType: string
-  ): Promise<Result<PageType, ApiError>> {
+  ): AsyncApiResult<PageType> {
     if (pageType == "casual:HomePage") {
       return ok({
         uiSchema: {
@@ -114,7 +115,7 @@ class FakePageTypeApi implements IPageTypeApi {
 }
 
 class FakePageApi implements IPageApi {
-  pages: Array<any>;
+  pages: any[];
 
   constructor() {
     this.pages = [];
@@ -124,7 +125,7 @@ class FakePageApi implements IPageApi {
     type: string,
     payload: any,
     parent: string | null
-  ): Promise<Result<boolean, Map<string, string>>> {
+  ): AsyncApiResult<boolean> {
     payload["meta"] = {
       type: type,
       path: `${parent || ""}/${payload.slug}`,
@@ -137,7 +138,7 @@ class FakePageApi implements IPageApi {
   async listDrafts(
     authntoken: string,
     parent: string | null
-  ): Promise<Result<PartialDraft[], Map<string, string>>> {
+  ): AsyncApiResult<PartialDraft[]> {
     let pages: PartialDraft[] = [];
 
     this.pages
@@ -164,7 +165,7 @@ class FakePageApi implements IPageApi {
   async showDraft(
     authntoken: string,
     path: string | null
-  ): Promise<Result<Draft, Map<string, string>>> {
+  ): AsyncApiResult<Draft> {
     let pages: Draft[] = [];
     this.pages
       .filter((page) => {
@@ -184,7 +185,7 @@ class FakePageApi implements IPageApi {
   async previewDraft(
     authntoken: string,
     path: string | null
-  ): Promise<Result<string, Map<string, string>>> {
+  ): AsyncApiResult<string> {
     return ok(`I preview ${path}`);
   }
 
@@ -192,7 +193,7 @@ class FakePageApi implements IPageApi {
     authntoken: string,
     path: string,
     page: Draft
-  ): Promise<Result<Draft, ApiError>> {
+  ): AsyncApiResult<Draft> {
     let oldPage: any | null = null;
     const pages: any[] = [];
     this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
@@ -213,13 +214,10 @@ class FakePageApi implements IPageApi {
     authntoken: string,
     hostname: string,
     path: string
-  ): Promise<Result<boolean, Map<string, string>>> {
+  ): AsyncApiResult<boolean> {
     throw new Error("Method not implemented.");
   }
-  async deleteDraft(
-    authntoken: string,
-    path: string
-  ): Promise<Result<boolean, ApiError>> {
+  async deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean> {
     const pages = this.pages.filter((page: PartialDraft) => {
       return page.meta.path != path;
     });
@@ -239,7 +237,7 @@ export class FakeSiteApi implements ISiteApi {
     authntoken: string,
     hostname: string,
     payload: SiteOption
-  ): Promise<Result<PartialSite, ApiError>> {
+  ): AsyncApiResult<PartialSite> {
     const postBody = { hostname: hostname, ...payload };
     this.sites.push(postBody);
     return ok(postBody);
@@ -248,7 +246,7 @@ export class FakeSiteApi implements ISiteApi {
   async deleteSite(
     authntoken: string,
     hostname: string
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
       return site.hostname != hostname;
     });
@@ -260,7 +258,7 @@ export class FakeSiteApi implements ISiteApi {
     authntoken: string,
     hostname: string,
     site: Site
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
       return site.hostname != hostname;
     });
@@ -269,10 +267,7 @@ export class FakeSiteApi implements ISiteApi {
     return ok(true);
   }
 
-  async showSite(
-    authntoken: string,
-    hostname: string
-  ): Promise<Result<Site, ApiError>> {
+  async showSite(authntoken: string, hostname: string): AsyncApiResult<Site> {
     const errors: ApiError = new Map();
     errors.set("site", "Site does not exists");
     let res: Result<Site, ApiError> = err(errors);
@@ -285,9 +280,7 @@ export class FakeSiteApi implements ISiteApi {
     return res;
   }
 
-  async listSites(
-    authntoken: string
-  ): Promise<Result<PartialSite[], ApiError>> {
+  async listSites(authntoken: string): AsyncApiResult<PartialSite[]> {
     return ok(this.sites as PartialSite[]);
   }
 }
@@ -299,9 +292,7 @@ export class FakeSnippetApi implements ISnippetApi {
     this.snippets = [];
   }
 
-  async listSnippets(
-    authntoken: string
-  ): Promise<Result<PartialSnippet[], Map<string, string>>> {
+  async listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]> {
     return ok(this.snippets || []);
   }
 
@@ -309,7 +300,7 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string,
     slug: string,
     snippet: Snippet
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const typ = snippet.meta.type;
     let snippets = this.snippets.filter((snippet: PartialSnippet) => {
       return snippet.slug != slug;
@@ -319,10 +310,7 @@ export class FakeSnippetApi implements ISnippetApi {
     return ok(true);
   }
 
-  async showSnippet(
-    authntoken: string,
-    slug: string
-  ): Promise<Result<Snippet, ApiError>> {
+  async showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet> {
     const snippets = this.snippets.filter((snippet: PartialSnippet) => {
       return snippet.slug == slug;
     });
@@ -338,7 +326,7 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string,
     type: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     let postBody: any = {
       type: type,
       payload: payload,
@@ -350,7 +338,7 @@ export class FakeSnippetApi implements ISnippetApi {
   async deleteSnippet(
     authntoken: string,
     snippet: Snippet
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const typ = snippet.meta.type;
     const snippets = this.snippets.filter((s: PartialSnippet) => {
       return s.slug != snippet.slug;
@@ -363,13 +351,13 @@ export class FakeSnippetApi implements ISnippetApi {
 class FakeSnippetTypeApi implements ISnippetTypeApi {
   async listSnippetTypes(
     authntoken: string
-  ): Promise<Result<PartialSnippetType[], Map<string, string>>> {
+  ): AsyncApiResult<PartialSnippetType[]> {
     return ok([{ type: "blog:HeaderSnippet" }, { type: "blog:FooterSnippet" }]);
   }
   async showSnippetType(
     authntoken: string,
     snippet_type: string
-  ): Promise<Result<SnippetType, Map<string, string>>> {
+  ): AsyncApiResult<SnippetType> {
     return ok({
       schema: {
         title: "HeaderSnippet",
@@ -420,7 +408,7 @@ export class FakeSettingApi implements ISettingApi {
   async listSettings(
     authntoken: string,
     hostname: string
-  ): Promise<Result<PartialSetting[], ApiError>> {
+  ): AsyncApiResult<PartialSetting[]> {
     const settings: PartialSetting[] = [];
     this.settings.map((s) => {
       if (s.hostname == hostname) {
@@ -435,7 +423,7 @@ export class FakeSettingApi implements ISettingApi {
     hostname: string,
     key: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const setting = {
       hostname: hostname,
       meta: { key: key },
@@ -448,7 +436,7 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string
-  ): Promise<Result<Setting, ApiError>> {
+  ): AsyncApiResult<Setting> {
     const settings = this.settings.map((s) => {
       if (s.hostname == hostname && s.meta.key == key) {
         return ok(s);
@@ -466,7 +454,7 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const settings: Setting[] = [];
     this.settings.map((s) => {
       if (s.hostname != hostname || s.meta.key != setting.meta.key) {
@@ -482,7 +470,7 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>> {
+  ): AsyncApiResult<boolean> {
     const key = setting.meta.key;
     const settings = this.settings.filter((s: any) => {
       return s.hostname != hostname || s.meta.key != key;
@@ -495,13 +483,13 @@ export class FakeSettingApi implements ISettingApi {
 export class FakeSettingTypeApi implements ISettingTypeApi {
   async listSettingTypes(
     authntoken: string
-  ): Promise<Result<PartialSettingType[], ApiError>> {
+  ): AsyncApiResult<PartialSettingType[]> {
     return ok([{ key: "blog:ff" }, { key: "blog:contact" }]);
   }
   async showSettingType(
     authntoken: string,
     key: string
-  ): Promise<Result<SettingType, ApiError>> {
+  ): AsyncApiResult<SettingType> {
     const resp: SettingType = {
       schema: {
         title: "ContactSetting",
@@ -519,7 +507,7 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
 export class FakeApi implements IApi {
   account: IAccountApi;
   pageType: IPageTypeApi;
-  draft: IPageApi;
+  page: IPageApi;
   site: ISiteApi;
   snippet: ISnippetApi;
   snippetType: ISnippetTypeApi;
@@ -529,7 +517,7 @@ export class FakeApi implements IApi {
   constructor() {
     this.account = new FakeAccountApi();
     this.pageType = new FakePageTypeApi();
-    this.draft = new FakePageApi();
+    this.page = new FakePageApi();
     this.site = new FakeSiteApi();
     this.snippet = new FakeSnippetApi();
     this.snippetType = new FakeSnippetTypeApi();

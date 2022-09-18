@@ -13,7 +13,7 @@ import { Table, Tbody } from "@chakra-ui/react";
 
 describe("As a user, I can list pages", () => {
   before(async () => {
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:HomePage",
       {
@@ -23,7 +23,7 @@ describe("As a user, I can list pages", () => {
       },
       null
     );
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:HomePage",
       {
@@ -33,7 +33,7 @@ describe("As a user, I can list pages", () => {
       },
       null
     );
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -43,7 +43,7 @@ describe("As a user, I can list pages", () => {
       },
       "/home"
     );
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -55,10 +55,10 @@ describe("As a user, I can list pages", () => {
     );
   });
   after(async () => {
-    await config.api.draft.deleteDraft("", "/home/sub1");
-    await config.api.draft.deleteDraft("", "/home/sub0");
-    await config.api.draft.deleteDraft("", "/home");
-    await config.api.draft.deleteDraft("", "/root");
+    await config.api.page.deleteDraft("", "/home/sub1");
+    await config.api.page.deleteDraft("", "/home/sub0");
+    await config.api.page.deleteDraft("", "/home");
+    await config.api.page.deleteDraft("", "/root");
   });
 
   it("Render a row for a page", async () => {
@@ -212,7 +212,7 @@ describe("As a user, I can list pages", () => {
     const newPage = await screen.findByText("Page list");
     expect(newPage.nodeName).equal("H4");
 
-    const subList = await config.api.draft.listDrafts("", "/home");
+    const subList = await config.api.page.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
         meta: {

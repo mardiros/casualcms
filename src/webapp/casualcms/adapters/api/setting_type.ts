@@ -1,8 +1,8 @@
-import { Result, ok, err } from "neverthrow";
+import { ok, err } from "neverthrow";
 
 import { BaseFetchApi, castError, FastApiError } from "./base";
 import { PartialSettingType, SettingType } from "../../domain/model";
-import { ApiError, ISettingTypeApi } from "../../domain/ports";
+import { ApiError, AsyncApiResult, ISettingTypeApi } from "../../domain/ports";
 
 export class FetchSettingTypeApi
   extends BaseFetchApi
@@ -10,7 +10,7 @@ export class FetchSettingTypeApi
 {
   async listSettingTypes(
     authntoken: string
-  ): Promise<Result<PartialSettingType[], ApiError>> {
+  ): AsyncApiResult<PartialSettingType[]> {
     const response = await this.fetch("/api/settings-types", {
       method: "GET",
       headers: {
@@ -27,7 +27,7 @@ export class FetchSettingTypeApi
   async showSettingType(
     authntoken: string,
     key: string
-  ): Promise<Result<SettingType, ApiError>> {
+  ): AsyncApiResult<SettingType> {
     const response = await this.fetch(`/api/settings-types/${key}`, {
       method: "GET",
       headers: {

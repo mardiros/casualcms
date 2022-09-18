@@ -18,6 +18,8 @@ import {
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
+export type ApiResult<T> = Result<T, ApiError>;
+export type AsyncApiResult<T> = Promise<ApiResult<T>>;
 
 export type Credentials = {
   username: string;
@@ -25,7 +27,7 @@ export type Credentials = {
 };
 
 export interface IAccountApi {
-  byCredentials(creds: Credentials): Promise<Result<Account, ApiError>>;
+  byCredentials(creds: Credentials): AsyncApiResult<Account>;
   logout(authntoken: string): Promise<boolean>;
 }
 
@@ -33,11 +35,8 @@ export interface IPageTypeApi {
   listPageTypes(
     authntoken: string,
     parentType: string | null
-  ): Promise<Result<PartialPageType[], ApiError>>;
-  showPageType(
-    authntoken: string,
-    pageType: string
-  ): Promise<Result<PageType, ApiError>>;
+  ): AsyncApiResult<PartialPageType[]>;
+  showPageType(authntoken: string, pageType: string): AsyncApiResult<PageType>;
 }
 
 export interface IPageApi {
@@ -46,30 +45,24 @@ export interface IPageApi {
     type: string,
     payload: any,
     parent: string | null
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
   listDrafts(
     authntoken: string,
     parent: string | null
-  ): Promise<Result<PartialDraft[], ApiError>>;
-  showDraft(authntoken: string, path: string): Promise<Result<Draft, ApiError>>;
-  previewDraft(
-    authntoken: string,
-    path: string
-  ): Promise<Result<string, ApiError>>;
+  ): AsyncApiResult<PartialDraft[]>;
+  showDraft(authntoken: string, path: string): AsyncApiResult<Draft>;
+  previewDraft(authntoken: string, path: string): AsyncApiResult<string>;
   updateDraft(
     authntoken: string,
     path: string,
     page: Draft
-  ): Promise<Result<Draft, ApiError>>;
+  ): AsyncApiResult<Draft>;
   publishPage(
     authntoken: string,
     hostname: string,
     path: string
-  ): Promise<Result<boolean, ApiError>>;
-  deleteDraft(
-    authntoken: string,
-    path: string
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
+  deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean>;
 }
 
 export type SiteOption = {
@@ -83,21 +76,15 @@ export interface ISiteApi {
     authntoken: string,
     hostname: string,
     payload: SiteOption
-  ): Promise<Result<PartialSite, ApiError>>;
-  listSites(authntoken: string): Promise<Result<PartialSite[], ApiError>>;
-  showSite(
-    authntoken: string,
-    hostname: string
-  ): Promise<Result<Site, ApiError>>;
+  ): AsyncApiResult<PartialSite>;
+  listSites(authntoken: string): AsyncApiResult<PartialSite[]>;
+  showSite(authntoken: string, hostname: string): AsyncApiResult<Site>;
   updateSite(
     authntoken: string,
     hostname: string,
     site: Site
-  ): Promise<Result<boolean, ApiError>>;
-  deleteSite(
-    authntoken: string,
-    hostname: string
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
+  deleteSite(authntoken: string, hostname: string): AsyncApiResult<boolean>;
 }
 
 export interface ISnippetApi {
@@ -105,41 +92,28 @@ export interface ISnippetApi {
     authntoken: string,
     type: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>>;
-  listSnippets(authntoken: string): Promise<Result<PartialSnippet[], ApiError>>;
-  showSnippet(
-    authntoken: string,
-    slug: string
-  ): Promise<Result<Snippet, ApiError>>;
+  ): AsyncApiResult<boolean>;
+  listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]>;
+  showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet>;
   updateSnippet(
     authntoken: string,
     slug: string,
     snippet: Snippet
-  ): Promise<Result<boolean, ApiError>>;
-  deleteSnippet(
-    authntoken: string,
-    snippet: Snippet
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
+  deleteSnippet(authntoken: string, snippet: Snippet): AsyncApiResult<boolean>;
 }
 
 export interface ISnippetTypeApi {
-  listSnippetTypes(
-    authntoken: string
-  ): Promise<Result<PartialSnippetType[], ApiError>>;
+  listSnippetTypes(authntoken: string): AsyncApiResult<PartialSnippetType[]>;
   showSnippetType(
     authntoken: string,
     snippetType: string
-  ): Promise<Result<SnippetType, ApiError>>;
+  ): AsyncApiResult<SnippetType>;
 }
 
 export interface ISettingTypeApi {
-  listSettingTypes(
-    authntoken: string
-  ): Promise<Result<PartialSettingType[], ApiError>>;
-  showSettingType(
-    authntoken: string,
-    key: string
-  ): Promise<Result<SettingType, ApiError>>;
+  listSettingTypes(authntoken: string): AsyncApiResult<PartialSettingType[]>;
+  showSettingType(authntoken: string, key: string): AsyncApiResult<SettingType>;
 }
 
 export interface ISettingApi {
@@ -148,24 +122,24 @@ export interface ISettingApi {
     hostname: string,
     key: string,
     payload: any
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
   listSettings(
     authntoken: string,
     hostname: string
-  ): Promise<Result<PartialSetting[], ApiError>>;
+  ): AsyncApiResult<PartialSetting[]>;
   showSetting(
     authntoken: string,
     hostname: string,
     key: string
-  ): Promise<Result<Setting, ApiError>>;
+  ): AsyncApiResult<Setting>;
   updateSetting(
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
   deleteSetting(
     authntoken: string,
     hostname: string,
     setting: Setting
-  ): Promise<Result<boolean, ApiError>>;
+  ): AsyncApiResult<boolean>;
 }

@@ -20,7 +20,7 @@ export const HomePage: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPages() {
       let pages: Result<PartialDraft[], ApiError>;
-      pages = await config.api.draft.listDrafts(token, null);
+      pages = await config.api.page.listDrafts(token, null);
       pages
         .map((pages: PartialDraft[]) => setPages(pages))
         .mapErr((err: ApiError) => setError(err));

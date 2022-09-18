@@ -9,7 +9,7 @@ import config from "./config";
 
 describe("As a user, I can edit existing pages", () => {
   before(async () => {
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:HomePage",
       {
@@ -20,7 +20,7 @@ describe("As a user, I can edit existing pages", () => {
       },
       null
     );
-    await config.api.draft.createDraft(
+    await config.api.page.createDraft(
       "",
       "casual:SectionPage",
       {
@@ -33,8 +33,8 @@ describe("As a user, I can edit existing pages", () => {
     );
   });
   after(async () => {
-    await config.api.draft.deleteDraft("", "/home/sub0");
-    await config.api.draft.deleteDraft("", "/home");
+    await config.api.page.deleteDraft("", "/home/sub0");
+    await config.api.page.deleteDraft("", "/home");
   });
 
   it("Load the root page in an edition form", async () => {
@@ -72,7 +72,7 @@ describe("As a user, I can edit existing pages", () => {
     expect(input.getAttribute("value")).equal("first section");
   });
 
-  it("Update the root page using the edition form", async () => {
+  it.only("Update the root page using the edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
@@ -87,13 +87,13 @@ describe("As a user, I can edit existing pages", () => {
     input = screen.getByLabelText("Body", { exact: false });
     fireEvent.change(input, { target: { value: "Long time ago" } });
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", { name: "Submit" });
     expect(button).not.equal(null);
     fireEvent.click(button);
 
     await waitForPath("/admin/pages");
 
-    const page = await config.api.draft.showDraft("", "/home");
+    const page = await config.api.page.showDraft("", "/home");
     expect(page.isOk()).equal(true);
     expect(page.unwrapOr({ title: "" }).title).equal("New Value");
   });

@@ -2,16 +2,16 @@ import json
 import os
 import time
 import uuid
-from functools import partial
 from multiprocessing import Process
 from pathlib import Path
-from typing import Any, Callable, Iterator, Optional
+from typing import Any, Callable, Iterator, List, Optional
 
 from behave import fixture  # type: ignore
 from blacksmith import SyncClientFactory, SyncStaticDiscovery, scan
 from selenium.common.exceptions import NoSuchElementException, WebDriverException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.webdriver import WebDriver as Firefox
+from selenium.webdriver.remote.webelement import WebElement
 
 from casualcms.entrypoint import main
 
@@ -40,23 +40,25 @@ class Browser:
                     raise exc
                 time.sleep(interval)
 
-    def find_element_by_xpath(self, path: str):
+    def find_element_by_xpath(self, path: str) -> WebElement:
         return self.wait_for(
-            partial(self.browser.find_element, By.XPATH),  # type: ignore
+            self.browser.find_element,  # type: ignore
+            By.XPATH,
             path,
         )
 
-    def dont_find_element_by_xpath(self, path: str):
+    def dont_find_element_by_xpath(self, path: str) -> None:
         try:
-            self.browser.find_element(By.XPATH, path)  # type: ignore
+            self.browser.find_element(By.XPATH, path)
         except NoSuchElementException:
             return
         else:
             raise ValueError(f"Element {path} exists")
 
-    def find_elements_by_xpath(self, path: str):
+    def find_elements_by_xpath(self, path: str) -> List[WebElement]:
         return self.wait_for(
-            partial(self.browser.find_elements, By.XPATH),  # type: ignore
+            self.browser.find_elements,  # type: ignore
+            By.XPATH,
             path,
         )
 
@@ -106,7 +108,8 @@ class Browser:
             log_id,
         )
         ret = self.wait_for(
-            partial(self.browser.find_element, By.ID),  # type: ignore
+            self.browser.find_element,  # type: ignore
+            By.ID,
             log_id,
         )
         data = json.loads(ret.text)

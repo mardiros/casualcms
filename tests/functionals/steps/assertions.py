@@ -1,7 +1,7 @@
 from typing import Any
 
 from behave import then  # type: ignore
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to  # type: ignore
 
 """
 Debug in the devtools of firefox

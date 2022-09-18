@@ -31,7 +31,7 @@ Feature: As a user, I can create and publish new pages
     # List pages
     Then I see the text "welcome home"
     And I see the text "Edit"
-    # Visit published site
-    When I click on the "Preview" link
+    # Check the preview
+    When I click on the "Preview" link ignoring the target attribute
     Then I see the text "welcome home"
     And I see the text "Welcome aboard!"

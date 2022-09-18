@@ -25,9 +25,7 @@ Feature: As a user, I can create and publish snippets
     Then I see the text "blog:HeaderSnippet"
     And I see the text "header"
     And I see the text "Edit"
-    When I visit "/home"
+    When I visit "/admin/pages/preview?page=%2Fhome"
     Then I see the text "Casual Blog"
     And I see the text "Cat"
     And I see the text "Dog"
-    When I click on the "Cat" link
-    Then I see the heading "Cat"

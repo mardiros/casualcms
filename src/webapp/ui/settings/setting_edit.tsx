@@ -63,12 +63,14 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
         .map((setting: Setting) => setSetting(setting))
         .mapErr((err: ApiError) => setError(err));
     }
-    loadSetting();
+    if (token) {
+      loadSetting();
+    }
     return () => {
       setSetting(null);
       setError(null);
     };
-  }, [hostname, settingKey]);
+  }, [auth, hostname, settingKey]);
 
   React.useEffect(() => {
     if (settingType && setting) {

@@ -151,6 +151,29 @@ class Browser:
             key,
             value,
         )
+    def remove_target_blank(self, text: str) -> None:
+        xpath = f'//a[contains(text(), "{text}")]'
+
+        # self.browser.execute_script("""
+        # var el = document.evaluate(
+        #     arguments[0],
+        #     document,
+        #     null,
+        #     XPathResult.FIRST_ORDERED_NODE_TYPE,
+        #     null
+        # ).singleNodeValue;
+
+        # el.setAttribute("target", "_self");
+        # """,
+        # xpath)
+
+        self.browser.execute_script("""
+        var els = document.getElementsByTagName("a");
+        for (var i = 0; i < els.length; i++) {
+            els[i].setAttribute("target", "_self");
+        }
+        """)
+
 
 
 def run_server(port: int, **kwargs: Any):

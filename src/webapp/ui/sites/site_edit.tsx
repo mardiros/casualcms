@@ -44,7 +44,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
       // console.log("setIsLoading");
       setIsLoading(false);
     }
-    if (hostname) {
+    if (token && hostname) {
       loadSite();
     }
     return () => {
@@ -52,7 +52,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
       setError(null);
       setIsLoading(true);
     };
-  }, [hostname]);
+  }, [auth, hostname]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();

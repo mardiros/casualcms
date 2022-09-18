@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Setting } from "../../casualcms/domain/model";
 import { AppContext } from "../../config";
 import { DeletePopoverForm } from "../layout/confirm";
@@ -15,6 +15,7 @@ export const SettingDeletePopoverForm: React.FunctionComponent<
 > = (props: SettingDeletePopoverFormProps) => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
+  let navigate = useNavigate();
   const token = auth.authenticatedUser?.token || "";
   const { hostname, curSetting } = props;
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
@@ -24,9 +25,11 @@ export const SettingDeletePopoverForm: React.FunctionComponent<
     setConfirmed(true);
   };
 
-  if (confirmed) {
-    return <Navigate to={`/admin/settings/${hostname}`} replace />;
-  }
+  React.useEffect(() => {
+    if (confirmed) {
+      navigate(`/admin/settings/${hostname}`);
+    }
+  }, [confirmed]);
 
   return (
     <DeletePopoverForm button_label="Delete this setting" onSubmit={onSubmit} />

@@ -68,7 +68,9 @@ export const SnippetListTable: React.FunctionComponent<
         .mapErr((err: ApiError) => setError(err)); // FIXME
       setIsLoading(false);
     }
-    loadSubSites();
+    if (token) {
+      loadSubSites();
+    }
     return function cleanup() {};
   }, []);
 
@@ -120,7 +122,6 @@ export const SnippetList: React.FunctionComponent<{}> = () => {
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
-  const params = useParams();
 
   return (
     <Box>

@@ -13,6 +13,7 @@ export type FastApiError = {
 
 export const castError = (api_errors: FastApiError): ApiError => {
   let errors = new Map();
+  console.log(api_errors);
   api_errors.detail.forEach((error) => {
     if (errors.has(error.loc[1])) {
       errors.set(error.loc[1], `${errors.get(error.loc[1])}; ${error.msg}`);

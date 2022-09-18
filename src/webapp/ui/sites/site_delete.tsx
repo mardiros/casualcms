@@ -27,9 +27,9 @@ export const SiteDeletePopoverForm: React.FunctionComponent<
 
   React.useEffect(() => {
     if (confirmed) {
-      navigate("/admin/sites")
+      navigate("/admin/sites");
     }
-  }, [confirmed])
+  }, [confirmed]);
 
   return (
     <DeletePopoverForm button_label="Delete this site" onSubmit={onSubmit} />

@@ -36,13 +36,15 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadType();
+    if (token) {
+      loadType();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setSnippetType(null);
     };
-  }, [snippetTypeName]);
+  }, [auth, snippetTypeName]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;

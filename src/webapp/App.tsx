@@ -103,12 +103,6 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
 const ThemedLayout: React.FunctionComponent<{}> = () => {
   return (
     <>
-      <RequireAuth>
-        <Routes>
-          <Route path="pages/preview" element={<PagePreview />} caseSensitive />
-        </Routes>
-      </RequireAuth>
-
       <ThemeProvider theme={theme}>
         <ColorModeProvider>
           <CSSReset />
@@ -127,6 +121,15 @@ export const App: React.FunctionComponent<AppProps> = (props: AppProps) => {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <RequireAuth>
+          <Routes>
+            <Route
+              path="admin/pages/preview"
+              element={<PagePreview />}
+              caseSensitive
+            />
+          </Routes>
+        </RequireAuth>
         <Routes>
           <Route path="admin/*" element={<ThemedLayout />} caseSensitive />
           {/* Required in tests */}

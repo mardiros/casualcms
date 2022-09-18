@@ -87,13 +87,15 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTypes();
+    if (token) {
+      loadTypes();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setTypes([]);
     };
-  }, [parentType]);
+  }, [auth, parentType]);
 
   React.useEffect(() => {
     async function loadPage() {

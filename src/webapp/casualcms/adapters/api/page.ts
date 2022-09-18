@@ -54,7 +54,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     authntoken: string,
     path: string
   ): Promise<Result<string, ApiError>> {
-    const response = await this.fetch(`/api/previews/${path}`, {
+    const response = await this.fetch(`/api/previews${path}`, {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

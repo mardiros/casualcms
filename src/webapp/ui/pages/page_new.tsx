@@ -40,13 +40,15 @@ export const PageNew: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadPageType();
+    if (token) {
+      loadPageType();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setPageType(null);
     };
-  }, [pageTypeName]);
+  }, [auth, pageTypeName]);
 
   React.useEffect(() => {
     async function loadPage() {

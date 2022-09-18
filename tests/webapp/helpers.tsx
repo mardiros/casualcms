@@ -72,8 +72,8 @@ export const waitForLoadingLabel = async (
   return resp;
 };
 
-export class ErrorBoundary extends React.Component<{children: any}> {
-  state: {hasError: boolean}
+export class ErrorBoundary extends React.Component<{ children: any }> {
+  state: { hasError: boolean };
   constructor(props: any) {
     super(props);
     this.state = { hasError: false };
@@ -85,13 +85,13 @@ export class ErrorBoundary extends React.Component<{children: any}> {
   }
   componentDidCatch(error: any, errorInfo: any) {
     // You can also log the error to an error reporting service
-    console.log({error, errorInfo});
+    console.log({ error, errorInfo });
   }
 
   render() {
     if (this.state.hasError) {
-        // You can render any custom fallback UI
-        return <h1>Something went wrong.</h1>;
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
     }
     return this.props.children;
   }
@@ -115,9 +115,7 @@ export const renderWithRouter = async (
         </FakeAuth>
       </AppContext.Provider>
     </ErrorBoundary>,
-    {
-
-    }
+    {}
   );
   return ret;
 };

@@ -80,13 +80,15 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTypes();
+    if (token) {
+      loadTypes();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setSnippetTypes([]);
     };
-  }, []);
+  }, [auth]);
 
   return (
     <Container>

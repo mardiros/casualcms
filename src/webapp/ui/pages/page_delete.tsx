@@ -12,7 +12,6 @@ type PageDeletePopoverFormProps = {
 export const PageDeletePopoverForm: React.FunctionComponent<
   PageDeletePopoverFormProps
 > = (props: PageDeletePopoverFormProps) => {
-
   const navigate = useNavigate();
   const config = React.useContext(AppContext);
   let auth = useAuth();
@@ -29,15 +28,15 @@ export const PageDeletePopoverForm: React.FunctionComponent<
   React.useEffect(() => {
     if (confirmed) {
       const nextPath =
-      curPage.meta.breadcrumb.length >= 2
-        ? curPage.meta.breadcrumb[curPage.meta.breadcrumb.length - 2].path
-        : "";
+        curPage.meta.breadcrumb.length >= 2
+          ? curPage.meta.breadcrumb[curPage.meta.breadcrumb.length - 2].path
+          : "";
       const qs = nextPath
         ? new URLSearchParams({
             parent: nextPath,
           })
         : "";
-      navigate(`/admin/pages?${qs}`)
+      navigate(`/admin/pages?${qs}`);
     }
   }, [confirmed]);
 

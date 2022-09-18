@@ -26,9 +26,11 @@ export const HomePage: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadPages();
+    if (token) {
+      loadPages();
+    }
     return function cleanup() {};
-  }, []);
+  }, [auth]);
 
   if (isLoading) {
     return <Loader label="preparing data..." />;

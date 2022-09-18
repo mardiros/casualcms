@@ -58,7 +58,7 @@ describe("As a user, I can list sites in settings", () => {
     renderWithRouter(
       <Route
         path="/admin/sites"
-        element={<SettingSiteListTable config={config} token="" />}
+        element={<SettingSiteListTable config={config} token="x" />}
       />,
       "/admin/sites"
     );

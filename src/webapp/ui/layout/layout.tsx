@@ -1,6 +1,4 @@
 import { Box, ColorModeProvider, CSSReset, Flex } from "@chakra-ui/react";
-import { theme } from "@chakra-ui/theme";
-import { ThemeProvider } from "@emotion/react";
 import { useLocation } from "react-router-dom";
 import { Header } from "./header";
 import { SideBar } from "./sidebar";

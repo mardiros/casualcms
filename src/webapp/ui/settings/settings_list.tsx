@@ -129,13 +129,15 @@ export const SettingList: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadTypes();
+    if (token) {
+      loadTypes();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setSettingTypes([]);
     };
-  }, [settingType]);
+  }, [auth, settingType]);
 
   if (isLoading) {
     return <Loader label="loading setting types..." />;

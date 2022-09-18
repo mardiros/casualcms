@@ -62,7 +62,7 @@ describe("As a user, I can list snippet", () => {
     renderWithRouter(
       <Route
         path="/admin/snippets"
-        element={<SnippetListTable config={config} token="" />}
+        element={<SnippetListTable config={config} token="x" />}
       />,
       "/admin/snippets"
     );

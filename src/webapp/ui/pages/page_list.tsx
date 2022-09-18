@@ -191,9 +191,11 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
 export const PageList: React.FunctionComponent<{}> = () => {
   // console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
   // console.log("# Rendering page list")
+
   const config = React.useContext(AppContext);
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
+
   const [curPage, setCurPage] = React.useState<Draft | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -211,13 +213,15 @@ export const PageList: React.FunctionComponent<{}> = () => {
       }
       setIsLoading(false);
     }
-    loadCurPage();
+    if (token) {
+      loadCurPage();
+    }
     return () => {
       setCurPage(null);
       setError(null);
       setIsLoading(true);
     };
-  }, [parentPath]);
+  }, [auth, parentPath]);
 
   if (isLoading) {
     return <Loader label="Loading pages" />;

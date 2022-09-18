@@ -27,9 +27,9 @@ export const SnippetDeletePopoverForm: React.FunctionComponent<
 
   React.useEffect(() => {
     if (confirmed) {
-      navigate(`/admin/snippets/${snippetType}`)
+      navigate(`/admin/snippets/${snippetType}`);
     }
-  }, [confirmed])
+  }, [confirmed]);
 
   return (
     <DeletePopoverForm button_label="Delete this snippet" onSubmit={onSubmit} />

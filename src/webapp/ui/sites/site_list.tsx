@@ -75,9 +75,11 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
         .mapErr((err: ApiError) => setError(err)); // FIXME
       setIsLoading(false);
     }
-    loadSubSites();
+    if (token) {
+      loadSubSites();
+    }
     return function cleanup() {};
-  }, []);
+  }, [token]);
 
   if (isLoading) {
     return <Loader label="Loading sites list" />;

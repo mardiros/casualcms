@@ -59,12 +59,14 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
         .map((snippet: Snippet) => setSnippet(snippet))
         .mapErr((err: ApiError) => setError(err));
     }
-    loadSnippet();
+    if (token) {
+      loadSnippet();
+    }
     return () => {
       setSnippet(null);
       setError(null);
     };
-  }, [snippetSlug]);
+  }, [auth, snippetSlug]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;

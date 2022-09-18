@@ -37,13 +37,15 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadType();
+    if (token) {
+      loadType();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setSettingType(null);
     };
-  }, [hostname, settingKey]);
+  }, [auth, hostname, settingKey]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;

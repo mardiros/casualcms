@@ -41,13 +41,15 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
         .map((typ: SettingType) => setSettingType(typ))
         .mapErr((err: ApiError) => setError(err));
     }
-    loadSettingType();
+    if (token) {
+      loadSettingType();
+    }
     return () => {
       setIsLoading(true);
       setError(null);
       setSettingType(null);
     };
-  }, [settingKey]);
+  }, [auth, settingKey]);
 
   React.useEffect(() => {
     async function loadSetting() {

@@ -9,7 +9,7 @@ import {
   Heading,
   Input,
 } from "@chakra-ui/react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import { Account } from "../../casualcms/domain/model";
 import { AppContext, useConfig } from "../../config";
@@ -43,8 +43,9 @@ export function RequireAuth({
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
-  const config = React.useContext(AppContext);
+  const navigate = useNavigate();
   let auth = useAuth();
+  const config = React.useContext(AppContext);
   const [authError, setAuthError] = React.useState<boolean>(false);
 
   React.useEffect(() => {
@@ -62,26 +63,31 @@ export function RequireAuth({
     }
     loadAuthenticatedUser();
     return function cleanup() {};
+  }, []);
+
+  React.useEffect(() => {
+    if (authError) {
+      return navigate("/admin/login");
+    }
   }, [authError]);
-
-  if (authError) {
-    return <Navigate to="/admin/login" replace />;
-  }
-
-  if (!auth.authenticatedUser) {
-    return <Loader label="Authenticating..." />;
-  }
 
   return <>{children}</>;
 }
 
 export const Login: React.FunctionComponent<{}> = () => {
+  const navigate = useNavigate();
   const auth = useAuth();
   const config = useConfig();
   const [error, setError] = React.useState<ApiError>(null);
   const [authSucceed, setAuthSuceed] = React.useState<boolean>(false);
   // let from = location.state?.from?.pathname || "/admin/";
   const from = "/admin/"; // keep last / to avoid one redirection
+
+  React.useEffect(() => {
+    if (authSucceed) {
+      return navigate(from);
+    }
+  }, [authSucceed]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -104,10 +110,6 @@ export const Login: React.FunctionComponent<{}> = () => {
       .mapErr((apiError) => {
         setError(apiError);
       });
-  }
-
-  if (authSucceed) {
-    return <Navigate to={from} replace />;
   }
 
   return (

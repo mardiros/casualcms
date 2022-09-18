@@ -68,12 +68,14 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
         .map((page: Draft) => setPage(page))
         .mapErr((err: ApiError) => setError(err));
     }
-    loadPage();
+    if (token) {
+      loadPage();
+    }
     return () => {
       setPage(null);
       setError(null);
     };
-  }, [pagePath]);
+  }, [auth, pagePath]);
 
   const onsubmit = async (data: any) => {
     if (!page) {

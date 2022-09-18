@@ -1,6 +1,5 @@
 import React from "react";
 import { useSearchParams } from "react-router-dom";
-import { Draft } from "../../casualcms/domain/model";
 import { ApiError } from "../../casualcms/domain/ports";
 import { useConfig } from "../../config";
 import { Loader } from "../layout/loader";
@@ -27,12 +26,14 @@ export const PagePreview: React.FunctionComponent<{}> = () => {
         .mapErr((err: ApiError) => setError(err));
       setIsLoading(false);
     }
-    loadPage();
+    if (token) {
+      loadPage();
+    }
     return () => {
       setPreviewContent(null);
       setError(null);
     };
-  }, [pagePath]);
+  }, [pagePath, auth]);
 
   if (isLoading) {
     return <Loader label="loading page..." />;

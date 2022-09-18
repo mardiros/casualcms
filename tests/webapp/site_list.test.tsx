@@ -59,7 +59,7 @@ describe("As a user, I can list settings per sites", () => {
     renderWithRouter(
       <Route
         path="/admin/sites"
-        element={<SiteListTable config={config} token="" />}
+        element={<SiteListTable config={config} token="abc" />}
       />,
       "/admin/sites"
     );

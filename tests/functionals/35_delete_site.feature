@@ -2,9 +2,9 @@ Feature: As a user, I want to delete website
 
   Scenario: start an initialized session and wait
     Given user on the admin page
-    And a "/home" page of type "blog:HomePage"
-    And a "/home/cat" page of type "blog:CategoryPage"
-    And a "/home/dog" page of type "blog:CategoryPage"
+    And a "/home" draft page of type "blog:HomePage"
+    And a "/home/cat" draft page of type "blog:CategoryPage"
+    And a "/home/dog" draft page of type "blog:CategoryPage"
     And a "cat.example.net" site with "/home/cat" root page
     And a "dog.example.net" site with "/home/dog" root page
     When I visit "/admin/sites/edit?hostname=cat.example.net"

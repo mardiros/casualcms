@@ -32,6 +32,6 @@ Feature: As a user, I can create and publish new pages
     Then I see the text "welcome home"
     And I see the text "Edit"
     # Visit published site
-    When I click on the "View" link
+    When I click on the "Preview" link
     Then I see the text "welcome home"
     And I see the text "Welcome aboard!"

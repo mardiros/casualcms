@@ -2,9 +2,9 @@ Feature: As a user, I can create and publish snippets
 
   Scenario: Create a header snippet
     Given user on the admin page
-    And a "/home" page of type "blog:HomePage"
-    And a "/home/cat" page of type "blog:CategoryPage"
-    And a "/home/dog" page of type "blog:CategoryPage"
+    And a "/home" draft page of type "blog:HomePage"
+    And a "/home/cat" draft page of type "blog:CategoryPage"
+    And a "/home/dog" draft page of type "blog:CategoryPage"
     When I visit "/admin/snippets/new"
     Then I see the text "Choose A Type Of Snippet"
     And I see the text "blog:HeaderSnippet"

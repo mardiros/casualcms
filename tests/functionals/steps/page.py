@@ -7,7 +7,7 @@ from faker import Faker
 fake = Faker()
 
 
-@given('a "{path}" page of type "{page_type}"')
+@given('a "{path}" draft page of type "{page_type}"')
 def create_page(context: Any, path: str, page_type: str) -> None:
 
     path_split = path.strip("/").split("/")
@@ -75,9 +75,29 @@ def create_page(context: Any, path: str, page_type: str) -> None:
             },
         }
 
-    print(payload)
     try:
         api.draft.post(payload)
+    except HTTPError as exc:
+        print(exc.response.json)
+        raise
+
+
+@given('publish the "{path}" page on "{hostname}"')
+def publish_page(context: Any, path: str, hostname: str) -> None:
+
+    account = context.browser.get_index_db_value("account", "alice")
+    token: str = account["token"]
+
+    api: SyncClient[Any, Any] = context.apicli("casualcms")
+    api.add_middleware(SyncHTTPBearerMiddleware(token))
+
+    payload: Dict[str, Any] = {
+        "path": path,
+        "hostname": hostname,
+    }
+
+    try:
+        api.page.post(payload)
     except HTTPError as exc:
         print(exc.response.json)
         raise

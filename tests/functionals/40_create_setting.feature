@@ -2,7 +2,7 @@ Feature: As a user, I can create a site
 
   Scenario: Navigate to the new setting form
     Given user on the admin page
-    And a "/home" page of type "blog:HomePage"
+    And a "/home" draft page of type "blog:HomePage"
     And a "127.0.0.1:6556" site with "/home" root page
     And a "localhost" site with "/home" root page
     When I click on the "Settings" link
@@ -16,7 +16,7 @@ Feature: As a user, I can create a site
 
   Scenario: Create a Setting
     Given user on the admin page
-    And a "/home" page of type "blog:HomePage"
+    And a "/home" draft page of type "blog:HomePage"
     And a "127.0.0.1:6556" site with "/home" root page
     And a "localhost" site with "/home" root page
     When I visit "/admin/settings/localhost/contact/new"
@@ -31,7 +31,7 @@ Feature: As a user, I can create a site
 
   Scenario: Create a Setting
     Given user on the admin page
-    And a "/home" page of type "blog:HomePage"
+    And a "/home" draft page of type "blog:HomePage"
     And a "127.0.0.1:6556" site with "/home" root page
     And a "localhost" site with "/home" root page
     And a "contact" setting on site "localhost"

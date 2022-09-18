@@ -22,15 +22,3 @@ Feature: As a user, I can create a site
     And I click on the "Submit" button
     Then I see the text "www.example.net"
     And I see the text "/home"
-
-  Scenario: Display site path
-    Given user on the admin page
-    And a "/home" draft page of type "blog:HomePage"
-    And a "/home/cat" draft page of type "blog:CategoryPage"
-    And a "/home/dog" draft page of type "blog:CategoryPage"
-    And a "/home/cat/my-first-article" draft page of type "blog:BlogPage"
-    And a "127.0.0.1:6556" site with "/home/cat" root page
-    When I visit "http://127.0.0.1:6556/"
-    Then I see the text "Cat"
-    When I visit "http://127.0.0.1:6556/my-first-article"
-    Then I see the text "My First Article"

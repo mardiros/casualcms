@@ -51,7 +51,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       // console.log("setIsLoading");
       setIsLoading(false);
     }
-    if (page) {
+    if (token && page) {
       loadPageType();
     }
     return () => {
@@ -59,7 +59,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       setError(null);
       setIsLoading(true);
     };
-  }, [page]);
+  }, [auth, page]);
 
   React.useEffect(() => {
     async function loadPage() {

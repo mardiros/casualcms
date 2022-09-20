@@ -57,10 +57,28 @@ def click_button_pos(context: Context, position: str, text: str):
     el[pos].click()
 
 
+@when('I click on the "{text}" button having the role "{role}"')
+def click_button_with_role(context: Context, text: str, role: str):
+    text = text.replace('"', '\\"')
+    el = context.browser.find_element_by_xpath(
+        f'//button[@role="{role}" and contains(text(), "{text}")]'
+    )
+    el.click()
+
+
 @when('I click on the "{text}" link')
 def click_link(context: Context, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(f'//a[contains(text(), "{text}")]')
+    el.click()
+
+
+@when('I click on the "{text}" label')
+def click_label(context: Context, text: str):
+    text = text.replace('"', '\\"')
+    el = context.browser.find_element_by_xpath(
+        f'//label/span[contains(text(), "{text}")]'
+    )
     el.click()
 
 
@@ -70,7 +88,6 @@ def click_link_pos(context: Context, position: str, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_elements_by_xpath(f'//a[contains(text(), "{text}")]')
     el[pos].click()
-
 
 
 @when('I click on the "{text}" link ignoring the target attribute')

@@ -15,7 +15,7 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { SunIcon } from "@chakra-ui/icons";
+import { SunIcon, ViewIcon } from "@chakra-ui/icons";
 import { ApiError, ApiResult } from "../../casualcms/domain/ports";
 import { useConfig } from "../../config";
 import { PartialSite } from "../../casualcms/domain/model";
@@ -28,6 +28,8 @@ type PublishButtonProps = {
 
 type selectableHostname = {
   hostname: string;
+  secure: boolean;
+  root_page_path: string;
   selected: boolean;
   response?: ApiResult<boolean>;
 };
@@ -61,7 +63,16 @@ export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
   );
 };
 
+function get_url(site: selectableHostname, pagePath: string) {
+  const localPath = pagePath.replace(site.root_page_path, "");
+  if (site.secure) {
+    return `https://${site.hostname}/${localPath}`;
+  }
+  return `http://${site.hostname}/${localPath}`;
+}
+
 type PublishResultBoxProps = {
+  pagePath: string;
   hostnames: selectableHostname[];
   onClose: React.MouseEventHandler<HTMLButtonElement>;
 };
@@ -69,30 +80,38 @@ type PublishResultBoxProps = {
 export const PublishResultBox: React.FunctionComponent<
   PublishResultBoxProps
 > = (props: PublishResultBoxProps) => {
-  const { hostnames, onClose } = props;
+  const { hostnames, pagePath, onClose } = props;
   return (
     <Box>
-      {hostnames.map((hostname, i) => (
-        <Box key={i}>
-          {
+      <Stack p={4} spacing={4} direction="column" bg={"teal.200"}>
+        {hostnames.map((hostname, i) => (
+          <Box key={i}>
             {
-              true: (
-                <>
-                  {hostname.hostname}
-                  &nbsp;
-                  {hostname.response && hostname.response.isOk() && "OK" || "ERROR"}
-                </>
-              ),
-              false: (
-                <>
-                  {hostname.hostname}
-                  &nbsp; ignored
-                </>
-              ),
-            }[hostname.selected.toString()]
-          }
-        </Box>
-      ))}
+              {
+                true: (
+                  <>
+                    {hostname.hostname}
+                    &nbsp;
+                    {(hostname.response && hostname.response.isOk() && (
+                      <a target="_blank" href={get_url(hostname, pagePath)}>
+                        <Icon as={ViewIcon} display="inline-block" verticalAlign="center" marginStart={20}/>
+                        View
+                      </a>
+                    )) ||
+                      "ERROR"}
+                  </>
+                ),
+                false: (
+                  <>
+                    {hostname.hostname}
+                    &nbsp; ignored
+                  </>
+                ),
+              }[hostname.selected.toString()]
+            }
+          </Box>
+        ))}
+      </Stack>
       <Button colorScheme="teal" onClick={onClose} role="close_publish_popover">
         Close
       </Button>
@@ -124,8 +143,8 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
   const { token, pagePath } = props;
   const { onOpen, onClose, isOpen } = useDisclosure();
   const [publishedState, setPublishedState] = React.useState<
-    "loading" | "begin" | "done"
-  >("loading");
+    "closed" | "loading" | "begin" | "done"
+  >("closed");
   const [error, setError] = React.useState<ApiError>(null);
   const [hostnames, setHostnames] = React.useState<selectableHostname[]>([]);
   const config = useConfig();
@@ -149,7 +168,12 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
           sites
             .filter((el) => pagePath.startsWith(el.root_page_path))
             .map((el) =>
-              hostnamesLoaded.push({ hostname: el.hostname, selected: false })
+              hostnamesLoaded.push({
+                hostname: el.hostname,
+                selected: false,
+                secure: el.secure,
+                root_page_path: el.root_page_path,
+              })
             );
         })
         .mapErr((err: ApiError) => setError(err)); // FIXME
@@ -159,7 +183,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
     if (token && publishedState == "loading") {
       loadSites();
     }
-    return function cleanup() { };
+    return function cleanup() {};
   }, [token, publishedState]);
 
   return (
@@ -169,7 +193,10 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
         setPublishedState("loading");
         onOpen();
       }}
-      onClose={onClose}
+      onClose={() => {
+        setPublishedState("closed");
+        onClose();
+      }}
       placement="right"
     >
       <PopoverTrigger>
@@ -183,6 +210,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
           <PopoverHeader>
             {
               {
+                closed: "...",
                 loading: "Choose website(s)",
                 begin: "Choose website(s)",
                 done: "Publish Reports",
@@ -193,14 +221,17 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
           <PopoverBody>
             {
               {
-                loading: (
-                  <Loader label="Loading sites" />
-                ),
+                closed: <></>,
+                loading: <Loader label="Loading sites" />,
                 begin: (
                   <SiteListBox hostnames={hostnames} onSubmit={onSubmit} />
                 ),
                 done: (
-                  <PublishResultBox hostnames={hostnames} onClose={onClose} />
+                  <PublishResultBox
+                    hostnames={hostnames}
+                    pagePath={pagePath}
+                    onClose={onClose}
+                  />
                 ),
               }[publishedState]
             }

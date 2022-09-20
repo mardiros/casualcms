@@ -19,13 +19,7 @@ import { AppConfig, AppContext } from "../../config";
 
 import { useAuth } from "../login/hooks";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import {
-  AddIcon,
-  ArrowRightIcon,
-  DeleteIcon,
-  EditIcon,
-  ViewIcon,
-} from "@chakra-ui/icons";
+import { AddIcon, ArrowRightIcon, EditIcon, ViewIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../layout/loader";
 import { ApiErrorUI } from "../layout/error_api";

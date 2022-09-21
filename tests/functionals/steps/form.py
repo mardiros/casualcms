@@ -1,4 +1,5 @@
 from behave import when  # type:ignore
+
 from tests.functionals.typing import Context
 
 POSITIONS = {"first": 0, "second": 1, "third": 2}

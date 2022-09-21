@@ -151,8 +151,9 @@ class Browser:
             key,
             value,
         )
+
     def remove_target_blank(self, text: str) -> None:
-        xpath = f'//a[contains(text(), "{text}")]'
+        # xpath = f'//a[contains(text(), "{text}")]'
 
         # self.browser.execute_script("""
         # var el = document.evaluate(
@@ -167,13 +168,14 @@ class Browser:
         # """,
         # xpath)
 
-        self.browser.execute_script("""
+        self.browser.execute_script(
+            """
         var els = document.getElementsByTagName("a");
         for (var i = 0; i < els.length; i++) {
             els[i].setAttribute("target", "_self");
         }
-        """)
-
+        """
+        )
 
 
 def run_server(port: int, **kwargs: Any):

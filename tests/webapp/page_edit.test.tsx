@@ -4,7 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/pages/page_edit";
 import { PageList } from "../../src/webapp/ui/pages/page_list";
-import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
+import { renderWithRouter, waitForPath } from "./helpers";
 import config from "./config";
 
 describe("As a user, I can edit existing pages", () => {
@@ -72,7 +72,7 @@ describe("As a user, I can edit existing pages", () => {
     expect(input.getAttribute("value")).equal("first section");
   });
 
-  it.only("Update the root page using the edition form", async () => {
+  it("Update the root page using the edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>

@@ -1,4 +1,4 @@
-import { err, ok, Result } from "neverthrow";
+import { err, Ok, ok, Result } from "neverthrow";
 import {
   Account,
   PartialPageType,
@@ -215,7 +215,7 @@ class FakePageApi implements IPageApi {
     hostname: string,
     path: string
   ): AsyncApiResult<boolean> {
-    throw new Error("Method not implemented.");
+    return ok(true);
   }
   async deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean> {
     const pages = this.pages.filter((page: PartialDraft) => {

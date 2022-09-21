@@ -26,7 +26,7 @@ type PublishButtonProps = {
   pagePath: string;
 };
 
-type selectableHostname = {
+export type SelectableHostname = {
   hostname: string;
   secure: boolean;
   root_page_path: string;
@@ -35,11 +35,11 @@ type selectableHostname = {
 };
 
 type SiteCheckBoxProps = {
-  hostname: selectableHostname;
+  hostname: SelectableHostname;
 };
 
 type SiteListBoxProps = {
-  hostnames: selectableHostname[];
+  hostnames: SelectableHostname[];
   onSubmit: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -63,7 +63,7 @@ export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
   );
 };
 
-function get_url(site: selectableHostname, pagePath: string) {
+function get_url(site: SelectableHostname, pagePath: string) {
   const localPath = pagePath.replace(site.root_page_path, "");
   if (site.secure) {
     return `https://${site.hostname}/${localPath}`;
@@ -73,7 +73,7 @@ function get_url(site: selectableHostname, pagePath: string) {
 
 type PublishResultBoxProps = {
   pagePath: string;
-  hostnames: selectableHostname[];
+  hostnames: SelectableHostname[];
   onClose: React.MouseEventHandler<HTMLButtonElement>;
 };
 
@@ -85,7 +85,7 @@ export const PublishResultBox: React.FunctionComponent<
     <Box>
       <Stack p={4} spacing={4} direction="column" bg={"teal.200"}>
         {hostnames.map((hostname, i) => (
-          <Box key={i}>
+          <Box key={i} role="publication_result">
             {
               {
                 true: (
@@ -93,20 +93,24 @@ export const PublishResultBox: React.FunctionComponent<
                     {hostname.hostname}
                     &nbsp;
                     {(hostname.response && hostname.response.isOk() && (
-                      <a target="_blank" href={get_url(hostname, pagePath)}>
-                        <Icon as={ViewIcon} display="inline-block" verticalAlign="center" marginStart={20}/>
+                      <a
+                        role="view_publication_result"
+                        target="_blank"
+                        href={get_url(hostname, pagePath)}
+                      >
+                        <Icon
+                          as={ViewIcon}
+                          display="inline-block"
+                          verticalAlign="center"
+                          marginStart={20}
+                        />
                         View
                       </a>
                     )) ||
                       "ERROR"}
                   </>
                 ),
-                false: (
-                  <>
-                    {hostname.hostname}
-                    &nbsp; ignored
-                  </>
-                ),
+                false: <>{hostname.hostname}&nbsp;Ignored</>,
               }[hostname.selected.toString()]
             }
           </Box>
@@ -125,6 +129,7 @@ export const SiteCheckBox: React.FunctionComponent<SiteCheckBoxProps> = (
   const { hostname } = props;
   return (
     <Checkbox
+      role="select_site"
       value={hostname.hostname}
       colorScheme={"teal"}
       onChange={(e) => {
@@ -146,7 +151,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
     "closed" | "loading" | "begin" | "done"
   >("closed");
   const [error, setError] = React.useState<ApiError>(null);
-  const [hostnames, setHostnames] = React.useState<selectableHostname[]>([]);
+  const [hostnames, setHostnames] = React.useState<SelectableHostname[]>([]);
   const config = useConfig();
   const onSubmit = async () => {
     const pages = hostnames
@@ -162,7 +167,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
     async function loadSites() {
       let sites: ApiResult<PartialSite[]>;
       sites = await config.api.site.listSites(token);
-      const hostnamesLoaded = [];
+      const hostnamesLoaded: SelectableHostname[] = [];
       sites
         .map((sites: PartialSite[]) => {
           sites

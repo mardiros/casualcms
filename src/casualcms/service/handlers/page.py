@@ -18,7 +18,7 @@ async def create_page(
     cmd: CreatePage,
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
-    tpage = resolve_page_type(cmd.type)
+    tpage = resolve_page_type(cmd.type).unwrap()
     page = tpage(created_at=cmd.created_at, **cmd.payload)
     return await uow.drafts.add(page)
 

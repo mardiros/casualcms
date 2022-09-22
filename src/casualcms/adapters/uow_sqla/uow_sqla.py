@@ -175,7 +175,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         except StopIteration:
             return Err(DraftRepositoryError.page_not_found)
         while orm_page:
-            typ = resolve_page_type(orm_page.type)  # type: ignore
+            typ = resolve_page_type(orm_page.type).unwrap()  # type: ignore
             page = typ(
                 id=orm_page.id,
                 slug=orm_page.slug,
@@ -246,7 +246,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         pages: CursorResult = await self.session.execute(qry)
 
         ret: list[DraftPage] = [
-            resolve_page_type(p.type)(  # type:ignore
+            resolve_page_type(p.type).unwrap()(  # type:ignore
                 id=p.id,
                 slug=p.slug,
                 title=p.title,

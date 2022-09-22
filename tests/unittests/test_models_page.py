@@ -3,7 +3,7 @@ from typing import Any, Dict
 import pytest
 
 from casualcms.domain.model import AbstractPageError, get_available_subtypes
-from casualcms.domain.model.draft import UnregisterType, resolve_page_type
+from casualcms.domain.model.draft import resolve_page_type
 
 from ..casualblog.models import (
     AbstractPage,
@@ -91,11 +91,10 @@ def test_page_types():
     ],
 )
 def test_resolve_page_type(params: Dict[str, Any]):
-    page = resolve_page_type(params["name"])
+    page = resolve_page_type(params["name"]).unwrap()
     assert page is params["class"]
 
 
 def test_resolve_page_type_error():
-    with pytest.raises(UnregisterType) as ctx:
-        resolve_page_type("blog:sectionpage")
-    assert str(ctx.value) == "Unregistered type blog:sectionpage"
+    err = resolve_page_type("blog:sectionpage").unwrap_err()
+    assert err.name == "unregistered"

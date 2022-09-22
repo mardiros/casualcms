@@ -27,7 +27,7 @@ async def show_template(
     type: str,
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
-    ptype = resolve_page_type(type)
+    ptype = resolve_page_type(type).unwrap()
     jsonschema = ptype.schema()
     jsonschema["definitions"].pop("Event", None)
     jsonschema["definitions"].pop("DraftPage", None)

@@ -1,3 +1,4 @@
+import enum
 from collections import defaultdict
 from datetime import datetime
 from typing import (
@@ -15,6 +16,7 @@ from typing import (
 from pydantic import BaseModel, Field
 from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
+from result import Err, Ok, Result
 
 from casualcms.domain.messages import Event
 from casualcms.domain.messages.commands import generate_id
@@ -26,9 +28,8 @@ class AbstractPageError(Exception):
     ...
 
 
-class UnregisterType(Exception):
-    def __init__(self, typ: str) -> None:
-        super().__init__(f"Unregistered type {typ}")
+class PageTypeError(enum.Enum):
+    unregistered = "Unregistered type"
 
 
 PageType = Type["DraftPage"]
@@ -54,11 +55,11 @@ class TypeTree:
     def roots(self) -> Set[PageType]:
         return self._roots
 
-    def resolve_type(self, typ: str) -> PageType:
+    def resolve_type(self, typ: str) -> Result[PageType, PageTypeError]:
         try:
-            return self._types[typ]
+            return Ok(self._types[typ])
         except KeyError:
-            raise UnregisterType(typ)
+            return Err(PageTypeError.unregistered)
 
     def get_childs(self, parent: LazyPageType) -> Set[PageType]:
         parent_typ = parent if isinstance(parent, str) else parent.__meta__.type
@@ -72,7 +73,7 @@ def get_available_subtypes(parent: PageType | str | None) -> Set[PageType]:
     return TypeTree().get_childs(parent)
 
 
-def resolve_page_type(typ: str) -> PageType:
+def resolve_page_type(typ: str) -> Result[PageType, PageTypeError]:
     return TypeTree().resolve_type(typ)
 
 

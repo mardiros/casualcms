@@ -1,7 +1,7 @@
 from typing import Any, MutableMapping, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
@@ -42,14 +42,13 @@ async def create_draft(
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
-    page_type = resolve_page_type(type)
-    # rtype = resolve(type)
-    # if rtype.is_err():
-    #     raise HTTPException(
-    #         status_code=422,
-    #         detail=[{"loc": ["body", "type"], "msg": f"Invalid page type {type}"}],
-    #     )
-    # page_type = rtype.unwrap()
+    rpage_type = resolve_page_type(type)
+    if rpage_type.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[{"loc": ["body", "type"], "msg": rpage_type.unwrap_err().value}],
+        )
+    page_type = rpage_type.unwrap()
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {"id": generate_id(), **payload}
         if parent:
@@ -60,7 +59,17 @@ async def create_draft(
                     detail=[{"loc": ["body", "parent"], "msg": "Unknown page"}],
                 )
             params["parent"] = parent_page.unwrap()
-        page_type(**params)  # validate pydantic model
+        try:
+            page_type(**params)  # validate pydantic model
+        except ValidationError as exc:
+            errors = exc.errors()
+            for error in errors:
+                error["loc"] = ["body", error["loc"]]  # type: ignore
+            raise HTTPException(
+                status_code=422,
+                detail=errors,
+            )
+
         await uow.commit()
 
     cmd = CreatePage(type=type, payload=params)

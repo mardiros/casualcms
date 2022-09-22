@@ -55,7 +55,7 @@ def fake_page(type: str, **kwargs: Any) -> DraftPage:
         "parent": None,
     }
 
-    typ = resolve_page_type(type)
+    typ = resolve_page_type(type).unwrap()
     page.update(kwargs)
     return typ(**page)
 

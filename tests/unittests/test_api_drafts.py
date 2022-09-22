@@ -54,6 +54,63 @@ async def test_api_create_draft(
         }
 
 
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "request": {
+                "type": "blog:HomePage",
+                "payload": {
+                    "title": 42,
+                    "description": "The home page",
+                    "hero_title": "You are awesome",
+                    "body": [{"body": True}],
+                },
+            },
+            "expected_response": {
+                "detail": [
+                    {
+                        "loc": ["body", ["slug"]],
+                        "msg": "field required",
+                        "type": "value_error.missing",
+                    }
+                ],
+            },
+        },
+        {
+            "request": {
+                "type": "blog:UnknownPage",
+                "payload": {
+                    "slug": "homelander",
+                    "title": 42,
+                    "description": "The home page",
+                    "hero_title": "You are awesome",
+                    "body": [{"body": True}],
+                },
+            },
+            "expected_response": {
+                "detail": [{"loc": ["body", "type"], "msg": "Unregistered type"}]
+            },
+        },
+    ],
+)
+async def test_api_create_draft_invalid_data_422(
+    params: Mapping[str, Any],
+    client: TestClient,
+    authntoken: AuthnToken,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.post(
+        "/api/drafts",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=params["request"],
+    )
+    assert resp.status_code == 422
+    assert resp.json() == params["expected_response"]
+
+
 async def test_api_list_draft_403(client: TestClient, draft_hp: DraftPage):
     resp = client.get("/api/drafts")
     assert resp.status_code == 403

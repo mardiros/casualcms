@@ -13,6 +13,10 @@ TODO
 
 * Page revision
 
+* Page tags, and search by tags in jinja2
+
+* Alembic SQL update
+
 * Historic
 
 * Display Errors in forms

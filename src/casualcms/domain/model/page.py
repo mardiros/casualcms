@@ -15,7 +15,7 @@ class Page(BaseModel):
     id: uuid = Field(default_factory=generate_id, exclude=True)
 
     site: Site = Field(...)
-    page: DraftPage = Field(...)
+    draft: DraftPage = Field(...)
 
     type: str = Field(...)
     template: str = Field(...)
@@ -29,4 +29,4 @@ class Page(BaseModel):
 
     @property
     def url(self) -> str:
-        return r"{self.site.url}{self.path}"
+        return f"{self.site.url}{self.path}"

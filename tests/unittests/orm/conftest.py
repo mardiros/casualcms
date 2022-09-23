@@ -22,6 +22,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
 from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model.page import Page
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -153,11 +154,11 @@ async def drafts(
         formated_page["body"] = p
         return formated_page
 
-    pages: Sequence[DraftPage] = params["pages"]
-    if pages:
+    draft_pages: Sequence[DraftPage] = params["drafts"]
+    if draft_pages:
         await sqla_session.execute(  # type: ignore
             orm.drafts.insert(),  # type: ignore
-            [format_page(p) for p in pages],
+            [format_page(p) for p in draft_pages],
         )
 
         await sqla_session.execute(  # type: ignore
@@ -168,11 +169,11 @@ async def drafts(
                     "descendant_id": p.id,
                     "length": 0,
                 }
-                for p in pages
+                for p in draft_pages
             ],
         )
 
-        for page in pages:
+        for page in draft_pages:
             # process parents
             if page.parent:
                 page.parent.id
@@ -193,22 +194,22 @@ async def drafts(
 
         await sqla_session.commit()
 
-    yield pages
+    yield draft_pages
 
     await sqla_session.execute(  # type: ignore
         delete(orm.drafts_treepath).where(
-            orm.drafts_treepath.c.descendant_id.in_([p.id for p in pages])
+            orm.drafts_treepath.c.descendant_id.in_([p.id for p in draft_pages])
         ),
     )
 
     await sqla_session.execute(  # type: ignore
         delete(orm.drafts_treepath).where(
-            orm.drafts_treepath.c.ancestor_id.in_([p.id for p in pages])
+            orm.drafts_treepath.c.ancestor_id.in_([p.id for p in draft_pages])
         ),
     )
 
     await sqla_session.execute(  # type: ignore
-        delete(orm.drafts).where(orm.drafts.c.id.in_([p.id for p in pages])),
+        delete(orm.drafts).where(orm.drafts.c.id.in_([p.id for p in draft_pages])),
     )
     await sqla_session.commit()
 
@@ -282,6 +283,37 @@ async def settings(
 
     await sqla_session.execute(  # type: ignore
         delete(orm.settings).where(orm.settings.c.id.in_([s.id for s in settings])),
+    )
+    await sqla_session.commit()
+
+
+@pytest.fixture()
+async def pages(
+    sqla_session: AsyncSession,
+    params: Mapping[str, Any],
+    sites: list[Site],
+    drafts: list[DraftPage],
+):
+    def format_page(page: Page) -> Dict[str, Any]:
+        formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
+        formated_page["id"] = page.id
+        formated_page["created_at"] = page.created_at
+        formated_page["draft_id"] = page.draft.id
+        formated_page["site_id"] = page.site.id
+        return formated_page
+
+    pages = params["pages"]
+
+    await sqla_session.execute(  # type: ignore
+        orm.pages.insert(),  # type: ignore
+        [format_page(p) for p in pages],
+    )
+    await sqla_session.commit()
+
+    yield pages
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages).where(orm.pages.c.id.in_([p.id for p in pages])),
     )
     await sqla_session.commit()
 

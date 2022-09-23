@@ -56,39 +56,39 @@ async def publish_page(
     cmd: PublishPage,
     uow: AbstractUnitOfWork,
 ) -> PageOperationResult:
-    rpage = await uow.drafts.by_id(cmd.id)
-    if rpage.is_err():
+    rdraft_page = await uow.drafts.by_id(cmd.id)
+    if rdraft_page.is_err():
         return Err(PageRepositoryError.draft_not_found)
-    page = rpage.unwrap()
+    draft_page = rdraft_page.unwrap()
 
     rsite = await uow.sites.by_id(cmd.site_id)
     if rsite.is_err():
         return Err(PageRepositoryError.site_not_found)
 
-    page = rpage.unwrap()
+    draft_page = rdraft_page.unwrap()
     site = rsite.unwrap()
-    if not page.path.startswith(site.root_page_path):
+    if not draft_page.path.startswith(site.root_page_path):
         return Err(PageRepositoryError.publication_error)
     lprefix = len(site.root_page_path)
-    path = page.path[lprefix:]
+    path = draft_page.path[lprefix:]
     path = f"//{site.hostname}/{path}"
-    rpublished_page = await uow.pages.by_page_and_site(page.id, site.id)
+    rpublished_page = await uow.pages.by_draft_page_and_site(draft_page.id, site.id)
     if rpublished_page.is_ok():
         published_page = rpublished_page.unwrap()
-        published_page.template = page.get_template()
-        published_page.title = page.title
+        published_page.template = draft_page.get_template()
+        published_page.title = draft_page.title
         published_page.path = path
-        published_page.body = page.get_context()
+        published_page.body = draft_page.get_context()
         rok = await uow.pages.update(rpublished_page.unwrap())
     else:
         published_page = Page(
             site=site,
-            page=page,
-            type=page.__meta__.type,
-            template=page.get_template(),
-            title=page.title,
+            draft=draft_page,
+            type=draft_page.__meta__.type,
+            template=draft_page.get_template(),
+            title=draft_page.title,
             path=path,
-            body=page.get_context(),
+            body=draft_page.get_context(),
         )
         rok = await uow.pages.add(published_page)
     if rok.is_err():

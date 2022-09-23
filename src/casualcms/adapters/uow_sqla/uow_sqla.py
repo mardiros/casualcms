@@ -689,11 +689,40 @@ class PageSQLRepository(AbstractPageRepository):
         self.session = session
         self.seen = set()
 
-    async def by_page_and_site(
-        self, page_id: str, site_id: str
+    async def by_draft_page_and_site(
+        self, draft_id: str, site_id: str
     ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
-        return Err(PageRepositoryError.page_not_found)
+
+        orm_pages: CursorResult = await self.session.execute(
+            select(orm.pages)
+            .filter(orm.pages.c.draft_id == draft_id)
+            .filter(orm.pages.c.site_id == site_id)
+            .limit(1)
+        )
+        orm_page = cast(Page, orm_pages.first())
+        if not orm_page:
+            return Err(PageRepositoryError.page_not_found)
+
+        rdraft = await DraftSQLRepository(self.session).by_id(draft_id)
+        if rdraft.is_err():
+            return Err(PageRepositoryError.page_not_found)
+        rsite = await SiteSQLRepository(self.session).by_id(site_id)
+        if rsite.is_err():
+            return Err(PageRepositoryError.page_not_found)
+        return Ok(
+            Page(
+                id=orm_page.id,
+                body=orm_page.body,
+                created_at=orm_page.created_at,
+                draft=rdraft.unwrap(),
+                site=rsite.unwrap(),
+                template=orm_page.template,
+                type=orm_page.type,
+                title=orm_page.title,
+                path=orm_page.path,
+            )
+        )
 
     async def by_url(self, url: str) -> PageRepositoryResult:
         """Fetch one page by its unique id."""

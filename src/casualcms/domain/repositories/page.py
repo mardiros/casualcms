@@ -22,8 +22,8 @@ class AbstractPageRepository(AbstractRepository):
     seen: set[Page]
 
     @abc.abstractmethod
-    async def by_page_and_site(
-        self, page_id: str, site_id: str
+    async def by_draft_page_and_site(
+        self, draft_id: str, site_id: str
     ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
 

@@ -148,3 +148,27 @@ settings = Table(
     Index("idx_settings_key_site_id", "key", "site_id", unique=True),
     Index("idx_settings_created_at", "created_at", unique=False),
 )
+
+pages = Table(
+    "pages",
+    metadata,
+    Column("id", UUID, primary_key=True),
+    Column("created_at", DateTime(), nullable=False),
+    Column(
+        "site_id",
+        UUID,
+        ForeignKey("sites.id", name="fk_pages_site_id"),
+        nullable=False,
+    ),
+    Column(
+        "draft_id",
+        UUID,
+        ForeignKey("drafts.id", name="fk_pages_site_id"),
+        nullable=False,
+    ),
+    Column("type", String(72), nullable=False),
+    Column("template", CIText, nullable=False),
+    Column("path", CIText, nullable=False),
+    Column("title", CIText, nullable=False),
+    Column("body", JSON, nullable=False),
+)

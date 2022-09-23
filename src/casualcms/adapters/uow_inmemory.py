@@ -141,12 +141,12 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 class PageInMemoryRepository(AbstractPageRepository):
     pages: dict[tuple[str, str], Page] = {}
 
-    async def by_page_and_site(
-        self, page_id: str, site_id: str
+    async def by_draft_page_and_site(
+        self, draft_id: str, site_id: str
     ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
         try:
-            ppage = self.pages[page_id, site_id]
+            ppage = self.pages[draft_id, site_id]
         except KeyError:
             return Err(PageRepositoryError.page_not_found)
         return Ok(ppage)
@@ -163,12 +163,12 @@ class PageInMemoryRepository(AbstractPageRepository):
 
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
-        self.pages[model.page.id, model.site.id] = model
+        self.pages[model.draft.id, model.site.id] = model
         return Ok(...)
 
     async def update(self, model: Page) -> PageOperationResult:
         """Update a model to the repository."""
-        self.pages[model.page.id, model.site.id] = model
+        self.pages[model.draft.id, model.site.id] = model
         return Ok(...)
 
 

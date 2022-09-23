@@ -12,6 +12,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     AccountSQLRepository,
     AuthnTokenSQLRepository,
     DraftSQLRepository,
+    PageSQLRepository,
     SettingSQLRepository,
     SiteSQLRepository,
     SnippetSQLRepository,
@@ -22,6 +23,7 @@ from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model.page import Page
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
@@ -32,6 +34,7 @@ from .fixtures import (
     fake_account,
     fake_authn_tokens,
     fake_contact_setting,
+    fake_draft_page,
     fake_ff_setting,
     fake_footer_snippet,
     fake_header_snippet,
@@ -45,14 +48,14 @@ bob = fake_account(username="bob")
 dylan = fake_account(username="dylan")
 henry = fake_account(username="henry")
 
-draft_hp = fake_page(
+draft_hp = fake_draft_page(
     type="blog:HomePage",
     slug="root",
     hero_title="lorem atchoum",
 )
 
 
-cat_page = fake_page(
+cat_page = fake_draft_page(
     type="blog:CategoryPage",
     slug="tech",
     parent=draft_hp,
@@ -61,7 +64,7 @@ cat_page = fake_page(
 )
 
 
-cat2_page = fake_page(
+cat2_page = fake_draft_page(
     type="blog:CategoryPage",
     slug="seo",
     parent=draft_hp,
@@ -69,7 +72,7 @@ cat2_page = fake_page(
     intro={"title": "SEO", "body": "You bot"},
 )
 
-blog_page = fake_page(
+blog_page = fake_draft_page(
     type="blog:BlogPage",
     slug="seo",
     parent=cat_page,
@@ -230,19 +233,19 @@ async def test_authntoken_delete(
     [
         {
             "id": draft_hp.id,
-            "pages": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],  # type: ignore
             "expected_slug": "root",
             "expected_path": "/root",
         },
         {
             "id": cat_page.id,
-            "pages": [draft_hp, cat_page, cat2_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page],  # type: ignore
             "expected_slug": "tech",
             "expected_path": "/root/tech",
         },
         {
             "id": blog_page.id,
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slug": "seo",
             "expected_path": "/root/tech/seo",
         },
@@ -272,19 +275,19 @@ async def test_draft_by_id_err(sqla_session: AsyncSession):
     [
         {
             "path": "/root",
-            "pages": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],  # type: ignore
             "expected_slug": "root",
             "expected_id": draft_hp.id,
         },
         {
             "path": "/root/tech",
-            "pages": [draft_hp, cat_page, cat2_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page],  # type: ignore
             "expected_slug": "tech",
             "expected_id": cat_page.id,
         },
         {
             "path": "/root/tech/seo",
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slug": "seo",
             "expected_id": blog_page.id,
         },
@@ -306,7 +309,7 @@ async def test_page_by_path(
     [
         {
             "path": "/root",
-            "pages": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],  # type: ignore
             "expected_slug": "root",
             "expected_id": draft_hp.id,
         }
@@ -327,28 +330,28 @@ async def test_page_by_path_err(
     [
         {
             "parent": None,
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["root"],
             "expected_ids": [draft_hp.id],
             "expected_paths": ["/root"],
         },
         {
             "parent": "/root",
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["seo", "tech"],
             "expected_ids": [cat2_page.id, cat_page.id],
             "expected_paths": ["/root/seo", "/root/tech"],
         },
         {
             "parent": "/root/tech",
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": ["seo"],
             "expected_ids": [blog_page.id],
             "expected_paths": ["/root/tech/seo"],
         },
         {
             "parent": "/root/seo",
-            "pages": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
             "expected_slugs": [],
             "expected_ids": [],
             "expected_paths": [],
@@ -371,11 +374,11 @@ async def test_page_by_parent(
     [
         {
             "parent": "/foo",
-            "pages": [draft_hp],
+            "drafts": [draft_hp],
         },
         {
             "parent": "/root/foo",
-            "pages": [draft_hp],
+            "drafts": [draft_hp],
         },
     ],
 )
@@ -395,13 +398,13 @@ async def test_page_by_parent_err(
         {
             "parent": None,
             "page": draft_hp,
-            "pages": [],  # type: ignore
+            "drafts": [],  # type: ignore
             "expected_ancestors": [(draft_hp.id, 0)],
         },
         {
             "parent": draft_hp,
             "page": cat_page,
-            "pages": [draft_hp],  # type: ignore
+            "drafts": [draft_hp],  # type: ignore
             "expected_ancestors": [(draft_hp.id, 1), (cat_page.id, 0)],
         },
     ],
@@ -443,7 +446,7 @@ async def test_page_add(
     [
         {
             "page": draft_hp,
-            "update_page": fake_page(
+            "update_page": fake_draft_page(
                 id=draft_hp.id,
                 type="blog:HomePage",
                 slug="home",
@@ -451,7 +454,7 @@ async def test_page_add(
                 description="new desc",
                 hero_title="my new hero",
             ),
-            "pages": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],  # type: ignore
             "expected_slug": "home",
             "expected_title": "new title",
             "expected_description": "new desc",
@@ -479,7 +482,7 @@ async def test_page_update(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],  # type: ignore
         },
     ],
 )
@@ -688,7 +691,7 @@ async def test_snippet_update(
     "params",
     [
         {
-            "pages": [draft_hp],
+            "drafts": [draft_hp],
             "site": fake_site(draft_hp),
         },
     ],
@@ -711,7 +714,7 @@ async def test_site_add(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(cat_page, hostname="www1"),
                 fake_site(cat2_page, hostname="www2"),
@@ -737,7 +740,7 @@ async def test_site_list(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(cat_page, id="abc"),
                 fake_site(cat2_page, id="123"),
@@ -767,7 +770,7 @@ async def test_site_by_id(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(cat_page, hostname="www1"),
                 fake_site(cat2_page, hostname="www2"),
@@ -797,7 +800,7 @@ async def test_site_by_hostname(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(cat_page, hostname="www1"),
                 fake_site(cat2_page, hostname="www2"),
@@ -857,7 +860,7 @@ async def test_site_update(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(cat_page, hostname="www1"),
                 fake_site(cat2_page, hostname="www2"),
@@ -886,7 +889,7 @@ async def test_site_remove(
     "params",
     [
         {
-            "pages": [draft_hp],
+            "drafts": [draft_hp],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -911,7 +914,7 @@ async def test_setting_add(params: Any, sqla_session: AsyncSession, sites: list[
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -944,7 +947,7 @@ async def test_setting_list(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -975,7 +978,7 @@ async def test_setting_list_filter_hostname(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -1007,7 +1010,7 @@ async def test_setting_by_id(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -1038,7 +1041,7 @@ async def test_setting_by_key(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -1083,7 +1086,7 @@ async def test_setting_update(
     "params",
     [
         {
-            "pages": [draft_hp, cat_page, cat2_page],
+            "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
                 fake_site(draft_hp, hostname="www"),
                 fake_site(draft_hp, hostname="www2"),
@@ -1184,9 +1187,64 @@ async def test_sql_uow_with_runtime_error(method: str, app_settings_sqlite: Sett
         },
     ],
 )
-async def test_sql_uow(params: Any, sql_uow: SQLUnitOfWork, accounts_uow: NoneType):
+async def test_sql_uow_account_by_username(
+    params: Any, sql_uow: SQLUnitOfWork, accounts_uow: NoneType
+):
     async with sql_uow as uow:
         alice_from_uow = await uow.accounts.by_username("alice")
         await uow.rollback()
 
     assert alice_from_uow.unwrap().id == alice.id
+
+    async with sql_uow as uow:
+        alicia_from_uow = await uow.accounts.by_username("alicia")
+        await uow.rollback()
+
+    assert alicia_from_uow.unwrap_err().name == "user_not_found"
+
+
+site_1 = fake_site(draft_hp, hostname="www")
+site_2 = fake_site(draft_hp, hostname="www2")
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "drafts": [draft_hp, cat_page, cat2_page],
+            "sites": [site_1, site_2],
+            "pages": [
+                fake_page(draft_hp, site_1),
+                fake_page(draft_hp, site_2),
+                fake_page(cat_page, site_1),
+            ],
+        },
+    ],
+)
+async def test_sql_uow_page_by_page_id_and_site_id(
+    params: Any,
+    sqla_session: AsyncSession,
+    sql_uow: SQLUnitOfWork,
+    pages: list[Page],
+):
+    repo = PageSQLRepository(sqla_session)
+
+    rpage = await repo.by_draft_page_and_site(draft_hp.id, site_1.id)
+
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[0].id
+
+    rpage = await repo.by_draft_page_and_site(draft_hp.id, site_2.id)
+
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[1].id
+
+    rpage = await repo.by_draft_page_and_site(cat_page.id, site_1.id)
+
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[2].id
+
+    rpage = await repo.by_draft_page_and_site(cat_page.id, site_2.id)
+
+    assert rpage.is_err()
+    assert rpage.unwrap_err().name == "page_not_found"

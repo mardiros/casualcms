@@ -13,6 +13,7 @@ from casualcms.domain.model import (
     resolve_setting_type,
     resolve_snippet_type,
 )
+from casualcms.domain.model.page import Page
 
 fake = Faker()
 
@@ -45,7 +46,7 @@ def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
     return AuthnToken(**token)
 
 
-def fake_page(type: str, **kwargs: Any) -> DraftPage:
+def fake_draft_page(type: str, **kwargs: Any) -> DraftPage:
     page: Dict[str, Any] = {
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),
@@ -119,3 +120,17 @@ def fake_contact_setting(hostname: str = "www", **kwargs: Any):
     settings = {"email": "bob@alice.net"}
     settings.update(kwargs)  # type: ignore
     return fake_setting("contact", hostname=hostname, **settings)
+
+
+def fake_page(draft: DraftPage, site: Site):
+    return Page(
+        id=fake.uuid4(),
+        body=draft.get_context(),
+        type=draft.__meta__.type,
+        template=draft.get_template(),
+        created_at=fake.past_datetime(),
+        draft=draft,
+        site=site,
+        path=f"//{site.hostname}/{draft.path}",
+        title=draft.title,
+    )

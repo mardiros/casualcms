@@ -35,8 +35,6 @@ TODO
 
 * Define and implement errors on reserved word for page, snippet, and settings
 
-* rename snippet slug by key
-
 * Add tests for 422 errors
 
 * Fix 401 Unauthorized (Not authenticated) / 403 Forbidden (Authenticated)

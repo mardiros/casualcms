@@ -262,7 +262,7 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
         values: Iterable[Snippet] = self.snippets.values()
         if type:
             values = filter(lambda s: s.__meta__.type == type, values)
-        return Ok(sorted(values, key=lambda s: s.slug))
+        return Ok(sorted(values, key=lambda s: s.key))
 
     async def by_id(self, id: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique id."""
@@ -271,23 +271,23 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
                 return Ok(snippet)
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
-        """Fetch one snippet by its unique slug."""
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique key."""
         try:
-            return Ok(self.snippets[slug])
+            return Ok(self.snippets[key])
         except KeyError:
             return Err(SnippetRepositoryError.snippet_not_found)
 
     async def add(self, model: Snippet) -> SnippetOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
-        self.snippets[model.slug] = model
+        self.snippets[model.key] = model
         return Ok(...)
 
     async def remove(self, model: Snippet) -> SnippetOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
-        del self.snippets[model.slug]
+        del self.snippets[model.key]
         return Ok(...)
 
     async def update(self, model: Snippet) -> SnippetOperationResult:
@@ -300,7 +300,7 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
                 break
         if k:
             del self.snippets[k]
-        self.snippets[model.slug] = model
+        self.snippets[model.key] = model
         return Ok(...)
 
 

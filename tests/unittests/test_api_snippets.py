@@ -30,18 +30,18 @@ async def test_api_create_snippet(
         json={
             "type": "blog:HeaderSnippet",
             "payload": {
-                "slug": "header",
+                "key": "header",
                 "title": "My Blog",
                 "links": [{"title": "cat", "href": "/cats"}],
             },
         },
     )
     assert resp.status_code == 201
-    assert resp.json() == {"slug": "header", "meta": {"type": "blog:HeaderSnippet"}}
+    assert resp.json() == {"key": "header", "meta": {"type": "blog:HeaderSnippet"}}
     async with uow as uow:
-        snippet = (await uow.snippets.by_slug("header")).unwrap()
+        snippet = (await uow.snippets.by_key("header")).unwrap()
         assert snippet.dict() == {
-            "slug": "header",
+            "key": "header",
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],
         }
@@ -72,9 +72,9 @@ async def test_api_list_snippet(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "alt-header"},
-        {"meta": {"type": "tests.casualblog.models:FooterSnippet"}, "slug": "footer"},
-        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "key": "alt-header"},
+        {"meta": {"type": "tests.casualblog.models:FooterSnippet"}, "key": "footer"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "key": "header"},
     ]
 
 
@@ -93,8 +93,8 @@ async def test_api_list_snippet_filter(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "alt-header"},
-        {"meta": {"type": "blog:HeaderSnippet"}, "slug": "header"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "key": "alt-header"},
+        {"meta": {"type": "blog:HeaderSnippet"}, "key": "header"},
     ]
 
 
@@ -107,7 +107,7 @@ async def test_api_patch_snippet_403(
     resp = client.patch(
         "/api/snippets/header",
         json={
-            "slug": "new-slug",
+            "key": "new-key",
             "title": "new title",
         },
     )
@@ -126,20 +126,20 @@ async def test_api_patch_snippet(
             "Authorization": f"Bearer {authntoken.token}",
         },
         json={
-            "slug": "new-slug",
+            "key": "new-key",
             "title": "new title",
         },
     )
     assert resp.status_code == 202
-    assert resp.json() == {"meta": {"type": "blog:HeaderSnippet"}, "slug": "new-slug"}
+    assert resp.json() == {"meta": {"type": "blog:HeaderSnippet"}, "key": "new-key"}
 
     async with uow as uow:
-        snip = await uow.snippets.by_slug("new-slug")
+        snip = await uow.snippets.by_key("new-key")
         assert snip.is_ok()
         snipok = cast(HeaderSnippet, snip.unwrap())
         assert snipok.title == "new title"
 
-        snip = await uow.snippets.by_slug("header")
+        snip = await uow.snippets.by_key("header")
         assert snip.is_err()
         assert snip.unwrap_err().name == "snippet_not_found"
 
@@ -172,7 +172,7 @@ async def test_api_get_snippet(
             {"href": "/dogs", "title": "dogs"},
         ],
         "meta": {"type": "blog:HeaderSnippet"},
-        "slug": "header",
+        "key": "header",
         "title": "A personal blog",
     }
 
@@ -203,6 +203,6 @@ async def test_api_delete_snippet(
     assert resp.text == ""
 
     async with uow as uow:
-        snip = await uow.snippets.by_slug("header")
+        snip = await uow.snippets.by_key("header")
         assert snip.is_err()
         assert snip.unwrap_err().name == "snippet_not_found"

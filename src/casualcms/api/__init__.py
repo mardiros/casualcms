@@ -57,12 +57,12 @@ def includeme(app: FastAPIConfigurator) -> None:
         "/snippets", snippet.create_snippet, methods=["POST"], status_code=201
     )
     router.add_api_route("/snippets", snippet.list_snippets, methods=["GET"])
-    router.add_api_route("/snippets/{slug}", snippet.show_snippet, methods=["GET"])
+    router.add_api_route("/snippets/{key}", snippet.show_snippet, methods=["GET"])
     router.add_api_route(
-        "/snippets/{slug}", snippet.delete_snippet, methods=["DELETE"], status_code=204
+        "/snippets/{key}", snippet.delete_snippet, methods=["DELETE"], status_code=204
     )
     router.add_api_route(
-        "/snippets/{slug}", snippet.update_snippet, methods=["PATCH"], status_code=202
+        "/snippets/{key}", snippet.update_snippet, methods=["PATCH"], status_code=202
     )
     router.add_api_route("/snippets-types", snippet_type.list_types, methods=["GET"])
     router.add_api_route(

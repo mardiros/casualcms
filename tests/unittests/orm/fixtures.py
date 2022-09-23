@@ -79,7 +79,7 @@ def fake_snippet(type: str, **kwargs: Any) -> Snippet:
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),
         "type": type,
-        "slug": fake.slug(),
+        "key": fake.slug(),
     }
 
     typ = resolve_snippet_type(type)

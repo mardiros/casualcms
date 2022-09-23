@@ -224,7 +224,7 @@ async def snippets(
             "id": snippet.id,
             "type": snippet.__meta__.type,
             "created_at": snippet.created_at,
-            "slug": s.pop("slug"),
+            "key": s.pop("key"),
         }
         formated_snippet["body"] = s
         return formated_snippet

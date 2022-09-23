@@ -121,7 +121,7 @@ class DeleteSite(Command):
 
 class CreateSnippet(Command):
     type: str = Field(...)
-    slug: str = Field(...)
+    key: str = Field(...)
     body: dict[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
@@ -131,7 +131,7 @@ class CreateSnippet(Command):
 
 
 class UpdateSnippet(Command):
-    slug: str | None = Field(..., description="New slug")
+    key: str | None = Field(..., description="New key")
     body: dict[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
@@ -141,7 +141,7 @@ class UpdateSnippet(Command):
 
 
 class DeleteSnippet(Command):
-    slug: str = Field(...)
+    key: str = Field(...)
     id: str = Field(...)
     metadata: Metadata = Metadata(
         category="snippet", name="update_snippet", schemaVersion=1

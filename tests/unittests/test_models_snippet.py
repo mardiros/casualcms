@@ -8,7 +8,7 @@ from ..casualblog.models import AbstractFooterSnippet, HeaderSnippet, Link
 def test_snippet_metadata():
     snip = HeaderSnippet(
         id="a",
-        slug="header",
+        key="header",
         title="awesome",
         links=[
             Link(title="dogs", href="/dogs"),
@@ -29,7 +29,7 @@ def test_snippet_abstract_raises():
 def test_snippet_get_context():
     snip = HeaderSnippet(
         id="a",
-        slug="header",
+        key="header",
         title="awesome",
         links=[
             Link(title="dogs", href="/dogs"),
@@ -42,7 +42,7 @@ def test_snippet_get_context():
             {"href": "/cats", "title": "cats"},
         ],
         "meta": {"type": "blog:HeaderSnippet"},
-        "slug": "header",
+        "key": "header",
         "title": "awesome",
     }
     context = snip.get_context()

@@ -506,23 +506,23 @@ async def test_page_remove(
     [
         {
             "snippets": [
-                fake_header_snippet(slug="snip-this"),
-                fake_header_snippet(slug="snip-it"),
-                fake_header_snippet(slug="snip-that"),
+                fake_header_snippet(key="snip-this"),
+                fake_header_snippet(key="snip-it"),
+                fake_header_snippet(key="snip-that"),
             ],
         },
     ],
 )
-async def test_snippet_by_slug(
+async def test_snippet_by_key(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet = await repo.by_slug("snip-it")
+    rsnippet = await repo.by_key("snip-it")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.id == snippets[1].id
 
-    rsnippet = await repo.by_slug("e404")
+    rsnippet = await repo.by_key("e404")
     assert rsnippet.is_err()
     assert rsnippet.unwrap_err().value == "Snippet not found"
 
@@ -546,7 +546,7 @@ async def test_snippet_by_id(
     rsnippet = await repo.by_id("123")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
-    assert snippet.slug == snippets[1].slug
+    assert snippet.key == snippets[1].key
 
     rsnippet = await repo.by_id("456")
     assert rsnippet.is_err()
@@ -568,7 +568,7 @@ async def test_snippet_add(params: Any, sqla_session: AsyncSession):
 
     resp = await sqla_session.execute(qry)  # type: ignore
     snippet: orm.snippets = resp.first()  # type: ignore
-    assert snippet.slug == params["snippet"].slug
+    assert snippet.key == params["snippet"].key
     assert snippet.body == {
         "title": params["snippet"].title,
         "links": params["snippet"].links,
@@ -580,9 +580,9 @@ async def test_snippet_add(params: Any, sqla_session: AsyncSession):
     [
         {
             "snippets": [
-                fake_header_snippet(slug="snip-this"),
-                fake_header_snippet(slug="snip-it"),
-                fake_header_snippet(slug="snip-that"),
+                fake_header_snippet(key="snip-this"),
+                fake_header_snippet(key="snip-it"),
+                fake_header_snippet(key="snip-that"),
             ],
         },
     ],
@@ -593,13 +593,13 @@ async def test_snippet_remove(
     repo = SnippetSQLRepository(sqla_session)
     await repo.remove(snippets[1])
 
-    qry = select(orm.snippets).filter(orm.snippets.c.slug == "snip-it")
+    qry = select(orm.snippets).filter(orm.snippets.c.key == "snip-it")
 
     resp = await sqla_session.execute(qry)  # type: ignore
     snippet: orm.snippets = resp.first()  # type: ignore
     assert snippet is None
 
-    qry = select(orm.snippets).filter(orm.snippets.c.slug == "snip-that")
+    qry = select(orm.snippets).filter(orm.snippets.c.key == "snip-that")
 
     resp = await sqla_session.execute(qry)  # type: ignore
     snippet: orm.snippets = resp.first()  # type: ignore
@@ -611,9 +611,9 @@ async def test_snippet_remove(
     [
         {
             "snippets": [
-                fake_header_snippet(slug="snip-this"),
-                fake_footer_snippet(slug="snip-it"),
-                fake_header_snippet(slug="snip-that"),
+                fake_header_snippet(key="snip-this"),
+                fake_footer_snippet(key="snip-it"),
+                fake_header_snippet(key="snip-that"),
             ],
         },
     ],
@@ -625,8 +625,8 @@ async def test_snippet_list_filter_type(
     rsnippets = await repo.list(type="blog:HeaderSnippet")
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
-    ss = [s.slug for s in snips]
-    assert ss == ["snip-that", "snip-this"]
+    sk = [s.key for s in snips]
+    assert sk == ["snip-that", "snip-this"]
 
 
 @pytest.mark.parametrize(
@@ -634,9 +634,9 @@ async def test_snippet_list_filter_type(
     [
         {
             "snippets": [
-                fake_header_snippet(slug="snip-this"),
-                fake_header_snippet(slug="snip-it"),
-                fake_header_snippet(slug="snip-that"),
+                fake_header_snippet(key="snip-this"),
+                fake_header_snippet(key="snip-it"),
+                fake_header_snippet(key="snip-that"),
             ],
         },
     ],
@@ -648,8 +648,8 @@ async def test_snippet_list(
     rsnippets = await repo.list()
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
-    ss = [s.slug for s in snips]
-    assert ss == ["snip-it", "snip-that", "snip-this"]
+    sk = [s.key for s in snips]
+    assert sk == ["snip-it", "snip-that", "snip-this"]
 
 
 @pytest.mark.parametrize(
@@ -657,9 +657,9 @@ async def test_snippet_list(
     [
         {
             "snippets": [
-                fake_header_snippet(slug="snip-this"),
-                fake_header_snippet(slug="snip-it"),
-                fake_header_snippet(slug="snip-that"),
+                fake_header_snippet(key="snip-this"),
+                fake_header_snippet(key="snip-it"),
+                fake_header_snippet(key="snip-that"),
             ],
         },
     ],
@@ -668,7 +668,7 @@ async def test_snippet_update(
     params: Any, sqla_session: AsyncSession, snippets: list[HeaderSnippet]
 ):
     snippet = snippets[1]
-    snippet.slug = "new-snip-slug"
+    snippet.key = "new-snip-key"
     snippet.title = "New title"
     snippet.links = [Link(title="l1", href="/l1")]
     repo = SnippetSQLRepository(sqla_session)
@@ -679,7 +679,7 @@ async def test_snippet_update(
 
     resp = await sqla_session.execute(qry)  # type: ignore
     rsnip: orm.snippets = resp.first()  # type: ignore
-    assert rsnip.slug == "new-snip-slug"
+    assert rsnip.key == "new-snip-key"
     assert rsnip.body["title"] == "New title"
     assert rsnip.body["links"] == [{"title": "l1", "href": "/l1"}]
 

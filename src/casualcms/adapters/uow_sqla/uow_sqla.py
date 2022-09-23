@@ -132,8 +132,8 @@ def format_snippet(snippet: Snippet) -> Dict[str, Any]:
         "id": snippet.id,
         "type": snippet.__meta__.type,
         "created_at": snippet.created_at,
-        "slug": snippet.slug,
-        "body": snippet.dict(exclude={"slug"}),
+        "key": snippet.key,
+        "body": snippet.dict(exclude={"key"}),
     }
     return formated_snippet
 
@@ -344,7 +344,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             return Ok(
                 typ(
                     id=orm_snippet.id,
-                    slug=orm_snippet.slug,
+                    key=orm_snippet.key,
                     **orm_snippet.body,  # type: ignore
                 )
             )
@@ -357,11 +357,11 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         )
         return await self._format_response(orm_snippets)
 
-    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
-        """Fetch one snippet by its unique slug."""
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
+        """Fetch one snippet by its unique key."""
 
         orm_snippets: CursorResult = await self.session.execute(
-            select(orm.snippets).filter_by(slug=slug).limit(1)
+            select(orm.snippets).filter_by(key=key).limit(1)
         )
         return await self._format_response(orm_snippets)
 
@@ -371,7 +371,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         qry = select(orm.snippets)
         if type:
             qry = qry.filter_by(type=type)
-        qry = qry.order_by(orm.snippets.c.slug)
+        qry = qry.order_by(orm.snippets.c.key)
         orm_snippets: CursorResult = await self.session.execute(qry)
         orm_snippet: Any
         snippets: list[Snippet] = []
@@ -380,7 +380,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             snippets.append(
                 typ(
                     id=orm_snippet.id,
-                    slug=orm_snippet.slug,
+                    key=orm_snippet.key,
                     **orm_snippet.body,  # type: ignore
                 )
             )
@@ -396,7 +396,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
     async def remove(self, model: Snippet) -> SnippetOperationResult:
         """Remove the model from the repository."""
         await self.session.execute(
-            delete(orm.snippets).where(orm.snippets.c.slug == model.slug),
+            delete(orm.snippets).where(orm.snippets.c.key == model.key),
         )
         self.seen.add(model)
         return Ok(...)

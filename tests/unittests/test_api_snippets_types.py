@@ -59,10 +59,10 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                     "title": "Links",
                     "type": "array",
                 },
-                "slug": {"title": "Slug", "type": "string"},
+                "key": {"title": "Key", "type": "string"},
                 "title": {"title": "Title", "type": "string"},
             },
-            "required": ["slug", "title"],
+            "required": ["key", "title"],
             "title": "HeaderSnippet",
             "type": "object",
         },
@@ -73,7 +73,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                     "title": {"ui:placeholder": "title", "ui:widget": "text"},
                 }
             },
-            "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
+            "key": {"ui:placeholder": "key", "ui:widget": "text"},
             "title": {"ui:placeholder": "title", "ui:widget": "text"},
         },
     }

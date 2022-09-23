@@ -42,8 +42,8 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         self.hostname = hostname
         self._settings: MutableMapping[str, Any] = {}
 
-    async def include_snippet(self, slug: str) -> str:
-        rsnippet = await self.uow.snippets.by_slug(slug)
+    async def include_snippet(self, key: str) -> str:
+        rsnippet = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
             return await self.render_template(

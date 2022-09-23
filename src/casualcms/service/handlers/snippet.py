@@ -23,7 +23,7 @@ async def create_snippet(
     snip = resolve_snippet_type(cmd.type)
     snippet = snip(
         id=cmd.id,
-        slug=cmd.slug,
+        key=cmd.key,
         created_at=cmd.created_at,
         **cmd.body,
     )
@@ -43,8 +43,8 @@ async def update_snippet(
     if rsnippet.is_err():
         return Err(rsnippet.unwrap_err())
     snippet = rsnippet.unwrap()
-    if cmd.slug:
-        snippet.slug = cmd.slug
+    if cmd.key:
+        snippet.key = cmd.key
     if cmd.body:
         for key, val in cmd.body.items():
             setattr(snippet, key, val)

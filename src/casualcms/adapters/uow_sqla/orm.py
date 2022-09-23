@@ -104,10 +104,10 @@ snippets = Table(
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
     Column("type", String(72), nullable=False),
-    Column("slug", CIText, nullable=False),
+    Column("key", CIText, nullable=False),
     Column("body", JSON, nullable=False),
     Index("idx_snippets_type", "type", unique=False),
-    Index("idx_snippets_slug", "slug", unique=True),
+    Index("idx_snippets_key", "key", unique=True),
     Index("idx_snippets_created_at", "created_at", unique=False),
 )
 

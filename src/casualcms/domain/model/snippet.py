@@ -89,7 +89,7 @@ class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
 class Snippet(AbstractSnippet):
 
     id: uuid = Field(default_factory=generate_id, exclude=True)
-    slug: str = Field(...)
+    key: str = Field(...)
 
     events: list[Event] = Field(default_factory=list, exclude=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)

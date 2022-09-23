@@ -30,7 +30,7 @@ class AbstractSnippetRepository(AbstractRepository):
         """Fetch one snippet by its unique id."""
 
     @abc.abstractmethod
-    async def by_slug(self, slug: str) -> SnippetRepositoryResult:
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
 
     @abc.abstractmethod

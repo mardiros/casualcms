@@ -20,7 +20,7 @@ class PartialSnippetMeta(BaseModel):
 
 
 class PartialSnippet(BaseModel):
-    slug: str = Field(...)
+    key: str = Field(...)
     meta: PartialSnippetMeta = Field(...)
 
 
@@ -40,8 +40,8 @@ async def create_snippet(
         }
         snippet_type(**params)  # validate pydantic model
         await uow.rollback()
-    slug = payload.pop("slug")
-    cmd = CreateSnippet(type=type, slug=slug, body=payload)
+    key = payload.pop("key")
+    cmd = CreateSnippet(type=type, key=key, body=payload)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
 
@@ -51,7 +51,7 @@ async def create_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "slug"], "msg": rsnippet.unwrap_err().value}
+                    {"loc": ["querystring", "key"], "msg": rsnippet.unwrap_err().value}
                 ],
             )
         else:
@@ -59,7 +59,7 @@ async def create_snippet(
             await uow.commit()
 
     return PartialSnippet(
-        slug=snippet.slug,
+        key=snippet.key,
         meta=PartialSnippetMeta(type=snippet.__meta__.type),
     )
 
@@ -79,25 +79,25 @@ async def list_snippets(
     snips = snippets.unwrap()
 
     return [
-        PartialSnippet(slug=s.slug, meta=PartialSnippetMeta(type=s.__meta__.type))
+        PartialSnippet(key=s.key, meta=PartialSnippetMeta(type=s.__meta__.type))
         for s in snips
     ]
 
 
 async def show_snippet(
-    slug: str = Field(...),
+    key: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
 
     async with app.uow as uow:
-        rsnippet = await uow.snippets.by_slug(slug)
+        rsnippet = await uow.snippets.by_key(key)
         await uow.rollback()
 
     if rsnippet.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "slug"], "msg": "Unknown snippet"}],
+            detail=[{"loc": ["querystring", "key"], "msg": "Unknown snippet"}],
         )
     snippet = rsnippet.unwrap()
     return snippet.get_data_context()
@@ -106,18 +106,18 @@ async def show_snippet(
 async def update_snippet(
     request: Request,
     app: AppConfig = FastAPIConfigurator.depends,
-    slug: str = Field(...),
+    key: str = Field(...),
     payload: dict[str, Any] = Body(...),
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSnippet:
 
     async with app.uow as uow:
-        rsnippet = await uow.snippets.by_slug(slug)
+        rsnippet = await uow.snippets.by_key(key)
         snippet = rsnippet.unwrap()
 
-    new_slug = payload.pop("slug")
+    new_key = payload.pop("key")
     payload.pop("meta", None)
-    cmd = UpdateSnippet(id=snippet.id, slug=new_slug, body=payload)
+    cmd = UpdateSnippet(id=snippet.id, key=new_key, body=payload)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
@@ -126,28 +126,28 @@ async def update_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
                 ],
             )
         else:
             await uow.commit()
 
     return PartialSnippet(
-        slug=new_slug,
+        key=new_key,
         meta=PartialSnippetMeta(type=snippet.__meta__.type),
     )
 
 
 async def delete_snippet(
     request: Request,
-    slug: str = Field(...),
+    key: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
 
     async with app.uow as uow:
-        slug = slug.strip("/")
-        rsnippet = await uow.snippets.by_slug(slug)
+        key = key.strip("/")
+        rsnippet = await uow.snippets.by_key(key)
         await uow.rollback()
 
     if rsnippet.is_err():
@@ -157,7 +157,7 @@ async def delete_snippet(
 
     cmd = DeleteSnippet(
         id=snippet.id,
-        slug=snippet.slug,
+        key=snippet.key,
     )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
@@ -167,7 +167,7 @@ async def delete_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
                 ],
             )
         else:

@@ -179,7 +179,7 @@ async def header_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="blog:HeaderSnippet",
-                slug="header",
+                key="header",
                 body={
                     "title": "A personal blog",
                     "links": [
@@ -203,7 +203,7 @@ async def alt_header_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="blog:HeaderSnippet",
-                slug="alt-header",
+                key="alt-header",
                 body={
                     "title": "Alternative title",
                     "links": [
@@ -227,7 +227,7 @@ async def footer_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="tests.casualblog.models:FooterSnippet",
-                slug="footer",
+                key="footer",
                 body={
                     "links": [
                         {"title": "about", "href": "/about"},

@@ -10,7 +10,7 @@ Feature: As a user, I can create and publish snippets
     And I see the text "blog:HeaderSnippet"
     And I see the text "casualblog.models:FooterSnippet"
     When I click on the "blog:HeaderSnippet" link
-    And I fill the field "slug" with "header"
+    And I fill the field "key" with "header"
     And I fill the field "title" with "Casual Blog"
     # First link
     And I click on the "Add Item" button

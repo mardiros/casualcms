@@ -4,8 +4,8 @@ from behave import given  # type: ignore
 from blacksmith import HTTPError, SyncClient, SyncHTTPBearerMiddleware
 
 
-@given('a "{slug}" snippet of type "{snippet_type}"')
-def create_snippet(context: Any, slug: str, snippet_type: str) -> None:
+@given('a "{key}" snippet of type "{snippet_type}"')
+def create_snippet(context: Any, key: str, snippet_type: str) -> None:
 
     account = context.browser.get_index_db_value("account", "alice")
     token: str = account["token"]
@@ -16,7 +16,7 @@ def create_snippet(context: Any, slug: str, snippet_type: str) -> None:
     payload: Dict[str, Any] = {
         "type": snippet_type,
         "payload": {
-            "slug": slug,
+            "key": key,
         },
     }
 
@@ -24,7 +24,7 @@ def create_snippet(context: Any, slug: str, snippet_type: str) -> None:
         payload = {
             "type": snippet_type,
             "payload": {
-                "slug": slug,
+                "key": key,
                 "title": "Casual Blog",
                 "links": [
                     {

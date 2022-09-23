@@ -6,10 +6,6 @@ Create Date: 2022-09-23 07:08:09.661182
 
 """
 from alembic import op
-import sqlalchemy as sa
-
-import citext  # type: ignore
-
 
 # revision identifiers, used by Alembic.
 revision = "774794be5cbb"

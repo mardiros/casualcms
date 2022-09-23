@@ -38,10 +38,13 @@ services:
       - "CASUALCMS_USE_RELOADER=true"
       - "CASUALCMS_UNIT_OF_WORK=casualcms.adapters.uow_sqla:SQLUnitOfWork"
       - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
+      # - "CASUALCMS_CREATE_DATABASE_SCHEMA=true"
     volumes:
       - "./tests/functionals/templates:/app/templates"
       - "./tests/casualblog:/app/casualblog"
       - "./src:/srv/casualcms/src"
+      - "./alembic.ini:/srv/casualcms/alembic.ini"
+      - "./sql-migrations:/srv/casualcms/sql-migrations"
 
   postgresql:
     image: "postgres:12-alpine"

@@ -298,27 +298,27 @@ export class FakeSnippetApi implements ISnippetApi {
 
   async updateSnippet(
     authntoken: string,
-    slug: string,
+    key: string,
     snippet: Snippet
   ): AsyncApiResult<boolean> {
     const typ = snippet.meta.type;
     let snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.slug != slug;
+      return snippet.key != key;
     });
     snippets.push(snippet);
     this.snippets = snippets;
     return ok(true);
   }
 
-  async showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet> {
+  async showSnippet(authntoken: string, key: string): AsyncApiResult<Snippet> {
     const snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.slug == slug;
+      return snippet.key == key;
     });
     if (snippets.length == 1) {
       return ok(snippets[0]);
     }
     let apiError = new Map();
-    apiError.set("slug", "Snippet not found");
+    apiError.set("key", "Snippet not found");
     return err(apiError);
   }
 
@@ -339,9 +339,8 @@ export class FakeSnippetApi implements ISnippetApi {
     authntoken: string,
     snippet: Snippet
   ): AsyncApiResult<boolean> {
-    const typ = snippet.meta.type;
     const snippets = this.snippets.filter((s: PartialSnippet) => {
-      return s.slug != snippet.slug;
+      return s.key != snippet.key;
     });
     this.snippets = snippets;
     return ok(true);
@@ -363,7 +362,7 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
         title: "HeaderSnippet",
         type: "object",
         properties: {
-          slug: { title: "Slug", type: "string" },
+          key: { title: "Key", type: "string" },
           title: { title: "Title", type: "string" },
           links: {
             title: "Links",
@@ -371,7 +370,7 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
             items: { $ref: "#/definitions/Link" },
           },
         },
-        required: ["slug", "title"],
+        required: ["key", "title"],
         definitions: {
           Link: {
             title: "Link",
@@ -385,7 +384,7 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
         },
       },
       uiSchema: {
-        slug: { "ui:widget": "text", "ui:placeholder": "slug" },
+        key: { "ui:widget": "text", "ui:placeholder": "key" },
         title: { "ui:widget": "text", "ui:placeholder": "title" },
         links: {
           items: {

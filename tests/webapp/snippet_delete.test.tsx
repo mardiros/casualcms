@@ -9,26 +9,26 @@ import { SnippetDeletePopoverForm } from "../../src/webapp/ui/snippets/snippet_d
 describe("As a user, I can delete a snippet", () => {
   before(async () => {
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
-      slug: "header",
+      key: "header",
     });
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
-      slug: "alt-header",
+      key: "alt-header",
     });
   });
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
-      slug: "alt-header",
+      key: "alt-header",
       meta: { type: "blog:HeaderSnippet" },
     });
     await config.api.snippet.deleteSnippet("", {
-      slug: "header",
+      key: "header",
       meta: { type: "blog:HeaderSnippet" },
     });
   });
 
   it("Delete a snippet", async () => {
     const snippet = {
-      slug: "header",
+      key: "header",
       meta: {
         type: "blog:HeaderSnippet",
       },
@@ -53,13 +53,13 @@ describe("As a user, I can delete a snippet", () => {
         meta: {
           type: "blog:HeaderSnippet",
         },
-        slug: "header",
+        key: "header",
       },
       {
         meta: {
           type: "blog:HeaderSnippet",
         },
-        slug: "alt-header",
+        key: "alt-header",
       },
     ]);
 
@@ -72,7 +72,7 @@ describe("As a user, I can delete a snippet", () => {
         meta: {
           type: "blog:HeaderSnippet",
         },
-        slug: "alt-header",
+        key: "alt-header",
       },
     ]);
   });

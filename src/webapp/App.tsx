@@ -59,7 +59,7 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
           caseSensitive
         />
         <Route
-          path="snippets/edit/:snippetTypeName/:snippetSlug"
+          path="snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
           caseSensitive
         />

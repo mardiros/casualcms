@@ -21,7 +21,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const [snippet, setSnippet] = React.useState<Snippet | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const params = useParams();
-  const snippetSlug = params.snippetSlug || "";
+  const snippetKey = params.snippetKey || "";
 
   const [snippetType, setSnippetType] = React.useState<SnippetType | null>(
     null
@@ -53,7 +53,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadSnippet() {
-      const rsnippet = await config.api.snippet.showSnippet(token, snippetSlug);
+      const rsnippet = await config.api.snippet.showSnippet(token, snippetKey);
       // console.log(rsnippet)
       rsnippet
         .map((snippet: Snippet) => setSnippet(snippet))
@@ -66,14 +66,14 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       setSnippet(null);
       setError(null);
     };
-  }, [auth, snippetSlug]);
+  }, [auth, snippetKey]);
 
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
-    await config.api.snippet.updateSnippet(token, snippetSlug, snippet);
+    await config.api.snippet.updateSnippet(token, snippetKey, snippet);
     navigate(`/admin/snippets`, { replace: true });
   };
 

@@ -83,7 +83,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     authntoken: string,
     snippet: Snippet
   ): AsyncApiResult<boolean> {
-    const response = await this.fetch(`/api/snippets/${snippet.slug}`, {
+    const response = await this.fetch(`/api/snippets/${snippet.key}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${authntoken}`,

@@ -59,7 +59,7 @@ export type PartialSnippetMeta = {
 };
 
 export type PartialSnippet = {
-  slug: string;
+  key: string;
   meta: PartialSnippetMeta;
 };
 

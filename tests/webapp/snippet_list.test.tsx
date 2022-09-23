@@ -15,26 +15,26 @@ import {
 describe("As a user, I can list snippet", () => {
   before(async () => {
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
-      slug: "header",
+      key: "header",
     });
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
-      slug: "alt-header",
+      key: "alt-header",
     });
   });
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
-      slug: "alt-header",
+      key: "alt-header",
       meta: { type: "blog:HeaderSnippet" },
     });
     await config.api.snippet.deleteSnippet("", {
-      slug: "header",
+      key: "header",
       meta: { type: "blog:HeaderSnippet" },
     });
   });
 
   it("Render a row for a snippet", async () => {
     const snippet = {
-      slug: "header",
+      key: "header",
       meta: { type: "blog:HeaderSnippet" },
     };
 

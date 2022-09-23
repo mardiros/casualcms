@@ -10,13 +10,13 @@ import { SnippetEdit } from "../../src/webapp/ui/snippets/snippet_edit";
 describe("As a user, I can edit existing snippet", () => {
   before(async () => {
     await config.api.snippet.createSnippet("", "blog:HeaderSnippet", {
-      slug: "header",
+      key: "header",
       title: "Casual Blog",
     });
   });
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
-      slug: "header",
+      key: "header",
       meta: { type: "blog:HeaderSnippet" },
     });
   });
@@ -29,7 +29,7 @@ describe("As a user, I can edit existing snippet", () => {
           element={<SnippetList />}
         ></Route>
         <Route
-          path="/admin/snippets/edit/:snippetTypeName/:snippetSlug"
+          path="/admin/snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
         ></Route>
       </>,
@@ -38,7 +38,7 @@ describe("As a user, I can edit existing snippet", () => {
 
     await waitForLoadingLabel("Loading form...");
 
-    let input = screen.getByLabelText("Slug", { exact: false });
+    let input = screen.getByLabelText("Key", { exact: false });
     expect(input.getAttribute("value")).equal("header");
 
     input = screen.getByLabelText("Title", { exact: false });
@@ -50,7 +50,7 @@ describe("As a user, I can edit existing snippet", () => {
       <>
         <Route path="/admin/snippets" element={<SnippetList />}></Route>
         <Route
-          path="/admin/snippets/edit/:snippetTypeName/:snippetSlug"
+          path="/admin/snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
         ></Route>
       </>,

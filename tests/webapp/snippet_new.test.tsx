@@ -21,7 +21,7 @@ describe("As a user, I can list snippet", () => {
 
     await waitForLoadingLabel("Loading form...");
 
-    let input = screen.getByLabelText("Slug", { exact: false });
+    let input = screen.getByLabelText("Key", { exact: false });
     fireEvent.change(input, { target: { value: "header" } });
 
     input = screen.getByLabelText("Title", { exact: false });
@@ -34,13 +34,13 @@ describe("As a user, I can list snippet", () => {
     const snippets = await config.api.snippet.listSnippets("");
     expect(snippets._unsafeUnwrap()).eql([
       {
-        slug: "header",
+        key: "header",
         title: "Casual Blog",
         meta: { type: "blog:HeaderSnippet" },
       },
     ]);
     await config.api.snippet.deleteSnippet("", {
-      slug: "header",
+      key: "header",
       meta: { type: "blog:HeaderSnippet" },
     });
   });

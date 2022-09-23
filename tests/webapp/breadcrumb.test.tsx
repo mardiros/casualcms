@@ -126,7 +126,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-    const snippet = { slug: "header", meta: { type: "HeaderSnippet" } };
+    const snippet = { key: "header", meta: { type: "HeaderSnippet" } };
     renderWithRouter(
       <>
         <Route

@@ -108,9 +108,9 @@ export const SnippetBreadcrumb: React.FunctionComponent<
       {snippet && (
         <BreadcrumbItem>
           <Link
-            to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.slug}`}
+            to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.key}`}
           >
-            {snippet.slug}
+            {snippet.key}
           </Link>
         </BreadcrumbItem>
       )}

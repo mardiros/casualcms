@@ -64,7 +64,7 @@ class FastAPIConfigurator(venusian.Scanner):
     def __init__(self, settings: Settings):
         FastAPIConfigurator.config = AppConfig(settings)
         super().__init__(
-            app=FastAPI(),
+            app=FastAPI(docs_url=None, redoc_url=None),
             messagebus=self.config.bus,  # type: ignore
         )
 

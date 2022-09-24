@@ -29,10 +29,10 @@ services:
       - python
       - src/casualcms/entrypoint.py
     environment:
-      - "CASUALCMS_ASSETS_PATH=/app/casualblog/assets"
-      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/templates"
+      - "CASUALCMS_ASSETS_PATH=/app/casualcms_com/assets"
+      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/casualcms_com/templates"
       - "PYTHONPATH=/app"
-      - 'CASUALCMS_IMPORT_MODELS=["casualblog"]'
+      - 'CASUALCMS_IMPORT_MODELS=["casualcms_com"]'
       - "CASUALCMS_ADMIN_USERNAME=alice"
       - "CASUALCMS_ADMIN_PASSWORD=secret"
       - "CASUALCMS_USE_RELOADER=true"
@@ -41,8 +41,8 @@ services:
       # - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
       # - "CASUALCMS_DATABASE_MIGRATIONS_PATH=/srv/casualcms/sql-migrations"
     volumes:
-      - "./tests/functionals/templates:/app/templates"
-      - "./tests/casualblog:/app/casualblog"
+      - "./casualcms.com:/app/casualcms_com"
+      # development module
       - "./src:/srv/casualcms/src"
       - "./alembic.ini:/srv/casualcms/alembic.ini"
       - "./sql-migrations:/srv/casualcms/sql-migrations"

@@ -1,0 +1,14 @@
+{% extends "layout.jinja2" %}
+{% block body %}
+  <section class="hero is-medium is-primary">
+    <div class="hero-body">
+      <h1 class="title">{{hero_title}}</h1>
+      {% if intro.title %}
+        <p class="subtitle">{{intro.title}}</p>
+      {% endif %}
+      <p>
+        {{intro.body|safe}}
+      </p>
+    </div>
+  </section>
+{% endblock %}

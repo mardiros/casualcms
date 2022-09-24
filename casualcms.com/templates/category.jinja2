@@ -1,0 +1,6 @@
+{% extends "layout.jinja2" %}
+{% block body %}
+  <h1>{{hero_title}}</h1>
+  <h2>{{intro.title}}</h2>
+  {{intro.body|safe}}
+{% endblock %}

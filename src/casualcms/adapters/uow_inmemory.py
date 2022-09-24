@@ -163,12 +163,12 @@ class PageInMemoryRepository(AbstractPageRepository):
 
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
-        self.pages[model.draft.id, model.site.id] = model
+        self.pages[model.draft_id, model.site.id] = model
         return Ok(...)
 
     async def update(self, model: Page) -> PageOperationResult:
         """Update a model to the repository."""
-        self.pages[model.draft.id, model.site.id] = model
+        self.pages[model.draft_id, model.site.id] = model
         return Ok(...)
 
 

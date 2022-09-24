@@ -1384,7 +1384,7 @@ async def test_sql_uow_page_update(
     resp = await sqla_session.execute(qry)  # type: ignore
     updated_page = resp.first()  # type: ignore
     assert updated_page.site_id == page.site.id
-    assert updated_page.draft_id == page.draft.id
+    assert updated_page.draft_id == page.draft_id
     assert updated_page.type == page.type
     assert updated_page.template == page.template
     assert updated_page.path == page.path

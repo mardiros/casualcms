@@ -95,7 +95,7 @@ def format_page(page: Page) -> Dict[str, Any]:
     formated_page: Dict[str, Any] = page.dict(exclude={"site", "draft"})
     formated_page["id"] = page.id
     formated_page["created_at"] = page.created_at
-    formated_page["draft_id"] = page.draft.id
+    formated_page["draft_id"] = page.draft_id
     formated_page["site_id"] = page.site.id
     return formated_page
 
@@ -714,9 +714,6 @@ class PageSQLRepository(AbstractPageRepository):
         if not orm_page:
             return Err(PageRepositoryError.page_not_found)
 
-        rdraft = await DraftSQLRepository(self.session).by_id(draft_id)
-        if rdraft.is_err():
-            return Err(PageRepositoryError.page_not_found)
         rsite = await SiteSQLRepository(self.session).by_id(site_id)
         if rsite.is_err():
             return Err(PageRepositoryError.page_not_found)
@@ -725,7 +722,7 @@ class PageSQLRepository(AbstractPageRepository):
                 id=orm_page.id,
                 body=orm_page.body,
                 created_at=orm_page.created_at,
-                draft=rdraft.unwrap(),
+                draft_id=draft_id,
                 site=rsite.unwrap(),
                 template=orm_page.template,
                 type=orm_page.type,
@@ -747,11 +744,6 @@ class PageSQLRepository(AbstractPageRepository):
         if not orm_page:
             return Err(PageRepositoryError.page_not_found)
 
-        rdraft = await DraftSQLRepository(self.session).by_id(
-            orm_page.draft_id  # type: ignore
-        )
-        if rdraft.is_err():
-            return Err(PageRepositoryError.page_not_found)
         rsite = await SiteSQLRepository(self.session).by_id(
             orm_page.site_id  # type: ignore
         )
@@ -766,7 +758,7 @@ class PageSQLRepository(AbstractPageRepository):
                 id=orm_page.id,
                 body=orm_page.body,
                 created_at=orm_page.created_at,
-                draft=rdraft.unwrap(),
+                draft_id=orm_page.draft_id,
                 site=site,
                 template=orm_page.template,
                 type=orm_page.type,

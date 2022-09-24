@@ -83,7 +83,7 @@ async def publish_page(
     else:
         published_page = Page(
             site=site,
-            draft=draft_page,
+            draft_id=draft_page.id,
             type=draft_page.__meta__.type,
             template=draft_page.get_template(),
             title=draft_page.title,

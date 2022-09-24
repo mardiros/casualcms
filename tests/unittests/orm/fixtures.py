@@ -132,7 +132,7 @@ def fake_page(draft: DraftPage, site: Site):
         type=draft.__meta__.type,
         template=draft.get_template(),
         created_at=fake.past_datetime(),
-        draft=draft,
+        draft_id=draft.id,
         site=site,
         path=path,
         title=draft.title,

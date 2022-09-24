@@ -164,7 +164,7 @@ pages = Table(
         "draft_id",
         UUID,
         ForeignKey("drafts.id", name="fk_pages_site_id"),
-        nullable=False,
+        nullable=True,
     ),
     Column("type", String(72), nullable=False),
     Column("template", CIText, nullable=False),

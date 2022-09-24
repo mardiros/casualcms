@@ -298,7 +298,7 @@ async def pages(
         formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
         formated_page["id"] = page.id
         formated_page["created_at"] = page.created_at
-        formated_page["draft_id"] = page.draft.id
+        formated_page["draft_id"] = page.draft_id
         formated_page["site_id"] = page.site.id
         return formated_page
 

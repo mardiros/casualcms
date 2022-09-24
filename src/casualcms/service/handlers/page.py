@@ -71,7 +71,7 @@ async def publish_page(
         return Err(PageRepositoryError.publication_error)
     lprefix = len(site.root_page_path)
     path = draft_page.path[lprefix:]
-    path = f"//{site.hostname}/{path}"
+    path = f"//{site.hostname}{path}"
     rpublished_page = await uow.pages.by_draft_page_and_site(draft_page.id, site.id)
     if rpublished_page.is_ok():
         published_page = rpublished_page.unwrap()

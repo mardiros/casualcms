@@ -123,6 +123,9 @@ def fake_contact_setting(hostname: str = "www", **kwargs: Any):
 
 
 def fake_page(draft: DraftPage, site: Site):
+    lprefix = len(site.root_page_path)
+    path = draft.path[lprefix:]
+    path = f"//{site.hostname}{path}"
     return Page(
         id=fake.uuid4(),
         body=draft.get_context(),
@@ -131,6 +134,6 @@ def fake_page(draft: DraftPage, site: Site):
         created_at=fake.past_datetime(),
         draft=draft,
         site=site,
-        path=f"//{site.hostname}/{draft.path}",
+        path=path,
         title=draft.title,
     )

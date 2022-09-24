@@ -1203,8 +1203,8 @@ async def test_sql_uow_account_by_username(
     assert alicia_from_uow.unwrap_err().name == "user_not_found"
 
 
-site_1 = fake_site(draft_hp, hostname="www")
-site_2 = fake_site(draft_hp, hostname="www2")
+site_1 = fake_site(draft_hp, hostname="www", secure=True)
+site_2 = fake_site(draft_hp, hostname="www2", secure=False)
 
 
 @pytest.mark.parametrize(
@@ -1246,5 +1246,52 @@ async def test_sql_uow_page_by_page_id_and_site_id(
 
     rpage = await repo.by_draft_page_and_site(cat_page.id, site_2.id)
 
+    assert rpage.is_err()
+    assert rpage.unwrap_err().name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "drafts": [draft_hp, cat_page, cat2_page],
+            "sites": [site_1, site_2],
+            "pages": [
+                fake_page(draft_hp, site_1),
+                fake_page(draft_hp, site_2),
+                fake_page(cat_page, site_1),
+            ],
+        },
+    ],
+)
+async def test_sql_uow_page_by_url(
+    params: Any,
+    sqla_session: AsyncSession,
+    sql_uow: SQLUnitOfWork,
+    pages: list[Page],
+):
+    repo = PageSQLRepository(sqla_session)
+
+    rpage = await repo.by_url("https://www")
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[0].id
+
+    rpage = await repo.by_url("https://www/")
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[0].id
+
+    rpage = await repo.by_url("http://www/")
+    assert rpage.is_err()
+    assert rpage.unwrap_err().name == "page_not_found"
+
+    rpage = await repo.by_url("http://www2/")
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[1].id
+
+    rpage = await repo.by_url("https://www/tech")
+    assert rpage.is_ok()
+    assert rpage.unwrap().id == pages[2].id
+
+    rpage = await repo.by_url("https://www2/tech")
     assert rpage.is_err()
     assert rpage.unwrap_err().name == "page_not_found"

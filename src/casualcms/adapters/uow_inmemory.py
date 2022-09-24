@@ -154,7 +154,7 @@ class PageInMemoryRepository(AbstractPageRepository):
     async def by_url(self, url: str) -> PageRepositoryResult:
         url_ = urlparse(url)
         hostname, path = url_.netloc, url_.path
-        path = f"//{hostname}/{path}"
+        path = f"//{hostname}{path.rstrip('/')}"
         page = [p for p in self.pages.values() if p.path == path]
 
         if not page:

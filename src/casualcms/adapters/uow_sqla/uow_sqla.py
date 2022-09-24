@@ -1,6 +1,7 @@
 from operator import and_
 from types import TracebackType
 from typing import Any, Callable, Dict, Optional, Type, cast
+from urllib.parse import urlparse
 
 from result import Err, Ok
 from sqlalchemy import alias, delete, text  # type: ignore
@@ -726,7 +727,44 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def by_url(self, url: str) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
-        return Err(PageRepositoryError.page_not_found)
+        url_ = urlparse(url)
+        scheme, hostname, path = url_.scheme, url_.netloc, url_.path
+        path = f"//{hostname}{path.rstrip('/')}"
+
+        orm_pages: CursorResult = await self.session.execute(
+            select(orm.pages).filter(orm.pages.c.path == path).limit(1)
+        )
+        orm_page = cast(Page, orm_pages.first())
+        if not orm_page:
+            return Err(PageRepositoryError.page_not_found)
+
+        rdraft = await DraftSQLRepository(self.session).by_id(
+            orm_page.draft_id  # type: ignore
+        )
+        if rdraft.is_err():
+            return Err(PageRepositoryError.page_not_found)
+        rsite = await SiteSQLRepository(self.session).by_id(
+            orm_page.site_id  # type: ignore
+        )
+        if rsite.is_err():
+            return Err(PageRepositoryError.page_not_found)
+        site = rsite.unwrap()
+        if site.secure and scheme == "http":
+            return Err(PageRepositoryError.page_not_found)
+
+        return Ok(
+            Page(
+                id=orm_page.id,
+                body=orm_page.body,
+                created_at=orm_page.created_at,
+                draft=rdraft.unwrap(),
+                site=site,
+                template=orm_page.template,
+                type=orm_page.type,
+                title=orm_page.title,
+                path=orm_page.path,
+            )
+        )
 
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""

@@ -76,6 +76,52 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 from . import orm
 
 
+def format_draft_page(page: DraftPage) -> Dict[str, Any]:
+    """Format the page to a dict ready to be inserted in the orm.drafts."""
+    p: Dict[str, Any] = page.dict()
+    formated_page: Dict[str, Any] = {
+        "id": page.id,
+        "type": page.__meta__.type,
+        "created_at": page.created_at,
+        "slug": p.pop("slug"),
+        "title": p.pop("title"),
+        "description": p.pop("description"),
+    }
+    formated_page["body"] = p
+    return formated_page
+
+
+def format_page(page: Page) -> Dict[str, Any]:
+    formated_page: Dict[str, Any] = page.dict(exclude={"site", "draft"})
+    formated_page["id"] = page.id
+    formated_page["created_at"] = page.created_at
+    formated_page["draft_id"] = page.draft.id
+    formated_page["site_id"] = page.site.id
+    return formated_page
+
+
+def format_snippet(snippet: Snippet) -> Dict[str, Any]:
+    formated_snippet: Dict[str, Any] = {
+        "id": snippet.id,
+        "type": snippet.__meta__.type,
+        "created_at": snippet.created_at,
+        "key": snippet.key,
+        "body": snippet.dict(exclude={"key"}),
+    }
+    return formated_snippet
+
+
+def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
+    formated_setting: Dict[str, Any] = {
+        "id": setting.id,
+        "key": setting.__meta__.key,
+        "created_at": setting.created_at,
+        "site_id": site_id,
+        "value": setting.dict(exclude={"hostname", "slug"}),
+    }
+    return formated_setting
+
+
 class AccountSQLRepository(AbstractAccountRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.seen = set()
@@ -111,43 +157,6 @@ class AccountSQLRepository(AbstractAccountRepository):
             return Err(AccountRepositoryError.integrity_error)
         self.seen.add(model)
         return Ok(...)
-
-
-def format_page(page: DraftPage) -> Dict[str, Any]:
-    """Format the page to a dict ready to be inserted in the orm.drafts."""
-    p: Dict[str, Any] = page.dict()
-    formated_page: Dict[str, Any] = {
-        "id": page.id,
-        "type": page.__meta__.type,
-        "created_at": page.created_at,
-        "slug": p.pop("slug"),
-        "title": p.pop("title"),
-        "description": p.pop("description"),
-    }
-    formated_page["body"] = p
-    return formated_page
-
-
-def format_snippet(snippet: Snippet) -> Dict[str, Any]:
-    formated_snippet: Dict[str, Any] = {
-        "id": snippet.id,
-        "type": snippet.__meta__.type,
-        "created_at": snippet.created_at,
-        "key": snippet.key,
-        "body": snippet.dict(exclude={"key"}),
-    }
-    return formated_snippet
-
-
-def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
-    formated_setting: Dict[str, Any] = {
-        "id": setting.id,
-        "key": setting.__meta__.key,
-        "created_at": setting.created_at,
-        "site_id": site_id,
-        "value": setting.dict(exclude={"hostname", "slug"}),
-    }
-    return formated_setting
 
 
 class DraftSQLRepository(AbstractDraftRepository):
@@ -264,7 +273,7 @@ class DraftSQLRepository(AbstractDraftRepository):
 
         await self.session.execute(  # type: ignore
             orm.drafts.insert(),  # type: ignore
-            [format_page(model)],
+            [format_draft_page(model)],
         )
 
         await self.session.execute(  # type: ignore
@@ -300,7 +309,7 @@ class DraftSQLRepository(AbstractDraftRepository):
 
     async def update(self, model: DraftPage) -> DraftOperationResult:
         """Update model in the repository."""
-        page = format_page(model)
+        page = format_draft_page(model)
         page.pop("id")
         cursor: CursorResult = await self.session.execute(
             orm.drafts.update(orm.drafts.c.id == model.id, values=page)  # type: ignore
@@ -769,14 +778,6 @@ class PageSQLRepository(AbstractPageRepository):
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
 
-        def format_page(page: Page) -> Dict[str, Any]:
-            formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
-            formated_page["id"] = page.id
-            formated_page["created_at"] = page.created_at
-            formated_page["draft_id"] = page.draft.id
-            formated_page["site_id"] = page.site.id
-            return formated_page
-
         await self.session.execute(  # type: ignore
             orm.pages.insert(),  # type: ignore
             [format_page(model)],
@@ -787,7 +788,15 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def update(self, model: Page) -> PageOperationResult:
         """Update a model to the repository."""
-        return Err(PageRepositoryError.page_not_found)
+        page = format_page(model)
+        page.pop("id")
+        cursor: CursorResult = await self.session.execute(
+            orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
+        )
+        if cursor.rowcount == 0:
+            return Err(PageRepositoryError.page_not_found)
+        self.seen.add(model)
+        return Ok(...)
 
 
 class SQLUnitOfWorkBySession(AbstractUnitOfWork):

@@ -1351,3 +1351,62 @@ async def test_sql_uow_page_add(
     assert page.path == params["expected"]["path"]
     assert page.title == params["expected"]["title"]
     assert page.body == params["expected"]["body"]
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "drafts": [draft_hp, cat_page, cat2_page],
+            "sites": [site_1, site_2],
+            "pages": [
+                fake_page(draft_hp, site_1),
+                fake_page(draft_hp, site_2),
+                fake_page(cat_page, site_1),
+            ],
+        },
+    ],
+)
+async def test_sql_uow_page_update(
+    params: Any,
+    sqla_session: AsyncSession,
+    sql_uow: SQLUnitOfWork,
+    pages: Sequence[Page],
+):
+    page = params["pages"][0]
+    page.title = "My new page title"
+    page.body = {"body": "my new body"}
+
+    repo = PageSQLRepository(sqla_session)
+    op_result = await repo.update(page)
+    assert page in repo.seen
+    assert op_result.is_ok()
+
+    qry = select(orm.pages).filter(orm.pages.c.id == page.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    updated_page = resp.first()  # type: ignore
+    assert updated_page.site_id == page.site.id
+    assert updated_page.draft_id == page.draft.id
+    assert updated_page.type == page.type
+    assert updated_page.template == page.template
+    assert updated_page.path == page.path
+    assert updated_page.title == page.title
+    assert updated_page.body == page.body
+
+    same_draft_other_site = params["pages"][1]
+    qry = select(orm.pages).filter(orm.pages.c.id == same_draft_other_site.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    saved_same_draft_other_site = resp.first()  # type: ignore
+    assert saved_same_draft_other_site.site_id == site_2.id
+    assert saved_same_draft_other_site.draft_id == draft_hp.id
+    assert saved_same_draft_other_site.title != page.title
+    assert saved_same_draft_other_site.body != page.body
+
+    other_draft_same_site = params["pages"][2]
+    qry = select(orm.pages).filter(orm.pages.c.id == other_draft_same_site.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    saved_same_draft_other_site = resp.first()  # type: ignore
+    assert saved_same_draft_other_site.site_id == site_1.id
+    assert saved_same_draft_other_site.draft_id == cat_page.id
+    assert saved_same_draft_other_site.title != page.title
+    assert saved_same_draft_other_site.body != page.body

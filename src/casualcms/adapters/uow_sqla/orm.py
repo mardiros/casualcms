@@ -163,7 +163,7 @@ pages = Table(
     Column(
         "draft_id",
         UUID,
-        ForeignKey("drafts.id", name="fk_pages_site_id"),
+        ForeignKey("drafts.id", name="fk_pages_draft_id"),
         nullable=True,
     ),
     Column("type", String(72), nullable=False),

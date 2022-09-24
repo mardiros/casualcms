@@ -26,6 +26,7 @@ TODO
 * Implement default site
 
 * Ensure we can't delete a page if it is associated to a site
+* Propose redirection to setup while deleting draft page
 
 * Add widget to choose a snippet (browse snippet popup)
 

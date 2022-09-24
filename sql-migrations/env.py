@@ -1,8 +1,11 @@
 from logging.config import fileConfig
+from typing import Any, Mapping, cast
+from xmlrpc.client import boolean
 
+from citext import CIText
 from alembic import context
-from sqlalchemy import engine_from_config, pool
-
+from alembic.autogenerate.api import AutogenContext
+from sqlalchemy import engine_from_config, pool  # type: ignore
 from casualcms.adapters.uow_sqla.orm import metadata
 
 # this is the Alembic Config object, which provides
@@ -50,6 +53,23 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
+def render_item(
+    type_: str, obj: Any, autogen_context: AutogenContext
+) -> str | boolean:
+    """Apply custom rendering for selected items."""
+    if type_ == "type" and isinstance(obj, CIText):
+        autogen_context.imports.add("import citext  # type: ignore")
+        return "citext.CIText"
+
+    if type_ == "foreign_key":
+        autogen_context.imports.add(
+            "import casualcms.adapters.uow_sqla.orm_types"
+        )
+        return False
+
+    return False
+
+
 def run_migrations_online() -> None:
     """Run migrations in 'online' mode.
 
@@ -58,13 +78,17 @@ def run_migrations_online() -> None:
 
     """
     connectable = engine_from_config(
-        config.get_section(config.config_ini_section),
+        cast(Mapping[str, Any], config.get_section(config.config_ini_section)),
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
 
     with connectable.connect() as connection:
-        context.configure(connection=connection, target_metadata=target_metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=target_metadata,
+            render_item=render_item,
+        )
 
         with context.begin_transaction():
             context.run_migrations()

@@ -36,5 +36,6 @@ async def publish_page(
             raise HTTPException(
                 status_code=500, detail={"msg": "Internal Server Error"}
             )
+        await uow.commit()
 
     return RESOURCE_CREATED

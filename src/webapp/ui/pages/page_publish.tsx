@@ -66,9 +66,9 @@ export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
 function get_url(site: SelectableHostname, pagePath: string) {
   const localPath = pagePath.replace(site.root_page_path, "");
   if (site.secure) {
-    return `https://${site.hostname}/${localPath}`;
+    return `https://${site.hostname}${localPath}`;
   }
-  return `http://${site.hostname}/${localPath}`;
+  return `http://${site.hostname}${localPath}`;
 }
 
 type PublishResultBoxProps = {

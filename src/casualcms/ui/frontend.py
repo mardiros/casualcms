@@ -32,10 +32,10 @@ async def serve_pages(
             if site.secure and request.url.scheme == "http":
                 return Response(
                     status_code=302,
-                    headers={"location": f"https://{hostname}/{request.url.path}"},
+                    headers={"location": f"https://{hostname}{request.url.path}"},
                 )
 
-        rpage = await uow.pages.by_url(f"//{hostname}/{request.url.path}".rstrip("/"))
+        rpage = await uow.pages.by_url(f"//{hostname}{request.url.path}".rstrip("/"))
         # page = await uow.drafts.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if rpage.is_err():
             raise HTTPException(

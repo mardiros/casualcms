@@ -126,7 +126,7 @@ describe("As a user, I can publish existing pages", () => {
     expect(boxes[0].textContent?.trim()).equal("stage.alice.bob View");
 
     const view_result = screen.getByRole("view_publication_result");
-    expect(view_result.getAttribute("href")).equal("https://stage.alice.bob/");
+    expect(view_result.getAttribute("href")).equal("https://stage.alice.bob");
 
     expect(boxes[1].textContent?.trim()).equal("preprod.alice.bob ERROR");
     expect(boxes[2].textContent?.trim()).equal("www Ignored");

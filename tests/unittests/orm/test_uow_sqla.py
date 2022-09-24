@@ -2,7 +2,6 @@ from types import NoneType
 from typing import Any, Sequence, cast
 
 import pytest
-from sqlalchemy import text  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.sql.expression import func  # type: ignore
@@ -114,9 +113,8 @@ async def test_account_add(sqla_session: AsyncSession):
     assert acc in repo.seen
     assert acc in repo.seen
 
-    accounts_ = await sqla_session.execute(  # type: ignore
-        text("SELECT username, email FROM accounts WHERE id = :id"), {"id": acc.id}
-    )
+    qry = select(orm.accounts).filter(orm.accounts.c.id == acc.id)
+    accounts_ = await sqla_session.execute(qry)  # type: ignore
     account = accounts_.first()  # type: ignore
     assert account.username == "alice"
     assert account.email == acc.email

@@ -21,3 +21,4 @@ indent_size = 2
 
 [*.{jinja2,html}]
 insert_final_newline = false
+indent_size = 2

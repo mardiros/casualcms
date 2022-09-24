@@ -115,7 +115,7 @@ async def test_account_add(sqla_session: AsyncSession):
     assert acc in repo.seen
 
     accounts_ = await sqla_session.execute(  # type: ignore
-        text("SELECT username, email FROM accounts where id = :id"), {"id": acc.id}
+        text("SELECT username, email FROM accounts WHERE id = :id"), {"id": acc.id}
     )
     account = accounts_.first()  # type: ignore
     assert account.username == "alice"
@@ -1225,7 +1225,7 @@ async def test_sql_uow_page_by_page_id_and_site_id(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: list[Page],
+    pages: Sequence[Page],
 ):
     repo = PageSQLRepository(sqla_session)
 
@@ -1268,7 +1268,7 @@ async def test_sql_uow_page_by_url(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: list[Page],
+    pages: Sequence[Page],
 ):
     repo = PageSQLRepository(sqla_session)
 
@@ -1295,3 +1295,59 @@ async def test_sql_uow_page_by_url(
     rpage = await repo.by_url("https://www2/tech")
     assert rpage.is_err()
     assert rpage.unwrap_err().name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "drafts": [draft_hp, cat_page, cat2_page],
+            "sites": [site_1, site_2],
+            "page": fake_page(draft_hp, site_1),
+            "expected": {
+                "site_id": site_1.id,
+                "draft_id": draft_hp.id,
+                "type": "blog:HomePage",
+                "template": "homepage.jinja2",
+                "path": "//www",
+                "title": draft_hp.title,
+                "body": draft_hp.get_context(),
+            },
+        },
+        {
+            "drafts": [draft_hp, cat_page, cat2_page],
+            "sites": [site_1, site_2],
+            "page": fake_page(cat_page, site_1),
+            "expected": {
+                "site_id": site_1.id,
+                "draft_id": cat_page.id,
+                "type": "blog:CategoryPage",
+                "template": "category.jinja2",
+                "path": "//www/tech",
+                "title": cat_page.title,
+                "body": cat_page.get_context(),
+            },
+        },
+    ],
+)
+async def test_sql_uow_page_add(
+    params: Any,
+    sqla_session: AsyncSession,
+    sql_uow: SQLUnitOfWork,
+    drafts: Sequence[DraftPage],
+) -> None:
+    page = params["page"]
+    repo = PageSQLRepository(sqla_session)
+    op_result = await repo.add(page)
+    assert op_result.is_ok()
+    assert page in repo.seen
+    qry = select(orm.pages).filter(orm.pages.c.id == page.id)
+    resp = await sqla_session.execute(qry)  # type: ignore
+    page = resp.first()  # type: ignore
+    assert page.site_id == params["expected"]["site_id"]
+    assert page.draft_id == params["expected"]["draft_id"]
+    assert page.type == params["expected"]["type"]
+    assert page.template == params["expected"]["template"]
+    assert page.path == params["expected"]["path"]
+    assert page.title == params["expected"]["title"]
+    assert page.body == params["expected"]["body"]

@@ -30,3 +30,6 @@ class Page(BaseModel):
     @property
     def url(self) -> str:
         return f"{self.site.url}{self.path}"
+
+    def __hash__(self) -> int:  # type: ignore
+        return hash(self.id)

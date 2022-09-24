@@ -768,7 +768,22 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def add(self, model: Page) -> PageOperationResult:
         """Append a new model to the repository."""
-        return Err(PageRepositoryError.page_not_found)
+
+        def format_page(page: Page) -> Dict[str, Any]:
+            formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
+            formated_page["id"] = page.id
+            formated_page["created_at"] = page.created_at
+            formated_page["draft_id"] = page.draft.id
+            formated_page["site_id"] = page.site.id
+            return formated_page
+
+        await self.session.execute(  # type: ignore
+            orm.pages.insert(),  # type: ignore
+            [format_page(model)],
+        )
+
+        self.seen.add(model)
+        return Ok(...)
 
     async def update(self, model: Page) -> PageOperationResult:
         """Update a model to the repository."""

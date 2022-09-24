@@ -10,8 +10,9 @@ from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
-from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy.orm import sessionmaker
 
+from casualcms.adapters.uow_sqla.setup_database import create_database_schema
 from casualcms.config import Settings
 from casualcms.domain.model import (
     Account,
@@ -736,7 +737,6 @@ class PageSQLRepository(AbstractPageRepository):
         url_ = urlparse(url)
         scheme, hostname, path = url_.scheme, url_.netloc, url_.path
         path = f"//{hostname}{path.rstrip('/')}"
-
         orm_pages: CursorResult = await self.session.execute(
             select(orm.pages).filter(orm.pages.c.path == path).limit(1)
         )
@@ -847,8 +847,7 @@ class SQLUnitOfWork(AbstractUnitOfWork):
             echo=False,
         )
         if self.app_settings.create_database_schema:
-            async with self.engine.begin() as conn:  # type: ignore
-                await conn.run_sync(orm.metadata.create_all)
+            await create_database_schema(self.app_settings, self.engine)
         self.create_session = await create_async_session(self.engine)
 
     async def dispose(self) -> None:

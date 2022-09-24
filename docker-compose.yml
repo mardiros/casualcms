@@ -36,9 +36,10 @@ services:
       - "CASUALCMS_ADMIN_USERNAME=alice"
       - "CASUALCMS_ADMIN_PASSWORD=secret"
       - "CASUALCMS_USE_RELOADER=true"
-      - "CASUALCMS_UNIT_OF_WORK=casualcms.adapters.uow_sqla:SQLUnitOfWork"
-      - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
-      # - "CASUALCMS_CREATE_DATABASE_SCHEMA=true"
+      - "CASUALCMS_CREATE_DATABASE_SCHEMA=true"
+      # - "CASUALCMS_UNIT_OF_WORK=casualcms.adapters.uow_sqla:SQLUnitOfWork"
+      # - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
+      # - "CASUALCMS_DATABASE_MIGRATIONS_PATH=/srv/casualcms/sql-migrations"
     volumes:
       - "./tests/functionals/templates:/app/templates"
       - "./tests/casualblog:/app/casualblog"

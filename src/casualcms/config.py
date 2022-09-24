@@ -28,10 +28,11 @@ class Settings(BaseSettings):
 
     # Bootstrap config
     unit_of_work: str | AbstractUnitOfWork = (
-        "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork"
+        "casualcms.adapters.uow_sqla:SQLUnitOfWork"
     )
-    database_url: str = ""
+    database_url: str = "postgresql+asyncpg://postgres@postgresql/casualcms"
     create_database_schema: bool = False
+    database_migration_cfg: str = "/srv/casualcms/alembic.ini"
 
     messagebus: MessageRegistry | None = None
 

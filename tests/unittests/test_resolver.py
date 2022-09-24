@@ -21,4 +21,4 @@ def test_resolve_ok():
 def test_resolve_err(mod: str):
     err = resolve(mod)
     assert err.is_err()
-    assert err.unwrap_err() == f"{mod} is not a valid."
+    assert err.unwrap_err() == f"{mod} does not resolve any type."

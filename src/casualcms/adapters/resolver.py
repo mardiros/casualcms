@@ -10,6 +10,6 @@ def resolve(value: str) -> Result[Any, str]:
     try:
         cls = ep.resolve()
     except (ImportError, ModuleNotFoundError):
-        return Err(f"{value} is not a valid.")
+        return Err(f"{value} does not resolve any type.")
     else:
         return Ok(cls)

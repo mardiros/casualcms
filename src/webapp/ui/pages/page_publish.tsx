@@ -218,7 +218,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
                 closed: "...",
                 loading: "Choose website(s)",
                 begin: "Choose website(s)",
-                done: "Publish Reports",
+                done: "Publication Report",
               }[publishedState]
             }
           </PopoverHeader>

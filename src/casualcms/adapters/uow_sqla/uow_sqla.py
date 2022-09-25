@@ -15,8 +15,8 @@ from typing import (
 from urllib.parse import urlparse
 
 from result import Err, Ok
-from sqlalchemy import alias, delete, text, Table  # type: ignore
-from sqlalchemy.engine import Row, CursorResult  # type: ignore
+from sqlalchemy import Table, alias, delete, text  # type: ignore
+from sqlalchemy.engine import CursorResult, Row  # type: ignore
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore

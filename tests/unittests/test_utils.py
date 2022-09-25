@@ -1,6 +1,7 @@
 from uuid import UUID
 
 import pytest
+
 from casualcms.utils import generate_id, generate_secret
 
 

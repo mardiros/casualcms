@@ -9,14 +9,11 @@ from casualcms.domain.model import Account, AccountStatus
 from casualcms.domain.model.account import AuthnToken
 
 
-async def authenticate(
-    request: Request,
+async def get_authenticated_user(
     username: str = Body(...),
     password: str = Body(...),
-    user_agent: str = Header(None),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> dict[str, Any]:
-
+):
     authenticated_user: Account | None = None
     async with app.uow as uow:
         stored_user = await uow.accounts.by_username(username)
@@ -24,7 +21,7 @@ async def authenticate(
             user = stored_user.unwrap()
             if user.status == AccountStatus.active and user.match_password(password):
                 authenticated_user = user
-        await uow.commit()
+        await uow.rollback()
 
     if not authenticated_user:
         raise HTTPException(
@@ -33,6 +30,15 @@ async def authenticate(
                 {"loc": ["body", "username"], "msg": "Invalid username or password"}
             ],
         )
+    return authenticated_user
+
+
+async def authenticate(
+    request: Request,
+    user_agent: str = Header(None),
+    app: AppConfig = FastAPIConfigurator.depends,
+    authenticated_user: Account = Depends(get_authenticated_user),
+) -> dict[str, Any]:
 
     client_addr: str = request.client.host
     cmd = CreateAuthnToken(

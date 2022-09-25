@@ -1,11 +1,22 @@
+from collections import defaultdict
 from operator import and_
 from types import TracebackType
-from typing import Any, Callable, Dict, Optional, Type, cast
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Sequence,
+    Type,
+    cast,
+)
 from urllib.parse import urlparse
 
 from result import Err, Ok
-from sqlalchemy import alias, delete, text  # type: ignore
-from sqlalchemy.engine.cursor import CursorResult  # type: ignore
+from sqlalchemy import alias, delete, text, Table  # type: ignore
+from sqlalchemy.engine import Row, CursorResult  # type: ignore
 from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
@@ -75,6 +86,16 @@ from casualcms.domain.repositories.user import (
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 from . import orm
+
+
+def mapped_result(
+    column_descriptions: Sequence[Mapping[str, Any]],
+    row: Row,
+) -> Mapping[Table, MutableMapping[str, Any]]:
+    ret: MutableMapping[Table, Any] = defaultdict(dict)
+    for idx, col in enumerate(column_descriptions):
+        ret[cast(Table, col["expr"].table)][col["expr"].name] = row[idx]
+    return ret
 
 
 def format_draft_page(page: DraftPage) -> Dict[str, Any]:
@@ -745,33 +766,38 @@ class PageSQLRepository(AbstractPageRepository):
         url_ = urlparse(url)
         scheme, hostname, path = url_.scheme, url_.netloc, url_.path
         path = f"//{hostname}{path.rstrip('/')}"
-        orm_pages: CursorResult = await self.session.execute(
-            select(orm.pages).filter(orm.pages.c.path == path).limit(1)
+        qry = (
+            select(orm.pages, orm.sites)
+            .filter(orm.pages.c.site_id == orm.sites.c.id)
+            .filter(orm.pages.c.path == path)
+            .limit(1)
         )
-        orm_page = cast(Page, orm_pages.first())
-        if not orm_page:
-            return Err(PageRepositoryError.page_not_found)
 
-        rsite = await SiteSQLRepository(self.session).by_id(
-            orm_page.site_id  # type: ignore
-        )
-        if rsite.is_err():
+        orm_pages: CursorResult = await self.session.execute(qry)
+        result = orm_pages.first()
+        if not result:
             return Err(PageRepositoryError.page_not_found)
-        site = rsite.unwrap()
-        if site.secure and scheme == "http":
+        orm_page_split = mapped_result(qry.column_descriptions, result)
+        site = orm_page_split[orm.sites]
+        if site["secure"] and scheme == "http":
             return Err(PageRepositoryError.page_not_found)
+        rdraft = await DraftSQLRepository(self.session).by_id(site["draft_id"])
+        if rdraft.is_err():
+            return Err(PageRepositoryError.page_not_found)
+        root = rdraft.unwrap()
 
+        orm_page = orm_page_split[orm.pages]
         return Ok(
             Page(
-                id=orm_page.id,
-                body=orm_page.body,
-                created_at=orm_page.created_at,
-                draft_id=orm_page.draft_id,
-                site=site,
-                template=orm_page.template,
-                type=orm_page.type,
-                title=orm_page.title,
-                path=orm_page.path,
+                id=orm_page["id"],
+                body=orm_page["body"],
+                created_at=orm_page["created_at"],
+                draft_id=orm_page["draft_id"],
+                site=Site(root_page_path=root.path, **site),
+                template=orm_page["template"],
+                type=orm_page["type"],
+                title=orm_page["title"],
+                path=orm_page["path"],
             )
         )
 

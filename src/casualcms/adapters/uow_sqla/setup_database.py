@@ -1,28 +1,27 @@
 from alembic import command
 from alembic.config import Config
-from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine  # type: ignore
 
 from casualcms.config import Settings
+
 from . import orm
 
 
-
-def stamp_alembic(settings: Settings):
+def stamp_alembic(settings: Settings) -> None:
     if settings.database_url == "sqlite+aiosqlite:///":
         return
     alembic_cfg = Config(settings.database_migration_cfg)
     command.stamp(alembic_cfg, "head")
 
 
-def upgrade_alembic(settings: Settings):
+def upgrade_alembic(settings: Settings) -> None:
     if settings.database_url == "sqlite+aiosqlite:///":
         return
     alembic_cfg = Config(settings.database_migration_cfg)
     command.upgrade(alembic_cfg, "head")
 
 
-async def create_database_schema(settings: Settings, engine: AsyncEngine):
+async def create_database_schema(settings: Settings, engine: AsyncEngine) -> None:
     async with engine.begin() as conn:  # type: ignore
         try:
             await conn.execute("select * from alembic_version")

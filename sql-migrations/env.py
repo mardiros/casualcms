@@ -2,10 +2,11 @@ from logging.config import fileConfig
 from typing import Any, Mapping, cast
 from xmlrpc.client import boolean
 
-from citext import CIText
 from alembic import context
 from alembic.autogenerate.api import AutogenContext
+from citext import CIText
 from sqlalchemy import engine_from_config, pool  # type: ignore
+
 from casualcms.adapters.uow_sqla.orm import metadata
 
 # this is the Alembic Config object, which provides
@@ -53,18 +54,14 @@ def run_migrations_offline() -> None:
         context.run_migrations()
 
 
-def render_item(
-    type_: str, obj: Any, autogen_context: AutogenContext
-) -> str | boolean:
+def render_item(type_: str, obj: Any, autogen_context: AutogenContext) -> str | boolean:
     """Apply custom rendering for selected items."""
     if type_ == "type" and isinstance(obj, CIText):
         autogen_context.imports.add("import citext  # type: ignore")
         return "citext.CIText"
 
     if type_ == "foreign_key":
-        autogen_context.imports.add(
-            "import casualcms.adapters.uow_sqla.orm_types"
-        )
+        autogen_context.imports.add("import casualcms.adapters.uow_sqla.orm_types")
         return False
 
     return False

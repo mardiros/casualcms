@@ -27,9 +27,7 @@ class Settings(BaseSettings):
     admin_email: str = "root@localhost"
 
     # Bootstrap config
-    unit_of_work: str | AbstractUnitOfWork = (
-        "casualcms.adapters.uow_sqla:SQLUnitOfWork"
-    )
+    unit_of_work: str | AbstractUnitOfWork = "casualcms.adapters.uow_sqla:SQLUnitOfWork"
     database_url: str = "postgresql+asyncpg://postgres@postgresql/casualcms"
     create_database_schema: bool = False
     database_migration_cfg: str = "/srv/casualcms/alembic.ini"

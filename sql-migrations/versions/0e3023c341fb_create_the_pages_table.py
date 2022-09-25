@@ -5,11 +5,11 @@ Revises: 774794be5cbb
 Create Date: 2022-09-24 10:31:13.758848
 
 """
-from alembic import op
+import citext  # type: ignore
 import sqlalchemy as sa
+from alembic import op
 
 import casualcms.adapters.uow_sqla.orm_types
-import citext  # type: ignore
 
 # revision identifiers, used by Alembic.
 revision = "0e3023c341fb"

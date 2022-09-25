@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.future import select  # type: ignore
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker  # type: ignore
 
 from casualcms.adapters.uow_sqla.setup_database import create_database_schema
 from casualcms.config import Settings
@@ -23,7 +23,7 @@ from casualcms.domain.model import (
     resolve_page_type,
 )
 from casualcms.domain.model.setting import Setting, SettingType, resolve_setting_type
-from casualcms.domain.model.snippet import Snippet, SnippetType, resolve_snippet_type
+from casualcms.domain.model.snippet import Snippet, resolve_snippet_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,

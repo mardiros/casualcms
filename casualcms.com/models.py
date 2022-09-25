@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import DraftPage, Setting, Snippet
+from casualcms.domain.model import DraftPage, Snippet
 
 
 class Link(BaseModel):
@@ -17,7 +17,6 @@ class HeaderSnippet(Snippet):
     class Meta:
         template = "header.jinja2"
         type = "HeaderSnippet"
-
 
 
 class Paragraph(BaseModel):

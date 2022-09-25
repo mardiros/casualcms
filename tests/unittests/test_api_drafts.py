@@ -70,9 +70,9 @@ async def test_api_create_draft(
             "expected_response": {
                 "detail": [
                     {
-                        "loc": ["body", ["slug"]],
-                        "msg": "field required",
-                        "type": "value_error.missing",
+                        "loc": ["body", "payload"],
+                        "msg": "Missing slug",
+                        "type": "value_error",
                     }
                 ],
             },
@@ -90,6 +90,27 @@ async def test_api_create_draft(
             },
             "expected_response": {
                 "detail": [{"loc": ["body", "type"], "msg": "Unregistered type"}]
+            },
+        },
+        {
+            "request": {
+                "type": "blog:UnknownPage",
+                "payload": {
+                    "slug": "/homelander",
+                    "title": 42,
+                    "description": "The home page",
+                    "hero_title": "You are awesome",
+                    "body": [],
+                },
+            },
+            "expected_response": {
+                "detail": [
+                    {
+                        "loc": ["body", "payload"],
+                        "msg": "Invalid slug field",
+                        "type": "value_error",
+                    }
+                ],
             },
         },
     ],

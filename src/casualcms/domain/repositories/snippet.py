@@ -9,6 +9,7 @@ from .base import AbstractRepository, OperationResult, RepositoryResult
 
 class SnippetRepositoryError(enum.Enum):
     snippet_not_found = "Snippet not found"
+    snippet_type_not_found = "Snippet Type not found"
 
 
 SnippetRepositoryResult = RepositoryResult[Snippet, SnippetRepositoryError]

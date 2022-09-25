@@ -86,7 +86,11 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                     "type": "string",
                     "description": "Title of the hero section",
                 },
-                "slug": {"title": "Slug", "type": "string"},
+                "slug": {
+                    "title": "Slug",
+                    "type": "string",
+                    "pattern": "^[^/]+$",
+                },
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["slug", "title", "description", "hero_title"],

@@ -17,7 +17,7 @@ from ..casualblog.models import (
 def test_page_metadata():
     page = HomePage(
         id="a",
-        slug="",
+        slug="home",
         title="awesome",
         description="",
         hero_title="You are awesome",
@@ -32,7 +32,7 @@ def test_page_abstract_raise():
     with pytest.raises(AbstractPageError) as context:
         AbstractPage(
             id="a",
-            slug="",
+            slug="home",
             title="awesome",
             description="",
             hero_title="You are awesome",

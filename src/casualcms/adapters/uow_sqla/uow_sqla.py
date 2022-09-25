@@ -351,7 +351,12 @@ class SnippetSQLRepository(AbstractSnippetRepository):
     ) -> SnippetRepositoryResult:
         orm_snippet = cast(Snippet, orm_snippets.first())
         if orm_snippet:
-            typ: SnippetType = resolve_snippet_type(orm_snippet.type)  # type: ignore
+            rtyp = resolve_snippet_type(
+                orm_snippet.type,  # type: ignore
+            )
+            if rtyp.is_err():
+                return Err(SnippetRepositoryError.snippet_type_not_found)
+            typ = rtyp.unwrap()
             return Ok(
                 typ(
                     id=orm_snippet.id,
@@ -387,7 +392,10 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         orm_snippet: Any
         snippets: list[Snippet] = []
         for orm_snippet in orm_snippets:
-            typ: SnippetType = resolve_snippet_type(orm_snippet.type)  # type: ignore
+            rtyp = resolve_snippet_type(orm_snippet.type)  # type: ignore
+            if rtyp.is_err():
+                return Err(SnippetRepositoryError.snippet_type_not_found)
+            typ = rtyp.unwrap()
             snippets.append(
                 typ(
                     id=orm_snippet.id,

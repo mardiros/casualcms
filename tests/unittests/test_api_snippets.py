@@ -1,5 +1,6 @@
-from typing import cast
+from typing import Any, Mapping, cast
 
+import pytest
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
@@ -45,6 +46,58 @@ async def test_api_create_snippet(
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],
         }
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "payload": {
+                "type": "RegisterMe",
+                "payload": {
+                    "key": "header",
+                },
+            },
+            "expected": {
+                "detail": [[{"loc": ["body", "type"], "msg": "Unregistered type"}]],
+            },
+        },
+        {
+            "payload": {
+                "type": "blog:HeaderSnippet",
+                "payload": {
+                    "key": "/header",
+                    "title": "My Blog",
+                    "links": [],
+                },
+            },
+            "expected": {
+                "detail": [
+                    {
+                        "loc": ["body", "payload"],
+                        "msg": "Invalid key field",
+                        "type": "value_error",
+                    }
+                ],
+            },
+        },
+    ],
+)
+async def test_api_create_snippet_422(
+    params: Mapping[str, Any],
+    client: TestClient,
+    authntoken: AuthnToken,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.post(
+        "/api/snippets",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=params["payload"],
+    )
+    assert resp.status_code == 422
+    assert resp.json() == params["expected"]
 
 
 async def test_api_list_snippet_403(client: TestClient, uow: AbstractUnitOfWork):

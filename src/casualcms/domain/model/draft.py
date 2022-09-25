@@ -1,6 +1,7 @@
 import enum
 from collections import defaultdict
 from datetime import datetime
+import re
 from typing import (
     Any,
     Iterable,
@@ -13,7 +14,7 @@ from typing import (
     cast,
 )
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConstrainedStr, Field
 from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
@@ -22,6 +23,11 @@ from casualcms.domain.messages import Event
 from casualcms.domain.messages.commands import generate_id
 
 uuid = str
+
+
+class Slug(ConstrainedStr):
+    regex = re.compile("^[^/]+$")
+    strip_whitespace = True
 
 
 class AbstractPageError(Exception):
@@ -123,7 +129,7 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
 class DraftPage(AbstractPage):
 
     id: uuid = Field(default_factory=generate_id, exclude=True)
-    slug: str = Field(...)
+    slug: Slug = Field(...)
     title: str = Field(...)
     description: str = Field(...)
 

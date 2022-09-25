@@ -1,4 +1,4 @@
-from typing import Any, MutableMapping, Optional, Sequence
+from typing import Any, MutableMapping, Optional, Sequence, cast
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -10,9 +10,10 @@ from casualcms.domain.messages.commands import (
     UpdateSnippet,
     generate_id,
 )
-from casualcms.domain.model import AuthnToken, resolve_snippet_type
+from casualcms.domain.model import AuthnToken
+from casualcms.domain.model.snippet import SnippetKey, SnippetType
 
-from .base import get_token_info
+from .base import MappingWithKey, get_snippet_type_body, get_token_info
 
 
 class PartialSnippetMeta(BaseModel):
@@ -26,12 +27,12 @@ class PartialSnippet(BaseModel):
 
 async def create_snippet(
     request: Request,
-    type: str = Body(...),
-    payload: dict[str, Any] = Body(...),
+    type: SnippetKey = Body(...),
+    payload: MappingWithKey = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
+    snippet_type: SnippetType = Depends(get_snippet_type_body),
 ) -> PartialSnippet:
-    snippet_type = resolve_snippet_type(type)
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {
             "id": generate_id(),
@@ -41,7 +42,7 @@ async def create_snippet(
         snippet_type(**params)  # validate pydantic model
         await uow.rollback()
     key = payload.pop("key")
-    cmd = CreateSnippet(type=type, key=key, body=payload)
+    cmd = CreateSnippet(type=type, key=key, body=cast(dict[str, Any], payload))
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
 
@@ -51,7 +52,10 @@ async def create_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "key"], "msg": rsnippet.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "key"],
+                        "msg": rsnippet.unwrap_err().value,
+                    }
                 ],
             )
         else:

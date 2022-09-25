@@ -83,7 +83,7 @@ def fake_snippet(type: str, **kwargs: Any) -> Snippet:
         "key": fake.slug(),
     }
 
-    typ = resolve_snippet_type(type)
+    typ = resolve_snippet_type(type).unwrap()
     snippet.update(kwargs)
     return typ(**snippet)
 

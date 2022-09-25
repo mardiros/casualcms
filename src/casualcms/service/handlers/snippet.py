@@ -20,7 +20,10 @@ async def create_snippet(
     cmd: CreateSnippet,
     uow: AbstractUnitOfWork,
 ) -> SnippetRepositoryResult:
-    snip = resolve_snippet_type(cmd.type)
+    rsnip = resolve_snippet_type(cmd.type)
+    if rsnip.is_err():
+        return Err(SnippetRepositoryError.snippet_type_not_found)
+    snip = rsnip.unwrap()
     snippet = snip(
         id=cmd.id,
         key=cmd.key,

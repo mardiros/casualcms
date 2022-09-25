@@ -1,19 +1,12 @@
-import secrets
-import uuid
 from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import Field
 
+from casualcms.domain.model.snippet import SnippetKey
+from casualcms.utils import generate_id, generate_secret
+
 from .base import Command, Metadata
-
-
-def generate_id() -> str:
-    return str(uuid.uuid1())
-
-
-def generate_secret() -> str:
-    return secrets.token_urlsafe(64)
 
 
 class CreateAccount(Command):
@@ -121,7 +114,7 @@ class DeleteSite(Command):
 
 class CreateSnippet(Command):
     type: str = Field(...)
-    key: str = Field(...)
+    key: SnippetKey = Field(...)
     body: dict[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
@@ -131,7 +124,7 @@ class CreateSnippet(Command):
 
 
 class UpdateSnippet(Command):
-    key: str | None = Field(..., description="New key")
+    key: SnippetKey | None = Field(..., description="New key")
     body: dict[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)

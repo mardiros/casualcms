@@ -59,7 +59,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                     "title": "Links",
                     "type": "array",
                 },
-                "key": {"title": "Key", "type": "string"},
+                "key": {"pattern": "^[^/]+$", "title": "Key", "type": "string"},
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["key", "title"],

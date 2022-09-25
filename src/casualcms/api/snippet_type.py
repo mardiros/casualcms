@@ -3,9 +3,10 @@ from typing import Any
 from fastapi import Depends
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AuthnToken, list_snippet_types, resolve_snippet_type
+from casualcms.domain.model import AuthnToken, list_snippet_types
+from casualcms.domain.model.snippet import SnippetKey, SnippetType
 
-from .base import get_token_info
+from .base import get_snippet_type, get_token_info
 
 
 class PartialSnippetType(BaseModel):
@@ -23,15 +24,15 @@ async def list_types(
 
 
 async def show_type(
-    type: str,
+    type: SnippetKey,
     token: AuthnToken = Depends(get_token_info),
+    snippet_type: SnippetType = Depends(get_snippet_type),
 ) -> dict[str, Any]:
-    ptype = resolve_snippet_type(type)
-    jsonschema = ptype.schema()
+    jsonschema = snippet_type.schema()
     jsonschema["definitions"].pop("Event", None)
     for key in ("id", "events", "created_at"):
         jsonschema["properties"].pop(key, None)
     return {
         "schema": jsonschema,
-        "uiSchema": ptype.ui_schema(),
+        "uiSchema": snippet_type.ui_schema(),
     }

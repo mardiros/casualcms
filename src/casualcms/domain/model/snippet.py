@@ -1,20 +1,30 @@
+import enum
 from datetime import datetime
+import re
 from typing import Any, Mapping, MutableMapping, Set, Type, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConstrainedStr, Field
 from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
+from result import Err, Ok, Result
 
 from casualcms.domain.messages import Event
-from casualcms.domain.messages.commands import generate_id
+from casualcms.utils import generate_id
 
 uuid = str
 SnippetType = Type["Snippet"]
 
 
-class UnregisterType(Exception):
-    def __init__(self, typ: str) -> None:
-        super().__init__(f"Unregistered type {typ}")
+class SnippetKey(ConstrainedStr):
+    regex = re.compile("^[^/]+$")
+    strip_whitespace = True
+
+
+class SnippetError(enum.Enum):
+    unregistered_type = "Unregistered type"
+
+
+SnippetTypeResult = Result[SnippetType, SnippetError]
 
 
 class SnippetTypeList:
@@ -23,11 +33,11 @@ class SnippetTypeList:
     def register(self, typ: SnippetType) -> None:
         self._types[typ.__meta__.type] = typ
 
-    def resolve_type(self, typ: str) -> SnippetType:
+    def resolve_type(self, typ: str) -> SnippetTypeResult:
         try:
-            return self._types[typ]
+            return Ok(self._types[typ])
         except KeyError:
-            raise UnregisterType(typ)
+            return Err(SnippetError.unregistered_type)
 
     @property
     def types(self) -> Set[SnippetType]:
@@ -38,7 +48,7 @@ def list_snippet_types() -> Set[SnippetType]:
     return SnippetTypeList().types
 
 
-def resolve_snippet_type(typ: str) -> SnippetType:
+def resolve_snippet_type(typ: str) -> SnippetTypeResult:
     return SnippetTypeList().resolve_type(typ)
 
 
@@ -89,7 +99,7 @@ class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
 class Snippet(AbstractSnippet):
 
     id: uuid = Field(default_factory=generate_id, exclude=True)
-    key: str = Field(...)
+    key: SnippetKey = Field(...)
 
     events: list[Event] = Field(default_factory=list, exclude=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)

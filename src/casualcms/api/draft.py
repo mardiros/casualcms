@@ -19,6 +19,7 @@ from .base import (
     RESOURCE_DELETED,
     RESOURCE_UPDATED,
     HTTPMessage,
+    MappingWithSlug,
     get_token_info,
 )
 
@@ -37,7 +38,7 @@ class PartialPage(BaseModel):
 async def create_draft(
     request: Request,
     type: str = Body(...),
-    payload: dict[str, Any] = Body(...),
+    payload: MappingWithSlug = Body(...),
     parent: str = Body(None),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),

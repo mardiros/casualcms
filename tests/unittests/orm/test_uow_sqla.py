@@ -669,7 +669,7 @@ async def test_snippet_update(
     params: Any, sqla_session: AsyncSession, snippets: list[HeaderSnippet]
 ):
     snippet = snippets[1]
-    snippet.key = "new-snip-key"
+    snippet.key = "new-snip-key"  # type: ignore
     snippet.title = "New title"
     snippet.links = [Link(title="l1", href="/l1")]
     repo = SnippetSQLRepository(sqla_session)

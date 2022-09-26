@@ -13,7 +13,7 @@ async def get_authenticated_user(
     username: str = Body(...),
     password: str = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
-):
+) -> Account:
     authenticated_user: Account | None = None
     async with app.uow as uow:
         stored_user = await uow.accounts.by_username(username)

@@ -94,7 +94,7 @@ async def test_api_create_draft(
         },
         {
             "request": {
-                "type": "blog:UnknownPage",
+                "type": "blog:HomePage",
                 "payload": {
                     "slug": "/homelander",
                     "title": 42,
@@ -426,3 +426,21 @@ async def test_delete_page(
 
     assert saved_home.is_err()
     assert saved_home.unwrap_err().name == "page_not_found"
+
+
+async def test_delete_page_422(
+    client: TestClient,
+    authntoken: AuthnToken,
+    draft_hp: DraftPage,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(
+        f"/api/drafts/{draft_hp.path}/unkwon",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 422
+    assert resp.json() == {
+        "detail": [{"loc": ["querystring", "path"], "msg": "Unknown page"}]
+    }

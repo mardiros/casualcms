@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from pydantic import Field
+from pyparsing import Mapping
 
 from casualcms.domain.model.snippet import SnippetKey
 from casualcms.utils import generate_id, generate_secret
@@ -58,7 +59,7 @@ class DeleteAuthnToken(Command):
 
 class CreatePage(Command):
     type: str = Field(...)
-    payload: dict[str, Any] = Field(...)
+    payload: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
     metadata: Metadata = Metadata(category="page", name="create_page", schemaVersion=1)
@@ -66,7 +67,7 @@ class CreatePage(Command):
 
 class UpdatePage(Command):
     id: str = Field(...)
-    payload: dict[str, Any] = Field(...)
+    payload: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     metadata: Metadata = Metadata(category="page", name="update_page", schemaVersion=1)
 
@@ -115,7 +116,7 @@ class DeleteSite(Command):
 class CreateSnippet(Command):
     type: str = Field(...)
     key: SnippetKey = Field(...)
-    body: dict[str, Any] = Field(...)
+    body: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
     metadata: Metadata = Metadata(
@@ -125,7 +126,7 @@ class CreateSnippet(Command):
 
 class UpdateSnippet(Command):
     key: SnippetKey | None = Field(..., description="New key")
-    body: dict[str, Any] | None = Field(...)
+    body: Mapping[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
     metadata: Metadata = Metadata(
@@ -144,7 +145,7 @@ class DeleteSnippet(Command):
 class CreateSetting(Command):
     key: str = Field(...)
     hostname: str = Field(...)
-    body: dict[str, Any] = Field(...)
+    body: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
     metadata: Metadata = Metadata(
@@ -155,7 +156,7 @@ class CreateSetting(Command):
 class UpdateSetting(Command):
     hostname: str = Field(...)
     key: str = Field(...)
-    body: dict[str, Any] | None = Field(...)
+    body: Mapping[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
     metadata: Metadata = Metadata(

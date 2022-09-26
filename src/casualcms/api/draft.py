@@ -1,4 +1,4 @@
-from typing import Any, MutableMapping, Optional
+from typing import Any, Mapping, MutableMapping, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
@@ -12,7 +12,7 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.draft import resolve_page_type
+from casualcms.domain.model.draft import DraftPage, PageType, resolve_page_type
 
 from .base import (
     RESOURCE_CREATED,
@@ -35,21 +35,24 @@ class PartialPage(BaseModel):
     meta: PartialPageMeta = Field(...)
 
 
-async def create_draft(
-    request: Request,
+def get_page_type(
     type: str = Body(...),
-    payload: MappingWithSlug = Body(...),
-    parent: str = Body(None),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
-) -> HTTPMessage:
+) -> PageType:
     rpage_type = resolve_page_type(type)
     if rpage_type.is_err():
         raise HTTPException(
             status_code=422,
             detail=[{"loc": ["body", "type"], "msg": rpage_type.unwrap_err().value}],
         )
-    page_type = rpage_type.unwrap()
+    return rpage_type.unwrap()
+
+
+async def build_params(
+    payload: MappingWithSlug = Body(...),
+    parent: str = Body(None),
+    page_type: PageType = Depends(get_page_type),
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> Mapping[str, Any]:
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {"id": generate_id(), **payload}
         if parent:
@@ -72,6 +75,16 @@ async def create_draft(
             )
 
         await uow.commit()
+    return params
+
+
+async def create_draft(
+    request: Request,
+    type: str = Body(...),
+    params: Mapping[str, Any] = Depends(build_params),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> HTTPMessage:
 
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host
@@ -118,12 +131,14 @@ async def list_drafts(
     ]
 
 
-async def show_draft(
+async def draft_by_path(
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
-) -> Any:
-
+) -> DraftPage:
+    async with app.uow as uow:
+        path = path.strip("/")
+        rpage = await uow.drafts.by_path(f"/{path}")
+        await uow.rollback()
     async with app.uow as uow:
         path = path.strip("/")
         rpage = await uow.drafts.by_path(f"/{path}")
@@ -134,18 +149,24 @@ async def show_draft(
             status_code=422,
             detail=[{"loc": ["querystring", "path"], "msg": "Unknown page"}],
         )
-    page = rpage.unwrap()
-    return page.get_data_context()
+    return rpage.unwrap()
+
+
+async def show_draft(
+    token: AuthnToken = Depends(get_token_info),
+    draft_page: DraftPage = Depends(draft_by_path),
+) -> Mapping[str, Any]:
+    return draft_page.get_data_context()
 
 
 async def preview_draft(
     request: Request,
-    path: str = Field(...),
+    draft_page: DraftPage = Depends(draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
 
-    context = await show_draft(path, app, token)
+    context = draft_page.get_data_context()
     async with app.uow as uow:
         hostname = request.url.hostname or ""
         if request.url.port:
@@ -154,45 +175,34 @@ async def preview_draft(
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        page = (await uow.drafts.by_path(context["meta"]["path"])).unwrap()
-        data = await renderer.render_template(page.get_template(), context)
+        data = await renderer.render_template(draft_page.get_template(), context)
         await uow.rollback()
     return Response(data)
 
 
 async def update_draft(
     request: Request,
-    path: str = Field(...),
+    draft_page: DraftPage = Depends(draft_by_path),
     payload: dict[str, Any] = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
 
-    async with app.uow as uow:
-        path = path.strip("/")
-        rpage = await uow.drafts.by_path(f"/{path}")
-        await uow.rollback()
-
-    if rpage.is_err():
-        raise HTTPException(
-            status_code=422,
-            detail=[{"loc": ["querystring", "path"], "msg": "Unknown parent"}],
-        )
-    page = rpage.unwrap()
     payload.pop("meta", None)
+    #  FIXME: validate the payload for the page here
     cmd = UpdatePage(
-        id=page.id,
+        id=draft_page.id,
         payload=payload,
     )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
-        rpage = await app.bus.handle(cmd, uow)
-        if rpage.is_err():
+        res = await app.bus.handle(cmd, uow)
+        if res.is_err():
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "path"], "msg": rpage.unwrap_err().value}
+                    {"loc": ["querystring", "path"], "msg": res.unwrap_err().value}
                 ],
             )
         else:
@@ -203,24 +213,13 @@ async def update_draft(
 
 async def delete_draft(
     request: Request,
-    path: str = Field(...),
+    draft_page: DraftPage = Depends(draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
-
-    async with app.uow as uow:
-        path = path.strip("/")
-        page = await uow.drafts.by_path(f"/{path}")
-        await uow.rollback()
-
-    if page.is_err():
-        return Response(content=page.unwrap_err().value, status_code=404)
-
-    p = page.unwrap()
-
     cmd = DeletePage(
-        id=p.id,
-        path=p.path,
+        id=draft_page.id,
+        path=draft_page.path,
     )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id

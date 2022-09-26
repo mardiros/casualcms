@@ -1,7 +1,7 @@
-from typing import Any, MutableMapping, Sequence
+from typing import Any, Mapping, MutableMapping, Sequence
 
 from fastapi import Body, Depends, HTTPException, Request, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import (
@@ -11,6 +11,7 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model import AuthnToken, resolve_setting_type
+from casualcms.domain.model.setting import Setting
 
 from .base import get_token_info
 
@@ -24,14 +25,13 @@ class PartialSetting(BaseModel):
     hostname: str = Field(...)
 
 
-async def create_setting(
+async def validate_payload(
     request: Request,
     hostname: str = Field(...),
     key: str = Body(...),
     payload: dict[str, Any] = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
-) -> PartialSetting:
+) -> Mapping[str, Any]:
     setting_type = resolve_setting_type(key)
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {
@@ -39,9 +39,29 @@ async def create_setting(
             "hostname": hostname,
             **payload,
         }
-        setting_type(**params)  # validate pydantic model
+        try:
+            setting_type(**params)  # validate pydantic model
+        except ValidationError as exc:
+            errors = exc.errors()
+            for error in errors:
+                error["loc"] = ["body", error["loc"]]  # type: ignore
+            raise HTTPException(
+                status_code=422,
+                detail=errors,
+            )
         await uow.rollback()
-    cmd = CreateSetting(key=key, hostname=hostname, body=payload)
+    return payload
+
+
+async def create_setting(
+    request: Request,
+    hostname: str = Field(...),
+    key: str = Body(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    validated_payload: Mapping[str, Any] = Depends(validate_payload),
+    token: AuthnToken = Depends(get_token_info),
+) -> PartialSetting:
+    cmd = CreateSetting(key=key, hostname=hostname, body=validated_payload)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
 
@@ -86,13 +106,11 @@ async def list_settings(
     ]
 
 
-async def show_setting(
+async def get_setting_by_path(
     hostname: str = Field(...),
     key: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
-) -> Any:
-
+) -> Setting:
     async with app.uow as uow:
         rsetting = await uow.settings.by_key(hostname, key)
         await uow.rollback()
@@ -100,24 +118,27 @@ async def show_setting(
     if rsetting.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "slug"], "msg": "Unknown setting"}],
+            detail=[{"loc": ["querystring", "key"], "msg": "Unknown setting"}],
         )
-    setting = rsetting.unwrap()
+    return rsetting.unwrap()
+
+
+async def show_setting(
+    setting: Setting = Depends(get_setting_by_path),
+    token: AuthnToken = Depends(get_token_info),
+) -> Any:
     return setting.get_data_context()
 
 
 async def update_setting(
     request: Request,
+    setting: Setting = Depends(get_setting_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     hostname: str = Field(...),
     key: str = Field(...),
     payload: dict[str, Any] = Body(...),
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSetting:
-
-    async with app.uow as uow:
-        rsetting = await uow.settings.by_key(hostname, key)
-        setting = rsetting.unwrap()
 
     payload.pop("meta", None)
     cmd = UpdateSetting(id=setting.id, hostname=hostname, key=key, body=payload)
@@ -129,7 +150,7 @@ async def update_setting(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
                 ],
             )
         else:
@@ -143,20 +164,10 @@ async def update_setting(
 
 async def delete_setting(
     request: Request,
-    hostname: str = Field(...),
-    key: str = Field(...),
+    setting: Setting = Depends(get_setting_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
-
-    async with app.uow as uow:
-        rsetting = await uow.settings.by_key(hostname, key)
-        await uow.rollback()
-
-    if rsetting.is_err():
-        return Response(content=rsetting.unwrap_err().value, status_code=404)
-
-    setting = rsetting.unwrap()
 
     cmd = DeleteSetting(
         id=setting.id,
@@ -171,7 +182,7 @@ async def delete_setting(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "slug"], "msg": resp.unwrap_err().value}
+                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
                 ],
             )
         else:

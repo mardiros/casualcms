@@ -196,3 +196,21 @@ async def test_api_delete_setting(
         rsetting = await uow.settings.by_key(default_site.hostname, "ff")
         assert rsetting.is_err()
         assert rsetting.unwrap_err().name == "setting_not_found"
+
+
+async def test_api_delete_setting_422(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(
+        f"/api/settings/{default_site.hostname}/e404",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 422
+    assert resp.json() == {
+        "detail": [{"loc": ["querystring", "key"], "msg": "Unknown setting"}]
+    }

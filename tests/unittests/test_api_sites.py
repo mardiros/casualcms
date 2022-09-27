@@ -38,6 +38,26 @@ async def test_api_create_site(
     }
 
 
+async def test_api_create_site_422(
+    client: TestClient,
+    authntoken: AuthnToken,
+    draft_hp: DraftPage,
+):
+    site = fake_site(draft_hp).dict()
+    site["root_page_path"] = "/not-me"
+    resp = client.post(
+        "/api/sites",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=site,
+    )
+    assert resp.status_code == 422
+    assert resp.json() == {
+        "detail": [{"loc": ["body", "root_page_path"], "msg": "Unknown page"}]
+    }
+
+
 async def test_api_list_sites_403(
     client: TestClient,
     draft_hp: DraftPage,
@@ -200,3 +220,18 @@ async def test_delete_site(
         saved_site = await uow.sites.by_hostname(default_site.hostname)
     assert saved_site.is_err()
     assert saved_site.unwrap_err().name == "site_not_found"
+
+
+async def test_delete_site_404(
+    client: TestClient,
+    authntoken: AuthnToken,
+    default_site: Site,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.delete(
+        f"/api/sites/not-{default_site.hostname}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+    )
+    assert resp.status_code == 404

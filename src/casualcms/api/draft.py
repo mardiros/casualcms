@@ -139,11 +139,6 @@ async def draft_by_path(
         path = path.strip("/")
         rpage = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
-    async with app.uow as uow:
-        path = path.strip("/")
-        rpage = await uow.drafts.by_path(f"/{path}")
-        await uow.rollback()
-
     if rpage.is_err():
         raise HTTPException(
             status_code=422,

@@ -4,7 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageEdit } from "../../src/webapp/ui/pages/page_edit";
 import { PageList } from "../../src/webapp/ui/pages/page_list";
-import { renderWithRouter, waitForPath } from "./helpers";
+import { renderWithRouter, renderWithRouterWithTheme } from "./helpers";
 import config from "./config";
 
 describe("As a user, I can edit existing pages", () => {
@@ -73,7 +73,7 @@ describe("As a user, I can edit existing pages", () => {
   });
 
   it("Update the root page using the edition form", async () => {
-    renderWithRouter(
+    renderWithRouterWithTheme(
       <>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,

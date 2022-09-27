@@ -1,6 +1,5 @@
 import React from "react";
 import { RenderResult, render, screen, waitFor } from "@testing-library/react";
-import { theme } from "@chakra-ui/theme";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { Routes } from "react-router-dom";
 
@@ -107,7 +106,34 @@ export const renderWithRouter = async (
     options?.isAuthenticated === undefined ? true : options.isAuthenticated;
   let ret = render(
     <ErrorBoundary>
-      <ChakraProvider theme={theme}>
+      <AppContext.Provider value={config}>
+        <FakeAuth isAuthenticated={isAuthent}>
+          <MemoryRouter initialEntries={[path]}>
+            <Routes>{routes}</Routes>
+            <LocationDisplay />
+          </MemoryRouter>
+        </FakeAuth>
+      </AppContext.Provider>
+    </ErrorBoundary>,
+    {}
+  );
+  return ret;
+};
+
+
+/** Rendering the Chackra Provider is slow, so, use int for compontents
+ * that requires it, such as toastee.
+ */
+export const renderWithRouterWithTheme = async (
+  routes: React.ReactNode,
+  path: string,
+  options?: { isAuthenticated?: boolean }
+): Promise<RenderResult> => {
+  const isAuthent =
+    options?.isAuthenticated === undefined ? true : options.isAuthenticated;
+  let ret = render(
+    <ErrorBoundary>
+      <ChakraProvider>
         <AppContext.Provider value={config}>
           <FakeAuth isAuthenticated={isAuthent}>
             <MemoryRouter initialEntries={[path]}>

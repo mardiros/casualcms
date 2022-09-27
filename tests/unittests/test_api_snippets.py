@@ -197,6 +197,31 @@ async def test_api_patch_snippet(
         assert snip.unwrap_err().name == "snippet_not_found"
 
 
+async def test_api_patch_snippet_422(
+    client: TestClient,
+    authntoken: AuthnToken,
+    header_snippet: HeaderSnippet,
+    uow: AbstractUnitOfWork,
+):
+    resp = client.patch(
+        "/api/snippets/header",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json={
+            "meta": {"type": "blog:HeaderSnippet"},
+            "key": "hea/der",
+            "title": "Casual Blog",
+        },
+    )
+    assert resp.status_code == 422
+    assert resp.json() == {
+        "detail": [
+            {"loc": ["body"], "msg": "Invalid key field", "type": "value_error"}
+        ],
+    }
+
+
 async def test_api_get_snippet_403(
     client: TestClient,
     header_snippet: HeaderSnippet,

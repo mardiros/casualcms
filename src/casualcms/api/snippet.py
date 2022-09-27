@@ -1,7 +1,7 @@
 from typing import Any, MutableMapping, Optional, Sequence, cast
 
 from fastapi import Body, Depends, HTTPException, Request, Response
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import (
@@ -11,7 +11,12 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model import AuthnToken
-from casualcms.domain.model.snippet import SnippetKey, SnippetType
+from casualcms.domain.model.snippet import (
+    Snippet,
+    SnippetKey,
+    SnippetType,
+    resolve_snippet_type,
+)
 
 from .base import MappingWithKey, get_snippet_type_body, get_token_info
 
@@ -25,22 +30,96 @@ class PartialSnippet(BaseModel):
     meta: PartialSnippetMeta = Field(...)
 
 
-async def create_snippet(
-    request: Request,
-    type: SnippetKey = Body(...),
+async def get_snippet_by_key(
+    key: str = Field(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> Snippet:
+    async with app.uow as uow:
+        rsnippet = await uow.snippets.by_key(key)
+        if rsnippet.is_err():
+            raise HTTPException(
+                status_code=404,
+                detail=[
+                    {
+                        "loc": ["path", "hostname"],
+                        "msg": rsnippet.unwrap_err().value,
+                    }
+                ],
+            )
+        await uow.rollback()
+
+    return rsnippet.unwrap()
+
+
+async def get_validated_payload(
     payload: MappingWithKey = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
     snippet_type: SnippetType = Depends(get_snippet_type_body),
-) -> PartialSnippet:
+) -> MappingWithKey:
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {
             "id": generate_id(),
             "type": type,
             **payload,
         }
-        snippet_type(**params)  # validate pydantic model
+        try:
+            snippet_type(**params)  # validate pydantic model
+        except ValidationError as exc:
+            errors = exc.errors()
+            for error in errors:
+                error["loc"] = ["body", error["loc"]]  # type: ignore
+            raise HTTPException(
+                status_code=422,
+                detail=errors,
+            )
         await uow.rollback()
+    return payload
+
+
+async def get_new_validated_payload(
+    payload: MappingWithKey = Body(...),
+    app: AppConfig = FastAPIConfigurator.depends,
+    snippet: Snippet = Depends(get_snippet_by_key),
+) -> MappingWithKey:
+    async with app.uow as uow:
+        params: MutableMapping[str, Any] = {
+            "id": generate_id(),
+            "type": type,
+            **payload,
+        }
+        rtype = resolve_snippet_type(snippet.__meta__.type)
+        if rtype.is_err():
+            raise HTTPException(
+                status_code=500,
+                detail=[
+                    {
+                        "loc": ["path", "key"],
+                        "msg": rtype.unwrap_err().value,
+                    }
+                ],
+            )
+        snippet_type = rtype.unwrap()
+        try:
+            snippet_type(**params)  # validate pydantic model
+        except ValidationError as exc:
+            errors = exc.errors()
+            for error in errors:
+                error["loc"] = ["body", error["loc"]]  # type: ignore
+            raise HTTPException(
+                status_code=422,
+                detail=errors,
+            )
+        await uow.rollback()
+    return payload
+
+
+async def create_snippet(
+    request: Request,
+    type: SnippetKey = Body(...),
+    payload: MappingWithKey = Depends(get_validated_payload),
+    app: AppConfig = FastAPIConfigurator.depends,
+    token: AuthnToken = Depends(get_token_info),
+) -> PartialSnippet:
     key = payload.pop("key")
     cmd = CreateSnippet(type=type, key=key, body=cast(dict[str, Any], payload))
     cmd.metadata.clientAddr = request.client.host
@@ -89,35 +168,20 @@ async def list_snippets(
 
 
 async def show_snippet(
-    key: str = Field(...),
+    snippet: Snippet = Depends(get_snippet_by_key),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
-
-    async with app.uow as uow:
-        rsnippet = await uow.snippets.by_key(key)
-        await uow.rollback()
-
-    if rsnippet.is_err():
-        raise HTTPException(
-            status_code=422,
-            detail=[{"loc": ["querystring", "key"], "msg": "Unknown snippet"}],
-        )
-    snippet = rsnippet.unwrap()
     return snippet.get_data_context()
 
 
 async def update_snippet(
     request: Request,
     app: AppConfig = FastAPIConfigurator.depends,
-    key: str = Field(...),
-    payload: dict[str, Any] = Body(...),
+    snippet: Snippet = Depends(get_snippet_by_key),
+    payload: MappingWithKey = Depends(get_new_validated_payload),
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSnippet:
-
-    async with app.uow as uow:
-        rsnippet = await uow.snippets.by_key(key)
-        snippet = rsnippet.unwrap()
 
     new_key = payload.pop("key")
     payload.pop("meta", None)

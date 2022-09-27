@@ -1,19 +1,18 @@
 import re
-from typing import Any, Callable, Iterator, List, MutableMapping
+from typing import Any, Callable, Iterator, MutableMapping
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
 from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.snippet import SnippetKey, SnippetType, resolve_snippet_type
 
 __all__ = [
     "router",
     "get_token_info",
-    "get_snippet_type",
-    "get_snippet_type_body",
+    "MappingWithKey",
+    "MappingWithSlug",
     "RESOURCE_CREATED",
     "RESOURCE_UPDATED",
     "RESOURCE_DELETED",
@@ -77,26 +76,3 @@ async def get_token_info(
             raise credentials_exception
         await uow.commit()
     return authntoken.unwrap()
-
-
-def _get_snippet_type(type: SnippetKey, loc: List[str]) -> SnippetType:
-    rtype = resolve_snippet_type(type)
-    if rtype.is_err():
-        raise HTTPException(
-            status_code=422,
-            detail=[[{"loc": loc, "msg": rtype.unwrap_err().value}]],
-        )
-    return rtype.unwrap()
-
-
-def get_snippet_type(type: SnippetKey) -> SnippetType:
-    """Get the snippet type from its key as a non pure function for FastAPI."""
-    return _get_snippet_type(type, ["path", "type"])
-
-
-def get_snippet_type_body(type: SnippetKey = Body(...)) -> SnippetType:
-    """
-    Get the snippet type from its key in the request body,
-
-    as a non pure function for FastAPI."""
-    return _get_snippet_type(type, ["body", "type"])

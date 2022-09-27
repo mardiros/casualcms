@@ -18,7 +18,21 @@ from casualcms.domain.model.snippet import (
     resolve_snippet_type,
 )
 
-from .base import MappingWithKey, get_snippet_type_body, get_token_info
+from .base import MappingWithKey, get_token_info
+
+
+def get_snippet_type_body(type: SnippetKey = Body(...)) -> SnippetType:
+    """
+    Get the snippet type from its key in the request body,
+
+    as a non pure function for FastAPI."""
+    rtype = resolve_snippet_type(type)
+    if rtype.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[[{"loc": ["body", "type"], "msg": rtype.unwrap_err().value}]],
+        )
+    return rtype.unwrap()
 
 
 class PartialSnippetMeta(BaseModel):

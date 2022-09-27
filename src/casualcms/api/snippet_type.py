@@ -1,12 +1,28 @@
 from typing import Any
 
-from fastapi import Depends
+from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AuthnToken, list_snippet_types
-from casualcms.domain.model.snippet import SnippetKey, SnippetType
+from casualcms.domain.model.snippet import SnippetKey, SnippetType, resolve_snippet_type
 
-from .base import get_snippet_type, get_token_info
+from .base import get_token_info
+
+
+def get_snippet_type(type: SnippetKey) -> SnippetType:
+    """Get the snippet type from its key as a non pure function for FastAPI."""
+    rtype = resolve_snippet_type(type)
+    if rtype.is_err():
+        raise HTTPException(
+            status_code=422,
+            detail=[
+                {
+                    "loc": ["path", "type"],
+                    "msg": rtype.unwrap_err().value,
+                },
+            ],
+        )
+    return rtype.unwrap()
 
 
 class PartialSnippetType(BaseModel):

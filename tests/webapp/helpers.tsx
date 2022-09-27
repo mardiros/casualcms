@@ -1,14 +1,15 @@
 import React from "react";
-import { RenderResult, screen, waitFor } from "@testing-library/react";
+import { RenderResult, render, screen, waitFor } from "@testing-library/react";
+import { theme } from "@chakra-ui/theme";
 import { MemoryRouter, useLocation } from "react-router-dom";
 import { Routes } from "react-router-dom";
-import { render } from "@testing-library/react";
 
 import config from "./config";
 
 import { AuthContext } from "../../src/webapp/ui/login/hooks";
 import { Account } from "../../src/webapp/casualcms/domain/model";
 import { AppContext } from "../../src/webapp/config";
+import { ChakraProvider } from "@chakra-ui/react";
 
 export const LocationDisplay = () => {
   const location = useLocation();
@@ -26,14 +27,14 @@ export function FakeAuth(props: FakeAuthProps): React.ReactElement {
     props.isAuthenticated === false
       ? null
       : {
-          id: "123",
-          username: "bob",
-          token: "abc",
-          lang: "en",
-        };
+        id: "123",
+        username: "bob",
+        token: "abc",
+        lang: "en",
+      };
 
   let [authenticatedUser, setUser] = React.useState<Account | null>(account);
-  let remember = (account: Account, callback: any) => {};
+  let remember = (account: Account, callback: any) => { };
   let forget = async (callback: () => Promise<boolean>) => {
     setUser(null);
     await callback();
@@ -106,14 +107,16 @@ export const renderWithRouter = async (
     options?.isAuthenticated === undefined ? true : options.isAuthenticated;
   let ret = render(
     <ErrorBoundary>
-      <AppContext.Provider value={config}>
-        <FakeAuth isAuthenticated={isAuthent}>
-          <MemoryRouter initialEntries={[path]}>
-            <Routes>{routes}</Routes>
-            <LocationDisplay />
-          </MemoryRouter>
-        </FakeAuth>
-      </AppContext.Provider>
+      <ChakraProvider theme={theme}>
+        <AppContext.Provider value={config}>
+          <FakeAuth isAuthenticated={isAuthent}>
+            <MemoryRouter initialEntries={[path]}>
+              <Routes>{routes}</Routes>
+              <LocationDisplay />
+            </MemoryRouter>
+          </FakeAuth>
+        </AppContext.Provider>
+      </ChakraProvider>
     </ErrorBoundary>,
     {}
   );

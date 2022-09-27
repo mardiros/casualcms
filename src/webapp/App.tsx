@@ -1,6 +1,6 @@
 import React from "react";
 import { BrowserRouter, Link, Navigate, Route, Routes } from "react-router-dom";
-import { ColorModeProvider, CSSReset, ThemeProvider } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@chakra-ui/theme";
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
 import { useAuth } from "./ui/login/hooks";
@@ -102,14 +102,9 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
 
 const ThemedLayout: React.FunctionComponent<{}> = () => {
   return (
-    <>
-      <ThemeProvider theme={theme}>
-        <ColorModeProvider>
-          <CSSReset />
-        </ColorModeProvider>
-        <Layout routes={<AppRoutes />} />
-      </ThemeProvider>
-    </>
+    <ChakraProvider theme={theme}>
+      <Layout routes={<AppRoutes />} />
+    </ChakraProvider>
   );
 };
 

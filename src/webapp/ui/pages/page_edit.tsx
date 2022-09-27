@@ -1,8 +1,8 @@
 import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, useToast } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { useConfig } from "../../config";
@@ -33,8 +33,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     ? new URLSearchParams({ parent: parentPath })
     : new URLSearchParams();
 
-  let navigate = useNavigate();
-
+  const toast = useToast()
   React.useEffect(() => {
     async function loadPageType() {
       if (!page) {
@@ -84,7 +83,13 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     }
     const newPage = data.formData;
     await config.api.page.updateDraft(token, page.meta.path, newPage);
-    navigate(`/admin/pages?${q}`, { replace: true });
+    toast({
+      title: 'Draft page saved.',
+      description: "Don't forget to publish you changes afterall.",
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    })
   };
 
   if (isLoading) {
@@ -109,7 +114,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
           formData={page}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
+        // onError={() => console.log("errors")}
         />
       )}
       <PageEditButtons token={token} pagePath={pagePath} />

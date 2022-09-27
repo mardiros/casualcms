@@ -75,7 +75,6 @@ describe("As a user, I can edit existing pages", () => {
   it("Update the root page using the edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/pages" element={<PageList />}></Route>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
       "/admin/pages/edit?page=/home"
@@ -91,7 +90,8 @@ describe("As a user, I can edit existing pages", () => {
     expect(button).not.equal(null);
     fireEvent.click(button);
 
-    await waitForPath("/admin/pages");
+    let toastee = await screen.findByText("Draft page saved.");
+    expect(toastee).not.equal(null);
 
     const page = await config.api.page.showDraft("", "/home");
     expect(page.isOk()).equal(true);

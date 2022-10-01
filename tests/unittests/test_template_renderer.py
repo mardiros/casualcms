@@ -4,8 +4,7 @@ from result import Err, Ok
 
 from casualcms.adapters.jinja2 import Jinja2TemplateRender, build_searchpath
 from casualcms.config import Settings
-from casualcms.domain.model import Setting, Site, Snippet
-from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model import DraftPage, Setting, Site, Snippet
 from casualcms.domain.repositories.setting import SettingRepositoryError
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.casualblog.models import HeaderSnippet, HomePage

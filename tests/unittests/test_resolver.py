@@ -5,7 +5,7 @@ from casualcms.domain.model import DraftPage
 
 
 def test_resolve_ok():
-    hp = resolve("casualcms.domain.model.draft:DraftPage")
+    hp = resolve("casualcms.domain.model:DraftPage")
     assert hp.is_ok()
     assert hp.unwrap() is DraftPage
 

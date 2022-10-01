@@ -16,7 +16,7 @@ from .abstract_snippet import (
     resolve_snippet_type,
 )
 from .account import Account, AccountStatus, AuthnToken
-from .draft import DraftPage
+from .draft_page import DraftPage
 from .published_page import Page
 from .setting import Setting, SettingType, list_setting_types, resolve_setting_type
 from .site import Site

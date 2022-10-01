@@ -2,11 +2,11 @@
 {% block body %}
   <section class="hero is-medium is-primary">
     <div class="hero-body">
-      <h1 class="title">{{hero_title}}</h1>
+      <h1 class="title">{{page.hero_title}}</h1>
     </div>
   </section>
 
-  {% for p in body %}
+  {% for p in page.body %}
     <h2>{{p.title}}</h2>
     {{ p.body | safe }}
   {% endfor %}

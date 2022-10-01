@@ -1,12 +1,13 @@
-from typing import Any, Mapping, cast
+from typing import Any, Mapping, Sequence, cast
 
 import pytest
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.repositories.draft import DraftRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.casualblog.models import HomePage
+from tests.casualblog.models import CategoryPage, HomePage
 
 
 async def test_api_create_draft_unauthenticated(
@@ -44,8 +45,8 @@ async def test_api_create_draft(
     assert resp.status_code == 201
     assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
-        page = (await uow.drafts.by_path("/index")).unwrap()
-        assert page.dict() == {
+        page: DraftPage[Any] = (await uow.drafts.by_path("/index")).unwrap()
+        assert page.page.dict() == {
             "slug": "index",
             "title": "Root Page",
             "description": "The home page",
@@ -132,13 +133,13 @@ async def test_api_create_draft_invalid_data_422(
     assert resp.json() == params["expected_response"]
 
 
-async def test_api_list_draft_403(client: TestClient, draft_hp: DraftPage):
+async def test_api_list_draft_403(client: TestClient, draft_hp: DraftPage[HomePage]):
     resp = client.get("/api/drafts")
     assert resp.status_code == 403
 
 
 async def test_api_list_root_draft_pages(
-    client: TestClient, authntoken: AuthnToken, draft_hp: DraftPage
+    client: TestClient, authntoken: AuthnToken, draft_hp: DraftPage[HomePage]
 ):
     resp = client.get(
         "/api/drafts",
@@ -153,7 +154,7 @@ async def test_api_list_root_draft_pages(
             "title": draft_hp.title,
             "meta": {
                 "path": draft_hp.path,
-                "type": draft_hp.__meta__.type,
+                "type": draft_hp.type,
             },
         }
     ]
@@ -162,7 +163,7 @@ async def test_api_list_root_draft_pages(
 async def test_create_draft_subpages(
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.post(
@@ -184,8 +185,8 @@ async def test_create_draft_subpages(
     assert resp.status_code == 201
     assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
-        page = (await uow.drafts.by_path("/home/test")).unwrap()
-        assert page.dict() == {
+        page: DraftPage[Any] = (await uow.drafts.by_path("/home/test")).unwrap()
+        assert page.page.dict() == {
             "slug": "test",
             "title": "sub Page",
             "description": "A sub page",
@@ -194,8 +195,8 @@ async def test_create_draft_subpages(
         }
 
     async with uow as uow:
-        pages = (await uow.drafts.by_parent("/home")).unwrap()
-        pages_dict = [page.dict() for page in pages]
+        pages: Sequence[DraftPage[Any]] = (await uow.drafts.by_parent("/home")).unwrap()
+        pages_dict = [page.page.dict() for page in pages]
         assert pages_dict == [
             {
                 "slug": "test",
@@ -209,7 +210,7 @@ async def test_create_draft_subpages(
 
 async def test_get_draft_403(
     client: TestClient,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.get("/api/drafts/home")
@@ -272,8 +273,8 @@ async def test_get_draft(
     params: Mapping[str, Any],
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
-    draft_subpage: DraftPage,
+    draft_hp: DraftPage[HomePage],
+    draft_subpage: DraftPage[CategoryPage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.get(
@@ -287,7 +288,7 @@ async def test_get_draft(
 
 async def test_preview_draft_403(
     client: TestClient,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.get("/api/previews/home")
@@ -307,8 +308,8 @@ async def test_preview_draft(
     params: Mapping[str, Any],
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
-    draft_subpage: DraftPage,
+    draft_hp: DraftPage[HomePage],
+    draft_subpage: DraftPage[CategoryPage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.get(
@@ -321,7 +322,9 @@ async def test_preview_draft(
     assert "<h2>Welcome aboard!</h2>" in resp.text
 
 
-async def test_update_home_draft_content_403(client: TestClient, draft_hp: DraftPage):
+async def test_update_home_draft_content_403(
+    client: TestClient, draft_hp: DraftPage[HomePage]
+):
     payload = {
         "slug": "new-home",
         "title": "new title",
@@ -339,7 +342,7 @@ async def test_update_home_draft_content_403(client: TestClient, draft_hp: Draft
 async def test_update_home_draft_content(
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     payload = {
@@ -359,21 +362,23 @@ async def test_update_home_draft_content(
     assert resp.status_code == 202
     assert resp.json() == {"message": "Resource Updated"}
     async with uow as uow:
-        saved_home = cast(
-            HomePage,
-            (await uow.drafts.by_path("/new-home")).unwrap(),
-        )
+        saved_home: DraftPage[HomePage] = (
+            await uow.drafts.by_path("/new-home")
+        ).unwrap()  # type: ignore
+
     assert saved_home.slug == "new-home"
     assert saved_home.title == payload["title"]
     assert saved_home.description == payload["description"]
-    assert saved_home.hero_title == payload["hero_title"]
-    assert saved_home.body == payload["body"]  # XXX should be a list[Paragraph] here
+    assert saved_home.page.hero_title == payload["hero_title"]
+    assert (
+        saved_home.page.body == payload["body"]
+    )  # XXX should be a list[Paragraph] here
 
 
 async def test_update_sub_draft_content(
     client: TestClient,
     authntoken: AuthnToken,
-    draft_subpage: DraftPage,
+    draft_subpage: DraftPage[CategoryPage],
     uow: AbstractUnitOfWork,
 ):
     payload = {
@@ -400,7 +405,7 @@ async def test_update_sub_draft_content(
 
 async def test_delete_draft_403(
     client: TestClient,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.delete(f"/api/drafts/{draft_hp.path}")
@@ -410,7 +415,7 @@ async def test_delete_draft_403(
 async def test_delete_page(
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.delete(
@@ -422,7 +427,7 @@ async def test_delete_page(
     assert resp.status_code == 204
 
     async with uow as uow:
-        saved_home = await uow.drafts.by_path("/home")
+        saved_home: DraftRepositoryResult[Any] = await uow.drafts.by_path("/home")
 
     assert saved_home.is_err()
     assert saved_home.unwrap_err().name == "page_not_found"
@@ -431,7 +436,7 @@ async def test_delete_page(
 async def test_delete_page_422(
     client: TestClient,
     authntoken: AuthnToken,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
     uow: AbstractUnitOfWork,
 ):
     resp = client.delete(

@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
+from casualcms.domain.model.draft import resolve_page_type
 
 
 async def serve_pages(
@@ -43,10 +44,13 @@ async def serve_pages(
                 detail=[{"msg": f"Page {path} not found"}],
             )
         page = rpage.unwrap()
+        rdraft = resolve_page_type(page.type)
+        draft = rdraft.unwrap()
+        body = draft(**page.body)
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        data = await renderer.render_template(page.template, page.body)
+        data = await renderer.render_page(page.template, body)
         await uow.rollback()
     return Response(data)
 

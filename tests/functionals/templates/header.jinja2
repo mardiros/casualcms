@@ -1,6 +1,6 @@
 <ul role="nav">
-    <li><a href="/home">{{title}}</a></li>
-    {%- for link in links -%}
+    <li><a href="/home">{{page.title}}</a></li>
+    {%- for link in page.links -%}
         <li><a href="{{link.href}}">{{link.title}}</a></li>
     {%- endfor -%}
 </ul>

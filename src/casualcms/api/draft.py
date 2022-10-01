@@ -5,14 +5,13 @@ from pydantic import BaseModel, Field, ValidationError
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
-from casualcms.domain.messages.commands import (
-    CreatePage,
-    DeletePage,
-    UpdatePage,
-    generate_id,
-)
+from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.draft import DraftPage, PageType, resolve_page_type
+from casualcms.domain.repositories.draft import (
+    DraftRepositoryResult,
+    DraftSequenceRepositoryResult,
+)
 
 from .base import (
     RESOURCE_CREATED,
@@ -54,15 +53,15 @@ async def build_params(
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
-        params: MutableMapping[str, Any] = {"id": generate_id(), **payload}
+        params: MutableMapping[str, Any] = {**payload}
         if parent:
-            parent_page = await uow.drafts.by_path(parent)
+            parent_page: DraftRepositoryResult[Any] = await uow.drafts.by_path(parent)
             if parent_page.is_err():
                 raise HTTPException(
                     status_code=422,
                     detail=[{"loc": ["body", "parent"], "msg": "Unknown page"}],
                 )
-            params["parent"] = parent_page.unwrap()
+            params["parent"] = parent_page.unwrap().page
         try:
             page_type(**params)  # validate pydantic model
         except ValidationError as exc:
@@ -85,7 +84,6 @@ async def create_draft(
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
-
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
@@ -95,7 +93,12 @@ async def create_draft(
         if rpage.is_err():
             raise HTTPException(
                 status_code=422,
-                detail=[{"loc": ["body", "parent"], "msg": rpage.unwrap_err().value}],
+                detail=[
+                    {
+                        "loc": ["body", "parent"],
+                        "msg": rpage.unwrap_err().value,
+                    }
+                ],
             )
         await uow.commit()
 
@@ -109,13 +112,18 @@ async def list_drafts(
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
-        pages = await uow.drafts.by_parent(parent)
+        pages: DraftSequenceRepositoryResult[Any] = await uow.drafts.by_parent(parent)
         await uow.rollback()
 
     if pages.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "parent"], "msg": "Unknown parent"}],
+            detail=[
+                {
+                    "loc": ["querystring", "parent"],
+                    "msg": "Unknown parent",
+                }
+            ],
         )
     ps = pages.unwrap()
     return [
@@ -124,7 +132,7 @@ async def list_drafts(
             title=p.title,
             meta=PartialPageMeta(
                 path=p.path,
-                type=p.__meta__.type,
+                type=p.type,
             ),
         )
         for p in ps
@@ -134,34 +142,40 @@ async def list_drafts(
 async def draft_by_path(
     path: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> DraftPage:
+) -> DraftPage[Any]:
     async with app.uow as uow:
         path = path.strip("/")
-        rpage = await uow.drafts.by_path(f"/{path}")
+        rpage: DraftRepositoryResult[Any] = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
     if rpage.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "path"], "msg": "Unknown page"}],
+            detail=[
+                {
+                    "loc": ["querystring", "path"],
+                    "msg": "Unknown page",
+                }
+            ],
         )
     return rpage.unwrap()
 
 
 async def show_draft(
     token: AuthnToken = Depends(get_token_info),
-    draft_page: DraftPage = Depends(draft_by_path),
+    draft_page: DraftPage[Any] = Depends(draft_by_path),
 ) -> Mapping[str, Any]:
-    return draft_page.get_data_context()
+    ret = draft_page.page.dict()
+    ret["meta"] = draft_page.page.metadata
+    return ret
 
 
 async def preview_draft(
     request: Request,
-    draft_page: DraftPage = Depends(draft_by_path),
+    draft_page: DraftPage[Any] = Depends(draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
 
-    context = draft_page.get_data_context()
     async with app.uow as uow:
         hostname = request.url.hostname or ""
         if request.url.port:
@@ -170,14 +184,17 @@ async def preview_draft(
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        data = await renderer.render_template(draft_page.get_template(), context)
+        data = await renderer.render_page(
+            draft_page.template,
+            draft_page.page,
+        )
         await uow.rollback()
     return Response(data)
 
 
 async def update_draft(
     request: Request,
-    draft_page: DraftPage = Depends(draft_by_path),
+    draft_page: DraftPage[Any] = Depends(draft_by_path),
     payload: dict[str, Any] = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
@@ -197,7 +214,10 @@ async def update_draft(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "path"], "msg": res.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "path"],
+                        "msg": res.unwrap_err().value,
+                    }
                 ],
             )
         else:
@@ -208,7 +228,7 @@ async def update_draft(
 
 async def delete_draft(
     request: Request,
-    draft_page: DraftPage = Depends(draft_by_path),
+    draft_page: DraftPage[Any] = Depends(draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
@@ -224,7 +244,10 @@ async def delete_draft(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "path"], "msg": resp.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "path"],
+                        "msg": resp.unwrap_err().value,
+                    }
                 ],
             )
         else:

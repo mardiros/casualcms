@@ -18,8 +18,8 @@ from result import Err, Ok
 from sqlalchemy import Table, alias, delete, text  # type: ignore
 from sqlalchemy.engine import CursorResult, Row  # type: ignore
 from sqlalchemy.exc import IntegrityError  # type: ignore
-from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
+from sqlalchemy.ext.asyncio.engine import create_async_engine  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
 
@@ -33,6 +33,7 @@ from casualcms.domain.model import (
     Site,
     resolve_page_type,
 )
+from casualcms.domain.model.draft import AbstractPage, PageImpl
 from casualcms.domain.model.setting import Setting, SettingType, resolve_setting_type
 from casualcms.domain.model.snippet import Snippet, resolve_snippet_type
 from casualcms.domain.repositories import (
@@ -98,12 +99,12 @@ def mapped_result(
     return ret
 
 
-def format_draft_page(page: DraftPage) -> Dict[str, Any]:
+def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.drafts."""
-    p: Dict[str, Any] = page.dict()
+    p: Dict[str, Any] = page.page.dict()
     formated_page: Dict[str, Any] = {
         "id": page.id,
-        "type": page.__meta__.type,
+        "type": page.type,
         "created_at": page.created_at,
         "slug": p.pop("slug"),
         "title": p.pop("title"),
@@ -186,7 +187,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen = set()
         self.session = session
 
-    async def by_id(self, id: str) -> DraftRepositoryResult:
+    async def by_id(self, id: str) -> DraftRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
         qry = (
             select(orm.drafts)
@@ -200,7 +201,8 @@ class DraftSQLRepository(AbstractDraftRepository):
             .order_by(orm.drafts_treepath.c.length.desc())
         )
         orm_pages: CursorResult = await self.session.execute(qry)
-        page: DraftPage | None = None
+        page: AbstractPage | None = None
+        draft_page: DraftPage[PageImpl] | None = None
         orm_page_iter = iter(orm_pages)  # type: ignore
         try:
             orm_page = next(orm_page_iter)  # type: ignore
@@ -209,24 +211,29 @@ class DraftSQLRepository(AbstractDraftRepository):
         while orm_page:
             typ = resolve_page_type(orm_page.type).unwrap()  # type: ignore
             page = typ(
-                id=orm_page.id,
-                slug=orm_page.slug,
-                title=orm_page.title,
-                description=orm_page.description,
                 parent=page,
                 **orm_page.body,
+            )
+            draft_page = DraftPage(
+                id=orm_page.id,  # type: ignore
+                created_at=orm_page.created_at,  # type: ignore
+                page=page,
             )
             try:
                 orm_page = next(orm_pages)  # type: ignore
             except StopIteration:
+                draft_page = DraftPage(
+                    id=orm_page.id,  # type: ignore
+                    page=page,
+                )
                 break
 
-        if page:
-            return Ok(page)
+        if draft_page:
+            return Ok(draft_page)
         # If we don't have a page here, it means that the tree path is broken
         return Err(DraftRepositoryError.page_broken_treepath)  # coverage: ignore
 
-    async def by_path(self, path: str) -> DraftRepositoryResult:
+    async def by_path(self, path: str) -> DraftRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
         slugs = enumerate(reversed(path.strip("/").split("/")))
         qry = select(orm.drafts)
@@ -249,10 +256,12 @@ class DraftSQLRepository(AbstractDraftRepository):
         page: CursorResult = await self.session.execute(qry)
         p: Any = page.first()
         if p:
-            return await self.by_id(p.id)
+            return await self.by_id(p.id)  # type: ignore
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
+    async def by_parent(
+        self, path: Optional[str]
+    ) -> DraftSequenceRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
 
         if not path:
@@ -262,9 +271,9 @@ class DraftSQLRepository(AbstractDraftRepository):
                 .filter(orm.drafts.c.id == orm.drafts_treepath.c.descendant_id)
                 .filter(orm.drafts_treepath.c.length > 0)
             ).exists()
-            parent = None
+            parent_page = None
         else:
-            parent_res = await self.by_path(path or "")
+            parent_res: DraftRepositoryResult[Any] = await self.by_path(path or "")
             if parent_res.is_err():
                 return cast(Err[DraftRepositoryError], parent_res)
             parent = parent_res.unwrap()
@@ -274,24 +283,30 @@ class DraftSQLRepository(AbstractDraftRepository):
                 .filter(orm.drafts_treepath.c.length == 1)
                 .filter(orm.drafts_treepath.c.ancestor_id == parent.id)
             ).exists()
+            parent_page = parent.page
         qry = select(orm.drafts).filter(sub).order_by(orm.drafts.c.slug)
         pages: CursorResult = await self.session.execute(qry)
 
-        ret: list[DraftPage] = [
+        ret: list[DraftPage[PageImpl]] = [
             resolve_page_type(p.type).unwrap()(  # type:ignore
-                id=p.id,
-                slug=p.slug,
-                title=p.title,
-                description=p.description,
-                parent=parent,
+                parent=parent_page,
                 **p.body,
             )
             for p in pages  # type:ignore
         ]
         return Ok(ret)
 
-    async def add(self, model: DraftPage) -> DraftOperationResult:
+    async def add(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Append a new model to the repository."""
+
+        parent_draft = None
+        if model.page.parent:
+            rparent_draft: DraftRepositoryResult[Any] = await self.by_path(
+                model.page.parent.path
+            )
+            if rparent_draft.is_err():
+                return Err(DraftRepositoryError.page_not_found)
+            parent_draft = rparent_draft.unwrap()
 
         await self.session.execute(  # type: ignore
             orm.drafts.insert(),  # type: ignore
@@ -310,8 +325,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         )
 
         # process parents
-        if model.parent:
-            model.parent.id
+        if parent_draft:
             await self.session.execute(
                 text(
                     """
@@ -324,12 +338,12 @@ class DraftSQLRepository(AbstractDraftRepository):
                     WHERE drafts_treepath.descendant_id = :parent_id
                     """
                 ),
-                {"draft_id": model.id, "parent_id": model.parent.id},
+                {"draft_id": model.id, "parent_id": parent_draft.id},
             )
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: DraftPage) -> DraftOperationResult:
+    async def update(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Update model in the repository."""
         page = format_draft_page(model)
         page.pop("id")
@@ -341,9 +355,11 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: DraftPage) -> DraftOperationResult:
+    async def remove(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Remove the model from the repository."""
-        child_pages = await self.by_parent(model.path)
+        child_pages: DraftSequenceRepositoryResult[Any] = await self.by_parent(
+            model.path
+        )
         if child_pages.is_err():
             return cast(Err[DraftRepositoryError], child_pages)
 
@@ -352,11 +368,13 @@ class DraftSQLRepository(AbstractDraftRepository):
 
         await self.session.execute(
             delete(orm.drafts_treepath).where(
-                orm.drafts_treepath.c.descendant_id == model.id
+                orm.drafts_treepath.c.descendant_id == model.id  # type: ignore
             ),
         )
         await self.session.execute(
-            delete(orm.drafts).where(orm.drafts.c.id == model.id),
+            delete(orm.drafts).where(
+                orm.drafts.c.id == model.id,  # type: ignore
+            ),
         )
         self.seen.add(model)
         return Ok(...)
@@ -436,7 +454,9 @@ class SnippetSQLRepository(AbstractSnippetRepository):
     async def remove(self, model: Snippet) -> SnippetOperationResult:
         """Remove the model from the repository."""
         await self.session.execute(
-            delete(orm.snippets).where(orm.snippets.c.key == model.key),
+            delete(orm.snippets).where(
+                orm.snippets.c.key == model.key,  # type: ignore
+            ),
         )
         self.seen.add(model)
         return Ok(...)
@@ -550,7 +570,9 @@ class SettingSQLRepository(AbstractSettingRepository):
     async def remove(self, model: Setting) -> SettingOperationResult:
         """Remove the model from the repository."""
         cursor: CursorResult = await self.session.execute(
-            delete(orm.settings).where(orm.settings.c.id == model.id),
+            delete(orm.settings).where(
+                orm.settings.c.id == model.id,  # type: ignore
+            ),
         )
         if cursor.rowcount == 0:
             return Err(SettingRepositoryError.setting_not_found)
@@ -612,7 +634,9 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
     async def remove(self, token: str) -> AuthnTokenOperationResult:
         """Delete a new model to the repository."""
         cursor: CursorResult = await self.session.execute(
-            delete(orm.authn_tokens).where(orm.authn_tokens.c.token == token),
+            delete(orm.authn_tokens).where(
+                orm.authn_tokens.c.token == token,  # type: ignore
+            ),
         )
         if cursor.rowcount == 0:
             return Err(AuthnTokenRepositoryError.token_not_found)
@@ -653,9 +677,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Append a new model to the repository."""
         data = model.dict()
         data["created_at"] = model.created_at
-        rpage = await DraftSQLRepository(self.session).by_path(
-            data.pop("root_page_path")
-        )
+        rpage: DraftRepositoryResult[Any] = await DraftSQLRepository(
+            self.session
+        ).by_path(data.pop("root_page_path"))
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
 
@@ -705,7 +729,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Update given model into the repository."""
         site = model.dict(exclude={"id", "draft_id", "root_page_path"})
 
-        rpage = await DraftSQLRepository(self.session).by_path(model.root_page_path)
+        rpage: DraftRepositoryResult[Any] = await DraftSQLRepository(
+            self.session
+        ).by_path(model.root_page_path)
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
         page = rpage.unwrap()  # FIXME, should return Ok(...)
@@ -720,7 +746,11 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def remove(self, model: Site) -> SiteOperationResult:
         """Remove given model from the repository."""
-        await self.session.execute(delete(orm.sites).where(orm.sites.c.id == model.id))
+        await self.session.execute(
+            delete(orm.sites).where(
+                orm.sites.c.id == model.id,  # type: ignore
+            )
+        )
         return Ok(...)
 
 
@@ -781,7 +811,9 @@ class PageSQLRepository(AbstractPageRepository):
         site = orm_page_split[orm.sites]
         if site["secure"] and scheme == "http":
             return Err(PageRepositoryError.page_not_found)
-        rdraft = await DraftSQLRepository(self.session).by_id(site["draft_id"])
+        rdraft: DraftRepositoryResult[Any] = await DraftSQLRepository(
+            self.session
+        ).by_id(site["draft_id"])
         if rdraft.is_err():
             return Err(PageRepositoryError.page_not_found)
         root = rdraft.unwrap()
@@ -817,7 +849,10 @@ class PageSQLRepository(AbstractPageRepository):
         page = format_page(model)
         page.pop("id")
         cursor: CursorResult = await self.session.execute(
-            orm.pages.update(orm.pages.c.id == model.id, values=page)  # type: ignore
+            orm.pages.update(
+                orm.pages.c.id == model.id,  # type: ignore
+                values=page,
+            )
         )
         if cursor.rowcount == 0:
             return Err(PageRepositoryError.page_not_found)

@@ -24,7 +24,7 @@ def test_build_searchpath():
 
 async def test_render_template(uow: AbstractUnitOfWork, app_settings: Settings):
     renderer = Jinja2TemplateRender(uow, app_settings.template_search_path, "")
-    data = await renderer.render_template("test.jinja2", {"title": "hey"})
+    data = await renderer.render_template("test.jinja2", {"page": {"title": "hey"}})
     assert data == "<html><title>hey</title></html>"
 
 

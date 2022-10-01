@@ -1,3 +1,5 @@
+from typing import Any
+
 from result import Err, Ok
 
 from casualcms.domain.messages.commands import (
@@ -7,7 +9,11 @@ from casualcms.domain.messages.commands import (
     UpdatePage,
 )
 from casualcms.domain.model import Page, resolve_page_type
-from casualcms.domain.repositories.draft import DraftOperationResult
+from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.repositories.draft import (
+    DraftOperationResult,
+    DraftRepositoryResult,
+)
 from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -19,8 +25,11 @@ async def create_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
     tpage = resolve_page_type(cmd.type).unwrap()
-    page = tpage(created_at=cmd.created_at, **cmd.payload)
-    return await uow.drafts.add(page)
+    page = tpage(**cmd.payload)
+    draft_page: DraftPage[Any] = DraftPage(
+        id=cmd.id, created_at=cmd.created_at, page=page
+    )
+    return await uow.drafts.add(draft_page)
 
 
 @listen
@@ -29,12 +38,12 @@ async def update_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
     for key, val in cmd.payload.items():
-        setattr(page, key, val)
+        setattr(page.page, key, val)
     return await uow.drafts.update(page)
 
 
@@ -44,7 +53,7 @@ async def delete_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
@@ -56,7 +65,7 @@ async def publish_page(
     cmd: PublishPage,
     uow: AbstractUnitOfWork,
 ) -> PageOperationResult:
-    rdraft_page = await uow.drafts.by_id(cmd.id)
+    rdraft_page: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
     if rdraft_page.is_err():
         return Err(PageRepositoryError.draft_not_found)
     draft_page = rdraft_page.unwrap()
@@ -75,20 +84,20 @@ async def publish_page(
     rpublished_page = await uow.pages.by_draft_page_and_site(draft_page.id, site.id)
     if rpublished_page.is_ok():
         published_page = rpublished_page.unwrap()
-        published_page.template = draft_page.get_template()
+        published_page.template = draft_page.template
         published_page.title = draft_page.title
         published_page.path = path
-        published_page.body = draft_page.get_context()
+        published_page.body = draft_page.page.dict()
         rok = await uow.pages.update(rpublished_page.unwrap())
     else:
         published_page = Page(
             site=site,
             draft_id=draft_page.id,
-            type=draft_page.__meta__.type,
-            template=draft_page.get_template(),
+            type=draft_page.type,
+            template=draft_page.template,
             title=draft_page.title,
             path=path,
-            body=draft_page.get_context(),
+            body=draft_page.page.dict(),
         )
         rok = await uow.pages.add(published_page)
     if rok.is_err():

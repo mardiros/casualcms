@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import DraftPage, Snippet
+from casualcms.domain.model import AbstractPage, Snippet
 
 
 class Link(BaseModel):
@@ -24,15 +24,15 @@ class Paragraph(BaseModel):
     body: str = Field(widget="textarea")
 
 
-class AbstractPage(DraftPage):
+class BasePage(AbstractPage):
     hero_title: str = Field(description="Title of the hero section")
 
     class Meta:
         abstract = True
 
 
-class HomePage(AbstractPage):
-    body: list[Paragraph] = []
+class HomePage(BasePage):
+    body: list[Paragraph] = Field(default_factory=list)
 
     class Meta:
         parent_types = None
@@ -40,9 +40,35 @@ class HomePage(AbstractPage):
         type = "HomePage"
 
 
-class DocumentationRootPage(AbstractPage):
+class DocumentationNavItem(BaseModel):
+    title: str = Field()
+    links: list[Link] = Field(default_factory=list)
 
-    intro: Optional[Paragraph] = Field()
+
+class DocumentationNav(BaseModel):
+    title: str = Field()
+    items: list[DocumentationNavItem] = Field(default_factory=list)
+
+    class Meta:
+        template = "documentation_nav.jinja2"
+        type = "DocumentationNavSnippet"
+
+
+class LayoutColumn(BaseModel):
+    item: DocumentationNav | Paragraph = Field()
+
+
+class LayoutColumns(BaseModel):
+    items: list[LayoutColumn] = Field(default_factory=list)
+
+    class Meta:
+        template = "columns.jinja2"
+        type = "Columns"
+
+
+class DocumentationRootPage(BasePage):
+
+    columns: LayoutColumns = Field()
 
     class Meta:
         parent_types = [HomePage]
@@ -50,7 +76,7 @@ class DocumentationRootPage(AbstractPage):
         template = "documentation/index.jinja2"
 
 
-class BlogRootPage(AbstractPage):
+class BlogRootPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
 
@@ -60,7 +86,7 @@ class BlogRootPage(AbstractPage):
         template = "blog/index.jinja2"
 
 
-class BlogPostPage(AbstractPage):
+class BlogPostPage(BasePage):
 
     body: list[Paragraph] = []
     related_post_snippet: str = ""

@@ -1,4 +1,5 @@
 from collections import defaultdict
+from operator import and_
 from pathlib import Path
 from typing import (
     Any,
@@ -11,7 +12,7 @@ from typing import (
 )
 
 import pytest
-from sqlalchemy import delete, select, text  # type: ignore
+from sqlalchemy import alias, delete, select, text  # type: ignore
 from sqlalchemy.engine.cursor import CursorResult  # type: ignore
 from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
@@ -21,7 +22,7 @@ from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
 from casualcms.config import Settings
 from casualcms.domain.model.account import Account, AuthnToken
-from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model.draft import AbstractPage, DraftPage
 from casualcms.domain.model.page import Page
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
@@ -94,7 +95,7 @@ async def accounts(
 @pytest.fixture()
 async def sites(
     sqla_session: AsyncSession,
-    drafts: list[DraftPage],
+    drafts: list[DraftPage[Any]],
     params: Mapping[str, Any],
 ) -> AsyncGenerator[Sequence[Site], None]:
 
@@ -130,7 +131,9 @@ async def authn_tokens(
 
     await sqla_session.execute(  # type: ignore
         delete(orm.authn_tokens).where(
-            orm.authn_tokens.c.token.in_([t.token for t in authn_tokens])
+            orm.authn_tokens.c.token.in_(  # type: ignore
+                [t.token for t in authn_tokens],
+            )
         ),
     )
     await sqla_session.commit()
@@ -140,21 +143,49 @@ async def authn_tokens(
 async def drafts(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
-) -> AsyncGenerator[Sequence[DraftPage], None]:
-    def format_page(page: DraftPage) -> Dict[str, Any]:
-        p: Dict[str, Any] = page.dict()
+) -> AsyncGenerator[Sequence[DraftPage[Any]], None]:
+    def format_page(page: DraftPage[Any]) -> Dict[str, Any]:
         formated_page: Dict[str, Any] = {
             "id": page.id,
-            "type": page.__meta__.type,
+            "type": page.type,
             "created_at": page.created_at,
-            "slug": p.pop("slug"),
-            "title": p.pop("title"),
-            "description": p.pop("description"),
+            "slug": page.slug,
+            "title": page.title,
+            "description": page.description,
+            "body": page.page.dict(),
         }
-        formated_page["body"] = p
         return formated_page
 
-    draft_pages: Sequence[DraftPage] = params["drafts"]
+    async def get_parent_id(page: AbstractPage) -> str:
+        page_slugs: list[str] = []
+        page_tree = page.parent
+        while page_tree:
+            page_slugs.append(page_tree.slug)
+            page_tree = page_tree.parent
+        slugs = enumerate(page_slugs)
+
+        qry = select(orm.drafts)
+        for idx, slug in slugs:
+            parent = alias(orm.drafts)
+            sub = (
+                select(orm.drafts_treepath)
+                .join(
+                    parent,
+                    and_(
+                        parent.c.id == orm.drafts_treepath.c.ancestor_id,
+                        parent.c.slug == slug,
+                    ),
+                )
+                .filter(orm.drafts.c.id == orm.drafts_treepath.c.descendant_id)
+                .filter(orm.drafts_treepath.c.length == idx)
+            )
+            qry = qry.filter(sub.exists())
+
+        res: CursorResult = await sqla_session.execute(qry)
+        parent_page: Any = res.first()
+        return parent_page.id
+
+    draft_pages: Sequence[DraftPage[Any]] = params["drafts"]
     if draft_pages:
         await sqla_session.execute(  # type: ignore
             orm.drafts.insert(),  # type: ignore
@@ -175,8 +206,10 @@ async def drafts(
 
         for page in draft_pages:
             # process parents
-            if page.parent:
-                page.parent.id
+            # FIXME
+            if page.page.parent:
+                parent_id = await get_parent_id(page.page)
+                # search in the tree path
                 await sqla_session.execute(
                     text(
                         """
@@ -189,7 +222,7 @@ async def drafts(
                         WHERE drafts_treepath.descendant_id = :parent_id
                         """
                     ),
-                    {"draft_id": page.id, "parent_id": page.parent.id},
+                    {"draft_id": page.id, "parent_id": parent_id},
                 )
 
         await sqla_session.commit()
@@ -292,7 +325,7 @@ async def pages(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
     sites: list[Site],
-    drafts: list[DraftPage],
+    drafts: list[DraftPage[Any]],
 ):
     def format_page(page: Page) -> Dict[str, Any]:
         formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})

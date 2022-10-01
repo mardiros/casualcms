@@ -4,6 +4,7 @@ from typing import Any, Mapping, MutableMapping
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
+from casualcms.domain.model.draft import AbstractPage
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
@@ -46,9 +47,10 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         rsnippet = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
-            return await self.render_template(
+            ret = await self.render_template(
                 snippet.get_template(), snippet.get_context()
             )
+            return ret
         else:
             # should render an error here
             return ""
@@ -81,6 +83,10 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
                 "get_setting": self.get_setting,
             },
         )
+
+    async def render_page(self, template: str, context: AbstractPage) -> str:
+        tpl = self.get_template(template)
+        return await tpl.render_async(page=context)
 
     async def render_template(self, template: str, context: Mapping[str, Any]) -> str:
         tpl = self.get_template(template)

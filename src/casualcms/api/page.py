@@ -1,9 +1,12 @@
+from typing import Any
+
 from fastapi import Body, Depends, HTTPException
 from result import Result
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import PublishPage
 from casualcms.domain.model import AuthnToken, Page
+from casualcms.domain.repositories.draft import DraftRepositoryResult
 
 from .base import RESOURCE_CREATED, HTTPMessage, get_token_info
 
@@ -17,7 +20,7 @@ async def publish_page(
 
     async with app.uow as uow:
         errs = []
-        rdraft = await uow.drafts.by_path(path)
+        rdraft: DraftRepositoryResult[Any] = await uow.drafts.by_path(path)
         if rdraft.is_err():
             errs.append([{"loc": ["body", "path"], "msg": rdraft.unwrap_err().value}])
         rsite = await uow.sites.by_hostname(hostname)

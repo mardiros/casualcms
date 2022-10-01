@@ -27,7 +27,6 @@ class SettingTypeList:
         try:
             return self._types[typ]
         except KeyError:
-            breakpoint()
             raise UnregisterType(typ)
 
     @property

@@ -48,7 +48,7 @@ reportIncompatibleVariableOverride = false
 
 [tool.mypy]
 plugins = [
-  "pydantic.mypy"
+  "pydantic.mypy",
 ]
 
 [[tool.mypy.overrides]]

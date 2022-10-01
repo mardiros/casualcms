@@ -26,7 +26,7 @@ from casualcms.domain.model.snippet import Snippet
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.casualblog.models import HomePage
+from tests.casualblog.models import CategoryPage, HomePage
 
 
 @pytest.fixture()
@@ -122,14 +122,14 @@ async def draft_hp(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[DraftPage, None]:
+) -> AsyncGenerator[DraftPage[HomePage], None]:
     async with uow as uow:
         page_id = generate_id()
         await messagebus.handle(
             CreatePage(
+                id=page_id,
                 type="blog:HomePage",
                 payload={
-                    "id": page_id,
                     "slug": "home",
                     "title": "hello world - casualcms",
                     "description": "I am so glad to be there",
@@ -138,7 +138,7 @@ async def draft_hp(
             ),
             uow,
         )
-        page = await uow.drafts.by_id(page_id)
+        page = await uow.drafts.by_id(page_id)  # type: ignore
         yield page.unwrap()
 
 
@@ -147,16 +147,16 @@ async def draft_subpage(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-    draft_hp: HomePage,
-) -> AsyncGenerator[DraftPage, None]:
+    draft_hp: DraftPage[HomePage],
+) -> AsyncGenerator[DraftPage[CategoryPage], None]:
     async with uow as uow:
         page_id = generate_id()
         await messagebus.handle(
             CreatePage(
+                id=page_id,
                 type="blog:CategoryPage",
                 payload={
-                    "id": page_id,
-                    "parent": draft_hp,
+                    "parent": draft_hp.page,
                     "slug": "sub",
                     "title": "a sub page",
                     "description": "I am so glad to be a sub page",
@@ -165,7 +165,7 @@ async def draft_subpage(
             ),
             uow,
         )
-        page = await uow.drafts.by_id(page_id)
+        page = await uow.drafts.by_id(page_id)  # type: ignore  # type:ignore
         yield page.unwrap()
 
 
@@ -179,7 +179,7 @@ async def header_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="blog:HeaderSnippet",
-                key="header",
+                key="header",  # type: ignore
                 body={
                     "title": "A personal blog",
                     "links": [
@@ -203,7 +203,7 @@ async def alt_header_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="blog:HeaderSnippet",
-                key="alt-header",
+                key="alt-header",  # type: ignore
                 body={
                     "title": "Alternative title",
                     "links": [
@@ -227,7 +227,7 @@ async def footer_snippet(
         snippet = await messagebus.handle(
             CreateSnippet(
                 type="tests.casualblog.models:FooterSnippet",
-                key="footer",
+                key="footer",  # type: ignore
                 body={
                     "links": [
                         {"title": "about", "href": "/about"},
@@ -244,7 +244,7 @@ async def default_site(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-    draft_hp: DraftPage,
+    draft_hp: DraftPage[HomePage],
 ) -> AsyncGenerator[Site, None]:
     async with uow as uow:
         site = await messagebus.handle(

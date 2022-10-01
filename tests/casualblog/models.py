@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import DraftPage, Setting, Snippet
+from casualcms.domain.model import AbstractPage, Setting, Snippet
 
 
 class Link(BaseModel):
@@ -64,14 +64,14 @@ class Paragraph(BaseModel):
     body: str = Field(widget="textarea")
 
 
-class AbstractPage(DraftPage):
+class BasePage(AbstractPage):
     hero_title: str = Field(description="Title of the hero section")
 
     class Meta:
         abstract = True
 
 
-class HomePage(AbstractPage):
+class HomePage(BasePage):
     body: list[Paragraph] = []
 
     class Meta:
@@ -80,7 +80,7 @@ class HomePage(AbstractPage):
         type = "blog:HomePage"
 
 
-class CategoryPage(AbstractPage):
+class CategoryPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
 
@@ -90,7 +90,7 @@ class CategoryPage(AbstractPage):
         template = "category.jinja2"
 
 
-class SectionPage(AbstractPage):
+class SectionPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
 
@@ -100,7 +100,7 @@ class SectionPage(AbstractPage):
         template = "section.jinja2"
 
 
-class BlogPage(AbstractPage):
+class BlogPage(BasePage):
 
     body: list[Paragraph] = []
     related_post_snippet: str = ""

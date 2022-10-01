@@ -1,10 +1,11 @@
-from typing import Iterable, Optional
+from typing import Any, Iterable, Optional
 from urllib.parse import urlparse
 
 from result import Err, Ok
 
 from casualcms.config import Settings
 from casualcms.domain.model import Account, AuthnToken, DraftPage, Page, Site
+from casualcms.domain.model.draft import PageImpl
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories import (
@@ -78,12 +79,12 @@ class AccountInMemoryRepository(AbstractAccountRepository):
 
 
 class DraftInMemoryRepository(AbstractDraftRepository):
-    pages: dict[str, DraftPage] = {}
+    pages: dict[str, DraftPage[Any]] = {}
 
     def __init__(self) -> None:
         self.seen = set()
 
-    async def by_id(self, id: str) -> DraftRepositoryResult:
+    async def by_id(self, id: str) -> DraftRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
         for page in self.pages.values():
             if page.id == id:
@@ -91,15 +92,17 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_path(self, path: str) -> DraftRepositoryResult:
+    async def by_path(self, path: str) -> DraftRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
         if path in self.pages:
             return Ok(self.pages[path])
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
+    async def by_parent(
+        self, path: Optional[str]
+    ) -> DraftSequenceRepositoryResult[PageImpl]:
         """Fetch one page by its unique path."""
-        ret: list[DraftPage] = []
+        ret: list[DraftPage[PageImpl]] = []
         if path:
             cnt = len(path.strip("/").split("/")) + 1
         else:
@@ -110,19 +113,19 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Ok(ret)
 
-    async def add(self, model: DraftPage) -> DraftOperationResult:
+    async def add(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
         return Ok(...)
 
-    async def remove(self, model: DraftPage) -> DraftOperationResult:
+    async def remove(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.pages[model.path]
         return Ok(...)
 
-    async def update(self, model: DraftPage) -> DraftOperationResult:
+    async def update(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -233,7 +236,9 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         for site in self.sites:
             if site.id != model.id:
                 sites.append(site)
-        rpage = await DraftInMemoryRepository().by_path(model.root_page_path)
+        rpage: DraftRepositoryResult[Any] = await DraftInMemoryRepository().by_path(
+            model.root_page_path
+        )
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
         model.draft_id = rpage.unwrap().id

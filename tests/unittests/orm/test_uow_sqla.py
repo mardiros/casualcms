@@ -26,9 +26,13 @@ from casualcms.domain.model.page import Page
 from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.repositories.draft import (
+    DraftRepositoryResult,
+    DraftSequenceRepositoryResult,
+)
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
-from ...casualblog.models import FeatureFlagSetting, HeaderSnippet, Link
+from ...casualblog.models import FeatureFlagSetting, HeaderSnippet, HomePage, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -57,7 +61,7 @@ draft_hp = fake_draft_page(
 cat_page = fake_draft_page(
     type="blog:CategoryPage",
     slug="tech",
-    parent=draft_hp,
+    parent=draft_hp.page,
     hero_title="Technologies",
     intro={"title": "tech", "body": "loli pop"},
 )
@@ -66,7 +70,7 @@ cat_page = fake_draft_page(
 cat2_page = fake_draft_page(
     type="blog:CategoryPage",
     slug="seo",
-    parent=draft_hp,
+    parent=draft_hp.page,
     hero_title="SEO",
     intro={"title": "SEO", "body": "You bot"},
 )
@@ -74,7 +78,7 @@ cat2_page = fake_draft_page(
 blog_page = fake_draft_page(
     type="blog:BlogPage",
     slug="seo",
-    parent=cat_page,
+    parent=cat_page.page,
     hero_title="SEO In Tech",
     body=[{"title": "SEO In Tech", "body": "U robot.txt"}],
 )
@@ -250,10 +254,10 @@ async def test_authntoken_delete(
     ],
 )
 async def test_draft_by_id(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page = await repo.by_id(params["id"])
+    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(params["id"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
     assert rok.slug == params["expected_slug"]
@@ -262,7 +266,9 @@ async def test_draft_by_id(
 
 async def test_draft_by_id_err(sqla_session: AsyncSession):
     repo = DraftSQLRepository(sqla_session)
-    root_page = await repo.by_id(draft_hp.id)
+    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(
+        draft_hp.id
+    )  # type:ignore
     assert root_page.is_err()
     err = root_page.unwrap_err()
     assert err.name == "page_not_found"
@@ -292,10 +298,10 @@ async def test_draft_by_id_err(sqla_session: AsyncSession):
     ],
 )
 async def test_page_by_path(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page = await repo.by_path(params["path"])
+    root_page: DraftRepositoryResult[HomePage] = await repo.by_path(params["path"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
     assert rok.slug == params["expected_slug"]
@@ -314,10 +320,10 @@ async def test_page_by_path(
     ],
 )
 async def test_page_by_path_err(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page = await repo.by_path("/e404")
+    root_page: DraftRepositoryResult[HomePage] = await repo.by_path("/e404")
     assert root_page.is_err()
     err = root_page.unwrap_err()
     assert err.name == "page_not_found"
@@ -357,10 +363,12 @@ async def test_page_by_path_err(
     ],
 )
 async def test_page_by_parent(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    child_pages = await repo.by_parent(params["parent"])
+    child_pages: DraftSequenceRepositoryResult[Any] = await repo.by_parent(
+        params["parent"]
+    )
     assert child_pages.is_ok()
     ps = child_pages.unwrap()
     assert [p.slug for p in ps] == params["expected_slugs"]
@@ -381,10 +389,12 @@ async def test_page_by_parent(
     ],
 )
 async def test_page_by_parent_err(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    child_pages = await repo.by_parent(params["parent"])
+    child_pages: DraftSequenceRepositoryResult[Any] = await repo.by_parent(
+        params["parent"]
+    )
     assert child_pages.is_err()
     err = child_pages.unwrap_err()
     assert err.name == "page_not_found"
@@ -408,7 +418,7 @@ async def test_page_by_parent_err(
     ],
 )
 async def test_page_add(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
     await repo.add(params["page"])
@@ -461,7 +471,7 @@ async def test_page_add(
     ],
 )
 async def test_page_update(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
     await repo.update(params["update_page"])
@@ -485,7 +495,7 @@ async def test_page_update(
     ],
 )
 async def test_page_remove(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
 
@@ -695,7 +705,7 @@ async def test_snippet_update(
     ],
 )
 async def test_site_add(
-    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage]
+    params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = SiteSQLRepository(sqla_session)
     await repo.add(params["site"])
@@ -723,7 +733,7 @@ async def test_site_add(
 async def test_site_list(
     params: Any,
     sqla_session: AsyncSession,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
     sites: Sequence[Site],
 ):
     repo = SiteSQLRepository(sqla_session)
@@ -749,7 +759,7 @@ async def test_site_list(
 async def test_site_by_id(
     params: Any,
     sqla_session: AsyncSession,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
     sites: Sequence[Site],
 ):
     repo = SiteSQLRepository(sqla_session)
@@ -779,7 +789,7 @@ async def test_site_by_id(
 async def test_site_by_hostname(
     params: Any,
     sqla_session: AsyncSession,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
     sites: Sequence[Site],
 ):
     repo = SiteSQLRepository(sqla_session)
@@ -809,7 +819,7 @@ async def test_site_by_hostname(
 async def test_site_update(
     params: Any,
     sqla_session: AsyncSession,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
     sites: Sequence[Site],
 ):
 
@@ -869,7 +879,7 @@ async def test_site_update(
 async def test_site_remove(
     params: Any,
     sqla_session: AsyncSession,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
     sites: Sequence[Site],
 ):
     repo = SiteSQLRepository(sqla_session)
@@ -1309,7 +1319,7 @@ async def test_sql_uow_page_by_url(
                 "template": "homepage.jinja2",
                 "path": "//www",
                 "title": draft_hp.title,
-                "body": draft_hp.get_context(),
+                "body": draft_hp.page.dict(),
             },
         },
         {
@@ -1323,7 +1333,7 @@ async def test_sql_uow_page_by_url(
                 "template": "category.jinja2",
                 "path": "//www/tech",
                 "title": cat_page.title,
-                "body": cat_page.get_context(),
+                "body": cat_page.page.dict(),
             },
         },
     ],
@@ -1332,7 +1342,7 @@ async def test_sql_uow_page_add(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    drafts: Sequence[DraftPage],
+    drafts: Sequence[DraftPage[Any]],
 ) -> None:
     page = params["page"]
     repo = PageSQLRepository(sqla_session)

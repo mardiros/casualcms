@@ -30,7 +30,7 @@ async def show_template(
     ptype = resolve_page_type(type).unwrap()
     jsonschema = ptype.schema()
     jsonschema["definitions"].pop("Event", None)
-    jsonschema["definitions"].pop("DraftPage", None)
+    jsonschema["definitions"].pop("AbstractPage", None)
     for key in ("id", "parent", "events", "created_at"):
         jsonschema["properties"].pop(key, None)
     return {

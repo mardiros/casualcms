@@ -1,5 +1,6 @@
 from .account import Account, AccountStatus, AuthnToken
 from .draft import (
+    AbstractPage,
     AbstractPageError,
     DraftPage,
     get_available_subtypes,
@@ -16,6 +17,7 @@ __all__ = [
     "AccountStatus",
     "AuthnToken",
     # Pages
+    "AbstractPage",
     "AbstractPageError",
     "DraftPage",
     "get_available_subtypes",

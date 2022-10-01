@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -12,6 +12,7 @@ from casualcms.domain.messages.commands import (
     generate_id,
 )
 from casualcms.domain.model import AuthnToken, DraftPage, Site
+from casualcms.domain.repositories.draft import DraftRepositoryResult
 
 from .base import RESOURCE_UPDATED, HTTPMessage, get_token_info
 
@@ -26,10 +27,10 @@ class PartialSite(BaseModel):
 async def get_root_draft_by_path(
     root_page_path: str = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> DraftPage:
+) -> DraftPage[Any]:
     async with app.uow as uow:
         path = root_page_path.strip("/")
-        rpage = await uow.drafts.by_path(f"/{path}")
+        rpage: DraftRepositoryResult[Any] = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
     if rpage.is_err():
         raise HTTPException(
@@ -84,7 +85,7 @@ async def create_site(
     hostname: str = Body(...),
     default: bool = Body(...),
     secure: bool = Body(...),
-    root_page: DraftPage = Depends(get_root_draft_by_path),
+    root_page: DraftPage[Any] = Depends(get_root_draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSite:
@@ -123,7 +124,7 @@ async def update_site(
     secure: bool | None = Body(None),
     hostname: str | None = Body(None),
     site: Site = Depends(get_site_by_current_hostname),
-    root_page: DraftPage = Depends(get_root_draft_by_path),
+    root_page: DraftPage[Any] = Depends(get_root_draft_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:

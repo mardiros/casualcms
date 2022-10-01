@@ -4,13 +4,14 @@ from collections import defaultdict
 from datetime import datetime
 from typing import (
     Any,
+    Generic,
     Iterable,
     Mapping,
-    MutableMapping,
     MutableSequence,
     Optional,
     Set,
     Type,
+    TypeVar,
     cast,
 )
 
@@ -38,7 +39,7 @@ class PageTypeError(enum.Enum):
     unregistered = "Unregistered type"
 
 
-PageType = Type["DraftPage"]
+PageType = Type["AbstractPage"]
 LazyPageType = str | PageType
 
 
@@ -117,44 +118,32 @@ class PageMetaclass(ModelMetaclass):
 class AbstractPage(BaseModel, metaclass=PageMetaclass):
     __meta__: PageMeta
 
+    slug: Slug = Field(...)
+    title: str = Field(...)
+    description: str = Field(...)
+    parent: Optional["AbstractPage"] = Field(None, exclude=True)
+
+    class Meta:
+        ...
+
     def __init__(self, **kwargs: Any) -> None:  # type: ignore
         if self.__meta__.abstract is True:
             raise AbstractPageError(f"Page {self.__class__.__name__} is abstract")
         super().__init__(**kwargs)
 
-    def get_template(self) -> str:
-        return self.__meta__.template
-
-
-class DraftPage(AbstractPage):
-
-    id: uuid = Field(default_factory=generate_id, exclude=True)
-    slug: Slug = Field(...)
-    title: str = Field(...)
-    description: str = Field(...)
-
-    parent: Optional["DraftPage"] = Field(None, exclude=True)
-    events: list[Event] = Field(default_factory=list, exclude=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)
-
-    class Meta:
-        abstract = True
-
     @property
     def path(self) -> str:
         slugs = []
-        page: Optional["DraftPage"] = self
+        page: Optional["AbstractPage"] = self
         while page:
             slugs.append(page.slug)
             page = page.parent
         return "/" + "/".join(reversed(slugs))
 
-    def __hash__(self) -> int:  # type: ignore
-        return hash(self.id)
-
-    def get_data_context(self) -> MutableMapping[str, Any]:
+    @property
+    def metadata(self) -> Mapping[str, Any]:
         breadcrumb: MutableSequence[Mapping[str, str]] = []
-        p: Optional[DraftPage] = self
+        p: Optional[AbstractPage] = self
         while p:
             breadcrumb.insert(
                 0,
@@ -166,22 +155,16 @@ class DraftPage(AbstractPage):
             )
             p = p.parent
         return {
-            "meta": {
-                "type": self.__meta__.type,
-                "path": self.path,
-                "breadcrumb": breadcrumb,
-            },
-            **self.dict(exclude={"events", "created_at"}),
+            "type": self.__meta__.type,
+            "path": self.path,
+            "breadcrumb": breadcrumb,
         }
-
-    def get_context(self) -> MutableMapping[str, Any]:
-        return self.get_data_context()
 
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}
         for key, val in cls.__fields__.items():
-            if key in ("id", "parent", "events", "created_at"):
+            if key in ("parent",):
                 continue
             ret[key] = cls.get_widget(val)
         return ret
@@ -210,3 +193,41 @@ class DraftPage(AbstractPage):
             "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),
             "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
         }
+
+
+PageImpl = TypeVar("PageImpl", bound=AbstractPage)
+
+
+class DraftPage(BaseModel, Generic[PageImpl]):
+
+    id: uuid = Field(default_factory=generate_id)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    events: list[Event] = Field(default_factory=list, exclude=True)
+    page: PageImpl = Field(...)
+
+    def __hash__(self) -> int:  # type: ignore
+        return hash(self.id)
+
+    @property
+    def slug(self) -> str:
+        return self.page.slug
+
+    @property
+    def path(self) -> str:
+        return self.page.path
+
+    @property
+    def type(self) -> str:
+        return self.page.__meta__.type
+
+    @property
+    def template(self) -> str:
+        return self.page.__meta__.template
+
+    @property
+    def title(self) -> str:
+        return self.page.title
+
+    @property
+    def description(self) -> str:
+        return self.page.description

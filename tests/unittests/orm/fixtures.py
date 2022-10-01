@@ -7,13 +7,13 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
+    Page,
     Site,
     Snippet,
     resolve_page_type,
     resolve_setting_type,
     resolve_snippet_type,
 )
-from casualcms.domain.model.page import Page
 
 fake = Faker()
 
@@ -46,8 +46,8 @@ def fake_authn_tokens(**kwargs: Any) -> AuthnToken:
     return AuthnToken(**token)
 
 
-def fake_draft_page(type: str, **kwargs: Any) -> DraftPage:
-    page: Dict[str, Any] = {
+def fake_draft_page(type: str, **kwargs: Any) -> DraftPage[Any]:
+    dpage: Dict[str, Any] = {
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),
         "slug": fake.slug(),
@@ -55,13 +55,17 @@ def fake_draft_page(type: str, **kwargs: Any) -> DraftPage:
         "description": fake.paragraph(nb_sentences=1),
         "parent": None,
     }
-
     typ = resolve_page_type(type).unwrap()
-    page.update(kwargs)
-    return typ(**page)
+    dpage.update(kwargs)
+    draft: DraftPage[Any] = DraftPage(
+        id=dpage.pop("id"),
+        created_at=dpage.pop("created_at"),
+        page=typ(**dpage),
+    )
+    return draft
 
 
-def fake_site(page: DraftPage, **kwargs: Any) -> Site:
+def fake_site(page: DraftPage[Any], **kwargs: Any) -> Site:
     site = {
         "id": fake.uuid4(),
         "created_at": fake.past_datetime(),
@@ -122,15 +126,15 @@ def fake_contact_setting(hostname: str = "www", **kwargs: Any):
     return fake_setting("contact", hostname=hostname, **settings)
 
 
-def fake_page(draft: DraftPage, site: Site):
+def fake_page(draft: DraftPage[Any], site: Site):
     lprefix = len(site.root_page_path)
     path = draft.path[lprefix:]
     path = f"//{site.hostname}{path}"
     return Page(
         id=fake.uuid4(),
-        body=draft.get_context(),
-        type=draft.__meta__.type,
-        template=draft.get_template(),
+        body=draft.page.dict(),
+        type=draft.type,
+        template=draft.template,
         created_at=fake.past_datetime(),
         draft_id=draft.id,
         site=site,

@@ -5,13 +5,7 @@ import pytest
 from casualcms.domain.model import AbstractPageError, get_available_subtypes
 from casualcms.domain.model.draft import resolve_page_type
 
-from ..casualblog.models import (
-    AbstractPage,
-    BlogPage,
-    CategoryPage,
-    HomePage,
-    SectionPage,
-)
+from ..casualblog.models import BasePage, BlogPage, CategoryPage, HomePage, SectionPage
 
 
 def test_page_metadata():
@@ -23,21 +17,17 @@ def test_page_metadata():
         hero_title="You are awesome",
         body=[{"body": "Hello!"}],
     )
-    assert page.get_template() == "homepage.jinja2"
+    assert page.__meta__.template == "homepage.jinja2"
     assert page.__meta__.abstract is False
     assert page.__meta__.type == "blog:HomePage"
 
 
 def test_page_abstract_raise():
     with pytest.raises(AbstractPageError) as context:
-        AbstractPage(
-            id="a",
-            slug="home",
-            title="awesome",
-            description="",
+        BasePage(
             hero_title="You are awesome",
         )
-    assert str(context.value) == "Page AbstractPage is abstract"
+    assert str(context.value) == "Page BasePage is abstract"
 
 
 def test_page_tree():

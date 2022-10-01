@@ -157,7 +157,13 @@ async def drafts(
             "slug": page.slug,
             "title": page.title,
             "description": page.description,
-            "body": page.page.dict(),
+            "body": page.page.dict(
+                exclude={
+                    "slug",
+                    "title",
+                    "description",
+                }
+            ),
         }
         return formated_page
 

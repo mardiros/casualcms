@@ -220,6 +220,9 @@ class DraftSQLRepository(AbstractDraftRepository):
             typ = resolve_page_type(orm_page.type).unwrap()  # type: ignore
             page = typ(
                 parent=page,
+                slug=orm_page.slug,
+                title=orm_page.title,
+                description=orm_page.description,
                 **orm_page.body,
             )
             draft_page = DraftPage(
@@ -296,9 +299,16 @@ class DraftSQLRepository(AbstractDraftRepository):
         pages: CursorResult = await self.session.execute(qry)
 
         ret: list[DraftPage[Page_contra]] = [
-            resolve_page_type(p.type).unwrap()(  # type:ignore
-                parent=parent_page,
-                **p.body,
+            DraftPage(
+                id=p.id,  # type:ignore
+                created_at=p.created_at,  # type:ignore
+                page=resolve_page_type(p.type).unwrap()(  # type:ignore
+                    parent=parent_page,
+                    slug=p.slug,
+                    title=p.title,
+                    description=p.description,
+                    **p.body,
+                ),
             )
             for p in pages  # type:ignore
         ]

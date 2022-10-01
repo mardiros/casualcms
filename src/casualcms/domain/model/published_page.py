@@ -11,7 +11,7 @@ from casualcms.domain.model.site import Site
 uuid = str
 
 
-class Page(BaseModel, Generic[Page_contra]):
+class PublishedPage(BaseModel, Generic[Page_contra]):
     id: uuid = Field(default_factory=generate_id, exclude=True)
     site: Site = Field(...)
     path: str = Field(...)

@@ -24,7 +24,7 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
-    Page,
+    PublishedPage,
     Setting,
     Site,
     Snippet,
@@ -269,11 +269,11 @@ async def default_site(
 @pytest.fixture
 async def home_page(
     app: FastAPI,
-    draft_hp: Page[HomePage],
+    draft_hp: PublishedPage[HomePage],
     default_site: Site,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Page[HomePage], None]:
+) -> AsyncGenerator[PublishedPage[HomePage], None]:
 
     async with uow as uow:
         await messagebus.handle(

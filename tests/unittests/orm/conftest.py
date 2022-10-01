@@ -26,7 +26,7 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
-    Page,
+    PublishedPage,
     Setting,
     Site,
     Snippet,
@@ -332,7 +332,7 @@ async def pages(
     sites: list[Site],
     drafts: list[DraftPage[Any]],
 ):
-    def format_page(page: Page[Any]) -> Dict[str, Any]:
+    def format_page(page: PublishedPage[Any]) -> Dict[str, Any]:
         formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
         formated_page["id"] = page.id
         formated_page["type"] = page.type

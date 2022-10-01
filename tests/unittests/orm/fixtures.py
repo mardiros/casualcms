@@ -7,7 +7,7 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
-    Page,
+    PublishedPage,
     Site,
     Snippet,
     resolve_page_type,
@@ -130,11 +130,11 @@ def fake_contact_setting(hostname: str = "www", **kwargs: Any) -> Setting:
     return fake_setting("contact", hostname=hostname, **settings)
 
 
-def fake_page(draft: DraftPage[Any], site: Site) -> Page[Any]:
+def fake_page(draft: DraftPage[Any], site: Site) -> PublishedPage[Any]:
     lprefix = len(site.root_page_path)
     path = draft.path[lprefix:]
     path = f"//{site.hostname}{path}"
-    return Page(
+    return PublishedPage(
         id=fake.uuid4(),
         page=draft.page,
         created_at=fake.past_datetime(),

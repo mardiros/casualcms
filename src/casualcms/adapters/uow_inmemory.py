@@ -8,13 +8,13 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
-    Page,
     Page_contra,
+    PublishedPage,
     Setting,
     Site,
     Snippet,
+    Snippet_contra,
 )
-from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -149,7 +149,7 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
 
 class PageInMemoryRepository(AbstractPageRepository):
-    pages: dict[tuple[str, str], Page[Any]] = {}
+    pages: dict[tuple[str, str], PublishedPage[Any]] = {}
 
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
@@ -171,12 +171,12 @@ class PageInMemoryRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_not_found)
         return Ok(page[0])
 
-    async def add(self, model: Page[Page_contra]) -> PageOperationResult:
+    async def add(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
         """Append a new model to the repository."""
         self.pages[model.draft_id, model.site.id] = model
         return Ok(...)
 
-    async def update(self, model: Page[Page_contra]) -> PageOperationResult:
+    async def update(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
         """Update a model to the repository."""
         self.pages[model.draft_id, model.site.id] = model
         return Ok(...)

@@ -20,7 +20,14 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 )
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
-from casualcms.domain.model import AuthnToken, DraftPage, Page, Setting, Site, Snippet
+from casualcms.domain.model import (
+    AuthnToken,
+    DraftPage,
+    PublishedPage,
+    Setting,
+    Site,
+    Snippet,
+)
 from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
@@ -1236,7 +1243,7 @@ async def test_sql_uow_page_by_page_id_and_site_id(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page[Any]],
+    pages: Sequence[PublishedPage[Any]],
 ):
     repo = PageSQLRepository(sqla_session)
 
@@ -1281,7 +1288,7 @@ async def test_sql_uow_page_by_url(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page[Any]],
+    pages: Sequence[PublishedPage[Any]],
 ):
     repo = PageSQLRepository(sqla_session)
 
@@ -1383,7 +1390,7 @@ async def test_sql_uow_page_update(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page[Any]],
+    pages: Sequence[PublishedPage[Any]],
 ):
     page = params["pages"][0]
     page.page.title = "My new page title"

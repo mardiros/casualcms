@@ -8,7 +8,7 @@ from casualcms.domain.messages.commands import (
     PublishPage,
     UpdatePage,
 )
-from casualcms.domain.model import DraftPage, Page, resolve_page_type
+from casualcms.domain.model import DraftPage, PublishedPage, resolve_page_type
 from casualcms.domain.repositories.draft import (
     DraftOperationResult,
     DraftRepositoryResult,
@@ -93,7 +93,7 @@ async def publish_page(
         published_page.page = draft_page.page
         rok = await uow.pages.update(rpublished_page.unwrap())
     else:
-        published_page = Page(
+        published_page = PublishedPage(
             site=site,
             page=draft_page.page,
             draft_id=draft_page.id,

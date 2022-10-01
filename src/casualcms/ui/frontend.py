@@ -1,4 +1,5 @@
 from typing import Any
+
 from fastapi import HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 

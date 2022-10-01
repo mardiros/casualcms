@@ -30,17 +30,17 @@ from casualcms.domain.model import (
     Account,
     AuthnToken,
     DraftPage,
-    Page,
     Page_contra,
+    PublishedPage,
     Setting,
     SettingType,
     Site,
     Snippet,
+    Snippet_contra,
     resolve_page_type,
     resolve_setting_type,
     resolve_snippet_type,
 )
-from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -119,7 +119,7 @@ def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
     return formated_page
 
 
-def format_page(page: Page[Any]) -> Dict[str, Any]:
+def format_page(page: PublishedPage[Any]) -> Dict[str, Any]:
     formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
     formated_page["id"] = page.id
     formated_page["type"] = page.type
@@ -796,7 +796,7 @@ class PageSQLRepository(AbstractPageRepository):
         typ = rtype.unwrap()
 
         return Ok(
-            Page(
+            PublishedPage(
                 id=orm_page.id,  # type: ignore
                 created_at=orm_page.created_at,  # type: ignore
                 draft_id=draft_id,
@@ -839,7 +839,7 @@ class PageSQLRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_model_not_found)
         typ = rtype.unwrap()
         return Ok(
-            Page(
+            PublishedPage(
                 id=orm_page["id"],
                 created_at=orm_page["created_at"],
                 draft_id=orm_page["draft_id"],
@@ -849,7 +849,7 @@ class PageSQLRepository(AbstractPageRepository):
             )
         )
 
-    async def add(self, model: Page[Page_contra]) -> PageOperationResult:
+    async def add(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
         """Append a new model to the repository."""
 
         await self.session.execute(  # type: ignore
@@ -860,7 +860,7 @@ class PageSQLRepository(AbstractPageRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Page[Page_contra]) -> PageOperationResult:
+    async def update(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
         """Update a model to the repository."""
         page = format_page(model)
         page.pop("id")

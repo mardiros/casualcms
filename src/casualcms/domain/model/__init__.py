@@ -17,7 +17,7 @@ from .abstract_snippet import (
 )
 from .account import Account, AccountStatus, AuthnToken
 from .draft_page import DraftPage
-from .published_page import Page
+from .published_page import PublishedPage
 from .setting import Setting, SettingType, list_setting_types, resolve_setting_type
 from .site import Site
 from .snippet import Snippet
@@ -37,7 +37,7 @@ __all__ = [
     # Draft Pages
     "DraftPage",
     # Published Pages
-    "Page",
+    "PublishedPage",
     # Snippets
     "AbstractSnippet",
     "AbstractSnippetError",

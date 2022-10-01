@@ -5,7 +5,7 @@ from result import Result
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.messages.commands import PublishPage
-from casualcms.domain.model import AuthnToken, Page
+from casualcms.domain.model import AuthnToken, PublishedPage
 from casualcms.domain.repositories.draft import DraftRepositoryResult
 
 from .base import RESOURCE_CREATED, HTTPMessage, get_token_info
@@ -34,7 +34,7 @@ async def publish_page(
         site = rsite.unwrap()
 
         cmd = PublishPage(id=draft.id, site_id=site.id)
-        rppage: Result[Page[Any], bool] = await app.bus.handle(cmd, uow)
+        rppage: Result[PublishedPage[Any], bool] = await app.bus.handle(cmd, uow)
         if rppage.is_err():
             raise HTTPException(
                 status_code=500, detail={"msg": "Internal Server Error"}

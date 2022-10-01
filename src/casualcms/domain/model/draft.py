@@ -5,16 +5,16 @@ from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
 from casualcms.domain.messages.commands import generate_id
-from casualcms.domain.model.abstract_page import PageImpl
+from casualcms.domain.model.abstract_page import Page_contra
 
 uuid = str
 
 
-class DraftPage(BaseModel, Generic[PageImpl]):
+class DraftPage(BaseModel, Generic[Page_contra]):
 
     id: uuid = Field(default_factory=generate_id)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    page: PageImpl = Field(...)
+    page: Page_contra = Field(...)
 
     events: list[Event] = Field(default_factory=list, exclude=True)
 

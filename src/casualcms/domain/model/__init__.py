@@ -1,7 +1,7 @@
 from .abstract_page import (
     AbstractPage,
     AbstractPageError,
-    PageImpl,
+    Page_contra,
     PageType,
     get_available_subtypes,
     resolve_page_type,
@@ -9,7 +9,7 @@ from .abstract_page import (
 from .abstract_snippet import (
     AbstractSnippet,
     AbstractSnippetError,
-    SnippetImpl,
+    Snippet_contra,
     SnippetKey,
     SnippetType,
     list_snippet_types,
@@ -32,7 +32,7 @@ __all__ = [
     "AbstractPageError",
     "get_available_subtypes",
     "resolve_page_type",
-    "PageImpl",
+    "Page_contra",
     "PageType",
     # Draft Pages
     "DraftPage",
@@ -42,7 +42,7 @@ __all__ = [
     "AbstractSnippet",
     "AbstractSnippetError",
     "Snippet",
-    "SnippetImpl",
+    "Snippet_contra",
     "SnippetKey",
     "SnippetType",
     "list_snippet_types",

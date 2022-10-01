@@ -192,4 +192,4 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
         }
 
 
-PageImpl = TypeVar("PageImpl", bound=AbstractPage, contravariant=True)
+Page_contra = TypeVar("Page_contra", bound=AbstractPage, contravariant=True)

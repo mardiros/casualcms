@@ -31,7 +31,7 @@ from casualcms.domain.model import (
     AuthnToken,
     DraftPage,
     Page,
-    PageImpl,
+    Page_contra,
     Setting,
     SettingType,
     Site,
@@ -40,7 +40,7 @@ from casualcms.domain.model import (
     resolve_setting_type,
     resolve_snippet_type,
 )
-from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -192,7 +192,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen = set()
         self.session = session
 
-    async def by_id(self, id: str) -> DraftRepositoryResult[PageImpl]:
+    async def by_id(self, id: str) -> DraftRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
         qry = (
             select(orm.drafts)
@@ -207,7 +207,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         )
         orm_pages: CursorResult = await self.session.execute(qry)
         page: AbstractPage | None = None
-        draft_page: DraftPage[PageImpl] | None = None
+        draft_page: DraftPage[Page_contra] | None = None
         orm_page_iter = iter(orm_pages)  # type: ignore
         try:
             orm_page = next(orm_page_iter)  # type: ignore
@@ -238,7 +238,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         # If we don't have a page here, it means that the tree path is broken
         return Err(DraftRepositoryError.page_broken_treepath)  # coverage: ignore
 
-    async def by_path(self, path: str) -> DraftRepositoryResult[PageImpl]:
+    async def by_path(self, path: str) -> DraftRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
         slugs = enumerate(reversed(path.strip("/").split("/")))
         qry = select(orm.drafts)
@@ -266,7 +266,7 @@ class DraftSQLRepository(AbstractDraftRepository):
 
     async def by_parent(
         self, path: Optional[str]
-    ) -> DraftSequenceRepositoryResult[PageImpl]:
+    ) -> DraftSequenceRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
 
         if not path:
@@ -292,7 +292,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         qry = select(orm.drafts).filter(sub).order_by(orm.drafts.c.slug)
         pages: CursorResult = await self.session.execute(qry)
 
-        ret: list[DraftPage[PageImpl]] = [
+        ret: list[DraftPage[Page_contra]] = [
             resolve_page_type(p.type).unwrap()(  # type:ignore
                 parent=parent_page,
                 **p.body,
@@ -301,7 +301,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         ]
         return Ok(ret)
 
-    async def add(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def add(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Append a new model to the repository."""
 
         parent_draft = None
@@ -348,7 +348,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def update(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Update model in the repository."""
         page = format_draft_page(model)
         page.pop("id")
@@ -360,7 +360,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def remove(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Remove the model from the repository."""
         child_pages: DraftSequenceRepositoryResult[Any] = await self.by_parent(
             model.path
@@ -392,7 +392,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def _format_response(
         self, orm_snippets: CursorResult
-    ) -> SnippetRepositoryResult[SnippetImpl]:
+    ) -> SnippetRepositoryResult[Snippet_contra]:
         orm_snippet = orm_snippets.first()
         if orm_snippet:
             rtyp = resolve_snippet_type(
@@ -412,14 +412,14 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             )
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult[SnippetImpl]:
+    async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique id."""
         orm_snippets: CursorResult = await self.session.execute(
             select(orm.snippets).filter_by(id=id).limit(1)
         )
         return await self._format_response(orm_snippets)  # type: ignore
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult[SnippetImpl]:
+    async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique key."""
 
         orm_snippets: CursorResult = await self.session.execute(
@@ -429,7 +429,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def list(
         self, type: Optional[str] = None
-    ) -> SnippetSequenceRepositoryResult[SnippetImpl]:
+    ) -> SnippetSequenceRepositoryResult[Snippet_contra]:
         """List all snippets, optionally filters on their types."""
 
         qry = select(orm.snippets)
@@ -438,7 +438,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         qry = qry.order_by(orm.snippets.c.key)
         orm_snippets: CursorResult = await self.session.execute(qry)
         orm_snippet: Any
-        snippets: list[Snippet[SnippetImpl]] = []
+        snippets: list[Snippet[Snippet_contra]] = []
         for orm_snippet in orm_snippets:
             rtyp = resolve_snippet_type(orm_snippet.type)  # type: ignore
             if rtyp.is_err():
@@ -453,14 +453,14 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             )
         return Ok(snippets)
 
-    async def add(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def add(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Append a new model to the repository."""
         qry: Any = orm.snippets.insert().values(format_snippet(model))
         await self.session.execute(qry)
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def remove(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Remove the model from the repository."""
         await self.session.execute(
             delete(orm.snippets).where(
@@ -470,7 +470,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def update(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         snippet = format_snippet(model)

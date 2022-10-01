@@ -4,17 +4,17 @@ from typing import Generic
 from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
-from casualcms.domain.model import SnippetImpl
+from casualcms.domain.model import Snippet_contra
 from casualcms.utils import generate_id
 
 uuid = str
 
 
-class Snippet(BaseModel, Generic[SnippetImpl]):
+class Snippet(BaseModel, Generic[Snippet_contra]):
 
     id: uuid = Field(default_factory=generate_id)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    snippet: SnippetImpl = Field(...)
+    snippet: Snippet_contra = Field(...)
 
     events: list[Event] = Field(default_factory=list, exclude=True)
 

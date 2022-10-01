@@ -21,7 +21,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model import AuthnToken, DraftPage, Page, Setting, Site, Snippet
-from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,
@@ -630,7 +630,7 @@ async def test_snippet_remove(
     ],
 )
 async def test_snippet_list_filter_type(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[SnippetImpl]]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Snippet_contra]]
 ):
     repo = SnippetSQLRepository(sqla_session)
     rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list(
@@ -655,7 +655,7 @@ async def test_snippet_list_filter_type(
     ],
 )
 async def test_snippet_list(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[SnippetImpl]]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Snippet_contra]]
 ):
     repo = SnippetSQLRepository(sqla_session)
     rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list()

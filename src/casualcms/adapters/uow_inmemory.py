@@ -9,12 +9,12 @@ from casualcms.domain.model import (
     AuthnToken,
     DraftPage,
     Page,
-    PageImpl,
+    Page_contra,
     Setting,
     Site,
     Snippet,
 )
-from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -91,7 +91,7 @@ class DraftInMemoryRepository(AbstractDraftRepository):
     def __init__(self) -> None:
         self.seen = set()
 
-    async def by_id(self, id: str) -> DraftRepositoryResult[PageImpl]:
+    async def by_id(self, id: str) -> DraftRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
         for page in self.pages.values():
             if page.id == id:
@@ -99,7 +99,7 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_path(self, path: str) -> DraftRepositoryResult[PageImpl]:
+    async def by_path(self, path: str) -> DraftRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
         if path in self.pages:
             return Ok(self.pages[path])
@@ -107,9 +107,9 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
     async def by_parent(
         self, path: Optional[str]
-    ) -> DraftSequenceRepositoryResult[PageImpl]:
+    ) -> DraftSequenceRepositoryResult[Page_contra]:
         """Fetch one page by its unique path."""
-        ret: list[DraftPage[PageImpl]] = []
+        ret: list[DraftPage[Page_contra]] = []
         if path:
             cnt = len(path.strip("/").split("/")) + 1
         else:
@@ -120,19 +120,19 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Ok(ret)
 
-    async def add(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def add(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.pages[model.path] = model
         return Ok(...)
 
-    async def remove(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def remove(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.pages[model.path]
         return Ok(...)
 
-    async def update(self, model: DraftPage[PageImpl]) -> DraftOperationResult:
+    async def update(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -271,40 +271,40 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
 
     async def list(
         self, type: Optional[str] = None
-    ) -> SnippetSequenceRepositoryResult[SnippetImpl]:
+    ) -> SnippetSequenceRepositoryResult[Snippet_contra]:
         """List all snippets, optionally filters on their types."""
-        values: Iterable[Snippet[SnippetImpl]] = self.snippets.values()
+        values: Iterable[Snippet[Snippet_contra]] = self.snippets.values()
         if type:
             values = filter(lambda s: s.type == type, values)
         return Ok(sorted(values, key=lambda s: s.key))
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult[SnippetImpl]:
+    async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique id."""
         for snippet in self.snippets.values():
             if snippet.id == id:
                 return Ok(snippet)
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult[SnippetImpl]:
+    async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique key."""
         try:
             return Ok(self.snippets[key])
         except KeyError:
             return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def add(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def add(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.snippets[model.key] = model
         return Ok(...)
 
-    async def remove(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def remove(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.snippets[model.key]
         return Ok(...)
 
-    async def update(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
+    async def update(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None

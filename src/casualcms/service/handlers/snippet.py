@@ -8,7 +8,7 @@ from casualcms.domain.messages.commands import (
     UpdateSnippet,
 )
 from casualcms.domain.model import resolve_snippet_type
-from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories.snippet import (
     SnippetOperationResult,
@@ -23,7 +23,7 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_snippet(
     cmd: CreateSnippet,
     uow: AbstractUnitOfWork,
-) -> SnippetRepositoryResult[SnippetImpl]:
+) -> SnippetRepositoryResult[Snippet_contra]:
     rsnip = resolve_snippet_type(cmd.type)
     if rsnip.is_err():
         return Err(SnippetRepositoryError.snippet_type_not_found)

@@ -137,4 +137,4 @@ class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
         }
 
 
-SnippetImpl = TypeVar("SnippetImpl", bound=AbstractSnippet, contravariant=True)
+Snippet_contra = TypeVar("Snippet_contra", bound=AbstractSnippet, contravariant=True)

@@ -31,7 +31,7 @@ from casualcms.domain.model import (
     Site,
     Snippet,
 )
-from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.abstract_snippet import Snippet_contra
 
 DATABASE_URL = "sqlite+aiosqlite:///"
 
@@ -257,7 +257,7 @@ async def snippets(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
 ) -> AsyncGenerator[Sequence[Snippet[Any]], None]:
-    def format_snippet(snippet: Snippet[SnippetImpl]) -> Dict[str, Any]:
+    def format_snippet(snippet: Snippet[Snippet_contra]) -> Dict[str, Any]:
         s: Dict[str, Any] = snippet.snippet.dict()
         formated_snippet: Dict[str, Any] = {
             "id": snippet.id,

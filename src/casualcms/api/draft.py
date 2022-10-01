@@ -6,8 +6,7 @@ from pydantic import BaseModel, Field, ValidationError
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
 from casualcms.domain.messages.commands import CreatePage, DeletePage, UpdatePage
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.draft import DraftPage, PageType, resolve_page_type
+from casualcms.domain.model import AuthnToken, DraftPage, PageType, resolve_page_type
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,

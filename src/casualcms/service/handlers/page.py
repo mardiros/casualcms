@@ -8,8 +8,7 @@ from casualcms.domain.messages.commands import (
     PublishPage,
     UpdatePage,
 )
-from casualcms.domain.model import Page, resolve_page_type
-from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model import DraftPage, Page, resolve_page_type
 from casualcms.domain.repositories.draft import (
     DraftOperationResult,
     DraftRepositoryResult,

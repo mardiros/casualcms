@@ -1,7 +1,7 @@
 import pytest
 
 from casualcms.adapters.resolver import resolve
-from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model import DraftPage
 
 
 def test_resolve_ok():

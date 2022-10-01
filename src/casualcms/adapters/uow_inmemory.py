@@ -4,10 +4,16 @@ from urllib.parse import urlparse
 from result import Err, Ok
 
 from casualcms.config import Settings
-from casualcms.domain.model import Account, AuthnToken, DraftPage, Page, Site
-from casualcms.domain.model.draft import PageImpl
-from casualcms.domain.model.setting import Setting
-from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.model import (
+    Account,
+    AuthnToken,
+    DraftPage,
+    Page,
+    PageImpl,
+    Setting,
+    Site,
+    Snippet,
+)
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,

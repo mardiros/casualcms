@@ -2,8 +2,11 @@ from typing import Any, Dict
 
 import pytest
 
-from casualcms.domain.model import AbstractPageError, get_available_subtypes
-from casualcms.domain.model.draft import resolve_page_type
+from casualcms.domain.model import (
+    AbstractPageError,
+    get_available_subtypes,
+    resolve_page_type,
+)
 
 from ..casualblog.models import BasePage, BlogPage, CategoryPage, HomePage, SectionPage
 

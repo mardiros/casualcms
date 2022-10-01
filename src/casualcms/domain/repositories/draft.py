@@ -3,7 +3,7 @@ import abc
 import enum
 from typing import Any, Optional, Sequence
 
-from casualcms.domain.model.draft import PageImpl
+from casualcms.domain.model import PageImpl
 
 from ..model import DraftPage
 from .base import AbstractRepository, OperationResult, RepositoryResult

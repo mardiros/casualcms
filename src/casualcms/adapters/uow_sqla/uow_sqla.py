@@ -26,16 +26,20 @@ from sqlalchemy.orm import sessionmaker  # type: ignore
 from casualcms.adapters.uow_sqla.setup_database import create_database_schema
 from casualcms.config import Settings
 from casualcms.domain.model import (
+    AbstractPage,
     Account,
     AuthnToken,
     DraftPage,
     Page,
+    PageImpl,
+    Setting,
+    SettingType,
     Site,
+    Snippet,
     resolve_page_type,
+    resolve_setting_type,
+    resolve_snippet_type,
 )
-from casualcms.domain.model.draft import AbstractPage, PageImpl
-from casualcms.domain.model.setting import Setting, SettingType, resolve_setting_type
-from casualcms.domain.model.snippet import Snippet, resolve_snippet_type
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,

@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
-from casualcms.domain.model.draft import resolve_page_type
+from casualcms.domain.model import resolve_page_type
 
 
 async def serve_pages(

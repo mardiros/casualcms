@@ -3,8 +3,7 @@ from typing import Any, Mapping, Sequence, cast
 import pytest
 from fastapi.testclient import TestClient
 
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.draft import DraftPage
+from casualcms.domain.model import AuthnToken, DraftPage
 from casualcms.domain.repositories.draft import DraftRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.casualblog.models import CategoryPage, HomePage

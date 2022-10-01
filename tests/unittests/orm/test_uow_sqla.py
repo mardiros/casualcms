@@ -20,12 +20,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 )
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
-from casualcms.domain.model.account import AuthnToken
-from casualcms.domain.model.draft import DraftPage
-from casualcms.domain.model.page import Page
-from casualcms.domain.model.setting import Setting
-from casualcms.domain.model.site import Site
-from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.model import AuthnToken, DraftPage, Page, Setting, Site, Snippet
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,

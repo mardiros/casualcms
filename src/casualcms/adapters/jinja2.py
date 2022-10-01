@@ -4,7 +4,7 @@ from typing import Any, Mapping, MutableMapping
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
-from casualcms.domain.model.draft import AbstractPage
+from casualcms.domain.model import AbstractPage
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 

@@ -2,7 +2,7 @@
 import abc
 import enum
 
-from casualcms.domain.model.page import Page
+from casualcms.domain.model.published_page import Page
 
 from .base import AbstractRepository, OperationResult, RepositoryResult
 

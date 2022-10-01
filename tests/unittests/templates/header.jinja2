@@ -1,6 +1,6 @@
-<h1>{{title}}</h1>
+<h1>{{snippet.title}}</h1>
 <ul role="nav">
-{%- for link in links -%}
+{%- for link in snippet.links -%}
     <li><a href="{{link.href}}">{{link.title}}</a></li>
 {%- endfor -%}
 {%- if get_setting("contact.email") -%}

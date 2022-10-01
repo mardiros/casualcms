@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Any, Mapping, MutableMapping
+from functools import partial
+from typing import Any, MutableMapping
 
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
 from casualcms.domain.model import AbstractPage
+from casualcms.domain.model.abstract_snippet import AbstractSnippet
 from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -22,7 +24,11 @@ def build_searchpath(template_search_path: str) -> list[str]:
 
 class AbstractTemplateRenderer(ABC):
     @abstractmethod
-    async def render_template(self, template: str, context: Mapping[str, Any]) -> str:
+    async def render_page(self, page: AbstractPage) -> str:
+        ...
+
+    @abstractmethod
+    async def render_snippet(self, snippet: AbstractSnippet, page: AbstractPage) -> str:
         ...
 
 
@@ -44,11 +50,11 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         self.hostname = hostname
         self._settings: MutableMapping[str, Any] = {}
 
-    async def include_snippet(self, key: str) -> str:
+    async def include_snippet(self, key: str, page: AbstractPage) -> str:
         rsnippet: SnippetRepositoryResult[Any] = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
-            ret = await self.render_template(snippet.template, snippet.snippet.dict())
+            ret = await self.render_snippet(snippet=snippet.snippet, page=page)
             return ret
         else:
             # should render an error here
@@ -74,19 +80,19 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
                 return ""
         return settings
 
-    def get_template(self, template: str) -> Template:
+    def get_template(self, page: AbstractPage, template: str) -> Template:
         return self.env.get_template(
             template,
             globals={
-                "include_snippet": self.include_snippet,
+                "include_snippet": partial(self.include_snippet, page=page),
                 "get_setting": self.get_setting,
             },
         )
 
-    async def render_page(self, template: str, context: AbstractPage) -> str:
-        tpl = self.get_template(template)
-        return await tpl.render_async(page=context)
+    async def render_page(self, page: AbstractPage) -> str:
+        tpl = self.get_template(page, page.__meta__.template)
+        return await tpl.render_async(page=page)
 
-    async def render_template(self, template: str, context: Mapping[str, Any]) -> str:
-        tpl = self.get_template(template)
-        return await tpl.render_async(**context)
+    async def render_snippet(self, snippet: AbstractSnippet, page: AbstractPage) -> str:
+        tpl = self.get_template(page, snippet.__meta__.template)
+        return await tpl.render_async(snippet=snippet, page=page)

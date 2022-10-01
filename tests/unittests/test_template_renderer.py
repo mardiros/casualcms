@@ -5,8 +5,10 @@ from result import Err, Ok
 from casualcms.adapters.jinja2 import Jinja2TemplateRender, build_searchpath
 from casualcms.config import Settings
 from casualcms.domain.model import Setting, Site, Snippet
+from casualcms.domain.model.draft import DraftPage
 from casualcms.domain.repositories.setting import SettingRepositoryError
 from casualcms.service.unit_of_work import AbstractUnitOfWork
+from tests.casualblog.models import HeaderSnippet, HomePage
 
 
 def test_build_searchpath():
@@ -20,27 +22,28 @@ def test_build_searchpath():
     assert path_list == [path, "/tmp"]
 
 
-async def test_render_template(uow: AbstractUnitOfWork, app_settings: Settings):
+async def test_render_page(
+    uow: AbstractUnitOfWork, draft_hp: DraftPage[HomePage], app_settings: Settings
+):
     renderer = Jinja2TemplateRender(uow, app_settings.template_search_path, "")
-    data = await renderer.render_template("test.jinja2", {"page": {"title": "hey"}})
-    assert data == "<html><title>hey</title></html>"
+    data = await renderer.render_page(draft_hp.page)
+    assert """<h2>Welcome aboard!</h2>""" in data
 
 
 async def test_render_template_with_snippet(
     uow: AbstractUnitOfWork,
     app_settings: Settings,
-    header_snippet: Snippet,
+    draft_hp: DraftPage[HomePage],
+    header_snippet: Snippet[HeaderSnippet],
 ):
     async with uow as uow:
         renderer = Jinja2TemplateRender(uow, app_settings.template_search_path, "")
-    data = await renderer.render_template("test_with_snippet.jinja2", {})
+    data = await renderer.render_snippet(header_snippet.snippet, draft_hp.page)
     assert (
         data
         == """
-        <html>
 <h1>A personal blog</h1>
 <ul role="nav"><li><a href="/cats">cats</a></li><li><a href="/dogs">dogs</a></li></ul>
-</html>
     """.strip()
     )
 
@@ -48,7 +51,7 @@ async def test_render_template_with_snippet(
 async def test_get_setting(
     uow: AbstractUnitOfWork,
     app_settings: Settings,
-    header_snippet: Snippet,
+    header_snippet: Snippet[HeaderSnippet],
     default_site: Site,
     contact_setting: Setting,
     ff_setting: Setting,
@@ -80,7 +83,8 @@ async def test_get_setting(
 async def test_render_template_with_snippet_and_setting(
     uow: AbstractUnitOfWork,
     app_settings: Settings,
-    header_snippet: Snippet,
+    header_snippet: Snippet[HeaderSnippet],
+    draft_hp: DraftPage[HomePage],
     default_site: Site,
     contact_setting: Setting,
 ):
@@ -88,7 +92,10 @@ async def test_render_template_with_snippet_and_setting(
         renderer = Jinja2TemplateRender(
             uow, app_settings.template_search_path, default_site.hostname
         )
-    data = await renderer.render_template("test_with_snippet.jinja2", {})
+    data = await renderer.render_snippet(
+        header_snippet.snippet,
+        draft_hp.page,
+    )
     nav = "".join(
         [
             '<li><a href="/cats">cats</a></li>',
@@ -100,9 +107,7 @@ async def test_render_template_with_snippet_and_setting(
     assert (
         data
         == f"""
-        <html>
 <h1>A personal blog</h1>
 <ul role="nav">{nav}</ul>
-</html>
     """.strip()
     )

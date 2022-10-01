@@ -183,10 +183,7 @@ async def preview_draft(
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        data = await renderer.render_page(
-            draft_page.template,
-            draft_page.page,
-        )
+        data = await renderer.render_page(draft_page.page)
         await uow.rollback()
     return Response(data)
 

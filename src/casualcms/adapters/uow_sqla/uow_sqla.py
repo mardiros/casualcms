@@ -119,9 +119,12 @@ def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
     return formated_page
 
 
-def format_page(page: Page) -> Dict[str, Any]:
-    formated_page: Dict[str, Any] = page.dict(exclude={"site", "draft"})
+def format_page(page: Page[Any]) -> Dict[str, Any]:
+    formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
     formated_page["id"] = page.id
+    formated_page["type"] = page.type
+    formated_page["title"] = page.title
+    formated_page["body"] = page.page.dict()
     formated_page["created_at"] = page.created_at
     formated_page["draft_id"] = page.draft_id
     formated_page["site_id"] = page.site.id
@@ -770,7 +773,7 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
-    ) -> PageRepositoryResult:
+    ) -> PageRepositoryResult[Page_contra]:
         """Fetch one page by its unique id."""
 
         orm_pages: CursorResult = await self.session.execute(
@@ -779,28 +782,31 @@ class PageSQLRepository(AbstractPageRepository):
             .filter(orm.pages.c.site_id == site_id)
             .limit(1)
         )
-        orm_page = cast(Page, orm_pages.first())
+        orm_page = orm_pages.first()
         if not orm_page:
             return Err(PageRepositoryError.page_not_found)
 
         rsite = await SiteSQLRepository(self.session).by_id(site_id)
         if rsite.is_err():
             return Err(PageRepositoryError.page_not_found)
+
+        rtype = resolve_page_type(orm_page.type)  # type: ignore
+        if rtype.is_err():
+            return Err(PageRepositoryError.page_model_not_found)
+        typ = rtype.unwrap()
+
         return Ok(
             Page(
-                id=orm_page.id,
-                body=orm_page.body,
-                created_at=orm_page.created_at,
+                id=orm_page.id,  # type: ignore
+                created_at=orm_page.created_at,  # type: ignore
                 draft_id=draft_id,
                 site=rsite.unwrap(),
-                template=orm_page.template,
-                type=orm_page.type,
-                title=orm_page.title,
-                path=orm_page.path,
+                page=typ(**orm_page.body),  # type: ignore
+                path=orm_page.path,  # type: ignore
             )
         )
 
-    async def by_url(self, url: str) -> PageRepositoryResult:
+    async def by_url(self, url: str) -> PageRepositoryResult[Page_contra]:
         """Fetch one page by its unique id."""
         url_ = urlparse(url)
         scheme, hostname, path = url_.scheme, url_.netloc, url_.path
@@ -828,21 +834,22 @@ class PageSQLRepository(AbstractPageRepository):
         root = rdraft.unwrap()
 
         orm_page = orm_page_split[orm.pages]
+        rtype = resolve_page_type(orm_page["type"])
+        if rtype.is_err():
+            return Err(PageRepositoryError.page_model_not_found)
+        typ = rtype.unwrap()
         return Ok(
             Page(
                 id=orm_page["id"],
-                body=orm_page["body"],
                 created_at=orm_page["created_at"],
                 draft_id=orm_page["draft_id"],
-                site=Site(root_page_path=root.path, **site),
-                template=orm_page["template"],
-                type=orm_page["type"],
-                title=orm_page["title"],
                 path=orm_page["path"],
+                site=Site(root_page_path=root.path, **site),
+                page=typ(**orm_page["body"]),
             )
         )
 
-    async def add(self, model: Page) -> PageOperationResult:
+    async def add(self, model: Page[Page_contra]) -> PageOperationResult:
         """Append a new model to the repository."""
 
         await self.session.execute(  # type: ignore
@@ -853,7 +860,7 @@ class PageSQLRepository(AbstractPageRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Page) -> PageOperationResult:
+    async def update(self, model: Page[Page_contra]) -> PageOperationResult:
         """Update a model to the repository."""
         page = format_page(model)
         page.pop("id")

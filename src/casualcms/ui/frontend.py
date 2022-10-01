@@ -1,9 +1,10 @@
+from typing import Any
 from fastapi import HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
-from casualcms.domain.model import resolve_page_type
+from casualcms.domain.repositories.page import PageRepositoryResult
 
 
 async def serve_pages(
@@ -36,21 +37,19 @@ async def serve_pages(
                     headers={"location": f"https://{hostname}{request.url.path}"},
                 )
 
-        rpage = await uow.pages.by_url(f"//{hostname}{request.url.path}".rstrip("/"))
+        rpage: PageRepositoryResult[Any] = await uow.pages.by_url(
+            f"//{hostname}{request.url.path}".rstrip("/")
+        )
         # page = await uow.drafts.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if rpage.is_err():
             raise HTTPException(
                 status_code=404,
                 detail=[{"msg": f"Page {path} not found"}],
             )
-        page_wrapper = rpage.unwrap()
-        rdraft = resolve_page_type(page_wrapper.type)
-        draft = rdraft.unwrap()
-        page = draft(**page_wrapper.body)
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        data = await renderer.render_page(page)
+        data = await renderer.render_page(rpage.unwrap().page)
         await uow.rollback()
     return Response(data)
 

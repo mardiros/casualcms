@@ -332,12 +332,15 @@ async def pages(
     sites: list[Site],
     drafts: list[DraftPage[Any]],
 ):
-    def format_page(page: Page) -> Dict[str, Any]:
+    def format_page(page: Page[Any]) -> Dict[str, Any]:
         formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
         formated_page["id"] = page.id
+        formated_page["type"] = page.type
         formated_page["created_at"] = page.created_at
         formated_page["draft_id"] = page.draft_id
         formated_page["site_id"] = page.site.id
+        formated_page["title"] = page.title
+        formated_page["body"] = page.page.dict()
         return formated_page
 
     pages = params["pages"]

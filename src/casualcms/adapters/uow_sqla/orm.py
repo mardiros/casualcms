@@ -167,7 +167,6 @@ pages = Table(
         nullable=True,
     ),
     Column("type", String(72), nullable=False),
-    Column("template", CIText, nullable=False),
     Column("path", CIText, nullable=False),
     Column("title", CIText, nullable=False),
     Column("body", JSON, nullable=False),

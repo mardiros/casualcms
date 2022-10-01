@@ -13,7 +13,11 @@ from casualcms.domain.repositories.draft import (
     DraftOperationResult,
     DraftRepositoryResult,
 )
-from casualcms.domain.repositories.page import PageOperationResult, PageRepositoryError
+from casualcms.domain.repositories.page import (
+    PageOperationResult,
+    PageRepositoryError,
+    PageRepositoryResult,
+)
 from casualcms.service.messagebus import listen
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -80,23 +84,20 @@ async def publish_page(
     lprefix = len(site.root_page_path)
     path = draft_page.path[lprefix:]
     path = f"//{site.hostname}{path}"
-    rpublished_page = await uow.pages.by_draft_page_and_site(draft_page.id, site.id)
+    rpublished_page: PageRepositoryResult[Any] = await uow.pages.by_draft_page_and_site(
+        draft_page.id, site.id
+    )
     if rpublished_page.is_ok():
         published_page = rpublished_page.unwrap()
-        published_page.template = draft_page.template
-        published_page.title = draft_page.title
         published_page.path = path
-        published_page.body = draft_page.page.dict()
+        published_page.page = draft_page.page
         rok = await uow.pages.update(rpublished_page.unwrap())
     else:
         published_page = Page(
             site=site,
+            page=draft_page.page,
             draft_id=draft_page.id,
-            type=draft_page.type,
-            template=draft_page.template,
-            title=draft_page.title,
             path=path,
-            body=draft_page.page.dict(),
         )
         rok = await uow.pages.add(published_page)
     if rok.is_err():

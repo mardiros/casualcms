@@ -29,6 +29,7 @@ from casualcms.domain.model import (
     Site,
     Snippet,
 )
+from casualcms.domain.repositories.page import PageRepositoryResult
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -268,18 +269,20 @@ async def default_site(
 @pytest.fixture
 async def home_page(
     app: FastAPI,
-    draft_hp: Page,
+    draft_hp: Page[HomePage],
     default_site: Site,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Page, None]:
+) -> AsyncGenerator[Page[HomePage], None]:
 
     async with uow as uow:
         await messagebus.handle(
             PublishPage(id=draft_hp.id, site_id=default_site.id),
             uow,
         )
-        ppage = await uow.pages.by_draft_page_and_site(draft_hp.id, default_site.id)
+        ppage: PageRepositoryResult[HomePage] = await uow.pages.by_draft_page_and_site(
+            draft_hp.id, default_site.id
+        )
         yield ppage.unwrap()
 
 

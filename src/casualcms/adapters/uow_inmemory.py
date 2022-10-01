@@ -149,11 +149,11 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
 
 class PageInMemoryRepository(AbstractPageRepository):
-    pages: dict[tuple[str, str], Page] = {}
+    pages: dict[tuple[str, str], Page[Any]] = {}
 
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
-    ) -> PageRepositoryResult:
+    ) -> PageRepositoryResult[Page_contra]:
         """Fetch one page by its unique id."""
         try:
             ppage = self.pages[draft_id, site_id]
@@ -161,7 +161,7 @@ class PageInMemoryRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_not_found)
         return Ok(ppage)
 
-    async def by_url(self, url: str) -> PageRepositoryResult:
+    async def by_url(self, url: str) -> PageRepositoryResult[Page_contra]:
         url_ = urlparse(url)
         hostname, path = url_.netloc, url_.path
         path = f"//{hostname}{path.rstrip('/')}"
@@ -171,12 +171,12 @@ class PageInMemoryRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_not_found)
         return Ok(page[0])
 
-    async def add(self, model: Page) -> PageOperationResult:
+    async def add(self, model: Page[Page_contra]) -> PageOperationResult:
         """Append a new model to the repository."""
         self.pages[model.draft_id, model.site.id] = model
         return Ok(...)
 
-    async def update(self, model: Page) -> PageOperationResult:
+    async def update(self, model: Page[Page_contra]) -> PageOperationResult:
         """Update a model to the repository."""
         self.pages[model.draft_id, model.site.id] = model
         return Ok(...)

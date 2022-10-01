@@ -34,7 +34,7 @@ async def publish_page(
         site = rsite.unwrap()
 
         cmd = PublishPage(id=draft.id, site_id=site.id)
-        rppage: Result[Page, bool] = await app.bus.handle(cmd, uow)
+        rppage: Result[Page[Any], bool] = await app.bus.handle(cmd, uow)
         if rppage.is_err():
             raise HTTPException(
                 status_code=500, detail={"msg": "Internal Server Error"}

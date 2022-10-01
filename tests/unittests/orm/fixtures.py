@@ -14,6 +14,7 @@ from casualcms.domain.model import (
     resolve_setting_type,
     resolve_snippet_type,
 )
+from casualcms.domain.model.setting import Setting
 from casualcms.utils import generate_id
 
 fake = Faker()
@@ -95,7 +96,7 @@ def fake_snippet(type: str, id: str | None = None, **kwargs: Any) -> Snippet[Any
     return snip
 
 
-def fake_header_snippet(**kwargs: Any):
+def fake_header_snippet(**kwargs: Any) -> Snippet[Any]:
     snippet: Dict[str, Any] = {
         "title": fake.name(),
         "links": [{"title": fake.paragraph(nb_sentences=1), "href": fake.url()}],
@@ -104,7 +105,7 @@ def fake_header_snippet(**kwargs: Any):
     return fake_snippet("blog:HeaderSnippet", **snippet)
 
 
-def fake_footer_snippet(**kwargs: Any):
+def fake_footer_snippet(**kwargs: Any) -> Snippet[Any]:
     snippet: Dict[str, Any] = {
         "links": [{"title": fake.paragraph(nb_sentences=1), "href": fake.url()}],
     }
@@ -112,35 +113,32 @@ def fake_footer_snippet(**kwargs: Any):
     return fake_snippet("tests.casualblog.models:FooterSnippet", **snippet)
 
 
-def fake_setting(key: str, hostname: str = "www", **kwargs: Any):
+def fake_setting(key: str, hostname: str = "www", **kwargs: Any) -> Setting:
     typ = resolve_setting_type(key)
     return typ(hostname=hostname, **kwargs)
 
 
-def fake_ff_setting(hostname: str = "www", **kwargs: Any):
+def fake_ff_setting(hostname: str = "www", **kwargs: Any) -> Setting:
     settings = {"use_stuff": True, "use_another_stuff": False}
     settings.update(kwargs)  # type: ignore
     return fake_setting("ff", hostname=hostname, **settings)
 
 
-def fake_contact_setting(hostname: str = "www", **kwargs: Any):
+def fake_contact_setting(hostname: str = "www", **kwargs: Any) -> Setting:
     settings = {"email": "bob@alice.net"}
     settings.update(kwargs)  # type: ignore
     return fake_setting("contact", hostname=hostname, **settings)
 
 
-def fake_page(draft: DraftPage[Any], site: Site):
+def fake_page(draft: DraftPage[Any], site: Site) -> Page[Any]:
     lprefix = len(site.root_page_path)
     path = draft.path[lprefix:]
     path = f"//{site.hostname}{path}"
     return Page(
         id=fake.uuid4(),
-        body=draft.page.dict(),
-        type=draft.type,
-        template=draft.template,
+        page=draft.page,
         created_at=fake.past_datetime(),
         draft_id=draft.id,
         site=site,
         path=path,
-        title=draft.title,
     )

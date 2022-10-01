@@ -26,6 +26,7 @@ from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,
 )
+from casualcms.domain.repositories.page import PageRepositoryResult
 from casualcms.domain.repositories.snippet import (
     SnippetRepositoryResult,
     SnippetSequenceRepositoryResult,
@@ -1235,11 +1236,13 @@ async def test_sql_uow_page_by_page_id_and_site_id(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page],
+    pages: Sequence[Page[Any]],
 ):
     repo = PageSQLRepository(sqla_session)
 
-    rpage = await repo.by_draft_page_and_site(draft_hp.id, site_1.id)
+    rpage: PageRepositoryResult[Any] = await repo.by_draft_page_and_site(
+        draft_hp.id, site_1.id
+    )
 
     assert rpage.is_ok()
     assert rpage.unwrap().id == pages[0].id
@@ -1278,11 +1281,11 @@ async def test_sql_uow_page_by_url(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page],
+    pages: Sequence[Page[Any]],
 ):
     repo = PageSQLRepository(sqla_session)
 
-    rpage = await repo.by_url("https://www")
+    rpage: PageRepositoryResult[Any] = await repo.by_url("https://www")
     assert rpage.is_ok()
     assert rpage.unwrap().id == pages[0].id
 
@@ -1357,7 +1360,6 @@ async def test_sql_uow_page_add(
     assert page.site_id == params["expected"]["site_id"]
     assert page.draft_id == params["expected"]["draft_id"]
     assert page.type == params["expected"]["type"]
-    assert page.template == params["expected"]["template"]
     assert page.path == params["expected"]["path"]
     assert page.title == params["expected"]["title"]
     assert page.body == params["expected"]["body"]
@@ -1381,11 +1383,11 @@ async def test_sql_uow_page_update(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
-    pages: Sequence[Page],
+    pages: Sequence[Page[Any]],
 ):
     page = params["pages"][0]
-    page.title = "My new page title"
-    page.body = {"body": "my new body"}
+    page.page.title = "My new page title"
+    page.page.body = {"body": "my new body"}
 
     repo = PageSQLRepository(sqla_session)
     op_result = await repo.update(page)
@@ -1398,10 +1400,15 @@ async def test_sql_uow_page_update(
     assert updated_page.site_id == page.site.id
     assert updated_page.draft_id == page.draft_id
     assert updated_page.type == page.type
-    assert updated_page.template == page.template
     assert updated_page.path == page.path
     assert updated_page.title == page.title
-    assert updated_page.body == page.body
+    assert updated_page.body == {
+        "title": "My new page title",
+        "body": {"body": "my new body"},
+        "description": page.page.description,
+        "hero_title": page.page.hero_title,
+        "slug": "root",
+    }
 
     same_draft_other_site = params["pages"][1]
     qry = select(orm.pages).filter(orm.pages.c.id == same_draft_other_site.id)
@@ -1410,7 +1417,7 @@ async def test_sql_uow_page_update(
     assert saved_same_draft_other_site.site_id == site_2.id
     assert saved_same_draft_other_site.draft_id == draft_hp.id
     assert saved_same_draft_other_site.title != page.title
-    assert saved_same_draft_other_site.body != page.body
+    assert saved_same_draft_other_site.body != page.dict()
 
     other_draft_same_site = params["pages"][2]
     qry = select(orm.pages).filter(orm.pages.c.id == other_draft_same_site.id)
@@ -1419,4 +1426,4 @@ async def test_sql_uow_page_update(
     assert saved_same_draft_other_site.site_id == site_1.id
     assert saved_same_draft_other_site.draft_id == cat_page.id
     assert saved_same_draft_other_site.title != page.title
-    assert saved_same_draft_other_site.body != page.body
+    assert saved_same_draft_other_site.body != page.dict()

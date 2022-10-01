@@ -21,9 +21,14 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
 from casualcms.config import Settings
 from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model import AuthnToken, DraftPage, Page, Setting, Site, Snippet
+from casualcms.domain.model.abstract_snippet import SnippetImpl
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
     DraftSequenceRepositoryResult,
+)
+from casualcms.domain.repositories.snippet import (
+    SnippetRepositoryResult,
+    SnippetSequenceRepositoryResult,
 )
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -520,10 +525,10 @@ async def test_page_remove(
     ],
 )
 async def test_snippet_by_key(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Any]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet = await repo.by_key("snip-it")
+    rsnippet: SnippetRepositoryResult[HeaderSnippet] = await repo.by_key("snip-it")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.id == snippets[1].id
@@ -546,10 +551,10 @@ async def test_snippet_by_key(
     ],
 )
 async def test_snippet_by_id(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Any]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet = await repo.by_id("123")
+    rsnippet: SnippetRepositoryResult[Any] = await repo.by_id("123")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.key == snippets[1].key
@@ -576,8 +581,8 @@ async def test_snippet_add(params: Any, sqla_session: AsyncSession):
     snippet: orm.snippets = resp.first()  # type: ignore
     assert snippet.key == params["snippet"].key
     assert snippet.body == {
-        "title": params["snippet"].title,
-        "links": params["snippet"].links,
+        "title": params["snippet"].snippet.title,
+        "links": params["snippet"].snippet.links,
     }
 
 
@@ -594,7 +599,7 @@ async def test_snippet_add(params: Any, sqla_session: AsyncSession):
     ],
 )
 async def test_snippet_remove(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Any]]
 ):
     repo = SnippetSQLRepository(sqla_session)
     await repo.remove(snippets[1])
@@ -625,10 +630,12 @@ async def test_snippet_remove(
     ],
 )
 async def test_snippet_list_filter_type(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[SnippetImpl]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippets = await repo.list(type="blog:HeaderSnippet")
+    rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list(
+        type="blog:HeaderSnippet"
+    )
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
     sk = [s.key for s in snips]
@@ -648,10 +655,10 @@ async def test_snippet_list_filter_type(
     ],
 )
 async def test_snippet_list(
-    params: Any, sqla_session: AsyncSession, snippets: list[Snippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[SnippetImpl]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippets = await repo.list()
+    rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list()
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
     sk = [s.key for s in snips]
@@ -671,12 +678,12 @@ async def test_snippet_list(
     ],
 )
 async def test_snippet_update(
-    params: Any, sqla_session: AsyncSession, snippets: list[HeaderSnippet]
+    params: Any, sqla_session: AsyncSession, snippets: list[Snippet[HeaderSnippet]]
 ):
     snippet = snippets[1]
-    snippet.key = "new-snip-key"  # type: ignore
-    snippet.title = "New title"
-    snippet.links = [Link(title="l1", href="/l1")]
+    snippet.snippet.key = "new-snip-key"  # type: ignore
+    snippet.snippet.title = "New title"
+    snippet.snippet.links = [Link(title="l1", href="/l1")]
     repo = SnippetSQLRepository(sqla_session)
     op = await repo.update(snippet)
     assert op.is_ok()

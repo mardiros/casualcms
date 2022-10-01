@@ -98,7 +98,11 @@ class PageMetaclass(ModelMetaclass):
                 ),
                 abstract=getattr(meta, "abstract", False),
                 parent_types=getattr(meta, "parent_types", []),
-                type=getattr(meta, "type", f"{namespace['__module__']}:{name}"),
+                type=getattr(
+                    meta,
+                    "type",
+                    f"{namespace['__module__']}:{namespace['__qualname__']}",
+                ),
             )
             new_namespace["__meta__"] = page_meta
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
@@ -188,4 +192,4 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
         }
 
 
-PageImpl = TypeVar("PageImpl", bound=AbstractPage)
+PageImpl = TypeVar("PageImpl", bound=AbstractPage, contravariant=True)

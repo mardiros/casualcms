@@ -15,7 +15,7 @@ def test_snippet_metadata():
             Link(title="cats", href="/cats"),
         ],
     )
-    assert snip.get_template() == "header.jinja2"
+    assert snip.__meta__.template == "header.jinja2"
     assert snip.__meta__.abstract is False
     assert snip.__meta__.type == "blog:HeaderSnippet"
 
@@ -41,11 +41,9 @@ def test_snippet_get_context():
             {"href": "/dogs", "title": "dogs"},
             {"href": "/cats", "title": "cats"},
         ],
-        "meta": {"type": "blog:HeaderSnippet"},
         "key": "header",
         "title": "awesome",
     }
-    context = snip.get_context()
+    context = snip.dict()
     assert context == expected_context
-    context = snip.get_data_context()
-    assert context == expected_context
+    assert snip.metadata == {"type": "blog:HeaderSnippet"}

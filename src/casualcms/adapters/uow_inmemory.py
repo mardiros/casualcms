@@ -14,6 +14,7 @@ from casualcms.domain.model import (
     Site,
     Snippet,
 )
+from casualcms.domain.model.abstract_snippet import SnippetImpl
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -263,45 +264,47 @@ class SiteInMemoryRepository(AbstractSiteRepository):
 
 
 class SnippetInMemoryRepository(AbstractSnippetRepository):
-    snippets: dict[str, Snippet] = {}
+    snippets: dict[str, Snippet[Any]] = {}
 
     def __init__(self) -> None:
         self.seen = set()
 
-    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
+    async def list(
+        self, type: Optional[str] = None
+    ) -> SnippetSequenceRepositoryResult[SnippetImpl]:
         """List all snippets, optionally filters on their types."""
-        values: Iterable[Snippet] = self.snippets.values()
+        values: Iterable[Snippet[SnippetImpl]] = self.snippets.values()
         if type:
-            values = filter(lambda s: s.__meta__.type == type, values)
+            values = filter(lambda s: s.type == type, values)
         return Ok(sorted(values, key=lambda s: s.key))
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult:
+    async def by_id(self, id: str) -> SnippetRepositoryResult[SnippetImpl]:
         """Fetch one snippet by its unique id."""
         for snippet in self.snippets.values():
             if snippet.id == id:
                 return Ok(snippet)
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult:
+    async def by_key(self, key: str) -> SnippetRepositoryResult[SnippetImpl]:
         """Fetch one snippet by its unique key."""
         try:
             return Ok(self.snippets[key])
         except KeyError:
             return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def add(self, model: Snippet) -> SnippetOperationResult:
+    async def add(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.snippets[model.key] = model
         return Ok(...)
 
-    async def remove(self, model: Snippet) -> SnippetOperationResult:
+    async def remove(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.snippets[model.key]
         return Ok(...)
 
-    async def update(self, model: Snippet) -> SnippetOperationResult:
+    async def update(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None

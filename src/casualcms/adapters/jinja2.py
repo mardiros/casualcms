@@ -5,6 +5,7 @@ import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
 from casualcms.domain.model import AbstractPage
+from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
@@ -44,12 +45,10 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         self._settings: MutableMapping[str, Any] = {}
 
     async def include_snippet(self, key: str) -> str:
-        rsnippet = await self.uow.snippets.by_key(key)
+        rsnippet: SnippetRepositoryResult[Any] = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
-            ret = await self.render_template(
-                snippet.get_template(), snippet.get_context()
-            )
+            ret = await self.render_template(snippet.template, snippet.snippet.dict())
             return ret
         else:
             # should render an error here

@@ -9,6 +9,7 @@ from .abstract_page import (
 from .abstract_snippet import (
     AbstractSnippet,
     AbstractSnippetError,
+    SnippetImpl,
     SnippetKey,
     SnippetType,
     list_snippet_types,
@@ -41,6 +42,7 @@ __all__ = [
     "AbstractSnippet",
     "AbstractSnippetError",
     "Snippet",
+    "SnippetImpl",
     "SnippetKey",
     "SnippetType",
     "list_snippet_types",

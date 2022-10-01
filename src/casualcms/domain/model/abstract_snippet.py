@@ -1,8 +1,9 @@
 import enum
 import re
-from typing import Any, Set, Type, cast
+from typing import Any, Mapping, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, ConstrainedStr, Field
+from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
@@ -69,7 +70,11 @@ class SnippetMetaclass(ModelMetaclass):
                     "",  # TODO: a default template for users
                 ),
                 abstract=getattr(meta, "abstract", False),
-                type=getattr(meta, "type", f"{namespace['__module__']}:{name}"),
+                type=getattr(
+                    meta,
+                    "type",
+                    f"{namespace['__module__']}:{namespace['__qualname__']}",
+                ),
             )
             new_namespace["__meta__"] = snippet_meta
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
@@ -81,10 +86,55 @@ class SnippetMetaclass(ModelMetaclass):
 class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
     __meta__: SnippetMeta
 
+    key: SnippetKey = Field(...)
+
+    class Meta:
+        abstract = True
+
     def __init__(self, **kwargs: Any) -> None:  # type: ignore
         if self.__meta__.abstract is True:
             raise AbstractSnippetError(f"Snippet {self.__class__.__name__} is abstract")
         super().__init__(**kwargs)
 
-    def get_template(self) -> str:
-        return self.__meta__.template
+    @property
+    def metadata(self) -> Mapping[str, Any]:
+        return {
+            "type": self.__meta__.type,
+        }
+
+    @classmethod
+    def ui_schema(cls) -> Mapping[str, Any]:
+        ret: dict[str, Any] = {}
+        for key, val in cls.__fields__.items():
+            if key in ("id", "events", "created_at"):
+                continue
+            ret[key] = cls.get_widget(val)
+        return ret
+
+    @classmethod
+    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
+
+        if "widget" in field.field_info.extra:
+            widget = {"ui:widget": field.field_info.extra["widget"]}
+            if field.field_info.extra["widget"] != "hidden":
+                widget["ui:placeholder"] = field.field_info.extra.get(
+                    "placeholder", field.name
+                )
+            return widget
+
+        if field.is_complex():
+
+            if isinstance(field.get_default(), list):
+                items = {}
+                for key, val in field.type_.__fields__.items():
+                    items[key] = cls.get_widget(val)
+                ret: Mapping[str, Any] = {"items": items}
+                return ret
+
+        return {
+            "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),
+            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
+        }
+
+
+SnippetImpl = TypeVar("SnippetImpl", bound=AbstractSnippet, contravariant=True)

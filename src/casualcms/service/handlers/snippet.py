@@ -1,3 +1,5 @@
+from typing import Any
+
 from result import Err, Ok
 
 from casualcms.domain.messages.commands import (
@@ -6,6 +8,8 @@ from casualcms.domain.messages.commands import (
     UpdateSnippet,
 )
 from casualcms.domain.model import resolve_snippet_type
+from casualcms.domain.model.abstract_snippet import SnippetImpl
+from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories.snippet import (
     SnippetOperationResult,
     SnippetRepositoryError,
@@ -19,17 +23,18 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_snippet(
     cmd: CreateSnippet,
     uow: AbstractUnitOfWork,
-) -> SnippetRepositoryResult:
+) -> SnippetRepositoryResult[SnippetImpl]:
     rsnip = resolve_snippet_type(cmd.type)
     if rsnip.is_err():
         return Err(SnippetRepositoryError.snippet_type_not_found)
     snip = rsnip.unwrap()
-    snippet = snip(
+    rsnippet = snip(
         id=cmd.id,
         key=cmd.key,
         created_at=cmd.created_at,
         **cmd.body,
     )
+    snippet: Snippet[Any] = Snippet(snippet=rsnippet)
     rop = await uow.snippets.add(snippet)
     if rop.is_err():
         return Err(rop.unwrap_err())
@@ -42,16 +47,17 @@ async def update_snippet(
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
 
-    rsnippet = await uow.snippets.by_id(cmd.id)
+    rsnippet: SnippetRepositoryResult[Any] = await uow.snippets.by_id(cmd.id)
     if rsnippet.is_err():
         return Err(rsnippet.unwrap_err())
-    snippet = rsnippet.unwrap()
+    snippet_wrapper = rsnippet.unwrap()
+    snippet = snippet_wrapper.snippet
     if cmd.key:
         snippet.key = cmd.key
     if cmd.body:
         for key, val in cmd.body.items():
             setattr(snippet, key, val)
-    return await uow.snippets.update(snippet)
+    return await uow.snippets.update(snippet_wrapper)
 
 
 @listen
@@ -59,7 +65,7 @@ async def delete_snippet(
     cmd: DeleteSnippet,
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
-    snippet = await uow.snippets.by_id(cmd.id)
+    snippet: SnippetRepositoryResult[Any] = await uow.snippets.by_id(cmd.id)
     if snippet.is_err():
         return Err(SnippetRepositoryError.snippet_not_found)
     s = snippet.unwrap()

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import AsyncGenerator, Iterator
+from typing import Any, AsyncGenerator, Iterator
 
 import pytest
 from fastapi import FastAPI
@@ -180,7 +180,7 @@ async def header_snippet(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Snippet, None]:
+) -> AsyncGenerator[Snippet[Any], None]:
     async with uow as uow:
         snippet = await messagebus.handle(
             CreateSnippet(
@@ -204,7 +204,7 @@ async def alt_header_snippet(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Snippet, None]:
+) -> AsyncGenerator[Snippet[Any], None]:
     async with uow as uow:
         snippet = await messagebus.handle(
             CreateSnippet(
@@ -228,7 +228,7 @@ async def footer_snippet(
     app: FastAPI,
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Snippet, None]:
+) -> AsyncGenerator[Snippet[Any], None]:
     async with uow as uow:
         snippet = await messagebus.handle(
             CreateSnippet(

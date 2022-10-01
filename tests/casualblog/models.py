@@ -2,7 +2,8 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, Setting, Snippet
+from casualcms.domain.model import AbstractPage, Setting
+from casualcms.domain.model.abstract_snippet import AbstractSnippet
 
 
 class Link(BaseModel):
@@ -10,7 +11,7 @@ class Link(BaseModel):
     href: str = Field()
 
 
-class HeaderSnippet(Snippet):
+class HeaderSnippet(AbstractSnippet):
     title: str = Field()
     links: list[Link] = Field(default_factory=list)
 
@@ -39,7 +40,7 @@ class ContactSetting(MyAbstractSetting):
         key = "contact"
 
 
-class AbstractFooterSnippet(Snippet):
+class AbstractFooterSnippet(AbstractSnippet):
     class Meta:
         abstract = True
 

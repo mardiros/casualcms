@@ -1,9 +1,11 @@
-from typing import Any, Mapping, cast
+from typing import Any, Mapping
 
 import pytest
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
+from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 from ..casualblog.models import FooterSnippet, HeaderSnippet
@@ -40,8 +42,8 @@ async def test_api_create_snippet(
     assert resp.status_code == 201
     assert resp.json() == {"key": "header", "meta": {"type": "blog:HeaderSnippet"}}
     async with uow as uow:
-        snippet = (await uow.snippets.by_key("header")).unwrap()
-        assert snippet.dict() == {
+        snippet: Snippet[Any] = (await uow.snippets.by_key("header")).unwrap()
+        assert snippet.snippet.dict() == {
             "key": "header",
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],
@@ -187,10 +189,12 @@ async def test_api_patch_snippet(
     assert resp.json() == {"meta": {"type": "blog:HeaderSnippet"}, "key": "new-key"}
 
     async with uow as uow:
-        snip = await uow.snippets.by_key("new-key")
+        snip: SnippetRepositoryResult[HeaderSnippet] = await uow.snippets.by_key(
+            "new-key"
+        )
         assert snip.is_ok()
-        snipok = cast(HeaderSnippet, snip.unwrap())
-        assert snipok.title == "new title"
+        snipok = snip.unwrap()
+        assert snipok.snippet.title == "new title"
 
         snip = await uow.snippets.by_key("header")
         assert snip.is_err()
@@ -281,6 +285,8 @@ async def test_api_delete_snippet(
     assert resp.text == ""
 
     async with uow as uow:
-        snip = await uow.snippets.by_key("header")
+        snip: SnippetRepositoryResult[HeaderSnippet] = await uow.snippets.by_key(
+            "header"
+        )
         assert snip.is_err()
         assert snip.unwrap_err().name == "snippet_not_found"

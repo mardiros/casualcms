@@ -17,6 +17,10 @@ from casualcms.domain.model import (
     SnippetType,
     resolve_snippet_type,
 )
+from casualcms.domain.repositories.snippet import (
+    SnippetRepositoryResult,
+    SnippetSequenceRepositoryResult,
+)
 
 from .base import MappingWithKey, get_token_info
 
@@ -47,9 +51,9 @@ class PartialSnippet(BaseModel):
 async def get_snippet_by_key(
     key: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> Snippet:
+) -> Snippet[Any]:
     async with app.uow as uow:
-        rsnippet = await uow.snippets.by_key(key)
+        rsnippet: SnippetRepositoryResult[Any] = await uow.snippets.by_key(key)
         if rsnippet.is_err():
             raise HTTPException(
                 status_code=404,
@@ -93,7 +97,7 @@ async def get_validated_payload(
 async def get_new_validated_payload(
     payload: MappingWithKey = Body(...),
     app: AppConfig = FastAPIConfigurator.depends,
-    snippet: Snippet = Depends(get_snippet_by_key),
+    snippet: Snippet[Any] = Depends(get_snippet_by_key),
 ) -> MappingWithKey:
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {
@@ -101,7 +105,7 @@ async def get_new_validated_payload(
             "type": type,
             **payload,
         }
-        rtype = resolve_snippet_type(snippet.__meta__.type)
+        rtype = resolve_snippet_type(snippet.type)
         if rtype.is_err():
             raise HTTPException(
                 status_code=500,
@@ -140,7 +144,7 @@ async def create_snippet(
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
-        rsnippet = await app.bus.handle(cmd, uow)
+        rsnippet: SnippetRepositoryResult[Any] = await app.bus.handle(cmd, uow)
         if rsnippet.is_err():
             raise HTTPException(
                 status_code=422,
@@ -157,7 +161,7 @@ async def create_snippet(
 
     return PartialSnippet(
         key=snippet.key,
-        meta=PartialSnippetMeta(type=snippet.__meta__.type),
+        meta=PartialSnippetMeta(type=snippet.type),
     )
 
 
@@ -169,30 +173,40 @@ async def list_snippets(
 ) -> Sequence[PartialSnippet]:
 
     async with app.uow as uow:
-        snippets = await uow.snippets.list(type=type)
+        snippets: SnippetSequenceRepositoryResult[Any] = await uow.snippets.list(
+            type=type
+        )
         await uow.rollback()
     if snippets.is_err():
-        raise HTTPException(status_code=500, detail=[{"msg": "Internal Server Error"}])
+        raise HTTPException(
+            status_code=500,
+            detail=[{"msg": "Internal Server Error"}],
+        )
     snips = snippets.unwrap()
 
     return [
-        PartialSnippet(key=s.key, meta=PartialSnippetMeta(type=s.__meta__.type))
+        PartialSnippet(
+            key=s.key,
+            meta=PartialSnippetMeta(type=s.type),
+        )
         for s in snips
     ]
 
 
 async def show_snippet(
-    snippet: Snippet = Depends(get_snippet_by_key),
+    snippet: Snippet[Any] = Depends(get_snippet_by_key),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
-    return snippet.get_data_context()
+    ret = snippet.snippet.dict()
+    ret["meta"] = snippet.snippet.metadata
+    return ret
 
 
 async def update_snippet(
     request: Request,
     app: AppConfig = FastAPIConfigurator.depends,
-    snippet: Snippet = Depends(get_snippet_by_key),
+    snippet: Snippet[Any] = Depends(get_snippet_by_key),
     payload: MappingWithKey = Depends(get_new_validated_payload),
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSnippet:
@@ -208,7 +222,10 @@ async def update_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "key"],
+                        "msg": resp.unwrap_err().value,
+                    }
                 ],
             )
         else:
@@ -216,7 +233,7 @@ async def update_snippet(
 
     return PartialSnippet(
         key=new_key,
-        meta=PartialSnippetMeta(type=snippet.__meta__.type),
+        meta=PartialSnippetMeta(type=snippet.type),
     )
 
 
@@ -229,11 +246,14 @@ async def delete_snippet(
 
     async with app.uow as uow:
         key = key.strip("/")
-        rsnippet = await uow.snippets.by_key(key)
+        rsnippet: SnippetRepositoryResult[Any] = await uow.snippets.by_key(key)
         await uow.rollback()
 
     if rsnippet.is_err():
-        return Response(content=rsnippet.unwrap_err().value, status_code=404)
+        return Response(
+            content=rsnippet.unwrap_err().value,
+            status_code=404,
+        )
 
     snippet = rsnippet.unwrap()
 
@@ -249,7 +269,10 @@ async def delete_snippet(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "key"], "msg": resp.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "key"],
+                        "msg": resp.unwrap_err().value,
+                    }
                 ],
             )
         else:

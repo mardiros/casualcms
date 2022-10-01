@@ -40,6 +40,7 @@ from casualcms.domain.model import (
     resolve_setting_type,
     resolve_snippet_type,
 )
+from casualcms.domain.model.abstract_snippet import SnippetImpl
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
     AbstractAuthnRepository,
@@ -127,13 +128,13 @@ def format_page(page: Page) -> Dict[str, Any]:
     return formated_page
 
 
-def format_snippet(snippet: Snippet) -> Dict[str, Any]:
+def format_snippet(snippet: Snippet[Any]) -> Dict[str, Any]:
     formated_snippet: Dict[str, Any] = {
         "id": snippet.id,
-        "type": snippet.__meta__.type,
+        "type": snippet.type,
         "created_at": snippet.created_at,
         "key": snippet.key,
-        "body": snippet.dict(exclude={"key"}),
+        "body": snippet.snippet.dict(exclude={"key"}),
     }
     return formated_snippet
 
@@ -391,8 +392,8 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def _format_response(
         self, orm_snippets: CursorResult
-    ) -> SnippetRepositoryResult:
-        orm_snippet = cast(Snippet, orm_snippets.first())
+    ) -> SnippetRepositoryResult[SnippetImpl]:
+        orm_snippet = orm_snippets.first()
         if orm_snippet:
             rtyp = resolve_snippet_type(
                 orm_snippet.type,  # type: ignore
@@ -401,30 +402,34 @@ class SnippetSQLRepository(AbstractSnippetRepository):
                 return Err(SnippetRepositoryError.snippet_type_not_found)
             typ = rtyp.unwrap()
             return Ok(
-                typ(
-                    id=orm_snippet.id,
-                    key=orm_snippet.key,
-                    **orm_snippet.body,  # type: ignore
+                Snippet(
+                    id=orm_snippet.id,  # type: ignore
+                    snippet=typ(
+                        key=orm_snippet.key,  # type: ignore
+                        **orm_snippet.body,  # type: ignore
+                    ),
                 )
             )
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult:
+    async def by_id(self, id: str) -> SnippetRepositoryResult[SnippetImpl]:
         """Fetch one snippet by its unique id."""
         orm_snippets: CursorResult = await self.session.execute(
             select(orm.snippets).filter_by(id=id).limit(1)
         )
-        return await self._format_response(orm_snippets)
+        return await self._format_response(orm_snippets)  # type: ignore
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult:
+    async def by_key(self, key: str) -> SnippetRepositoryResult[SnippetImpl]:
         """Fetch one snippet by its unique key."""
 
         orm_snippets: CursorResult = await self.session.execute(
             select(orm.snippets).filter_by(key=key).limit(1)
         )
-        return await self._format_response(orm_snippets)
+        return await self._format_response(orm_snippets)  # type: ignore
 
-    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
+    async def list(
+        self, type: Optional[str] = None
+    ) -> SnippetSequenceRepositoryResult[SnippetImpl]:
         """List all snippets, optionally filters on their types."""
 
         qry = select(orm.snippets)
@@ -433,7 +438,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         qry = qry.order_by(orm.snippets.c.key)
         orm_snippets: CursorResult = await self.session.execute(qry)
         orm_snippet: Any
-        snippets: list[Snippet] = []
+        snippets: list[Snippet[SnippetImpl]] = []
         for orm_snippet in orm_snippets:
             rtyp = resolve_snippet_type(orm_snippet.type)  # type: ignore
             if rtyp.is_err():
@@ -448,14 +453,14 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             )
         return Ok(snippets)
 
-    async def add(self, model: Snippet) -> SnippetOperationResult:
+    async def add(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Append a new model to the repository."""
         qry: Any = orm.snippets.insert().values(format_snippet(model))
         await self.session.execute(qry)
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: Snippet) -> SnippetOperationResult:
+    async def remove(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Remove the model from the repository."""
         await self.session.execute(
             delete(orm.snippets).where(
@@ -465,7 +470,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Snippet) -> SnippetOperationResult:
+    async def update(self, model: Snippet[SnippetImpl]) -> SnippetOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         snippet = format_snippet(model)

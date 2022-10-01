@@ -14,6 +14,7 @@ from casualcms.domain.model import (
     resolve_setting_type,
     resolve_snippet_type,
 )
+from casualcms.utils import generate_id
 
 fake = Faker()
 
@@ -79,17 +80,19 @@ def fake_site(page: DraftPage[Any], **kwargs: Any) -> Site:
     return Site(**site)
 
 
-def fake_snippet(type: str, **kwargs: Any) -> Snippet:
+def fake_snippet(type: str, id: str | None = None, **kwargs: Any) -> Snippet[Any]:
     snippet: Dict[str, Any] = {
-        "id": fake.uuid4(),
-        "created_at": fake.past_datetime(),
         "type": type,
         "key": fake.slug(),
     }
 
     typ = resolve_snippet_type(type).unwrap()
     snippet.update(kwargs)
-    return typ(**snippet)
+    snip: Snippet[Any] = Snippet(
+        id=id or generate_id(),
+        snippet=typ(**snippet),
+    )
+    return snip
 
 
 def fake_header_snippet(**kwargs: Any):

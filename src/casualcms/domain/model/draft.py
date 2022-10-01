@@ -14,8 +14,9 @@ class DraftPage(BaseModel, Generic[PageImpl]):
 
     id: uuid = Field(default_factory=generate_id)
     created_at: datetime = Field(default_factory=datetime.utcnow)
-    events: list[Event] = Field(default_factory=list, exclude=True)
     page: PageImpl = Field(...)
+
+    events: list[Event] = Field(default_factory=list, exclude=True)
 
     def __hash__(self) -> int:  # type: ignore
         return hash(self.id)

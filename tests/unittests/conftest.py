@@ -20,9 +20,15 @@ from casualcms.domain.messages.commands import (
     PublishPage,
     generate_id,
 )
-from casualcms.domain.model import Account, AuthnToken, DraftPage, Page, Site
-from casualcms.domain.model.setting import Setting
-from casualcms.domain.model.snippet import Snippet
+from casualcms.domain.model import (
+    Account,
+    AuthnToken,
+    DraftPage,
+    Page,
+    Setting,
+    Site,
+    Snippet,
+)
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork

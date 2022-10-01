@@ -1,10 +1,9 @@
 from datetime import datetime, timedelta
-from typing import Any
+from typing import Any, Mapping
 
 from pydantic import Field
-from pyparsing import Mapping
 
-from casualcms.domain.model.snippet import SnippetKey
+from casualcms.domain.model import SnippetKey
 from casualcms.utils import generate_id, generate_secret
 
 from .base import Command, Metadata

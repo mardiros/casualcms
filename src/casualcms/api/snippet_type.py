@@ -3,8 +3,13 @@ from typing import Any
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AuthnToken, list_snippet_types
-from casualcms.domain.model.snippet import SnippetKey, SnippetType, resolve_snippet_type
+from casualcms.domain.model import (
+    AuthnToken,
+    SnippetKey,
+    SnippetType,
+    list_snippet_types,
+    resolve_snippet_type,
+)
 
 from .base import get_token_info
 

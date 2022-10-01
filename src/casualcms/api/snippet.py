@@ -10,8 +10,8 @@ from casualcms.domain.messages.commands import (
     UpdateSnippet,
     generate_id,
 )
-from casualcms.domain.model import AuthnToken
-from casualcms.domain.model.snippet import (
+from casualcms.domain.model import (
+    AuthnToken,
     Snippet,
     SnippetKey,
     SnippetType,

@@ -5,7 +5,7 @@ from casualcms.domain.messages.commands import (
     DeleteSnippet,
     UpdateSnippet,
 )
-from casualcms.domain.model.snippet import resolve_snippet_type
+from casualcms.domain.model import resolve_snippet_type
 from casualcms.domain.repositories.snippet import (
     SnippetOperationResult,
     SnippetRepositoryError,

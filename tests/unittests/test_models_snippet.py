@@ -1,6 +1,6 @@
 import pytest
 
-from casualcms.domain.model.snippet import AbstractSnippetError
+from casualcms.domain.model import AbstractSnippetError
 
 from ..casualblog.models import AbstractFooterSnippet, HeaderSnippet, Link
 

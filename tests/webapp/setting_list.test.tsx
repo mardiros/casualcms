@@ -35,12 +35,12 @@ describe("As a user, I can list settings of a given site", () => {
   after(async () => {
     await config.api.site.deleteSite("", "www.localhost");
     await config.api.site.deleteSite("", "*");
-    await config.api.setting.deleteSetting("", "www.localhost", {
-      meta: { key: "blog:contact" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "www.localhost", key: "blog:contact" },
     });
   });
 
-  it("Render a row for a setting", async () => {
+  it("<SettingRow />: Render a row for a setting", async () => {
     renderWithRouter(
       <Route
         path="/admin/settingrow"
@@ -49,7 +49,7 @@ describe("As a user, I can list settings of a given site", () => {
             <Tbody>
               <SettingRow
                 settingUrl={"/admin/settings/.../edit"}
-                settingType={{ key: "contact" }}
+                settingType={{ hostname: "www.localhost", key: "contact" }}
               />
             </Tbody>
           </Table>
@@ -62,8 +62,8 @@ describe("As a user, I can list settings of a given site", () => {
     expect(link.getAttribute("href")).equal("/admin/settings/.../edit");
   });
 
-  it("Render table if setting types are loaded", async () => {
-    const settingTypes = [{ key: "blog:ff" }, { key: "blog:contact" }];
+  it("<SettingsTable />: Render table if setting types are loaded", async () => {
+    const settingTypes = [{ hostname: "www.localhost", key: "blog:ff" }, { hostname: "www.localhost", key: "blog:contact" }];
     renderWithRouter(
       <Route
         path="/admin/settings/table"
@@ -92,7 +92,7 @@ describe("As a user, I can list settings of a given site", () => {
     );
   });
 
-  it("Render settings lists from the API", async () => {
+  it("<SettingList />: Render settings lists from the API", async () => {
     renderWithRouter(
       <Route path="/admin/settings/:hostname" element={<SettingList />} />,
       "/admin/settings/www.localhost"

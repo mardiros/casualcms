@@ -33,6 +33,7 @@ from casualcms.domain.model import (
     Page_contra,
     PublishedPage,
     Setting,
+    Setting_contra,
     SettingType,
     Site,
     Snippet,
@@ -142,13 +143,13 @@ def format_snippet(snippet: Snippet[Any]) -> Dict[str, Any]:
     return formated_snippet
 
 
-def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
+def format_setting(site_id: str, setting: Setting[Setting_contra]) -> Dict[str, Any]:
     formated_setting: Dict[str, Any] = {
         "id": setting.id,
-        "key": setting.__meta__.key,
+        "key": setting.key,
         "created_at": setting.created_at,
         "site_id": site_id,
-        "value": setting.dict(exclude={"hostname", "slug"}),
+        "value": setting.setting.dict(),
     }
     return formated_setting
 
@@ -503,20 +504,21 @@ class SettingSQLRepository(AbstractSettingRepository):
 
     async def _format_response(
         self, orm_settings: CursorResult
-    ) -> SettingRepositoryResult:
+    ) -> SettingRepositoryResult[Setting_contra]:
         resp = orm_settings.first()
         if resp:
             typ: SettingType = resolve_setting_type(resp.key)  # type: ignore
             return Ok(
-                typ(
+                Setting(
                     id=resp.id,  # type: ignore
+                    key=resp.key,  # type: ignore
                     hostname=resp.hostname,  # type: ignore
-                    **resp.value,  # type: ignore
+                    setting=typ(**resp.value),  # type: ignore
                 )
             )
         return Err(SettingRepositoryError.setting_not_found)
 
-    async def by_id(self, id: str) -> SettingRepositoryResult:
+    async def by_id(self, id: str) -> SettingRepositoryResult[Setting_contra]:
         """Fetch one setting by its unique id."""
         qry = (
             select(orm.settings, orm.sites.c.hostname)
@@ -531,7 +533,9 @@ class SettingSQLRepository(AbstractSettingRepository):
         orm_settings: CursorResult = await self.session.execute(qry)
         return await self._format_response(orm_settings)
 
-    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
+    async def by_key(
+        self, hostname: str, key: str
+    ) -> SettingRepositoryResult[Setting_contra]:
         """Fetch one setting by its unique key."""
 
         orm_settings: CursorResult = await self.session.execute(
@@ -551,7 +555,7 @@ class SettingSQLRepository(AbstractSettingRepository):
 
     async def list(
         self, hostname: Optional[str] = None
-    ) -> SettingSequenceRepositoryResult:
+    ) -> SettingSequenceRepositoryResult[Setting_contra]:
         """List all settings, optionally filters on their types."""
 
         qry = select(orm.settings, orm.sites.c.hostname)
@@ -564,21 +568,21 @@ class SettingSQLRepository(AbstractSettingRepository):
         qry = qry.order_by(orm.sites.c.hostname, orm.settings.c.key)
         orm_settings: CursorResult = await self.session.execute(qry)
         orm_setting: Any
-        settings: list[Setting] = []
+        settings: list[Setting[Setting_contra]] = []
 
         for orm_setting in orm_settings:
-            typ: SettingType = resolve_setting_type(orm_setting.key)  # type: ignore
+            typ: SettingType = resolve_setting_type(orm_setting.key)
             settings.append(
-                typ(
+                Setting(
                     id=orm_setting.id,
                     key=orm_setting.key,
                     hostname=orm_setting.hostname,
-                    **orm_setting.value,  # type: ignore
+                    setting=typ(**orm_setting.value),
                 )
             )
         return Ok(settings)
 
-    async def add(self, model: Setting) -> SettingOperationResult:
+    async def add(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Append a new model to the repository."""
         rsite = await SiteSQLRepository(self.session).by_hostname(model.hostname)
         if rsite.is_err():
@@ -589,7 +593,7 @@ class SettingSQLRepository(AbstractSettingRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def remove(self, model: Setting) -> SettingOperationResult:
+    async def remove(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Remove the model from the repository."""
         cursor: CursorResult = await self.session.execute(
             delete(orm.settings).where(
@@ -601,7 +605,7 @@ class SettingSQLRepository(AbstractSettingRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def update(self, model: Setting) -> SettingOperationResult:
+    async def update(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         rsite = await SiteSQLRepository(self.session).by_hostname(model.hostname)

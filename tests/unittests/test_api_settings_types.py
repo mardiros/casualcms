@@ -38,7 +38,6 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
     assert resp.status_code == 200
     assert resp.json() == {
         "schema": {
-            "definitions": {},
             "properties": {
                 "use_another_stuff": {"title": "Use Another Stuff", "type": "boolean"},
                 "use_stuff": {
@@ -47,7 +46,6 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                     "default": False,
                 },
             },
-            "required": [],
             "title": "FeatureFlagSetting",
             "type": "object",
         },

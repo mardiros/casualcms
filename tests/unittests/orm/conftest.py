@@ -295,20 +295,19 @@ async def settings(
     sqla_session: AsyncSession,
     params: Mapping[str, Any],
     sites: list[Site],
-) -> AsyncGenerator[Sequence[Setting], None]:
-    def format_setting(site_id: str, setting: Setting) -> Dict[str, Any]:
-        s: Dict[str, Any] = setting.dict(exclude={"hostname"})
+) -> AsyncGenerator[Sequence[Setting[Any]], None]:
+    def format_setting(site_id: str, setting: Setting[Any]) -> Dict[str, Any]:
         formated_setting: Dict[str, Any] = {
             "id": setting.id,
-            "key": setting.__meta__.key,
+            "key": setting.key,
             "created_at": setting.created_at,
             "site_id": site_id,
+            "value": setting.setting.dict(),
         }
-        formated_setting["value"] = s
         return formated_setting
 
-    settings: Sequence[Setting] = params["settings"]
-    settings_per_hosts: MutableMapping[str, list[Setting]] = defaultdict(list)
+    settings: Sequence[Setting[Any]] = params["settings"]
+    settings_per_hosts: MutableMapping[str, list[Setting[Any]]] = defaultdict(list)
     for s in settings:
         settings_per_hosts[s.hostname].append(s)
     for hostname, hsettings in settings_per_hosts.items():

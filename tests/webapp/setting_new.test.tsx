@@ -7,7 +7,7 @@ import { SettingNew } from "../../src/webapp/ui/settings/setting_new";
 import config from "./config";
 
 describe("As a user, I can list setting", () => {
-  it("Create the setting using the web form", async () => {
+  it("<SettingNew />: Create the setting using the web form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -32,8 +32,7 @@ describe("As a user, I can list setting", () => {
     const settings = await config.api.setting.listSettings("", "www.localhost");
     expect(settings._unsafeUnwrap()).eql([
       {
-        hostname: "www.localhost",
-        meta: { key: "blog:contact" },
+        meta: { hostname: "www.localhost", key: "blog:contact" },
       },
     ]);
     const contactSetting = await config.api.setting.showSetting(
@@ -42,12 +41,11 @@ describe("As a user, I can list setting", () => {
       "blog:contact"
     );
     expect(contactSetting._unsafeUnwrap()).eql({
-      hostname: "www.localhost",
       email: "alice@example.net",
-      meta: { key: "blog:contact" },
+      meta: { hostname: "www.localhost", key: "blog:contact" },
     });
-    await config.api.setting.deleteSetting("", "www.localhost", {
-      meta: { key: "blog:contact" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "www.localhost", key: "blog:contact" },
     });
   });
 });

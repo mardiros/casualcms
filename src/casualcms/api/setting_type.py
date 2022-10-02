@@ -27,12 +27,7 @@ async def show_type(
     token: AuthnToken = Depends(get_token_info),
 ) -> dict[str, Any]:
     ptype = resolve_setting_type(key)
-    jsonschema = ptype.schema()
-    jsonschema["required"] = [r for r in jsonschema["required"] if r != "hostname"]
-    jsonschema["definitions"].pop("Event", None)
-    for key in ("id", "events", "created_at", "hostname"):
-        jsonschema["properties"].pop(key, None)
     return {
-        "schema": jsonschema,
+        "schema": ptype.schema(),
         "uiSchema": ptype.ui_schema(),
     }

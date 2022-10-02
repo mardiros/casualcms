@@ -67,11 +67,10 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
 
   async updateSetting(
     authntoken: string,
-    hostname: string,
     setting: Setting
   ): AsyncApiResult<boolean> {
     const response = await this.fetch(
-      `/api/settings/${hostname}/${setting.meta.key}`,
+      `/api/settings/${setting.meta.hostname}/${setting.meta.key}`,
       {
         method: "PATCH",
         headers: {
@@ -90,11 +89,10 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
 
   async deleteSetting(
     authntoken: string,
-    hostname: string,
     setting: Setting
   ): AsyncApiResult<boolean> {
     const response = await this.fetch(
-      `/api/settings/${hostname}/${setting.meta.key}`,
+      `/api/settings/${setting.meta.hostname}/${setting.meta.key}`,
       {
         method: "DELETE",
         headers: {

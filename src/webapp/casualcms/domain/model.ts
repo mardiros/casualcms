@@ -77,6 +77,7 @@ export type SnippetType = {
 
 export type PartialSettingType = {
   key: string;
+  hostname: string;
 };
 
 export type SettingType = {
@@ -87,7 +88,6 @@ export type SettingType = {
 
 export type PartialSetting = {
   meta: PartialSettingType;
-  hostname: string;
 };
 
 export type Setting = {

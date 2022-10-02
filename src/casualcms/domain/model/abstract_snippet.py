@@ -106,8 +106,6 @@ class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}
         for key, val in cls.__fields__.items():
-            if key in ("id", "events", "created_at"):
-                continue
             ret[key] = cls.get_widget(val)
         return ret
 

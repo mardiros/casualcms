@@ -7,7 +7,12 @@ from casualcms.config import Settings
 from casualcms.domain.model import DraftPage, Setting, Site, Snippet
 from casualcms.domain.repositories.setting import SettingRepositoryError
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.casualblog.models import HeaderSnippet, HomePage
+from tests.casualblog.models import (
+    ContactSetting,
+    FeatureFlagSetting,
+    HeaderSnippet,
+    HomePage,
+)
 
 
 def test_build_searchpath():
@@ -52,8 +57,8 @@ async def test_get_setting(
     app_settings: Settings,
     header_snippet: Snippet[HeaderSnippet],
     default_site: Site,
-    contact_setting: Setting,
-    ff_setting: Setting,
+    contact_setting: Setting[ContactSetting],
+    ff_setting: Setting[FeatureFlagSetting],
 ):
     async with uow as uow:
         renderer = Jinja2TemplateRender(
@@ -63,13 +68,15 @@ async def test_get_setting(
         assert renderer._settings == {  # type: ignore
             "foo": Err(SettingRepositoryError.setting_not_found),
         }
-        assert await renderer.get_setting("contact") == contact_setting
+        assert await renderer.get_setting("contact") == contact_setting.setting
         assert renderer._settings == {  # type: ignore
             "foo": Err(SettingRepositoryError.setting_not_found),
             "contact": Ok(contact_setting),
         }
         assert await renderer.get_setting("contact.email") == "email@example.net"
-        assert await renderer.get_setting("ff.use_stuff") is True
+        assert (
+            await renderer.get_setting("ff.use_stuff") is ff_setting.setting.use_stuff
+        )
 
     async with uow as uow:
         renderer = Jinja2TemplateRender(

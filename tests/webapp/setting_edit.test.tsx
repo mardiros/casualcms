@@ -28,14 +28,14 @@ describe("As a user, I can list setting", () => {
     );
   });
   after(async () => {
-    await config.api.setting.deleteSetting("", "www.localhost", {
-      meta: { key: "blog:contact" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "www.localhost", key: "blog:contact" },
     });
     await config.api.site.deleteSite("", "www.localhost");
     await config.api.site.deleteSite("", "*");
   });
 
-  it("Update the setting using the web form", async () => {
+  it("<SettingEdit />: Update the setting using the web form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -60,8 +60,10 @@ describe("As a user, I can list setting", () => {
     const settings = await config.api.setting.listSettings("", "www.localhost");
     expect(settings._unsafeUnwrap()).eql([
       {
-        hostname: "www.localhost",
-        meta: { key: "blog:contact" },
+        meta: {
+          hostname: "www.localhost",
+          key: "blog:contact"
+        },
       },
     ]);
     const contactSetting = await config.api.setting.showSetting(
@@ -70,9 +72,11 @@ describe("As a user, I can list setting", () => {
       "blog:contact"
     );
     expect(contactSetting._unsafeUnwrap()).eql({
-      hostname: "www.localhost",
       email: "bob@example.net",
-      meta: { key: "blog:contact" },
+      meta: {
+        hostname: "www.localhost",
+        key: "blog:contact"
+      },
     });
   });
 });

@@ -29,23 +29,24 @@ describe("As a user, I can delete a setting", () => {
     });
   });
   after(async () => {
-    await config.api.setting.deleteSetting("", "www", {
-      meta: { key: "blog:contact" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "www", key: "blog:contact" },
     });
-    await config.api.setting.deleteSetting("", "www", {
-      meta: { key: "blog:ff" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "www", key: "blog:ff" },
     });
-    await config.api.setting.deleteSetting("", "news", {
-      meta: { key: "blog:contact" },
+    await config.api.setting.deleteSetting("", {
+      meta: { hostname: "news", key: "blog:contact" },
     });
     await config.api.site.deleteSite("", "news");
     await config.api.site.deleteSite("", "www");
   });
 
-  it("Delete a setting", async () => {
+  it("<SettingDeletePopoverForm/> Delete a setting", async () => {
     const setting = {
       meta: {
         key: "blog:contact",
+        hostname: "www",
       },
       email: "alice@bob.net",
     };
@@ -55,7 +56,7 @@ describe("As a user, I can delete a setting", () => {
         <Route
           path="/admin/settings/:hostname/:key"
           element={
-            <SettingDeletePopoverForm hostname="www" curSetting={setting} />
+            <SettingDeletePopoverForm curSetting={setting} />
           }
         />
         <Route
@@ -71,14 +72,14 @@ describe("As a user, I can delete a setting", () => {
     let subList = await config.api.setting.listSettings("", "www");
     expect(subList._unsafeUnwrap()).eql([
       {
-        hostname: "www",
         meta: {
+          hostname: "www",
           key: "blog:contact",
         },
       },
       {
-        hostname: "www",
         meta: {
+          hostname: "www",
           key: "blog:ff",
         },
       },
@@ -87,8 +88,8 @@ describe("As a user, I can delete a setting", () => {
     subList = await config.api.setting.listSettings("", "news");
     expect(subList._unsafeUnwrap()).eql([
       {
-        hostname: "news",
         meta: {
+          hostname: "news",
           key: "blog:contact",
         },
       },
@@ -100,8 +101,8 @@ describe("As a user, I can delete a setting", () => {
     subList = await config.api.setting.listSettings("", "www");
     expect(subList._unsafeUnwrap()).eql([
       {
-        hostname: "www",
         meta: {
+          hostname: "www",
           key: "blog:ff",
         },
       },
@@ -110,8 +111,8 @@ describe("As a user, I can delete a setting", () => {
     subList = await config.api.setting.listSettings("", "news");
     expect(subList._unsafeUnwrap()).eql([
       {
-        hostname: "news",
         meta: {
+          hostname: "news",
           key: "blog:contact",
         },
       },

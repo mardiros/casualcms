@@ -4,6 +4,7 @@ from typing import Any, Mapping
 from pydantic import Field
 
 from casualcms.domain.model import SnippetKey
+from casualcms.domain.model.setting import SettingKey
 from casualcms.utils import generate_id, generate_secret
 
 from .base import Command, Metadata
@@ -142,7 +143,7 @@ class DeleteSnippet(Command):
 
 
 class CreateSetting(Command):
-    key: str = Field(...)
+    key: SettingKey = Field(...)
     hostname: str = Field(...)
     body: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -154,7 +155,7 @@ class CreateSetting(Command):
 
 class UpdateSetting(Command):
     hostname: str = Field(...)
-    key: str = Field(...)
+    key: SettingKey = Field(...)
     body: Mapping[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
@@ -165,7 +166,7 @@ class UpdateSetting(Command):
 
 class DeleteSetting(Command):
     hostname: str = Field(...)
-    key: str = Field(...)
+    key: SettingKey = Field(...)
     id: str = Field(...)
     metadata: Metadata = Metadata(
         category="setting", name="update_setting", schemaVersion=1

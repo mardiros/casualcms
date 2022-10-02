@@ -1,9 +1,8 @@
-from typing import cast
-
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.site import Site
+from casualcms.domain.repositories.setting import SettingRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 from ..casualblog.models import ContactSetting, FeatureFlagSetting
@@ -44,16 +43,22 @@ async def test_api_create_setting(
     )
     assert resp.status_code == 201
     assert resp.json() == {
-        "meta": {"key": "ff"},
-        "hostname": default_site.hostname,
+        "meta": {
+            "key": "ff",
+            "hostname": default_site.hostname,
+        },
     }
     async with uow as uow:
-        setting = (await uow.settings.by_key(default_site.hostname, "ff")).unwrap()
-        assert setting.__meta__.key == "ff"
+        rsetting: SettingRepositoryResult[
+            FeatureFlagSetting
+        ] = await uow.settings.by_key(default_site.hostname, "ff")
+        assert rsetting.is_ok()
+        setting = rsetting.unwrap()
+        assert setting.key == "ff"
         assert setting.dict() == {
             "hostname": "www.example.net",
-            "use_stuff": True,
-            "use_another_stuff": None,
+            "key": "ff",
+            "setting": {"use_another_stuff": None, "use_stuff": True},
         }
 
 
@@ -82,8 +87,8 @@ async def test_api_list_setting(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"meta": {"key": "contact"}, "hostname": default_site.hostname},
-        {"meta": {"key": "ff"}, "hostname": default_site.hostname},
+        {"meta": {"key": "contact", "hostname": default_site.hostname}},
+        {"meta": {"key": "ff", "hostname": default_site.hostname}},
     ]
 
 
@@ -122,16 +127,20 @@ async def test_api_patch_setting(
     )
     assert resp.status_code == 202
     assert resp.json() == {
-        "meta": {"key": "ff"},
-        "hostname": default_site.hostname,
+        "meta": {
+            "key": "ff",
+            "hostname": default_site.hostname,
+        }
     }
 
     async with uow as uow:
-        rsetting = await uow.settings.by_key(default_site.hostname, "ff")
+        rsetting: SettingRepositoryResult[
+            FeatureFlagSetting
+        ] = await uow.settings.by_key(default_site.hostname, "ff")
         assert rsetting.is_ok()
-        setting = cast(FeatureFlagSetting, rsetting.unwrap())
-        assert setting.use_stuff is True
-        assert setting.use_another_stuff is True
+        setting = rsetting.unwrap()
+        assert setting.setting.use_stuff is True
+        assert setting.setting.use_another_stuff is True
 
 
 async def test_api_get_setting_403(
@@ -158,8 +167,10 @@ async def test_api_get_setting(
     )
     assert resp.status_code == 200
     assert resp.json() == {
-        "meta": {"key": "ff"},
-        "hostname": default_site.hostname,
+        "meta": {
+            "key": "ff",
+            "hostname": default_site.hostname,
+        },
         "use_stuff": True,
         "use_another_stuff": None,
     }
@@ -193,7 +204,9 @@ async def test_api_delete_setting(
     assert resp.text == ""
 
     async with uow as uow:
-        rsetting = await uow.settings.by_key(default_site.hostname, "ff")
+        rsetting: SettingRepositoryResult[
+            FeatureFlagSetting
+        ] = await uow.settings.by_key(default_site.hostname, "ff")
         assert rsetting.is_err()
         assert rsetting.unwrap_err().name == "setting_not_found"
 

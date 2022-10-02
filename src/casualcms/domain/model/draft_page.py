@@ -4,8 +4,8 @@ from typing import Generic
 from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
-from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model.abstract_page import Page_contra
+from casualcms.utils import generate_id
 
 uuid = str
 

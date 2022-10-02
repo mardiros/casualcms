@@ -6,7 +6,6 @@ import { DeletePopoverForm } from "../layout/confirm";
 import { useAuth } from "../login/hooks";
 
 type SettingDeletePopoverFormProps = {
-  hostname: string;
   curSetting: Setting;
 };
 
@@ -17,17 +16,17 @@ export const SettingDeletePopoverForm: React.FunctionComponent<
   let auth = useAuth();
   let navigate = useNavigate();
   const token = auth.authenticatedUser?.token || "";
-  const { hostname, curSetting } = props;
+  const { curSetting } = props;
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {
-    await config.api.setting.deleteSetting(token, hostname, curSetting);
+    await config.api.setting.deleteSetting(token, curSetting);
     setConfirmed(true);
   };
 
   React.useEffect(() => {
     if (confirmed) {
-      navigate(`/admin/settings/${hostname}`);
+      navigate(`/admin/settings/${curSetting.meta.hostname}`);
     }
   }, [confirmed]);
 

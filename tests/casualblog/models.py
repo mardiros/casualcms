@@ -2,8 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, Setting
-from casualcms.domain.model.abstract_snippet import AbstractSnippet
+from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet
 
 
 class Link(BaseModel):
@@ -20,7 +19,7 @@ class HeaderSnippet(AbstractSnippet):
         type = "blog:HeaderSnippet"
 
 
-class FeatureFlagSetting(Setting):
+class FeatureFlagSetting(AbstractSetting):
     use_stuff: bool = False
     use_another_stuff: bool | None
 
@@ -28,7 +27,7 @@ class FeatureFlagSetting(Setting):
         key = "ff"
 
 
-class MyAbstractSetting(Setting):
+class MyAbstractSetting(AbstractSetting):
     class Meta:
         abstract = True
 

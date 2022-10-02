@@ -6,6 +6,13 @@ from .abstract_page import (
     get_available_subtypes,
     resolve_page_type,
 )
+from .abstract_setting import (
+    AbstractSetting,
+    Setting_contra,
+    SettingType,
+    list_setting_types,
+    resolve_setting_type,
+)
 from .abstract_snippet import (
     AbstractSnippet,
     AbstractSnippetError,
@@ -18,7 +25,7 @@ from .abstract_snippet import (
 from .account import Account, AccountStatus, AuthnToken
 from .draft_page import DraftPage
 from .published_page import PublishedPage
-from .setting import Setting, SettingType, list_setting_types, resolve_setting_type
+from .setting import Setting
 from .site import Site
 from .snippet import Snippet
 
@@ -48,8 +55,10 @@ __all__ = [
     "list_snippet_types",
     "resolve_snippet_type",
     # Setting
+    "AbstractSetting",
     "Setting",
     "SettingType",
+    "Setting_contra",
     "list_setting_types",
     "resolve_setting_type",
     # Sites

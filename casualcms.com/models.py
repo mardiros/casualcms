@@ -2,7 +2,7 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, Snippet
+from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet
 
 
 class Link(BaseModel):
@@ -10,7 +10,14 @@ class Link(BaseModel):
     href: str = Field()
 
 
-class HeaderSnippet(Snippet):
+class Settings(AbstractSetting):
+    environment: str = Field(...)
+
+    class Meta:
+        key = "feature-flags"
+
+
+class HeaderSnippet(AbstractSnippet):
     title: str = Field()
     links: list[Link] = Field(default_factory=list)
 

@@ -58,7 +58,6 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
         hostname,
         settingKey
       );
-      // console.log(setting)
       rsetting
         .map((setting: Setting) => setSetting(setting))
         .mapErr((err: ApiError) => setError(err));
@@ -84,7 +83,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
 
   const onsubmit = async (data: any) => {
     const setting = data.formData;
-    await config.api.setting.updateSetting(token, hostname, setting);
+    await config.api.setting.updateSetting(token, setting);
     navigate(`/admin/settings/${hostname}`, { replace: true });
   };
 
@@ -104,7 +103,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
             onSubmit={onsubmit}
             // onError={() => console.log("errors")}
           />
-          <SettingDeletePopoverForm hostname={hostname} curSetting={setting} />
+          <SettingDeletePopoverForm curSetting={setting} />
         </>
       )}
     </Box>

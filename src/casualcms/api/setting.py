@@ -1,4 +1,4 @@
-from typing import Any, Mapping, MutableMapping, Sequence
+from typing import Any, Mapping, Sequence
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
@@ -8,21 +8,25 @@ from casualcms.domain.messages.commands import (
     CreateSetting,
     DeleteSetting,
     UpdateSetting,
-    generate_id,
 )
 from casualcms.domain.model import AuthnToken, resolve_setting_type
+from casualcms.domain.model.abstract_setting import Setting_contra
 from casualcms.domain.model.setting import Setting
+from casualcms.domain.repositories.setting import (
+    SettingRepositoryResult,
+    SettingSequenceRepositoryResult,
+)
 
 from .base import get_token_info
 
 
 class PartialSettingMeta(BaseModel):
     key: str = Field(...)
+    hostname: str = Field(...)
 
 
 class PartialSetting(BaseModel):
     meta: PartialSettingMeta = Field(...)
-    hostname: str = Field(...)
 
 
 async def validate_payload(
@@ -34,13 +38,8 @@ async def validate_payload(
 ) -> Mapping[str, Any]:
     setting_type = resolve_setting_type(key)
     async with app.uow as uow:
-        params: MutableMapping[str, Any] = {
-            "id": generate_id(),
-            "hostname": hostname,
-            **payload,
-        }
         try:
-            setting_type(**params)  # validate pydantic model
+            setting_type(key=key, **payload)  # validate pydantic model
         except ValidationError as exc:
             errors = exc.errors()
             for error in errors:
@@ -61,7 +60,11 @@ async def create_setting(
     validated_payload: Mapping[str, Any] = Depends(validate_payload),
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSetting:
-    cmd = CreateSetting(key=key, hostname=hostname, body=validated_payload)
+    cmd = CreateSetting(
+        key=key,  # type: ignore
+        hostname=hostname,
+        body=validated_payload,
+    )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
 
@@ -71,7 +74,10 @@ async def create_setting(
             raise HTTPException(
                 status_code=422,
                 detail=[
-                    {"loc": ["querystring", "key"], "msg": rsetting.unwrap_err().value}
+                    {
+                        "loc": ["querystring", "key"],
+                        "msg": rsetting.unwrap_err().value,
+                    }
                 ],
             )
         else:
@@ -79,8 +85,7 @@ async def create_setting(
             await uow.commit()
 
     return PartialSetting(
-        meta=PartialSettingMeta(key=setting.__meta__.key),
-        hostname=hostname,
+        meta=PartialSettingMeta(key=setting.key, hostname=hostname),
     )
 
 
@@ -91,16 +96,20 @@ async def list_settings(
 ) -> Sequence[PartialSetting]:
 
     async with app.uow as uow:
-        settings = await uow.settings.list(hostname=hostname)
+        settings: SettingSequenceRepositoryResult[Any] = await uow.settings.list(
+            hostname=hostname
+        )
         await uow.rollback()
     if settings.is_err():
-        raise HTTPException(status_code=500, detail=[{"msg": "Internal Server Error"}])
+        raise HTTPException(
+            status_code=500,
+            detail=[{"msg": "Internal Server Error"}],
+        )
     setting = settings.unwrap()
 
     return [
         PartialSetting(
-            meta=PartialSettingMeta(key=s.__meta__.key),
-            hostname=hostname,
+            meta=PartialSettingMeta(key=s.key, hostname=hostname),
         )
         for s in setting
     ]
@@ -110,29 +119,35 @@ async def get_setting_by_path(
     hostname: str = Field(...),
     key: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
-) -> Setting:
+) -> Setting[Any]:
     async with app.uow as uow:
-        rsetting = await uow.settings.by_key(hostname, key)
+        rsetting: SettingRepositoryResult[Any] = await uow.settings.by_key(
+            hostname, key
+        )
         await uow.rollback()
 
     if rsetting.is_err():
         raise HTTPException(
             status_code=422,
-            detail=[{"loc": ["querystring", "key"], "msg": "Unknown setting"}],
+            detail=[
+                {"loc": ["querystring", "key"], "msg": "Unknown setting"},
+            ],
         )
     return rsetting.unwrap()
 
 
 async def show_setting(
-    setting: Setting = Depends(get_setting_by_path),
+    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
-    return setting.get_data_context()
+    ret = setting.setting.dict()
+    ret["meta"] = {"key": setting.key, "hostname": setting.hostname}
+    return ret
 
 
 async def update_setting(
     request: Request,
-    setting: Setting = Depends(get_setting_by_path),
+    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     hostname: str = Field(...),
     key: str = Field(...),
@@ -141,7 +156,12 @@ async def update_setting(
 ) -> PartialSetting:
 
     payload.pop("meta", None)
-    cmd = UpdateSetting(id=setting.id, hostname=hostname, key=key, body=payload)
+    cmd = UpdateSetting(
+        id=setting.id,
+        hostname=hostname,
+        key=key,  # type: ignore
+        body=payload,
+    )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
@@ -157,14 +177,13 @@ async def update_setting(
             await uow.commit()
 
     return PartialSetting(
-        meta=PartialSettingMeta(key=setting.__meta__.key),
-        hostname=hostname,
+        meta=PartialSettingMeta(key=setting.key, hostname=hostname),
     )
 
 
 async def delete_setting(
     request: Request,
-    setting: Setting = Depends(get_setting_by_path),
+    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Response:
@@ -172,7 +191,7 @@ async def delete_setting(
     cmd = DeleteSetting(
         id=setting.id,
         hostname=setting.hostname,
-        key=setting.__meta__.key,
+        key=setting.key,
     )
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id

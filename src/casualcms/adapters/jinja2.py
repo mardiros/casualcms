@@ -7,6 +7,7 @@ from jinja2 import Environment, FileSystemLoader, Template
 
 from casualcms.domain.model import AbstractPage
 from casualcms.domain.model.abstract_snippet import AbstractSnippet
+from casualcms.domain.repositories.setting import SettingRepositoryResult
 from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
@@ -63,7 +64,9 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
     async def _try_get_from_cache(self, key: str) -> Any:
         if key in self._settings:
             return self._settings[key]
-        rsetting = await self.uow.settings.by_key(self.hostname, key)
+        rsetting: SettingRepositoryResult[Any] = await self.uow.settings.by_key(
+            self.hostname, key
+        )
         self._settings[key] = rsetting
         return rsetting
 
@@ -72,7 +75,7 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         rsettings = await self._try_get_from_cache(key)
         if rsettings.is_err():
             return ""
-        settings = rsettings.unwrap().dict()
+        settings = rsettings.unwrap().setting.dict()
         for k in subkeys:
             if k in settings:
                 settings = settings[k]

@@ -11,6 +11,7 @@ from casualcms.domain.model import (
     Page_contra,
     PublishedPage,
     Setting,
+    Setting_contra,
     Site,
     Snippet,
     Snippet_contra,
@@ -319,47 +320,49 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
 
 
 class SettingInMemoryRepository(AbstractSettingRepository):
-    settings: dict[tuple[str, str], Setting] = {}
+    settings: dict[tuple[str, str], Setting[Any]] = {}
 
     def __init__(self) -> None:
         self.seen = set()
 
     async def list(
         self, hostname: Optional[str] = None
-    ) -> SettingSequenceRepositoryResult:
+    ) -> SettingSequenceRepositoryResult[Setting_contra]:
         """List all settings, optionally filters on their types."""
-        values: Iterable[Setting] = self.settings.values()
+        values: Iterable[Setting[Setting_contra]] = self.settings.values()
         if hostname:
             values = filter(lambda s: s.hostname == hostname, values)
-        return Ok(sorted(values, key=lambda s: (s.hostname, s.__meta__.key)))
+        return Ok(sorted(values, key=lambda s: (s.hostname, s.key)))
 
-    async def by_id(self, id: str) -> SettingRepositoryResult:
+    async def by_id(self, id: str) -> SettingRepositoryResult[Setting_contra]:
         """Fetch one setting by its unique id."""
         for setting in self.settings.values():
             if setting.id == id:
                 return Ok(setting)
         return Err(SettingRepositoryError.setting_not_found)
 
-    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
+    async def by_key(
+        self, hostname: str, key: str
+    ) -> SettingRepositoryResult[Setting_contra]:
         """Fetch one setting by its unique slug."""
         try:
             return Ok(self.settings[(hostname, key)])
         except KeyError:
             return Err(SettingRepositoryError.setting_not_found)
 
-    async def add(self, model: Setting) -> SettingOperationResult:
+    async def add(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
-        self.settings[(model.hostname, model.__meta__.key)] = model
+        self.settings[(model.hostname, model.key)] = model
         return Ok(...)
 
-    async def remove(self, model: Setting) -> SettingOperationResult:
+    async def remove(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
-        del self.settings[(model.hostname, model.__meta__.key)]
+        del self.settings[(model.hostname, model.key)]
         return Ok(...)
 
-    async def update(self, model: Setting) -> SettingOperationResult:
+    async def update(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -369,7 +372,7 @@ class SettingInMemoryRepository(AbstractSettingRepository):
                 break
         if k:
             del self.settings[k]
-        self.settings[(model.hostname, model.__meta__.key)] = model
+        self.settings[(model.hostname, model.key)] = model
         return Ok(...)
 
 

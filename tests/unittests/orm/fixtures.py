@@ -113,18 +113,25 @@ def fake_footer_snippet(**kwargs: Any) -> Snippet[Any]:
     return fake_snippet("tests.casualblog.models:FooterSnippet", **snippet)
 
 
-def fake_setting(key: str, hostname: str = "www", **kwargs: Any) -> Setting:
+def fake_setting(key: str, hostname: str = "www", **kwargs: Any) -> Setting[Any]:
     typ = resolve_setting_type(key)
-    return typ(hostname=hostname, **kwargs)
+    stg = typ(**kwargs)
+    return Setting(
+        id=kwargs.pop("id", fake.uuid4()),
+        created_at=fake.past_datetime(),
+        hostname=hostname,
+        key=key,  # type: ignore
+        setting=stg,
+    )
 
 
-def fake_ff_setting(hostname: str = "www", **kwargs: Any) -> Setting:
+def fake_ff_setting(hostname: str = "www", **kwargs: Any) -> Setting[Any]:
     settings = {"use_stuff": True, "use_another_stuff": False}
     settings.update(kwargs)  # type: ignore
     return fake_setting("ff", hostname=hostname, **settings)
 
 
-def fake_contact_setting(hostname: str = "www", **kwargs: Any) -> Setting:
+def fake_contact_setting(hostname: str = "www", **kwargs: Any) -> Setting[Any]:
     settings = {"email": "bob@alice.net"}
     settings.update(kwargs)  # type: ignore
     return fake_setting("contact", hostname=hostname, **settings)

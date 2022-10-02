@@ -410,8 +410,8 @@ export class FakeSettingApi implements ISettingApi {
   ): AsyncApiResult<PartialSetting[]> {
     const settings: PartialSetting[] = [];
     this.settings.map((s) => {
-      if (s.hostname == hostname) {
-        settings.push({ hostname: hostname, meta: s.meta });
+      if (s.meta.hostname == hostname) {
+        settings.push({ meta: s.meta });
       }
     });
     return ok(settings);
@@ -424,8 +424,7 @@ export class FakeSettingApi implements ISettingApi {
     payload: any
   ): AsyncApiResult<boolean> {
     const setting = {
-      hostname: hostname,
-      meta: { key: key },
+      meta: { hostname: hostname, key: key },
       ...payload,
     };
     this.settings.push(setting);
@@ -437,7 +436,7 @@ export class FakeSettingApi implements ISettingApi {
     key: string
   ): AsyncApiResult<Setting> {
     const settings = this.settings.map((s) => {
-      if (s.hostname == hostname && s.meta.key == key) {
+      if (s.meta.hostname == hostname && s.meta.key == key) {
         return ok(s);
       }
     });
@@ -451,12 +450,11 @@ export class FakeSettingApi implements ISettingApi {
 
   async updateSetting(
     authntoken: string,
-    hostname: string,
     setting: Setting
   ): AsyncApiResult<boolean> {
     const settings: Setting[] = [];
     this.settings.map((s) => {
-      if (s.hostname != hostname || s.meta.key != setting.meta.key) {
+      if (s.meta.hostname != s.meta.hostname || s.meta.key != setting.meta.key) {
         settings.push(s);
       }
     });
@@ -467,12 +465,12 @@ export class FakeSettingApi implements ISettingApi {
 
   async deleteSetting(
     authntoken: string,
-    hostname: string,
     setting: Setting
   ): AsyncApiResult<boolean> {
     const key = setting.meta.key;
+    const hostname = setting.meta.hostname;
     const settings = this.settings.filter((s: any) => {
-      return s.hostname != hostname || s.meta.key != key;
+      return s.meta.hostname != hostname || s.meta.key != key;
     });
     this.settings = settings;
     return ok(true);
@@ -483,7 +481,10 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
   async listSettingTypes(
     authntoken: string
   ): AsyncApiResult<PartialSettingType[]> {
-    return ok([{ key: "blog:ff" }, { key: "blog:contact" }]);
+    return ok([
+      { hostname: "www", key: "blog:ff" },
+      { hostname: "www", key: "blog:contact" },
+    ]);
   }
   async showSettingType(
     authntoken: string,

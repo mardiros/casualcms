@@ -1,5 +1,5 @@
 from types import NoneType
-from typing import Any, Sequence, cast
+from typing import Any, Sequence
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
@@ -19,7 +19,6 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     SQLUnitOfWorkBySession,
 )
 from casualcms.config import Settings
-from casualcms.domain.messages.commands import generate_id
 from casualcms.domain.model import (
     AuthnToken,
     DraftPage,
@@ -34,13 +33,18 @@ from casualcms.domain.repositories.draft import (
     DraftSequenceRepositoryResult,
 )
 from casualcms.domain.repositories.page import PageRepositoryResult
+from casualcms.domain.repositories.setting import (
+    SettingRepositoryResult,
+    SettingSequenceRepositoryResult,
+)
 from casualcms.domain.repositories.snippet import (
     SnippetRepositoryResult,
     SnippetSequenceRepositoryResult,
 )
 from casualcms.service.unit_of_work import AbstractUnitOfWork
+from casualcms.utils import generate_id
 
-from ...casualblog.models import FeatureFlagSetting, HeaderSnippet, HomePage, Link
+from ...casualblog.models import HeaderSnippet, HomePage, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -946,18 +950,29 @@ async def test_setting_add(params: Any, sqla_session: AsyncSession, sites: list[
     ],
 )
 async def test_setting_list(
-    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+    params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsettings = await repo.list()
+    rsettings: SettingSequenceRepositoryResult[Any] = await repo.list()
     assert rsettings.is_ok()
-    sets = rsettings.unwrap()
-    ss = [s.dict() for s in sets]
-    ss = [s.dict() for s in sets]
+    saved_settings = rsettings.unwrap()
+    ss = [s.dict() for s in saved_settings]
     assert ss == [
-        {"email": "bob@alice.net", "hostname": "www"},
-        {"hostname": "www", "use_another_stuff": False, "use_stuff": True},
-        {"hostname": "www2", "use_another_stuff": False, "use_stuff": True},
+        {
+            "hostname": "www",
+            "key": "contact",
+            "setting": {"email": "bob@alice.net"},
+        },
+        {
+            "hostname": "www",
+            "key": "ff",
+            "setting": {"use_another_stuff": False, "use_stuff": True},
+        },
+        {
+            "hostname": "www2",
+            "key": "ff",
+            "setting": {"use_another_stuff": False, "use_stuff": True},
+        },
     ]
 
 
@@ -979,16 +994,24 @@ async def test_setting_list(
     ],
 )
 async def test_setting_list_filter_hostname(
-    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+    params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsettings = await repo.list(hostname="www")
+    rsettings: SettingSequenceRepositoryResult[Any] = await repo.list(hostname="www")
     assert rsettings.is_ok()
-    sets = rsettings.unwrap()
-    ss = [s.dict() for s in sets]
+    saved_settings = rsettings.unwrap()
+    ss = [s.dict() for s in saved_settings]
     assert ss == [
-        {"email": "bob@alice.net", "hostname": "www"},
-        {"hostname": "www", "use_another_stuff": False, "use_stuff": True},
+        {
+            "hostname": "www",
+            "key": "contact",
+            "setting": {"email": "bob@alice.net"},
+        },
+        {
+            "hostname": "www",
+            "key": "ff",
+            "setting": {"use_another_stuff": False, "use_stuff": True},
+        },
     ]
 
 
@@ -1010,13 +1033,13 @@ async def test_setting_list_filter_hostname(
     ],
 )
 async def test_setting_by_id(
-    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+    params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsetting = await repo.by_id(settings[0].id)
+    rsetting: SettingRepositoryResult[Any] = await repo.by_id(settings[0].id)
     assert rsetting.is_ok()
     setting = rsetting.unwrap()
-    assert setting.__meta__.key == "ff"
+    assert setting.key == "ff"
     assert setting.hostname == "www"
 
     rsetting = await repo.by_id("456")
@@ -1042,10 +1065,10 @@ async def test_setting_by_id(
     ],
 )
 async def test_setting_by_key(
-    params: Any, sqla_session: AsyncSession, settings: list[Setting]
+    params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsetting = await repo.by_key("www", "ff")
+    rsetting: SettingRepositoryResult[Any] = await repo.by_key("www", "ff")
     assert rsetting.is_ok()
     setting = rsetting.unwrap()
     assert setting.id == settings[0].id
@@ -1073,10 +1096,13 @@ async def test_setting_by_key(
     ],
 )
 async def test_setting_update(
-    params: Any, sqla_session: AsyncSession, sites: list[Site], settings: list[Setting]
+    params: Any,
+    sqla_session: AsyncSession,
+    sites: list[Site],
+    settings: list[Setting[Any]],
 ):
-    setting: FeatureFlagSetting = cast(FeatureFlagSetting, settings[0])
-    setting.use_another_stuff = True
+    setting = settings[0]
+    setting.setting.use_another_stuff = True
     repo = SettingSQLRepository(sqla_session)
     rsetting = await repo.update(setting)
     assert rsetting.is_ok()
@@ -1118,7 +1144,10 @@ async def test_setting_update(
     ],
 )
 async def test_setting_remove(
-    params: Any, sqla_session: AsyncSession, sites: list[Site], settings: list[Setting]
+    params: Any,
+    sqla_session: AsyncSession,
+    sites: list[Site],
+    settings: list[Setting[Any]],
 ):
     setting = settings[0]
     repo = SettingSQLRepository(sqla_session)

@@ -16,6 +16,13 @@ class SettingKey(ConstrainedStr):
     strip_whitespace = True
 
 
+class PublicMetadata(BaseModel):
+    """Metadata exposed to the API"""
+
+    key: str = Field(...)
+    hostname: str = Field(...)
+
+
 class Setting(BaseModel, Generic[Setting_contra]):
 
     id: uuid = Field(default_factory=generate_id, exclude=True)
@@ -29,3 +36,7 @@ class Setting(BaseModel, Generic[Setting_contra]):
 
     def __hash__(self) -> int:  # type: ignore
         return hash(self.id)
+
+    @property
+    def metadata(self) -> PublicMetadata:
+        return PublicMetadata(key=self.key, hostname=self.hostname)

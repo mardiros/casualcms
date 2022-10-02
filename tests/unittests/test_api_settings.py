@@ -43,7 +43,7 @@ async def test_api_create_setting(
     )
     assert resp.status_code == 201
     assert resp.json() == {
-        "meta": {
+        "metadata": {
             "key": "ff",
             "hostname": default_site.hostname,
         },
@@ -87,8 +87,8 @@ async def test_api_list_setting(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"meta": {"key": "contact", "hostname": default_site.hostname}},
-        {"meta": {"key": "ff", "hostname": default_site.hostname}},
+        {"metadata": {"key": "contact", "hostname": default_site.hostname}},
+        {"metadata": {"key": "ff", "hostname": default_site.hostname}},
     ]
 
 
@@ -127,7 +127,7 @@ async def test_api_patch_setting(
     )
     assert resp.status_code == 202
     assert resp.json() == {
-        "meta": {
+        "metadata": {
             "key": "ff",
             "hostname": default_site.hostname,
         }
@@ -167,7 +167,7 @@ async def test_api_get_setting(
     )
     assert resp.status_code == 200
     assert resp.json() == {
-        "meta": {
+        "metadata": {
             "key": "ff",
             "hostname": default_site.hostname,
         },

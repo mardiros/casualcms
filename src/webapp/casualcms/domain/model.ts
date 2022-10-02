@@ -25,7 +25,7 @@ export type PartialPageMeta = {
 export type PartialDraft = {
   slug: string;
   title: string;
-  meta: PartialPageMeta;
+  metadata: PartialPageMeta;
 };
 
 export type BreadCrumbItem = {
@@ -41,7 +41,7 @@ export type PageMeta = {
 };
 
 export type Draft = {
-  meta: PageMeta;
+  metadata: PageMeta;
   [k: string]: any;
 };
 
@@ -60,7 +60,7 @@ export type PartialSnippetMeta = {
 
 export type PartialSnippet = {
   key: string;
-  meta: PartialSnippetMeta;
+  metadata: PartialSnippetMeta;
 };
 
 export type Snippet = PartialSnippet;
@@ -87,10 +87,10 @@ export type SettingType = {
 };
 
 export type PartialSetting = {
-  meta: PartialSettingType;
+  metadata: PartialSettingType;
 };
 
 export type Setting = {
-  meta: PartialSettingType;
+  metadata: PartialSettingType;
   [k: string]: any;
 };

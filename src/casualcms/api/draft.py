@@ -30,7 +30,7 @@ class PartialPageMeta(BaseModel):
 class PartialPage(BaseModel):
     slug: str = Field(...)
     title: str = Field(...)
-    meta: PartialPageMeta = Field(...)
+    metadata: PartialPageMeta = Field(...)
 
 
 def get_page_type(
@@ -129,7 +129,7 @@ async def list_drafts(
         PartialPage(
             slug=p.slug,
             title=p.title,
-            meta=PartialPageMeta(
+            metadata=PartialPageMeta(
                 path=p.path,
                 type=p.type,
             ),
@@ -164,7 +164,7 @@ async def show_draft(
     draft_page: DraftPage[Any] = Depends(draft_by_path),
 ) -> Mapping[str, Any]:
     ret = draft_page.page.dict()
-    ret["meta"] = draft_page.page.metadata
+    ret["metadata"] = draft_page.metadata
     return ret
 
 
@@ -196,7 +196,7 @@ async def update_draft(
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
 
-    payload.pop("meta", None)
+    payload.pop("metadata", None)
     #  FIXME: validate the payload for the page here
     cmd = UpdatePage(
         id=draft_page.id,

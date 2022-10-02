@@ -69,8 +69,8 @@ export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
           );
           typ.map((val) => {
             settingsObj[
-              val.meta.key
-            ] = `/admin/settings/${hostname}/${val.meta.key}/edit`;
+              val.metadata.key
+            ] = `/admin/settings/${hostname}/${val.metadata.key}/edit`;
           });
           setSettingsUrl(settingsObj);
         })

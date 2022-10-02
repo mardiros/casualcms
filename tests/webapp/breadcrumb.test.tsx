@@ -13,7 +13,7 @@ import { PageMeta } from "../../src/webapp/casualcms/domain/model";
 
 describe("As a user, I can navigate throw the breadcrumb", () => {
   it("Render links using the breadcrumb of the page meta", async () => {
-    const meta: PageMeta = {
+    const metadata: PageMeta = {
       path: "",
       type: "",
       breadcrumb: [
@@ -30,7 +30,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       ],
     };
     const page = {
-      meta: meta,
+      metadata: metadata,
     };
     renderWithRouter(
       <>
@@ -49,7 +49,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     );
   });
   it("Render links using the breadcrumb of the page meta with an appending text", async () => {
-    const meta: PageMeta = {
+    const metadata: PageMeta = {
       path: "",
       type: "",
       breadcrumb: [
@@ -65,7 +65,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
         },
       ],
     };
-    const page = { meta: meta };
+    const page = { metadata: metadata };
     renderWithRouter(
       <>
         <Route
@@ -126,7 +126,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
-    const snippet = { key: "header", meta: { type: "HeaderSnippet" } };
+    const snippet = { key: "header", metadata: { type: "HeaderSnippet" } };
     renderWithRouter(
       <>
         <Route

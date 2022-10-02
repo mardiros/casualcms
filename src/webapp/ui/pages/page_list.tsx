@@ -48,7 +48,7 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
       <Td>
         <Link
           to={`/admin/pages/edit?${new URLSearchParams({
-            page: page.meta.path,
+            page: page.metadata.path,
           })}`}
         >
           <Icon as={EditIcon} marginEnd={2} />
@@ -58,7 +58,7 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
       <Td>
         <a
           href={`/admin/pages/preview?${new URLSearchParams({
-            page: page.meta.path,
+            page: page.metadata.path,
           })}`}
           target="preview"
         >
@@ -69,7 +69,7 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
       <Td>
         <Link
           to={`/admin/pages/?${new URLSearchParams({
-            parent: page.meta.path,
+            parent: page.metadata.path,
           })}`}
           data-testid="View child pages"
         >
@@ -92,13 +92,13 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
   let navigate = useNavigate();
   const qsEdit = curPage
     ? new URLSearchParams({
-        page: curPage.meta.path,
+        page: curPage.metadata.path,
       })
     : "";
   const qs = curPage
     ? new URLSearchParams({
-        parent: curPage.meta.path,
-        type: curPage.meta.type,
+        parent: curPage.metadata.path,
+        type: curPage.metadata.type,
       })
     : "";
   return (

@@ -24,18 +24,18 @@ describe("As a user, I can list snippet", () => {
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
       key: "alt-header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
   });
 
   it("Render a row for a snippet", async () => {
     const snippet = {
       key: "header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     };
 
     renderWithRouter(

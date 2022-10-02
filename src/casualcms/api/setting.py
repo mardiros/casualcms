@@ -11,7 +11,7 @@ from casualcms.domain.messages.commands import (
 )
 from casualcms.domain.model import AuthnToken, resolve_setting_type
 from casualcms.domain.model.abstract_setting import Setting_contra
-from casualcms.domain.model.setting import Setting
+from casualcms.domain.model.setting import Setting, PublicMetadata
 from casualcms.domain.repositories.setting import (
     SettingRepositoryResult,
     SettingSequenceRepositoryResult,
@@ -20,13 +20,8 @@ from casualcms.domain.repositories.setting import (
 from .base import get_token_info
 
 
-class PartialSettingMeta(BaseModel):
-    key: str = Field(...)
-    hostname: str = Field(...)
-
-
 class PartialSetting(BaseModel):
-    meta: PartialSettingMeta = Field(...)
+    metadata: PublicMetadata = Field(...)
 
 
 async def validate_payload(
@@ -85,7 +80,7 @@ async def create_setting(
             await uow.commit()
 
     return PartialSetting(
-        meta=PartialSettingMeta(key=setting.key, hostname=hostname),
+        metadata=setting.metadata,
     )
 
 
@@ -107,12 +102,7 @@ async def list_settings(
         )
     setting = settings.unwrap()
 
-    return [
-        PartialSetting(
-            meta=PartialSettingMeta(key=s.key, hostname=hostname),
-        )
-        for s in setting
-    ]
+    return [PartialSetting(metadata=s.metadata) for s in setting]
 
 
 async def get_setting_by_path(
@@ -141,7 +131,7 @@ async def show_setting(
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
     ret = setting.setting.dict()
-    ret["meta"] = {"key": setting.key, "hostname": setting.hostname}
+    ret["metadata"] = {"key": setting.key, "hostname": setting.hostname}
     return ret
 
 
@@ -155,7 +145,7 @@ async def update_setting(
     token: AuthnToken = Depends(get_token_info),
 ) -> PartialSetting:
 
-    payload.pop("meta", None)
+    payload.pop("metadata", None)
     cmd = UpdateSetting(
         id=setting.id,
         hostname=hostname,
@@ -176,9 +166,7 @@ async def update_setting(
         else:
             await uow.commit()
 
-    return PartialSetting(
-        meta=PartialSettingMeta(key=setting.key, hostname=hostname),
-    )
+    return PartialSetting(metadata=setting.metadata)
 
 
 async def delete_setting(

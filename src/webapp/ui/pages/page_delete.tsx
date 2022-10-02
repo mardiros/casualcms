@@ -21,15 +21,15 @@ export const PageDeletePopoverForm: React.FunctionComponent<
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {
-    await config.api.page.deleteDraft(token, curPage.meta.path);
+    await config.api.page.deleteDraft(token, curPage.metadata.path);
     setConfirmed(true);
   };
 
   React.useEffect(() => {
     if (confirmed) {
       const nextPath =
-        curPage.meta.breadcrumb.length >= 2
-          ? curPage.meta.breadcrumb[curPage.meta.breadcrumb.length - 2].path
+        curPage.metadata.breadcrumb.length >= 2
+          ? curPage.metadata.breadcrumb[curPage.metadata.breadcrumb.length - 2].path
           : "";
       const qs = nextPath
         ? new URLSearchParams({

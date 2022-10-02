@@ -36,12 +36,12 @@ describe("As a user, I can list snippet", () => {
       {
         key: "header",
         title: "Casual Blog",
-        meta: { type: "blog:HeaderSnippet" },
+        metadata: { type: "blog:HeaderSnippet" },
       },
     ]);
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
   });
 });

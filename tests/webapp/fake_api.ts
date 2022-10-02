@@ -126,7 +126,7 @@ class FakePageApi implements IPageApi {
     payload: any,
     parent: string | null
   ): AsyncApiResult<boolean> {
-    payload["meta"] = {
+    payload["metadata"] = {
       type: type,
       path: `${parent || ""}/${payload.slug}`,
       breadcrumb: [],
@@ -146,16 +146,16 @@ class FakePageApi implements IPageApi {
         let starter = parent || "";
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
-        const pathLen = page.meta.path.split("/").length;
-        return page.meta.path.startsWith(starter) && pathLen == startLen + 1;
+        const pathLen = page.metadata.path.split("/").length;
+        return page.metadata.path.startsWith(starter) && pathLen == startLen + 1;
       })
       .map((page) =>
         pages.push({
           slug: page.slug,
           title: page.title,
-          meta: {
-            path: page.meta.path,
-            type: page.meta.type,
+          metadata: {
+            path: page.metadata.path,
+            type: page.metadata.type,
           },
         })
       );
@@ -169,7 +169,7 @@ class FakePageApi implements IPageApi {
     let pages: Draft[] = [];
     this.pages
       .filter((page) => {
-        return page.meta.path == path;
+        return page.metadata.path == path;
       })
       .map((page) => pages.push(page));
     if (pages.length) {
@@ -199,9 +199,9 @@ class FakePageApi implements IPageApi {
     this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
     if (pages.length) {
       const newPage = { ...oldPage, ...page };
-      const newPath: string[] = newPage.meta.path.split("/");
+      const newPath: string[] = newPage.metadata.path.split("/");
       newPath[newPath.length - 1] = page.slug;
-      newPage.meta.path = newPath.join("/");
+      newPage.metadata.path = newPath.join("/");
       pages.push(newPage);
       this.pages = pages;
       return ok(newPage);
@@ -219,7 +219,7 @@ class FakePageApi implements IPageApi {
   }
   async deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean> {
     const pages = this.pages.filter((page: PartialDraft) => {
-      return page.meta.path != path;
+      return page.metadata.path != path;
     });
     this.pages = pages;
     return ok(true);
@@ -301,7 +301,7 @@ export class FakeSnippetApi implements ISnippetApi {
     key: string,
     snippet: Snippet
   ): AsyncApiResult<boolean> {
-    const typ = snippet.meta.type;
+    const typ = snippet.metadata.type;
     let snippets = this.snippets.filter((snippet: PartialSnippet) => {
       return snippet.key != key;
     });
@@ -331,7 +331,7 @@ export class FakeSnippetApi implements ISnippetApi {
       type: type,
       payload: payload,
     };
-    payload["meta"] = { type: type };
+    payload["metadata"] = { type: type };
     this.snippets.push(payload);
     return ok(true);
   }
@@ -410,8 +410,8 @@ export class FakeSettingApi implements ISettingApi {
   ): AsyncApiResult<PartialSetting[]> {
     const settings: PartialSetting[] = [];
     this.settings.map((s) => {
-      if (s.meta.hostname == hostname) {
-        settings.push({ meta: s.meta });
+      if (s.metadata.hostname == hostname) {
+        settings.push({ metadata: s.metadata });
       }
     });
     return ok(settings);
@@ -424,7 +424,7 @@ export class FakeSettingApi implements ISettingApi {
     payload: any
   ): AsyncApiResult<boolean> {
     const setting = {
-      meta: { hostname: hostname, key: key },
+      metadata: { hostname: hostname, key: key },
       ...payload,
     };
     this.settings.push(setting);
@@ -436,7 +436,7 @@ export class FakeSettingApi implements ISettingApi {
     key: string
   ): AsyncApiResult<Setting> {
     const settings = this.settings.map((s) => {
-      if (s.meta.hostname == hostname && s.meta.key == key) {
+      if (s.metadata.hostname == hostname && s.metadata.key == key) {
         return ok(s);
       }
     });
@@ -454,7 +454,7 @@ export class FakeSettingApi implements ISettingApi {
   ): AsyncApiResult<boolean> {
     const settings: Setting[] = [];
     this.settings.map((s) => {
-      if (s.meta.hostname != s.meta.hostname || s.meta.key != setting.meta.key) {
+      if (s.metadata.hostname != s.metadata.hostname || s.metadata.key != setting.metadata.key) {
         settings.push(s);
       }
     });
@@ -467,10 +467,10 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     setting: Setting
   ): AsyncApiResult<boolean> {
-    const key = setting.meta.key;
-    const hostname = setting.meta.hostname;
+    const key = setting.metadata.key;
+    const hostname = setting.metadata.hostname;
     const settings = this.settings.filter((s: any) => {
-      return s.meta.hostname != hostname || s.meta.key != key;
+      return s.metadata.hostname != hostname || s.metadata.key != key;
     });
     this.settings = settings;
     return ok(true);

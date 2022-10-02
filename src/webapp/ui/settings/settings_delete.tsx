@@ -26,7 +26,7 @@ export const SettingDeletePopoverForm: React.FunctionComponent<
 
   React.useEffect(() => {
     if (confirmed) {
-      navigate(`/admin/settings/${curSetting.meta.hostname}`);
+      navigate(`/admin/settings/${curSetting.metadata.hostname}`);
     }
   }, [confirmed]);
 

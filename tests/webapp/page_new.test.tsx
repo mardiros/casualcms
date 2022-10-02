@@ -42,7 +42,7 @@ describe("As a user, I can create the root page", () => {
     const pages = await config.api.page.listDrafts("", null);
     expect(pages._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           path: "/home",
           type: "casual:HomePage",
         },

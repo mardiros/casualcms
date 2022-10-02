@@ -40,9 +40,9 @@ export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
   return (
     <Tr>
       <Td>{snippet.key}</Td>
-      <Td>{snippet.meta.type}</Td>
+      <Td>{snippet.metadata.type}</Td>
       <Td>
-        <Link to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.key}`}>
+        <Link to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}>
           <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Link>

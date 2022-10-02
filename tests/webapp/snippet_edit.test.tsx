@@ -17,7 +17,7 @@ describe("As a user, I can edit existing snippet", () => {
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
   });
 

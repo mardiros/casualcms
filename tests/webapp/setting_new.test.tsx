@@ -32,7 +32,7 @@ describe("As a user, I can list setting", () => {
     const settings = await config.api.setting.listSettings("", "www.localhost");
     expect(settings._unsafeUnwrap()).eql([
       {
-        meta: { hostname: "www.localhost", key: "blog:contact" },
+        metadata: { hostname: "www.localhost", key: "blog:contact" },
       },
     ]);
     const contactSetting = await config.api.setting.showSetting(
@@ -42,10 +42,10 @@ describe("As a user, I can list setting", () => {
     );
     expect(contactSetting._unsafeUnwrap()).eql({
       email: "alice@example.net",
-      meta: { hostname: "www.localhost", key: "blog:contact" },
+      metadata: { hostname: "www.localhost", key: "blog:contact" },
     });
     await config.api.setting.deleteSetting("", {
-      meta: { hostname: "www.localhost", key: "blog:contact" },
+      metadata: { hostname: "www.localhost", key: "blog:contact" },
     });
   });
 });

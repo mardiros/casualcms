@@ -36,7 +36,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       }
       const rtyp = await config.api.snippetType.showSnippetType(
         token,
-        snippet.meta.type
+        snippet.metadata.type
       );
       rtyp
         .map((typ: SnippetType) => setSnippetType(typ))

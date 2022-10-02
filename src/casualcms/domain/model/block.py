@@ -13,8 +13,8 @@ class BlockMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
         page_meta = None
-        if "Meta" in namespace:
-            meta = cast(object, namespace.pop("Meta"))
+        if "metadata" in namespace:
+            meta = cast(object, namespace.pop("metadata"))
             page_meta = BlockMeta(
                 template=getattr(
                     meta,

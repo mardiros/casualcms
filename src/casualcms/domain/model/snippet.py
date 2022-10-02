@@ -10,6 +10,10 @@ from casualcms.utils import generate_id
 uuid = str
 
 
+class PublicMetadata(BaseModel):
+    type: str = Field(...)
+
+
 class Snippet(BaseModel, Generic[Snippet_contra]):
 
     id: uuid = Field(default_factory=generate_id)
@@ -35,3 +39,7 @@ class Snippet(BaseModel, Generic[Snippet_contra]):
     @property
     def template(self) -> str:
         return self.snippet.__meta__.template
+
+    @property
+    def metadata(self) -> PublicMetadata:
+        return PublicMetadata(type=self.type)

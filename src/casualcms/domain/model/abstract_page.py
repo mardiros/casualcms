@@ -137,26 +137,6 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
             page = page.parent
         return "/" + "/".join(reversed(slugs))
 
-    @property
-    def metadata(self) -> Mapping[str, Any]:
-        breadcrumb: MutableSequence[Mapping[str, str]] = []
-        p: Optional[AbstractPage] = self
-        while p:
-            breadcrumb.insert(
-                0,
-                {
-                    "slug": p.slug,
-                    "path": p.path,
-                    "title": p.title,
-                },
-            )
-            p = p.parent
-        return {
-            "type": self.__meta__.type,
-            "path": self.path,
-            "breadcrumb": breadcrumb,
-        }
-
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}

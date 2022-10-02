@@ -18,18 +18,18 @@ describe("As a user, I can delete a snippet", () => {
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
       key: "alt-header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      meta: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet" },
     });
   });
 
   it("Delete a snippet", async () => {
     const snippet = {
       key: "header",
-      meta: {
+      metadata: {
         type: "blog:HeaderSnippet",
       },
     };
@@ -50,13 +50,13 @@ describe("As a user, I can delete a snippet", () => {
     let subList = await config.api.snippet.listSnippets("");
     expect(subList._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           type: "blog:HeaderSnippet",
         },
         key: "header",
       },
       {
-        meta: {
+        metadata: {
           type: "blog:HeaderSnippet",
         },
         key: "alt-header",
@@ -69,7 +69,7 @@ describe("As a user, I can delete a snippet", () => {
     subList = await config.api.snippet.listSnippets("");
     expect(subList._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           type: "blog:HeaderSnippet",
         },
         key: "alt-header",

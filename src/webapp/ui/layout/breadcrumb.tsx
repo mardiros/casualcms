@@ -46,7 +46,7 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
         </Link>
       </BreadcrumbItem>
       {page &&
-        page.meta.breadcrumb.map((item, i) => (
+        page.metadata.breadcrumb.map((item, i) => (
           <BreadcrumbItem key={i}>
             <Link
               to={`/admin/pages/?${new URLSearchParams({
@@ -108,7 +108,7 @@ export const SnippetBreadcrumb: React.FunctionComponent<
       {snippet && (
         <BreadcrumbItem>
           <Link
-            to={`/admin/snippets/edit/${snippet.meta.type}/${snippet.key}`}
+            to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}
           >
             {snippet.key}
           </Link>

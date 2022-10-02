@@ -50,7 +50,7 @@ describe("As a user, I can delete a page", () => {
       slug: "sub1",
       title: "Section Page",
       description: "first section",
-      meta: {
+      metadata: {
         path: "/home/sub1",
         type: "casual:HomePage",
         breadcrumb: [
@@ -84,7 +84,7 @@ describe("As a user, I can delete a page", () => {
     let subList = await config.api.page.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
         },
@@ -92,7 +92,7 @@ describe("As a user, I can delete a page", () => {
         title: "Section Page",
       },
       {
-        meta: {
+        metadata: {
           path: "/home/sub1",
           type: "casual:SectionPage",
         },
@@ -107,7 +107,7 @@ describe("As a user, I can delete a page", () => {
     subList = await config.api.page.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
         },

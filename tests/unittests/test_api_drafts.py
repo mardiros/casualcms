@@ -151,7 +151,7 @@ async def test_api_list_root_draft_pages(
         {
             "slug": draft_hp.slug,
             "title": draft_hp.title,
-            "meta": {
+            "metadata": {
                 "path": draft_hp.path,
                 "type": draft_hp.type,
             },
@@ -222,7 +222,7 @@ async def test_get_draft_403(
         {
             "path": "/api/drafts/home",
             "response": {
-                "meta": {
+                "metadata": {
                     "type": "blog:HomePage",
                     "path": "/home",
                     "breadcrumb": [
@@ -243,7 +243,7 @@ async def test_get_draft_403(
         {
             "path": "/api/drafts/home/sub",
             "response": {
-                "meta": {
+                "metadata": {
                     "type": "blog:CategoryPage",
                     "path": "/home/sub",
                     "breadcrumb": [

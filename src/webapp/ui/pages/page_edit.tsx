@@ -41,7 +41,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       }
       const rtyp = await config.api.pageType.showPageType(
         token,
-        page.meta.type
+        page.metadata.type
       );
       // console.log(rtyp);
       rtyp
@@ -82,7 +82,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       return;
     }
     const newPage = data.formData;
-    await config.api.page.updateDraft(token, page.meta.path, newPage);
+    await config.api.page.updateDraft(token, page.metadata.path, newPage);
     toast({
       title: 'Draft page saved.',
       description: "Don't forget to publish you changes afterall.",

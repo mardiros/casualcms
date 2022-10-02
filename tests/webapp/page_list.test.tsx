@@ -65,7 +65,7 @@ describe("As a user, I can list pages", () => {
     const page = {
       slug: "home",
       title: "Home Page",
-      meta: {
+      metadata: {
         path: "/home",
         type: "casual:HomePage",
       },
@@ -143,7 +143,7 @@ describe("As a user, I can list pages", () => {
 
   it("Redirect to the new page while clicking on the add button", async () => {
     const page = {
-      meta: {
+      metadata: {
         path: "/home",
         type: "casual:HomePage",
         breadcrumb: [],
@@ -171,7 +171,7 @@ describe("As a user, I can list pages", () => {
 
   it("Render a delete button if there is no child pages", async () => {
     const page = {
-      meta: {
+      metadata: {
         path: "/home/sub1",
         type: "casual:HomePage",
         breadcrumb: [
@@ -215,7 +215,7 @@ describe("As a user, I can list pages", () => {
     const subList = await config.api.page.listDrafts("", "/home");
     expect(subList._unsafeUnwrap()).eql([
       {
-        meta: {
+        metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
         },

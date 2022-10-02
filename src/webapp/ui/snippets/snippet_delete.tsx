@@ -17,7 +17,7 @@ export const SnippetDeletePopoverForm: React.FunctionComponent<
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const curSnippet = props.curSnippet;
-  const snippetType = curSnippet.meta.type;
+  const snippetType = curSnippet.metadata.type;
   const [confirmed, setConfirmed] = React.useState<boolean>(false);
 
   const onSubmit = async () => {

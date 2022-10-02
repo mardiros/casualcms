@@ -17,6 +17,7 @@ from casualcms.domain.model import (
     SnippetType,
     resolve_snippet_type,
 )
+from casualcms.domain.model.snippet import PublicMetadata
 from casualcms.domain.repositories.snippet import (
     SnippetRepositoryResult,
     SnippetSequenceRepositoryResult,
@@ -39,13 +40,9 @@ def get_snippet_type_body(type: SnippetKey = Body(...)) -> SnippetType:
     return rtype.unwrap()
 
 
-class PartialSnippetMeta(BaseModel):
-    type: str = Field(...)
-
-
 class PartialSnippet(BaseModel):
     key: str = Field(...)
-    meta: PartialSnippetMeta = Field(...)
+    metadata: PublicMetadata = Field(...)
 
 
 async def get_snippet_by_key(
@@ -161,7 +158,7 @@ async def create_snippet(
 
     return PartialSnippet(
         key=snippet.key,
-        meta=PartialSnippetMeta(type=snippet.type),
+        metadata=snippet.metadata,
     )
 
 
@@ -187,7 +184,7 @@ async def list_snippets(
     return [
         PartialSnippet(
             key=s.key,
-            meta=PartialSnippetMeta(type=s.type),
+            metadata=s.metadata,
         )
         for s in snips
     ]
@@ -199,7 +196,7 @@ async def show_snippet(
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
     ret = snippet.snippet.dict()
-    ret["meta"] = snippet.snippet.metadata
+    ret["metadata"] = snippet.snippet.metadata
     return ret
 
 
@@ -212,7 +209,7 @@ async def update_snippet(
 ) -> PartialSnippet:
 
     new_key = payload.pop("key")
-    payload.pop("meta", None)
+    payload.pop("metadata", None)
     cmd = UpdateSnippet(id=snippet.id, key=new_key, body=payload)
     cmd.metadata.clientAddr = request.client.host
     cmd.metadata.userId = token.user_id
@@ -233,7 +230,7 @@ async def update_snippet(
 
     return PartialSnippet(
         key=new_key,
-        meta=PartialSnippetMeta(type=snippet.type),
+        metadata=snippet.metadata,
     )
 
 

@@ -15,6 +15,7 @@ from tests.casualblog.models import (
     HeaderSnippet,
     HomePage,
     SectionPage,
+    SnippetBlockPage,
 )
 
 
@@ -142,10 +143,36 @@ async def test_render_template_with_block(
         data.strip()
         == textwrap.dedent(
             """\
-        <div>
-          <h4>a box</h4>
-          <p>lorem ipsum</p>
-        </div>
-        """
+            <div>
+              <h4>a box</h4>
+              <p>lorem ipsum</p>
+            </div>
+            """
+        ).strip()
+    )
+
+
+async def test_render_page_with_snippet_and_block(
+    uow: AbstractUnitOfWork,
+    app_settings: Settings,
+    draft_hp: DraftPage[HomePage],
+    default_site: Site,
+    snippet_block_page: DraftPage[SnippetBlockPage],
+):
+    async with uow as uow:
+        renderer = Jinja2TemplateRender(
+            uow, app_settings.template_search_path, default_site.hostname
+        )
+        data = await renderer.render_page(snippet_block_page.page)
+    assert (
+        data.strip()
+        == textwrap.dedent(
+            """\
+            <div class="page">
+              <div class="snippet">
+              <h4>page / snippet title / box title</h4>
+            </div>
+            </div>
+            """
         ).strip()
     )

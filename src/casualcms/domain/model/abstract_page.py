@@ -1,16 +1,7 @@
 import enum
 import re
 from collections import defaultdict
-from typing import (
-    Any,
-    Iterable,
-    Mapping,
-    Optional,
-    Set,
-    Type,
-    TypeVar,
-    cast,
-)
+from typing import Any, Iterable, Mapping, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, ConstrainedStr, Field
 from pydantic.fields import ModelField

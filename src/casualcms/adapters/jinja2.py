@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import Any, MutableMapping, Optional
+from typing import Any, MutableMapping
 
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
@@ -33,6 +33,10 @@ class AbstractTemplateRenderer(ABC):
     async def render_snippet(self, snippet: AbstractSnippet, page: AbstractPage) -> str:
         ...
 
+    @abstractmethod
+    async def render_block(self, block: Block, page: AbstractPage) -> str:
+        ...
+
 
 class Jinja2TemplateRender(AbstractTemplateRenderer):
     uow: AbstractUnitOfWork
@@ -52,11 +56,19 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         self.hostname = hostname
         self._settings: MutableMapping[str, Any] = {}
 
-    async def include_snippet(self, key: str, page: AbstractPage) -> str:
+    async def include_block(
+        self, block: Block, page: AbstractPage, **kwargs: Any
+    ) -> str:
+        ret = await self.render_block(block=block, page=page, **kwargs)
+        return ret
+
+    async def include_snippet(self, key: str, page: AbstractPage, **kwargs: Any) -> str:
         rsnippet: SnippetRepositoryResult[Any] = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
-            ret = await self.render_snippet(snippet=snippet.snippet, page=page)
+            ret = await self.render_snippet(
+                snippet=snippet.snippet, page=page, **kwargs
+            )
             return ret
         else:
             # should render an error here
@@ -88,6 +100,7 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         return self.env.get_template(
             template,
             globals={
+                "include_block": partial(self.include_block, page=page),
                 "include_snippet": partial(self.include_snippet, page=page),
                 "get_setting": self.get_setting,
             },
@@ -97,15 +110,17 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         tpl = self.get_template(page, page.__meta__.template)
         return await tpl.render_async(page=page)
 
-    async def render_snippet(self, snippet: AbstractSnippet, page: AbstractPage) -> str:
+    async def render_snippet(
+        self, snippet: AbstractSnippet, page: AbstractPage, **kwargs: Any
+    ) -> str:
         tpl = self.get_template(page, snippet.__meta__.template)
-        return await tpl.render_async(snippet=snippet, page=page)
+        return await tpl.render_async(snippet=snippet, page=page, **kwargs)
 
     async def render_block(
         self,
         block: Block,
         page: AbstractPage,
-        snippet: Optional[AbstractSnippet] = None,
+        **kwargs: Any,
     ) -> str:
         tpl = self.get_template(page, block.__meta__.template)
-        return await tpl.render_async(block=block, page=page, snippet=snippet)
+        return await tpl.render_async(block=block, page=page, **kwargs)

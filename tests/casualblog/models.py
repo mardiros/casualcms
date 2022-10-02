@@ -98,6 +98,28 @@ class CategoryPage(BasePage):
         template = "category.jinja2"
 
 
+class BlockInSnippet(Block):
+    title: str
+
+    class Meta:
+        template = "snippet_block.jinja2"
+
+
+class SnippetBlock(AbstractSnippet):
+    title: str
+    box: BlockInSnippet
+
+    class Meta:
+        template = "snippet_box.jinja2"
+        type = "blog:SnippetBlock"
+
+
+class SnippetBlockPage(AbstractPage):
+    class Meta:
+        template = "page_with_snippet_block.jinja2"
+        type = "blog:SnippetBlockPage"
+
+
 class SectionPage(BasePage):
 
     intro: Optional[Paragraph] = Field()

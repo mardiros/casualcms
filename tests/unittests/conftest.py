@@ -33,7 +33,13 @@ from casualcms.domain.repositories.page import PageRepositoryResult
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.casualblog.models import CategoryPage, HomePage, SectionPage
+from tests.casualblog.models import (
+    CategoryPage,
+    HomePage,
+    SectionPage,
+    SnippetBlock,
+    SnippetBlockPage,
+)
 
 
 @pytest.fixture()
@@ -172,7 +178,7 @@ async def draft_subpage(
             ),
             uow,
         )
-        page = await uow.drafts.by_id(page_id)  # type: ignore  # type:ignore
+        page = await uow.drafts.by_id(page_id)  # type: ignore
         yield page.unwrap()
 
 
@@ -203,7 +209,7 @@ async def section_page(
             ),
             uow,
         )
-        page = await uow.drafts.by_id(page_id)  # type: ignore  # type:ignore
+        page = await uow.drafts.by_id(page_id)  # type: ignore
         yield page.unwrap()
 
 
@@ -275,6 +281,53 @@ async def footer_snippet(
             uow,
         )
     yield snippet.unwrap()
+
+
+@pytest.fixture
+async def box_in_snippet(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+) -> AsyncGenerator[Snippet[Any], None]:
+    async with uow as uow:
+        snippet = await messagebus.handle(
+            CreateSnippet(
+                type="blog:SnippetBlock",
+                key="snippet_block",  # type: ignore
+                body={
+                    "title": "snippet title",
+                    "box": {"title": "box title"},
+                },
+            ),
+            uow,
+        )
+    yield snippet.unwrap()
+
+
+@pytest.fixture
+async def snippet_block_page(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    box_in_snippet: Snippet[SnippetBlock],
+    draft_hp: DraftPage[HomePage],
+) -> AsyncGenerator[DraftPage[SnippetBlockPage], None]:
+    async with uow as uow:
+        page_id = generate_id()
+        await messagebus.handle(
+            CreatePage(
+                id=page_id,
+                type="blog:SnippetBlockPage",
+                payload={
+                    "slug": "snippet-block-page",
+                    "title": "page",
+                    "description": "...",
+                },
+            ),
+            uow,
+        )
+        page = await uow.drafts.by_id(page_id)  # type: ignore
+        yield page.unwrap()
 
 
 @pytest.fixture

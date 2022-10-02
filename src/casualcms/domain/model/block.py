@@ -4,26 +4,27 @@ from pydantic import BaseModel, Field
 from pydantic.main import ModelMetaclass
 
 
+class MissingBlockMetaError(Exception):
+    ...
+
+
 class BlockMeta(BaseModel):
     template: str = Field(...)
-    type: str = Field(...)
 
 
 class BlockMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
-        page_meta = None
-        if "metadata" in namespace:
-            meta = cast(object, namespace.pop("metadata"))
-            page_meta = BlockMeta(
-                template=getattr(
-                    meta,
-                    "template",
-                    "",  # TODO: a default template for users
-                ),
-                type=getattr(meta, "type", f"{namespace['__module__']}:{name}"),
+        block_meta = None
+        if "Meta" in namespace:
+            meta = cast(object, namespace.pop("Meta"))
+            block_meta = BlockMeta(
+                template=getattr(meta, "template", ""),
             )
-            new_namespace["__meta__"] = page_meta
+            new_namespace["__meta__"] = block_meta
+        else:
+            name = f"{namespace['__module__']}:{namespace['__qualname__']}"
+            raise MissingBlockMetaError(f"Meta class is missing for block {name}")
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
         return ret
 
@@ -31,5 +32,5 @@ class BlockMetaclass(ModelMetaclass):
 class Block(BaseModel, metaclass=BlockMetaclass):
     __meta__: BlockMeta
 
-    def get_template(self) -> str:
-        return self.__meta__.template
+    class Meta:
+        ...

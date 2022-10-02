@@ -64,11 +64,7 @@ class SnippetMetaclass(ModelMetaclass):
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
             snippet_meta = SnippetMeta(
-                template=getattr(
-                    meta,
-                    "template",
-                    "",  # TODO: a default template for users
-                ),
+                template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
                 type=getattr(
                     meta,

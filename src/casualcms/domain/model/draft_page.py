@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Generic
 
 from pydantic import BaseModel, Field
-from pyparsing import Optional
 
 from casualcms.domain.messages import Event
 from casualcms.domain.model.abstract_page import AbstractPage, Page_contra

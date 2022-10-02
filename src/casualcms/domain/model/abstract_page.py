@@ -5,7 +5,6 @@ from typing import (
     Any,
     Iterable,
     Mapping,
-    MutableSequence,
     Optional,
     Set,
     Type,
@@ -91,11 +90,7 @@ class PageMetaclass(ModelMetaclass):
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
             page_meta = PageMeta(
-                template=getattr(
-                    meta,
-                    "template",
-                    "",  # TODO: a default template for users
-                ),
+                template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
                 parent_types=getattr(meta, "parent_types", []),
                 type=getattr(

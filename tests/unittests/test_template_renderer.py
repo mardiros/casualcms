@@ -1,4 +1,6 @@
+import textwrap
 from pathlib import Path
+from typing import Any
 
 from result import Err, Ok
 
@@ -12,6 +14,7 @@ from tests.casualblog.models import (
     FeatureFlagSetting,
     HeaderSnippet,
     HomePage,
+    SectionPage,
 )
 
 
@@ -92,16 +95,16 @@ async def test_render_template_with_snippet_and_setting(
     header_snippet: Snippet[HeaderSnippet],
     draft_hp: DraftPage[HomePage],
     default_site: Site,
-    contact_setting: Setting,
+    contact_setting: Setting[Any],
 ):
     async with uow as uow:
         renderer = Jinja2TemplateRender(
             uow, app_settings.template_search_path, default_site.hostname
         )
-    data = await renderer.render_snippet(
-        header_snippet.snippet,
-        draft_hp.page,
-    )
+        data = await renderer.render_snippet(
+            header_snippet.snippet,
+            draft_hp.page,
+        )
     nav = "".join(
         [
             '<li><a href="/cats">cats</a></li>',
@@ -116,4 +119,33 @@ async def test_render_template_with_snippet_and_setting(
 <h1>A personal blog</h1>
 <ul role="nav">{nav}</ul>
     """.strip()
+    )
+
+
+async def test_render_template_with_block(
+    uow: AbstractUnitOfWork,
+    app_settings: Settings,
+    draft_hp: DraftPage[HomePage],
+    default_site: Site,
+    section_page: DraftPage[SectionPage],
+):
+
+    async with uow as uow:
+        renderer = Jinja2TemplateRender(
+            uow, app_settings.template_search_path, default_site.hostname
+        )
+        data = await renderer.render_block(
+            section_page.page.box,
+            section_page.page,
+        )
+    assert (
+        data.strip()
+        == textwrap.dedent(
+            """\
+        <div>
+          <h4>a box</h4>
+          <p>lorem ipsum</p>
+        </div>
+        """
+        ).strip()
     )

@@ -11,7 +11,7 @@ from casualcms.domain.messages.commands import (
 )
 from casualcms.domain.model import AuthnToken, resolve_setting_type
 from casualcms.domain.model.abstract_setting import Setting_contra
-from casualcms.domain.model.setting import Setting, PublicMetadata
+from casualcms.domain.model.setting import PublicMetadata, Setting
 from casualcms.domain.repositories.setting import (
     SettingRepositoryResult,
     SettingSequenceRepositoryResult,

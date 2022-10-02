@@ -23,6 +23,7 @@ from .abstract_snippet import (
     resolve_snippet_type,
 )
 from .account import Account, AccountStatus, AuthnToken
+from .block import Block
 from .draft_page import DraftPage
 from .published_page import PublishedPage
 from .setting import Setting
@@ -45,6 +46,8 @@ __all__ = [
     "DraftPage",
     # Published Pages
     "PublishedPage",
+    # Block,
+    "Block",
     # Snippets
     "AbstractSnippet",
     "AbstractSnippetError",

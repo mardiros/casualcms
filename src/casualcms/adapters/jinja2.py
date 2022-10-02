@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import Any, MutableMapping
+from typing import Any, MutableMapping, Optional
 
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
 
 from casualcms.domain.model import AbstractPage
 from casualcms.domain.model.abstract_snippet import AbstractSnippet
+from casualcms.domain.model.block import Block
 from casualcms.domain.repositories.setting import SettingRepositoryResult
 from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -99,3 +100,12 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
     async def render_snippet(self, snippet: AbstractSnippet, page: AbstractPage) -> str:
         tpl = self.get_template(page, snippet.__meta__.template)
         return await tpl.render_async(snippet=snippet, page=page)
+
+    async def render_block(
+        self,
+        block: Block,
+        page: AbstractPage,
+        snippet: Optional[AbstractSnippet] = None,
+    ) -> str:
+        tpl = self.get_template(page, block.__meta__.template)
+        return await tpl.render_async(block=block, page=page, snippet=snippet)

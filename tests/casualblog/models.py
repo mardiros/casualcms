@@ -2,12 +2,20 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet
+from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet, Block
 
 
 class Link(BaseModel):
     title: str = Field()
     href: str = Field()
+
+
+class Box(Block):
+    title: str = Field()
+    paragraph: str = Field()
+
+    class Meta:
+        template = "box.jinja2"
 
 
 class HeaderSnippet(AbstractSnippet):
@@ -93,6 +101,7 @@ class CategoryPage(BasePage):
 class SectionPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
+    box: Box
 
     class Meta:
         parent_types = [HomePage]

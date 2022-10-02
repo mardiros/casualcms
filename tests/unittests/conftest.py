@@ -33,7 +33,7 @@ from casualcms.domain.repositories.page import PageRepositoryResult
 from casualcms.entrypoint import bootstrap
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
-from tests.casualblog.models import CategoryPage, HomePage
+from tests.casualblog.models import CategoryPage, HomePage, SectionPage
 
 
 @pytest.fixture()
@@ -177,6 +177,37 @@ async def draft_subpage(
 
 
 @pytest.fixture
+async def section_page(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    draft_hp: DraftPage[HomePage],
+) -> AsyncGenerator[DraftPage[SectionPage], None]:
+    async with uow as uow:
+        page_id = generate_id()
+        await messagebus.handle(
+            CreatePage(
+                id=page_id,
+                type="blog:SectionPage",
+                payload={
+                    "parent": draft_hp.page,
+                    "slug": "sub",
+                    "title": "a sub page",
+                    "description": "I am so glad to be a sub page",
+                    "hero_title": "section",
+                    "box": {
+                        "title": "a box",
+                        "paragraph": "lorem ipsum",
+                    },
+                },
+            ),
+            uow,
+        )
+        page = await uow.drafts.by_id(page_id)  # type: ignore  # type:ignore
+        yield page.unwrap()
+
+
+@pytest.fixture
 async def header_snippet(
     app: FastAPI,
     uow: AbstractUnitOfWork,
@@ -292,11 +323,11 @@ async def ff_setting(
     uow: AbstractUnitOfWork,
     default_site: Site,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Setting, None]:
+) -> AsyncGenerator[Setting[Any], None]:
     async with uow as uow:
         setting = await messagebus.handle(
             CreateSetting(
-                key="ff",
+                key="ff",  # type: ignore
                 hostname=default_site.hostname,
                 body={
                     "use_stuff": True,
@@ -313,11 +344,11 @@ async def contact_setting(
     uow: AbstractUnitOfWork,
     default_site: Site,
     messagebus: MessageRegistry,
-) -> AsyncGenerator[Setting, None]:
+) -> AsyncGenerator[Setting[Any], None]:
     async with uow as uow:
         setting = await messagebus.handle(
             CreateSetting(
-                key="contact",
+                key="contact",  # type: ignore
                 hostname=default_site.hostname,
                 body={
                     "email": "email@example.net",

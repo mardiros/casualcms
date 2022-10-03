@@ -12,7 +12,7 @@ export const Layout: React.FunctionComponent<LayoutProps> = (
 ) => {
   const location = useLocation();
   if (location.pathname.startsWith("/admin/pages/preview")) {
-    return <></>;
+    return <>{props.routes}</>;
   }
   return (
     <>

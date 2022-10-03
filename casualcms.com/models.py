@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet
+from casualcms.domain.model.block import Block
 
 
 class Link(BaseModel):
@@ -26,9 +27,12 @@ class HeaderSnippet(AbstractSnippet):
         type = "HeaderSnippet"
 
 
-class Paragraph(BaseModel):
+class Paragraph(Block):
     title: Optional[str] = Field()
     body: str = Field(widget="textarea")
+
+    class Meta:
+        template = "paragraph.jinja2"
 
 
 class BasePage(AbstractPage):
@@ -52,25 +56,23 @@ class DocumentationNavItem(BaseModel):
     links: list[Link] = Field(default_factory=list)
 
 
-class DocumentationNav(BaseModel):
+class DocumentationNav(Block):
     title: str = Field()
     items: list[DocumentationNavItem] = Field(default_factory=list)
 
     class Meta:
-        template = "documentation_nav.jinja2"
-        type = "DocumentationNavSnippet"
+        template = "documentation/nav.jinja2"
 
 
 class LayoutColumn(BaseModel):
     item: DocumentationNav | Paragraph = Field()
 
 
-class LayoutColumns(BaseModel):
+class LayoutColumns(Block):
     items: list[LayoutColumn] = Field(default_factory=list)
 
     class Meta:
         template = "columns.jinja2"
-        type = "Columns"
 
 
 class DocumentationRootPage(BasePage):

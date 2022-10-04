@@ -61,7 +61,7 @@ class DocumentationNav(Block):
     items: list[DocumentationNavItem] = Field(default_factory=list)
 
     class Meta:
-        template = "documentation/nav.jinja2"
+        template = "documentation/menu.jinja2"
 
 
 class LayoutColumn(BaseModel):

@@ -1,0 +1,13 @@
+<div class="block">
+  <p class="title is-3">{{block.title}}</p>
+  <aside class="menu">
+    {% for item in block.items %}
+      <p class="menu-label">
+        {{item.title}}
+      </p>
+      {% for link in item.links %}
+          <li><a href="{{link.href}}">{{link.title}}</a></li>
+      {% endfor %}
+    {% endfor %}
+  </aside>
+</div>

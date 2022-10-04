@@ -57,7 +57,6 @@ export const SideBar: React.FunctionComponent<{}> = () => {
     <Box
       minWidth={250}
       height="calc(100vh - 90px)"
-      bgColor="teal.300"
       color="white"
     >
       <SimpleGrid columns={1} spacing={1}>

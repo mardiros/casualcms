@@ -12,17 +12,17 @@ export const Layout: React.FunctionComponent<LayoutProps> = (
 ) => {
   const location = useLocation();
   if (location.pathname.startsWith("/admin/pages/preview")) {
-    return <>{props.routes}</>;
+    return <></>;
   }
   return (
     <>
       <Box w="100%" p={4} bg="teal.300" h="90px">
         <Header />
       </Box>
-      <Box w="100%" bg="teal.50" minH="calc(100vh - 90px)" color="teal.900">
+      <Box w="100%" bg="teal.300" minH="calc(100vh - 90px)" color="teal.900">
         <Flex>
           <SideBar />
-          <Box flex="1" padding={4}>
+          <Box  bg="teal.50" flex="1" padding={4}>
             {props.routes}
           </Box>
         </Flex>

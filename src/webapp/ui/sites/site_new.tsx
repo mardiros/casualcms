@@ -86,7 +86,7 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
           <FormHelperText>Use https.</FormHelperText>
         </FormControl>
         <FormControl paddingTop={5}>
-          <Button type="submit" colorScheme="teal">
+          <Button type="submit" colorScheme="cyan">
             Submit
           </Button>
         </FormControl>

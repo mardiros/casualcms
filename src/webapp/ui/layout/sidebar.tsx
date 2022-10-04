@@ -32,11 +32,11 @@ export const SideBarItem: React.FunctionComponent<SideBarItemProps> = (
 };
 
 export const SideBar: React.FunctionComponent<{}> = () => {
-  const selectedColor = ["teal.50", "black", "true"];
-  let pagesColor = ["teal.500", "white", "false"];
-  let sitesColor = ["teal.500", "white", "false"];
-  let snippetsColor = ["teal.500", "white", "false"];
-  let settingsColor = ["teal.500", "white", "false"];
+  const selectedColor = ["cyan.50", "black", "true"];
+  let pagesColor = ["cyan.500", "white", "false"];
+  let sitesColor = ["cyan.500", "white", "false"];
+  let snippetsColor = ["cyan.500", "white", "false"];
+  let settingsColor = ["cyan.500", "white", "false"];
   const location = useLocation();
   if (
     location.pathname.startsWith("/admin/pages") ||

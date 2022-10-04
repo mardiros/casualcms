@@ -113,7 +113,7 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
   return (
     <Stack p={4} spacing={4} direction="row" align="right">
       <Button
-        colorScheme="teal"
+        colorScheme="cyan"
         onClick={() => navigate(`/admin/sites/new`, { replace: true })}
       >
         <Icon as={AddIcon} marginEnd={2} />

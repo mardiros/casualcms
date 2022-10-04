@@ -108,7 +108,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
           onClick={() =>
             navigate(`/admin/pages/edit?${qsEdit}`, { replace: true })
           }
-          colorScheme="teal"
+          colorScheme="cyan"
         >
           <Icon as={EditIcon} marginEnd={2} />
           Edit
@@ -117,7 +117,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
 
       <Button
         onClick={() => navigate(`/admin/pages/new?${qs}`, { replace: true })}
-        colorScheme="teal"
+        colorScheme="cyan"
       >
         <Icon as={AddIcon} marginEnd={2} />
         Add new page

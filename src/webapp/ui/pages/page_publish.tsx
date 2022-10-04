@@ -56,7 +56,7 @@ export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
           ))}
         </Stack>
       </CheckboxGroup>
-      <Button colorScheme="teal" onClick={onSubmit} role="publish">
+      <Button colorScheme="cyan" onClick={onSubmit} role="publish">
         Submit
       </Button>
     </>
@@ -83,7 +83,7 @@ export const PublishResultBox: React.FunctionComponent<
   const { hostnames, pagePath, onClose } = props;
   return (
     <Box>
-      <Stack p={4} spacing={4} direction="column" bg={"teal.200"}>
+      <Stack p={4} spacing={4} direction="column" bg={"cyan.200"}>
         {hostnames.map((hostname, i) => (
           <Box key={i} role="publication_result">
             {
@@ -116,7 +116,7 @@ export const PublishResultBox: React.FunctionComponent<
           </Box>
         ))}
       </Stack>
-      <Button colorScheme="teal" onClick={onClose} role="close_publish_popover">
+      <Button colorScheme="cyan" onClick={onClose} role="close_publish_popover">
         Close
       </Button>
     </Box>
@@ -131,7 +131,7 @@ export const SiteCheckBox: React.FunctionComponent<SiteCheckBoxProps> = (
     <Checkbox
       role="select_site"
       value={hostname.hostname}
-      colorScheme={"teal"}
+      colorScheme={"cyan"}
       onChange={(e) => {
         hostname.selected = e.target.checked;
       }}
@@ -205,13 +205,13 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
       placement="right"
     >
       <PopoverTrigger>
-        <Button colorScheme="teal" role="open_publish_popover">
+        <Button colorScheme="cyan" role="open_publish_popover">
           <Icon as={SunIcon} marginEnd={2} />
           Publish
         </Button>
       </PopoverTrigger>
       <Portal>
-        <PopoverContent backgroundColor={"teal.200"}>
+        <PopoverContent backgroundColor={"cyan.200"}>
           <PopoverHeader>
             {
               {

@@ -31,7 +31,7 @@ export const AccountMenu: React.FunctionComponent<AccountMenuProps> = (
   };
   return (
     <Menu>
-      <MenuButton as={Button} colorScheme="teal" rightIcon={<HamburgerIcon />}>
+      <MenuButton as={Button} colorScheme="cyan" rightIcon={<HamburgerIcon />}>
         {props.username}
       </MenuButton>
       <MenuList>

@@ -8,7 +8,7 @@ export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
   return (
     <Flex minWidth="max-content" alignItems="center" gap="2">
       <Box p="2">
-        <Heading size="lg" color="teal.800">
+        <Heading size="lg" color="cyan.50">
           <Link to="/admin">👕 Casual CMS</Link>
         </Heading>
       </Box>
@@ -20,7 +20,7 @@ export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
           <Box
             as="button"
             borderRadius="md"
-            bg="teal"
+            bg="cyan"
             color="white"
             px={8}
             h={8}

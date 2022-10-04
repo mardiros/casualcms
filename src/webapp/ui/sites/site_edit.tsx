@@ -132,7 +132,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
           </FormControl>
           <FormControl>
             <Stack p={4} spacing={4} direction="row" align="right">
-              <Button type="submit" colorScheme="teal">
+              <Button type="submit" colorScheme="cyan">
                 Submit
               </Button>
               <SiteDeletePopoverForm curSite={site} />

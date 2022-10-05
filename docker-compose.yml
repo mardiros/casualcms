@@ -30,9 +30,9 @@ services:
       - src/casualcms/entrypoint.py
     environment:
       - "CASUALCMS_ASSETS_PATH=/app/casualcms_com/assets"
-      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/casualcms_com/templates"
+      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/casualcms_com/models"
       - "PYTHONPATH=/app"
-      - 'CASUALCMS_IMPORT_MODELS=["casualcms_com"]'
+      - 'CASUALCMS_IMPORT_MODELS=["casualcms_com.models"]'
       - "CASUALCMS_ADMIN_USERNAME=alice"
       - "CASUALCMS_ADMIN_PASSWORD=secret"
       - "CASUALCMS_USE_RELOADER=true"

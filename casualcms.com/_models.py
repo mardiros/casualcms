@@ -2,20 +2,13 @@ from typing import Optional
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet
+from casualcms.domain.model import AbstractPage, AbstractSnippet
 from casualcms.domain.model.block import Block
 
 
 class Link(BaseModel):
     title: str = Field()
     href: str = Field()
-
-
-class Settings(AbstractSetting):
-    environment: str = Field(...)
-
-    class Meta:
-        key = "feature-flags"
 
 
 class HeaderSnippet(AbstractSnippet):
@@ -84,23 +77,3 @@ class DocumentationRootPage(BasePage):
         type = "DocumentationRootPage"
         template = "documentation/index.jinja2"
 
-
-class BlogRootPage(BasePage):
-
-    intro: Optional[Paragraph] = Field()
-
-    class Meta:
-        parent_types = [HomePage]
-        type = "BlogRootPage"
-        template = "blog/index.jinja2"
-
-
-class BlogPostPage(BasePage):
-
-    body: list[Paragraph] = []
-    related_post_snippet: str = ""
-
-    class Meta:
-        parent_types = [BlogRootPage, "BlogPostPage"]
-        type = "BlogPostPage"
-        template = "blog/blogpost.jinja2"

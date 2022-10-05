@@ -1,0 +1,17 @@
+<div class="block">
+  <p class="title is-3">{{snippet.title}}</p>
+  <aside class="menu">
+    {% for chapter in snippet.chapters %}
+      <p class="menu-label">
+        {{chapter.title}}
+      </p>
+      <ul>
+        {% for link in chapter.links %}
+          <li>
+            {{ include_block(link) }}
+          </li>
+       {% endfor %}
+      </ul>
+    {% endfor %}
+  </aside>
+</div>

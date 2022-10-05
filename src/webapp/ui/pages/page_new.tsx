@@ -1,4 +1,5 @@
 import React from "react";
+import validator from "@rjsf/validator-ajv6";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
@@ -94,6 +95,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
           schema={pageType.schema}
           uiSchema={pageType.uiSchema}
           formData={data}
+          validator={validator}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
           // onError={() => console.log("errors")}

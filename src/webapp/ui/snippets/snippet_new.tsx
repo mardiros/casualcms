@@ -1,4 +1,5 @@
 import React from "react";
+import validator from "@rjsf/validator-ajv6";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
@@ -70,6 +71,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
           schema={snippetType.schema}
           uiSchema={snippetType.uiSchema}
           formData={data}
+          validator={validator}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
           // onError={() => console.log("errors")}

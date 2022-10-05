@@ -1,8 +1,9 @@
 import React from "react";
+import validator from "@rjsf/validator-ajv6";
 import { Box, Heading } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../casualcms/domain/ports";
 import { AppContext } from "../../config";
@@ -99,6 +100,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
             schema={settingType.schema}
             uiSchema={settingType.uiSchema}
             formData={setting}
+            validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
             // onError={() => console.log("errors")}

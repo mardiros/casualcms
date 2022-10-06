@@ -40,7 +40,13 @@ async def test_api_create_snippet(
         },
     )
     assert resp.status_code == 201
-    assert resp.json() == {"key": "header", "metadata": {"type": "blog:HeaderSnippet"}}
+    assert resp.json() == {
+        "key": "header",
+        "metadata": {
+            "type": "blog:HeaderSnippet",
+            "title": "blog: Header Snippet",
+        },
+    }
     async with uow as uow:
         snippet: Snippet[Any] = (await uow.snippets.by_key("header")).unwrap()
         assert snippet.snippet.dict() == {
@@ -127,12 +133,27 @@ async def test_api_list_snippet(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"metadata": {"type": "blog:HeaderSnippet"}, "key": "alt-header"},
         {
-            "metadata": {"type": "tests.casualblog.models:FooterSnippet"},
+            "metadata": {
+                "type": "blog:HeaderSnippet",
+                "title": "blog: Header Snippet",
+            },
+            "key": "alt-header",
+        },
+        {
+            "metadata": {
+                "type": "tests.casualblog.models:FooterSnippet",
+                "title": "Footer Snippet",
+            },
             "key": "footer",
         },
-        {"metadata": {"type": "blog:HeaderSnippet"}, "key": "header"},
+        {
+            "metadata": {
+                "type": "blog:HeaderSnippet",
+                "title": "blog: Header Snippet",
+            },
+            "key": "header",
+        },
     ]
 
 
@@ -151,8 +172,20 @@ async def test_api_list_snippet_filter(
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"metadata": {"type": "blog:HeaderSnippet"}, "key": "alt-header"},
-        {"metadata": {"type": "blog:HeaderSnippet"}, "key": "header"},
+        {
+            "metadata": {
+                "type": "blog:HeaderSnippet",
+                "title": "blog: Header Snippet",
+            },
+            "key": "alt-header",
+        },
+        {
+            "metadata": {
+                "type": "blog:HeaderSnippet",
+                "title": "blog: Header Snippet",
+            },
+            "key": "header",
+        },
     ]
 
 
@@ -189,7 +222,13 @@ async def test_api_patch_snippet(
         },
     )
     assert resp.status_code == 202
-    assert resp.json() == {"metadata": {"type": "blog:HeaderSnippet"}, "key": "new-key"}
+    assert resp.json() == {
+        "metadata": {
+            "type": "blog:HeaderSnippet",
+            "title": "blog: Header Snippet",
+        },
+        "key": "new-key",
+    }
 
     async with uow as uow:
         snip: SnippetRepositoryResult[HeaderSnippet] = await uow.snippets.by_key(
@@ -256,7 +295,10 @@ async def test_api_get_snippet(
             {"href": "/cats", "title": "cats"},
             {"href": "/dogs", "title": "dogs"},
         ],
-        "metadata": {"type": "blog:HeaderSnippet"},
+        "metadata": {
+            "type": "blog:HeaderSnippet",
+            "title": "blog: Header Snippet",
+        },
         "key": "header",
         "title": "A personal blog",
     }

@@ -1,4 +1,5 @@
 import { err, Ok, ok, Result } from "neverthrow";
+import { string } from "prop-types";
 import {
   Account,
   PartialPageType,
@@ -334,7 +335,11 @@ export class FakeSnippetApi implements ISnippetApi {
       type: type,
       payload: payload,
     };
-    payload["metadata"] = { type: type };
+    const titles: Record<string, string> = {
+      "blog:HeaderSnippet": "Header Snippet",
+      "blog:FooterSnippet": "Footer Snippet",
+    };
+    payload["metadata"] = { type: type, title: titles[type] };
     this.snippets.push(payload);
     return ok(true);
   }
@@ -354,7 +359,10 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
   async listSnippetTypes(
     authntoken: string
   ): AsyncApiResult<PartialSnippetType[]> {
-    return ok([{ type: "blog:HeaderSnippet" }, { type: "blog:FooterSnippet" }]);
+    return ok([
+      { title: "Header Snippet", type: "blog:HeaderSnippet" },
+      { title: "Footer Snippet", type: "blog:FooterSnippet" },
+    ]);
   }
   async showSnippetType(
     authntoken: string,

@@ -57,6 +57,7 @@ export type Site = PartialSite;
 
 export type PartialSnippetMeta = {
   type: string;
+  title: string;
 };
 
 export type PartialSnippet = {
@@ -68,6 +69,7 @@ export type Snippet = PartialSnippet;
 
 export type PartialSnippetType = {
   type: string;
+  title: string;
 };
 
 export type SnippetType = {

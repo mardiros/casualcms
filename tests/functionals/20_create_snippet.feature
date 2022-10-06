@@ -7,9 +7,9 @@ Feature: As a user, I can create and publish snippets
     And a "/home/dog" draft page of type "blog:CategoryPage"
     When I visit "/admin/snippets/new"
     Then I see the text "Choose A Type Of Snippet"
-    And I see the text "blog:HeaderSnippet"
-    And I see the text "casualblog.models:FooterSnippet"
-    When I click on the "blog:HeaderSnippet" link
+    And I see the text "blog: Header Snippet"
+    And I see the text "Footer Snippet"
+    When I click on the "blog: Header Snippet" link
     And I fill the field "key" with "header"
     And I fill the field "title" with "Casual Blog"
     # First link
@@ -22,7 +22,7 @@ Feature: As a user, I can create and publish snippets
     And I fill the "second" field "href" with "/home/dog"
     # Submit the form
     And I click on the "Submit" button
-    Then I see the text "blog:HeaderSnippet"
+    Then I see the text "blog: Header Snippet"
     And I see the text "header"
     And I see the text "Edit"
     When I visit "/admin/pages/preview?page=%2Fhome"

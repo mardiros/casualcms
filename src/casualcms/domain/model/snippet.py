@@ -12,6 +12,7 @@ uuid = str
 
 class PublicMetadata(BaseModel):
     type: str = Field(...)
+    title: str = Field(...)
 
 
 class Snippet(BaseModel, Generic[Snippet_contra]):
@@ -42,4 +43,7 @@ class Snippet(BaseModel, Generic[Snippet_contra]):
 
     @property
     def metadata(self) -> PublicMetadata:
-        return PublicMetadata(type=self.type)
+        return PublicMetadata(
+            type=self.type,
+            title=self.snippet.__meta__.title,
+        )

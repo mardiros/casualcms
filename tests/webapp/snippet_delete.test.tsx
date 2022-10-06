@@ -18,19 +18,20 @@ describe("As a user, I can delete a snippet", () => {
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
       key: "alt-header",
-      metadata: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet", title: "Header Snippet" },
     });
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      metadata: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet", title: "Header Snippet" },
     });
   });
 
-  it("Delete a snippet", async () => {
+  it("<SnippetDeletePopoverForm />: Delete a snippet", async () => {
     const snippet = {
       key: "header",
       metadata: {
         type: "blog:HeaderSnippet",
+        title: "Header Snippet",
       },
     };
 
@@ -52,12 +53,14 @@ describe("As a user, I can delete a snippet", () => {
       {
         metadata: {
           type: "blog:HeaderSnippet",
+          title: "Header Snippet",
         },
         key: "header",
       },
       {
         metadata: {
           type: "blog:HeaderSnippet",
+          title: "Header Snippet",
         },
         key: "alt-header",
       },
@@ -71,6 +74,7 @@ describe("As a user, I can delete a snippet", () => {
       {
         metadata: {
           type: "blog:HeaderSnippet",
+          title: "Header Snippet",
         },
         key: "alt-header",
       },

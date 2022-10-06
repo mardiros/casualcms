@@ -17,11 +17,11 @@ describe("As a user, I can edit existing snippet", () => {
   after(async () => {
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      metadata: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet", title: "Header Snippet" },
     });
   });
 
-  it("Load the snippet in an edition form", async () => {
+  it("<SnippetEdit />: Load the snippet in an edition form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -45,7 +45,7 @@ describe("As a user, I can edit existing snippet", () => {
     expect(input.getAttribute("value")).equal("Casual Blog");
   });
 
-  it("Update snippet using the edition form", async () => {
+  it("<SnippetList />: Update snippet using the edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/snippets" element={<SnippetList />}></Route>

@@ -49,7 +49,7 @@ export const SnippetTypesTable: React.FunctionComponent<
               <Td>
                 <Link to={`/admin/snippets/new/${typ.type}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />
-                  {typ.type}
+                  {typ.title}
                 </Link>
               </Td>
             </Tr>

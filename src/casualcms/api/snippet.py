@@ -196,7 +196,7 @@ async def show_snippet(
     token: AuthnToken = Depends(get_token_info),
 ) -> Any:
     ret = snippet.snippet.dict()
-    ret["metadata"] = snippet.snippet.metadata
+    ret["metadata"] = snippet.metadata
     return ret
 
 

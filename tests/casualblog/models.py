@@ -59,6 +59,7 @@ class FooterSnippet(AbstractFooterSnippet):
 
     class Meta:
         template = "footer.jinja2"
+        title = "Footer Snippet"
 
 
 class RelatedPostSnippet(AbstractFooterSnippet):

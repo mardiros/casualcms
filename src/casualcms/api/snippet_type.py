@@ -32,6 +32,7 @@ def get_snippet_type(type: SnippetKey) -> SnippetType:
 
 class PartialSnippetType(BaseModel):
     type: str = Field(...)
+    title: str = Field(...)
 
 
 async def list_types(
@@ -39,7 +40,13 @@ async def list_types(
 ) -> list[PartialSnippetType]:
     stypes = list_snippet_types()
     return sorted(
-        [PartialSnippetType(type=s.__meta__.type) for s in stypes],
+        [
+            PartialSnippetType(
+                title=s.__meta__.title,
+                type=s.__meta__.type,
+            )
+            for s in stypes
+        ],
         key=lambda s: s.type,
     )
 

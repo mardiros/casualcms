@@ -7,7 +7,7 @@ import { SnippetNew } from "../../src/webapp/ui/snippets/snippet_new";
 import config from "./config";
 
 describe("As a user, I can list snippet", () => {
-  it("Create the snippet using the web form", async () => {
+  it("<SnippetNew />: Create the snippet using the web form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -36,12 +36,12 @@ describe("As a user, I can list snippet", () => {
       {
         key: "header",
         title: "Casual Blog",
-        metadata: { type: "blog:HeaderSnippet" },
+        metadata: { type: "blog:HeaderSnippet", title: "Header Snippet" },
       },
     ]);
     await config.api.snippet.deleteSnippet("", {
       key: "header",
-      metadata: { type: "blog:HeaderSnippet" },
+      metadata: { type: "blog:HeaderSnippet", title: "Header Snippet" },
     });
   });
 });

@@ -19,10 +19,22 @@ async def test_list_types(client: TestClient, authntoken: AuthnToken):
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"type": "blog:HeaderSnippet"},
-        {"type": "blog:RelatedPostSnippet"},
-        {"type": "blog:SnippetBlock"},
-        {"type": "tests.casualblog.models:FooterSnippet"},
+        {
+            "title": "blog: Header Snippet",
+            "type": "blog:HeaderSnippet",
+        },
+        {
+            "title": "blog: Related Post Snippet",
+            "type": "blog:RelatedPostSnippet",
+        },
+        {
+            "title": "blog: Snippet Block",
+            "type": "blog:SnippetBlock",
+        },
+        {
+            "title": "Footer Snippet",
+            "type": "tests.casualblog.models:FooterSnippet",
+        },
     ]
 
 

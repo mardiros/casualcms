@@ -55,6 +55,7 @@ class SnippetMeta(BaseModel):
     template: str = Field(...)
     abstract: bool = Field(...)
     type: str = Field(...)
+    title: str = Field(...)
 
 
 class SnippetMetaclass(ModelMetaclass):
@@ -63,18 +64,21 @@ class SnippetMetaclass(ModelMetaclass):
         snippet_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
+            type_ = getattr(
+                meta,
+                "type",
+                f"{namespace['__module__']}:{namespace['__qualname__']}",
+            )
             snippet_meta = SnippetMeta(
                 template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
-                type=getattr(
-                    meta,
-                    "type",
-                    f"{namespace['__module__']}:{namespace['__qualname__']}",
-                ),
+                type=type_,
+                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", type_)),
             )
             new_namespace["__meta__"] = snippet_meta
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
         if snippet_meta and not snippet_meta.abstract:
+            ret.__config__.title = snippet_meta.title  # type: ignore
             SnippetTypeList().register(ret)  # type: ignore
         return ret
 

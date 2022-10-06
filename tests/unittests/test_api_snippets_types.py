@@ -64,7 +64,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["key", "title"],
-            "title": "HeaderSnippet",
+            "title": "blog: Header Snippet",
             "type": "object",
         },
         "uiSchema": {

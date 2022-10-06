@@ -1,6 +1,10 @@
 package := 'casualcms'
 default_test_suite := 'tests/unittests'
 
+fmt: black prettier
+
+test: flake8 mypy pytest jstest functest
+
 doc:
     cd docs && poetry run make html
     xdg-open docs/build/html/index.html
@@ -17,7 +21,12 @@ prettier:
 flake8:
     poetry run flake8 && echo "$(tput setaf 10)Success: no lint issue$(tput setaf 7)"
 
-test: flake8 mypy pytest jstest functest
+mypy:
+    poetry run mypy src/ tests/
+
+black:
+    poetry run isort .
+    poetry run black .
 
 pytest test_suite=default_test_suite:
     poetry run pytest -sxv {{test_suite}}
@@ -49,13 +58,6 @@ funcdevtest: build_dev_frontend
 
 servetest:
     poetry run python tests/functionals/fixtures.py
-
-mypy:
-    poetry run mypy src/ tests/
-
-black:
-    poetry run isort .
-    poetry run black .
 
 install:
     npm ci

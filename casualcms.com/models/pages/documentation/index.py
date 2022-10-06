@@ -1,8 +1,9 @@
 from typing import Optional
+
 from pydantic import Field
+
 from casualcms.domain.model.abstract_page import AbstractPage
 from casualcms.domain.model.block import Block
-
 
 
 class Paragraph(Block):
@@ -14,7 +15,6 @@ class Paragraph(Block):
 
 
 class DocumentationHomePage(AbstractPage):
-
     class Meta:
         parent_types = ["HomePage"]
         type = "DocumentationHomePage"

@@ -1,8 +1,7 @@
+from casualcms_com.models.atoms.link import Link
 from pydantic import Field
 
 from casualcms.domain.model import AbstractSnippet
-
-from casualcms_com.models.atoms.link import Link
 
 
 class HeaderSnippet(AbstractSnippet):

@@ -1,4 +1,5 @@
 from pydantic import Field
+
 from casualcms.domain.model import Block
 
 

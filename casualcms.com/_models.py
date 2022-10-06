@@ -76,4 +76,3 @@ class DocumentationRootPage(BasePage):
         parent_types = [HomePage]
         type = "DocumentationRootPage"
         template = "documentation/index.jinja2"
-

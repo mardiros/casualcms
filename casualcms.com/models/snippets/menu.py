@@ -1,8 +1,7 @@
+from casualcms_com.models.atoms.link import Link
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AbstractSnippet
-
-from casualcms_com.models.atoms.link import Link
 
 
 class Chapter(BaseModel):

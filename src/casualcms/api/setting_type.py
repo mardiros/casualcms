@@ -10,6 +10,7 @@ from .base import get_token_info
 
 class PartialSettingType(BaseModel):
     key: str = Field(...)
+    title: str = Field(...)
 
 
 async def list_types(
@@ -17,7 +18,13 @@ async def list_types(
 ) -> list[PartialSettingType]:
     stypes = list_setting_types()
     return sorted(
-        [PartialSettingType(key=s.__meta__.key) for s in stypes],
+        [
+            PartialSettingType(
+                key=s.__meta__.key,
+                title=s.__meta__.title,
+            )
+            for s in stypes
+        ],
         key=lambda s: s.key,
     )
 

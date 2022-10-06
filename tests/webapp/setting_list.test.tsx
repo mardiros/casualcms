@@ -49,7 +49,7 @@ describe("As a user, I can list settings of a given site", () => {
             <Tbody>
               <SettingRow
                 settingUrl={"/admin/settings/.../edit"}
-                settingType={{ hostname: "www.localhost", key: "contact" }}
+                settingType={{ title: "Contact", key: "contact" }}
               />
             </Tbody>
           </Table>
@@ -58,12 +58,15 @@ describe("As a user, I can list settings of a given site", () => {
       "/admin/settingrow"
     );
 
-    let link = await screen.findByText("contact", { exact: false });
+    let link = await screen.findByText("Contact", { exact: false });
     expect(link.getAttribute("href")).equal("/admin/settings/.../edit");
   });
 
   it("<SettingsTable />: Render table if setting types are loaded", async () => {
-    const settingTypes = [{ hostname: "www.localhost", key: "blog:ff" }, { hostname: "www.localhost", key: "blog:contact" }];
+    const settingTypes = [
+      { title: "Feature Flag", key: "blog:ff" },
+      { title: "Contact", key: "blog:contact" },
+    ];
     renderWithRouter(
       <Route
         path="/admin/settings/table"
@@ -79,13 +82,13 @@ describe("As a user, I can list settings of a given site", () => {
       "/admin/settings/table"
     );
 
-    const ff = await screen.findByText("blog:ff", { exact: false });
+    const ff = await screen.findByText("Feature Flag", { exact: false });
     expect(ff.nodeName).equal("A");
     expect(ff.getAttribute("href")).equal(
       "/admin/settings/www.localhost/blog:ff/new"
     );
 
-    const contact = await screen.findByText("blog:contact", { exact: false });
+    const contact = await screen.findByText("Contact", { exact: false });
     expect(contact.nodeName).equal("A");
     expect(contact.getAttribute("href")).equal(
       "/admin/settings/www.localhost/blog:contact/edit"
@@ -97,12 +100,12 @@ describe("As a user, I can list settings of a given site", () => {
       <Route path="/admin/settings/:hostname" element={<SettingList />} />,
       "/admin/settings/www.localhost"
     );
-    const ff = await screen.findByText("blog:ff", { exact: false });
+    const ff = await screen.findByText("Feature Flag", { exact: false });
     expect(ff.getAttribute("href")).equal(
       "/admin/settings/www.localhost/blog:ff/new"
     );
 
-    const contact = await screen.findByText("blog:contact", { exact: false });
+    const contact = await screen.findByText("Contact", { exact: false });
     expect(contact.getAttribute("href")).equal(
       "/admin/settings/www.localhost/blog:contact/edit"
     );

@@ -23,7 +23,10 @@ describe("As a user, I can choose a root templates type", () => {
     expect(spinner).not.equal(null);
   });
   it("render rows per template type", async () => {
-    const tpls = [{ type: "casual:One", title: "One" }, { type: "casual:Two", title: "Two" }];
+    const tpls = [
+      { type: "casual:One", title: "One" },
+      { type: "casual:Two", title: "Two" },
+    ];
     renderWithRouter(
       <Route
         path="/admin/pages/new"

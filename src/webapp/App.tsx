@@ -1,5 +1,12 @@
 import React from "react";
-import { BrowserRouter, Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Link,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 import { theme } from "@chakra-ui/theme";
 import { AuthProvider, Login, RequireAuth } from "./ui/login/components";
@@ -46,11 +53,7 @@ const AuhtenticatedRoutes: React.FunctionComponent<{}> = () => {
           caseSensitive
         />
         <Route path="pages/edit" element={<PageEdit />} caseSensitive />
-        <Route
-          path="pages/preview"
-          element={<PagePreview />}
-          caseSensitive
-        />
+        <Route path="pages/preview" element={<PagePreview />} caseSensitive />
 
         <Route path="snippets" element={<SnippetList />} caseSensitive />
         <Route
@@ -108,7 +111,11 @@ const AppRoutes: React.FunctionComponent<{}> = () => {
 const ThemedLayout: React.FunctionComponent<{}> = () => {
   const location = useLocation();
   if (location.pathname.startsWith("/admin/pages/preview")) {
-    return <><AppRoutes /></>;
+    return (
+      <>
+        <AppRoutes />
+      </>
+    );
   }
   return (
     <ChakraProvider theme={theme}>

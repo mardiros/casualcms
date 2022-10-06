@@ -34,7 +34,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     ? new URLSearchParams({ parent: parentPath })
     : new URLSearchParams();
 
-  const toast = useToast()
+  const toast = useToast();
   React.useEffect(() => {
     async function loadPageType() {
       if (!page) {
@@ -85,12 +85,12 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     const newPage = data.formData;
     await config.api.page.updateDraft(token, page.metadata.path, newPage);
     toast({
-      title: 'Draft page saved.',
+      title: "Draft page saved.",
       description: "Don't forget to publish you changes afterall.",
-      status: 'success',
+      status: "success",
       duration: 2000,
       isClosable: true,
-    })
+    });
   };
 
   if (isLoading) {
@@ -116,7 +116,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
           validator={validator}
           // onChange={() => console.log("changed")}
           onSubmit={onsubmit}
-        // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
         />
       )}
       <PageEditButtons token={token} pagePath={pagePath} />

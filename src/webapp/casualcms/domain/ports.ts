@@ -132,12 +132,6 @@ export interface ISettingApi {
     hostname: string,
     key: string
   ): AsyncApiResult<Setting>;
-  updateSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean>;
-  deleteSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean>;
+  updateSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean>;
+  deleteSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean>;
 }

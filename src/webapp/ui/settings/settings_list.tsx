@@ -39,7 +39,7 @@ export const SettingRow: React.FunctionComponent<SettingRowProps> = (
   return (
     <Tr>
       <Td>
-        <Link to={settingUrl || "#broken"}>{settingType.key}</Link>
+        <Link to={settingUrl || "#broken"}>{settingType.title}</Link>
       </Td>
     </Tr>
   );

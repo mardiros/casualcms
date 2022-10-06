@@ -10,7 +10,7 @@ Feature: As a user, I can create a site
     And I see the text "localhost"
     When I click on the "first" link "Edit Settings"
     Then I see the text "contact"
-    And I see the text "ff"
+    And I see the text "Feature Flag"
     When I click on the "contact" link
     Then I see the text "New Setting"
 

@@ -18,7 +18,10 @@ async def test_list_types(client: TestClient, authntoken: AuthnToken):
         },
     )
     assert resp.status_code == 200
-    assert resp.json() == [{"key": "contact"}, {"key": "ff"}]
+    assert resp.json() == [
+        {"key": "contact", "title": "contact"},
+        {"key": "ff", "title": "Feature Flag"},
+    ]
 
 
 async def test_get_type_403(client: TestClient):

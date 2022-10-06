@@ -29,7 +29,8 @@ export const PageDeletePopoverForm: React.FunctionComponent<
     if (confirmed) {
       const nextPath =
         curPage.metadata.breadcrumb.length >= 2
-          ? curPage.metadata.breadcrumb[curPage.metadata.breadcrumb.length - 2].path
+          ? curPage.metadata.breadcrumb[curPage.metadata.breadcrumb.length - 2]
+              .path
           : "";
       const qs = nextPath
         ? new URLSearchParams({

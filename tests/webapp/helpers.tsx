@@ -26,14 +26,14 @@ export function FakeAuth(props: FakeAuthProps): React.ReactElement {
     props.isAuthenticated === false
       ? null
       : {
-        id: "123",
-        username: "bob",
-        token: "abc",
-        lang: "en",
-      };
+          id: "123",
+          username: "bob",
+          token: "abc",
+          lang: "en",
+        };
 
   let [authenticatedUser, setUser] = React.useState<Account | null>(account);
-  let remember = (account: Account, callback: any) => { };
+  let remember = (account: Account, callback: any) => {};
   let forget = async (callback: () => Promise<boolean>) => {
     setUser(null);
     await callback();
@@ -119,7 +119,6 @@ export const renderWithRouter = async (
   );
   return ret;
 };
-
 
 /** Rendering the Chackra Provider is slow, so, use int for compontents
  * that requires it, such as toastee.

@@ -55,9 +55,7 @@ describe("As a user, I can delete a setting", () => {
       <>
         <Route
           path="/admin/settings/:hostname/:key"
-          element={
-            <SettingDeletePopoverForm curSetting={setting} />
-          }
+          element={<SettingDeletePopoverForm curSetting={setting} />}
         />
         <Route
           path="/admin/settings/:hostname"

@@ -54,11 +54,7 @@ export const SideBar: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <Box
-      minWidth={250}
-      height="calc(100vh - 90px)"
-      color="white"
-    >
+    <Box minWidth={250} height="calc(100vh - 90px)" color="white">
       <SimpleGrid columns={1} spacing={1}>
         <SideBarItem colors={pagesColor} href="/admin/pages" title="Pages" />
         <SideBarItem

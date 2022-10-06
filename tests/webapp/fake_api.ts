@@ -148,7 +148,9 @@ class FakePageApi implements IPageApi {
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
         const pathLen = page.metadata.path.split("/").length;
-        return page.metadata.path.startsWith(starter) && pathLen == startLen + 1;
+        return (
+          page.metadata.path.startsWith(starter) && pathLen == startLen + 1
+        );
       })
       .map((page) =>
         pages.push({
@@ -455,7 +457,10 @@ export class FakeSettingApi implements ISettingApi {
   ): AsyncApiResult<boolean> {
     const settings: Setting[] = [];
     this.settings.map((s) => {
-      if (s.metadata.hostname != s.metadata.hostname || s.metadata.key != setting.metadata.key) {
+      if (
+        s.metadata.hostname != s.metadata.hostname ||
+        s.metadata.key != setting.metadata.key
+      ) {
         settings.push(s);
       }
     });
@@ -483,8 +488,8 @@ export class FakeSettingTypeApi implements ISettingTypeApi {
     authntoken: string
   ): AsyncApiResult<PartialSettingType[]> {
     return ok([
-      { hostname: "www", key: "blog:ff" },
-      { hostname: "www", key: "blog:contact" },
+      { title: "Feature Flags", key: "blog:ff" },
+      { title: "Contact", key: "blog:contact" },
     ]);
   }
   async showSettingType(

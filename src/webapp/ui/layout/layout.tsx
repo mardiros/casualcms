@@ -22,7 +22,7 @@ export const Layout: React.FunctionComponent<LayoutProps> = (
       <Box w="100%" bg="cyan.800" minH="calc(100vh - 90px)" color="cyan.900">
         <Flex>
           <SideBar />
-          <Box  bg="cyan.200" flex="1" padding={4}>
+          <Box bg="cyan.200" flex="1" padding={4}>
             {props.routes}
           </Box>
         </Flex>

@@ -62,7 +62,7 @@ describe("As a user, I can list setting", () => {
       {
         metadata: {
           hostname: "www.localhost",
-          key: "blog:contact"
+          key: "blog:contact",
         },
       },
     ]);
@@ -75,7 +75,7 @@ describe("As a user, I can list setting", () => {
       email: "bob@example.net",
       metadata: {
         hostname: "www.localhost",
-        key: "blog:contact"
+        key: "blog:contact",
       },
     });
   });

@@ -88,6 +88,7 @@ class HomePage(BasePage):
         parent_types = None
         template = "homepage.jinja2"
         type = "blog:HomePage"
+        title = "🏠 Home Page"
 
 
 class CategoryPage(BasePage):

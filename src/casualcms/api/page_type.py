@@ -10,6 +10,7 @@ from .base import get_token_info
 
 class PartialPageType(BaseModel):
     type: str = Field(...)
+    title: str = Field(...)
 
 
 async def list_templates(
@@ -18,7 +19,14 @@ async def list_templates(
 ) -> list[PartialPageType]:
     ptypes = get_available_subtypes(type)
     return sorted(
-        [PartialPageType(type=p.__meta__.type) for p in ptypes], key=lambda x: x.type
+        [
+            PartialPageType(
+                type=p.__meta__.type,
+                title=p.__meta__.title,
+            )
+            for p in ptypes
+        ],
+        key=lambda x: x.type,
     )
 
 

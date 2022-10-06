@@ -22,7 +22,7 @@ async def test_list_page_types(client: TestClient, authntoken: AuthnToken):
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"type": "blog:HomePage"},
+        {"title": "🏠 Home Page", "type": "blog:HomePage"},
     ]
 
 
@@ -37,8 +37,8 @@ async def test_list_page_types_for_childs(client: TestClient, authntoken: AuthnT
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"type": "blog:CategoryPage"},
-        {"type": "blog:SectionPage"},
+        {"title": "blog: Category Page", "type": "blog:CategoryPage"},
+        {"title": "blog: Section Page", "type": "blog:SectionPage"},
     ]
 
 
@@ -94,7 +94,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["slug", "title", "description", "hero_title"],
-            "title": "blog: Home Page",
+            "title": "🏠 Home Page",
             "type": "object",
         },
         "uiSchema": {

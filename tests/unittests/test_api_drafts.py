@@ -153,7 +153,8 @@ async def test_api_list_root_draft_pages(
             "title": draft_hp.title,
             "metadata": {
                 "path": draft_hp.path,
-                "type": draft_hp.type,
+                "type": draft_hp.page.__meta__.type,
+                "title": draft_hp.page.__meta__.title,
             },
         }
     ]

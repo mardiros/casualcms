@@ -43,8 +43,17 @@ export const PageRow: React.FunctionComponent<PageRowProps> = (
   const page = props.page;
   return (
     <Tr>
-      <Td>{page.slug}</Td>
+      <Td>
+        <Link
+          to={`/admin/pages/edit?${new URLSearchParams({
+            page: page.metadata.path,
+          })}`}
+        >
+          {page.slug}
+        </Link>
+      </Td>
       <Td>{page.title}</Td>
+      <Td>{page.metadata.title}</Td>
       <Td>
         <Link
           to={`/admin/pages/edit?${new URLSearchParams({
@@ -165,6 +174,7 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
             <Tr>
               <Th>Slug</Th>
               <Th>Title</Th>
+              <Th>Type</Th>
               <Th>Edit</Th>
               <Th>View</Th>
               <Th>Childs</Th>

@@ -128,8 +128,13 @@ class FakePageApi implements IPageApi {
     payload: any,
     parent: string | null
   ): AsyncApiResult<boolean> {
+    const titles: Record<string, string> = {
+      "casual:HomePage": "Home Page",
+      "casual:SectionPage": "Section Page",
+    };
     payload["metadata"] = {
       type: type,
+      title: titles[type],
       path: `${parent || ""}/${payload.slug}`,
       breadcrumb: [],
     };
@@ -160,6 +165,7 @@ class FakePageApi implements IPageApi {
           metadata: {
             path: page.metadata.path,
             type: page.metadata.type,
+            title: page.metadata.title,
           },
         })
       );

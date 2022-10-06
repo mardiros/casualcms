@@ -61,13 +61,14 @@ describe("As a user, I can list pages", () => {
     await config.api.page.deleteDraft("", "/root");
   });
 
-  it("Render a row for a page", async () => {
+  it("<PageRow /> Render a row for a page", async () => {
     const page = {
       slug: "home",
       title: "Home Page",
       metadata: {
         path: "/home",
         type: "casual:HomePage",
+        title: "Home Page Type",
       },
     };
     renderWithRouter(
@@ -85,7 +86,14 @@ describe("As a user, I can list pages", () => {
     );
     await waitForLoadingLabel("Loading pages list");
 
-    let link = screen.getByText("Edit", { exact: false });
+    let link = screen.getByRole("link", { name: "home" });
+    expect(link).not.equal(undefined);
+    expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
+
+    const type = screen.getByText("Home Page Type", { exact: false });
+    expect(type).not.equal(undefined);
+
+    link = screen.getByText("Edit", { exact: false });
     expect(link).not.equal(undefined);
     expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
 
@@ -100,7 +108,7 @@ describe("As a user, I can list pages", () => {
     expect(link.getAttribute("href")).equal("/admin/pages/?parent=%2Fhome");
   });
 
-  it("Render root pages table from the API", async () => {
+  it("<PageListTable />: Render root pages table from the API", async () => {
     renderWithRouter(
       <Route
         path="/admin/pages"
@@ -121,7 +129,7 @@ describe("As a user, I can list pages", () => {
     expect(links.length).equal(3);
   });
 
-  it("Render sub pages table from the API", async () => {
+  it("<PageListTable />: Render sub pages table from the API", async () => {
     renderWithRouter(
       <Route
         path="/admin/pages"
@@ -141,7 +149,7 @@ describe("As a user, I can list pages", () => {
     expect(links.length).equal(3);
   });
 
-  it("Redirect to the new page while clicking on the add button", async () => {
+  it("<PageListButtons />: Redirect to the new page while clicking on the add button", async () => {
     const page = {
       metadata: {
         path: "/home",
@@ -169,7 +177,7 @@ describe("As a user, I can list pages", () => {
     expect(newPage.nodeName).equal("H4");
   });
 
-  it("Render a delete button if there is no child pages", async () => {
+  it("<PageListButtons />: Render a delete button if there is no child pages", async () => {
     const page = {
       metadata: {
         path: "/home/sub1",
@@ -218,6 +226,7 @@ describe("As a user, I can list pages", () => {
         metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
+          title: "Section Page",
         },
         slug: "sub0",
         title: "Section Page",

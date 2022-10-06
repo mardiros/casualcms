@@ -7,7 +7,7 @@ import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
 import config from "./config";
 
 describe("As a user, I can create the root page", () => {
-  it("Create the root page from the web form", async () => {
+  it("<PageNew />: Create the root page from the web form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -45,6 +45,7 @@ describe("As a user, I can create the root page", () => {
         metadata: {
           path: "/home",
           type: "casual:HomePage",
+          title: "Home Page",
         },
         slug: "home",
         title: "Welcome Home",

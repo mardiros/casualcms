@@ -45,7 +45,7 @@ describe("As a user, I can delete a page", () => {
     await config.api.page.deleteDraft("", "/home");
   });
 
-  it("Delete a page", async () => {
+  it("<PageDeletePopoverForm />: Delete a page", async () => {
     const page = {
       slug: "sub1",
       title: "Section Page",
@@ -87,6 +87,7 @@ describe("As a user, I can delete a page", () => {
         metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
+          title: "Section Page",
         },
         slug: "sub0",
         title: "Section Page",
@@ -95,6 +96,7 @@ describe("As a user, I can delete a page", () => {
         metadata: {
           path: "/home/sub1",
           type: "casual:SectionPage",
+          title: "Section Page",
         },
         slug: "sub1",
         title: "Another Section Page",
@@ -110,6 +112,7 @@ describe("As a user, I can delete a page", () => {
         metadata: {
           path: "/home/sub0",
           type: "casual:SectionPage",
+          title: "Section Page",
         },
         slug: "sub0",
         title: "Section Page",

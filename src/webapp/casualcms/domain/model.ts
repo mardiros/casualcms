@@ -21,6 +21,7 @@ export type PageType = {
 export type PartialPageMeta = {
   path: string;
   type: string;
+  title: string;
 };
 
 export type PartialDraft = {

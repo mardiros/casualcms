@@ -25,6 +25,7 @@ from .base import (
 class PartialPageMeta(BaseModel):
     path: str = Field(...)
     type: str = Field(...)
+    title: str = Field(...)
 
 
 class PartialPage(BaseModel):
@@ -132,6 +133,7 @@ async def list_drafts(
             metadata=PartialPageMeta(
                 path=p.path,
                 type=p.type,
+                title=p.page.__meta__.title,
             ),
         )
         for p in ps

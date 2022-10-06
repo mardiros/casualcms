@@ -23,7 +23,7 @@ describe("As a user, I can choose a root templates type", () => {
     expect(spinner).not.equal(null);
   });
   it("render rows per template type", async () => {
-    const tpls = [{ type: "casual:One" }, { type: "casual:Two" }];
+    const tpls = [{ type: "casual:One", title: "One" }, { type: "casual:Two", title: "Two" }];
     renderWithRouter(
       <Route
         path="/admin/pages/new"
@@ -37,9 +37,9 @@ describe("As a user, I can choose a root templates type", () => {
       />,
       "/admin/pages/new"
     );
-    let link = screen.getByText("casual:One");
+    let link = screen.getByText("One");
     expect(link.getAttribute("href")).equal("/admin/pages/new/casual:One");
-    link = screen.getByText("casual:Two");
+    link = screen.getByText("Two");
     expect(link.getAttribute("href")).equal("/admin/pages/new/casual:Two");
   });
 
@@ -51,13 +51,13 @@ describe("As a user, I can choose a root templates type", () => {
           <PageTypesTable
             isLoading={false}
             parentPath="/home"
-            pageTypes={[{ type: "casual:One" }]}
+            pageTypes={[{ title: "One", type: "casual:One" }]}
           />
         }
       />,
       "/admin/pages/new"
     );
-    let link = screen.getByText("casual:One");
+    let link = screen.getByText("One");
     expect(link.getAttribute("href")).equal(
       "/admin/pages/new/casual:One?parent=%2Fhome"
     );
@@ -69,7 +69,7 @@ describe("As a user, I can choose a root templates type", () => {
       "/admin/pages/new"
     );
     await waitForLoadingLabel("loading page types...");
-    const tpl = screen.getByText("casual:HomePage");
+    const tpl = screen.getByText("Home Page");
     expect(tpl).not.equal(null);
   });
 });

@@ -9,6 +9,7 @@ export type Account = {
 
 export type PartialPageType = {
   type: string;
+  title: string;
 };
 
 export type PageType = {

@@ -9,12 +9,12 @@ Feature: As a user, I can create and publish new pages
     Then I see the text "Create my first page"
     When I click on the "Create my first page" link
     Then I see the text "Choose A Type Of Page"
-    And I see the text "blog:HomePage"
+    And I see the text "Home Page"
 
   Scenario: Create new page
     Given user on the admin page
     When I click on the "Create my first page" link
-    And I click on the "blog:HomePage" link
+    And I click on the "Home Page" link
     And I fill the field "slug" with "home"
     And I fill the field "title" with "welcome home"
     And I fill the field "hero_title" with "welcome home"

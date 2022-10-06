@@ -59,6 +59,7 @@ class FakePageTypeApi implements IPageTypeApi {
     return ok([
       {
         type: parentType ? "casual:Page" : "casual:HomePage",
+        title: parentType ? "Page" : "Home Page",
       },
     ]);
   }

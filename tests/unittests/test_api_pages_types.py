@@ -94,7 +94,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["slug", "title", "description", "hero_title"],
-            "title": "HomePage",
+            "title": "blog: Home Page",
             "type": "object",
         },
         "uiSchema": {

@@ -15,7 +15,6 @@ class Paragraph(Block):
 
 class DocumentationHomePage(AbstractPage):
 
-
     class Meta:
         parent_types = ["HomePage"]
         type = "DocumentationHomePage"

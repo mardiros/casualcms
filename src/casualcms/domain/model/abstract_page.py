@@ -72,6 +72,7 @@ class PageMeta(BaseModel):
     parent_types: Optional[Iterable[PageType]] = Field(...)
     abstract: bool = Field(...)
     type: str = Field(...)
+    title: str = Field(...)
 
 
 class PageMetaclass(ModelMetaclass):
@@ -80,20 +81,30 @@ class PageMetaclass(ModelMetaclass):
         page_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
+            type_ = getattr(
+                meta,
+                "type",
+                f"{namespace['__module__']}:{namespace['__qualname__']}",
+            )
             page_meta = PageMeta(
                 template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
                 parent_types=getattr(meta, "parent_types", []),
-                type=getattr(
-                    meta,
-                    "type",
-                    f"{namespace['__module__']}:{namespace['__qualname__']}",
-                ),
+                type=type_,
+                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", type_)),
             )
+
             new_namespace["__meta__"] = page_meta
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
-        if page_meta and not page_meta.abstract:
-            TypeTree().register(ret, page_meta.parent_types or None)  # type: ignore
+        if page_meta:
+            # inject jsonschema title in pydantic config here
+            ret.__config__.title = page_meta.title  # type: ignore
+            if not page_meta.abstract:
+                TypeTree().register(
+                    # ret is a metaclass for pylance
+                    ret,  # type: ignore
+                    page_meta.parent_types or None,
+                )
 
         return ret
 

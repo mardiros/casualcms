@@ -16,6 +16,7 @@ class Box(Block):
 
     class Meta:
         template = "box.jinja2"
+        title = "Paragraph in box"
 
 
 class HeaderSnippet(AbstractSnippet):

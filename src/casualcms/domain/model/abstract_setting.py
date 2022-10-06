@@ -1,3 +1,4 @@
+import re
 from typing import Any, Mapping, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, Field
@@ -49,6 +50,7 @@ class AbstractSettingError(Exception):
 class SettingMeta(BaseModel):
     abstract: bool = Field(...)
     key: str = Field(...)
+    title: str = Field(...)
 
 
 class SettingMetaclass(ModelMetaclass):
@@ -57,9 +59,11 @@ class SettingMetaclass(ModelMetaclass):
         setting_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
+            key = getattr(meta, "key", f"{namespace['__module__']}:{name}")
             setting_meta = SettingMeta(
                 abstract=getattr(meta, "abstract", False),
-                key=getattr(meta, "key", f"{namespace['__module__']}:{name}"),
+                key=key,
+                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", key)),
             )
             new_namespace["__meta__"] = setting_meta
         else:
@@ -67,8 +71,10 @@ class SettingMetaclass(ModelMetaclass):
                 f"Meta class is missing for setting {namespace['__module__']}:{name}"
             )
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
-        if setting_meta and not setting_meta.abstract:
-            SettingTypeList().register(ret)  # type: ignore
+        if setting_meta:
+            ret.__config__.title = setting_meta.title  # type: ignore
+            if not setting_meta.abstract:
+                SettingTypeList().register(ret)  # type: ignore
         return ret
 
 

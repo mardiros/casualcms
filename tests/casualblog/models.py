@@ -33,6 +33,7 @@ class FeatureFlagSetting(AbstractSetting):
 
     class Meta:
         key = "ff"
+        title = "Feature Flag"
 
 
 class MyAbstractSetting(AbstractSetting):

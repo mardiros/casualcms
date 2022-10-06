@@ -46,7 +46,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
                     "default": False,
                 },
             },
-            "title": "FeatureFlagSetting",
+            "title": "Feature Flag",
             "type": "object",
         },
         "uiSchema": {

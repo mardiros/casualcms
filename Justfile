@@ -1,5 +1,6 @@
 package := 'casualcms'
 default_test_suite := 'tests/unittests'
+default_functest_suite := 'tests/functionals/'
 
 fmt: black prettier
 
@@ -50,8 +51,8 @@ cov test_suite=default_test_suite:
     poetry run pytest --cov-report=html --cov={{package}} {{test_suite}}
     xdg-open htmlcov/index.html
 
-functest: build_dev_frontend
-    poetry run behave --tags=-dev --no-capture tests/functionals/
+functest test_suite=default_functest_suite: build_dev_frontend
+    poetry run behave --tags=-dev --no-capture {{test_suite}}
 
 funcdevtest: build_dev_frontend
     poetry run behave --tags=dev --no-capture tests/functionals/

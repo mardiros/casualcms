@@ -5,6 +5,8 @@ from pydantic import BaseModel, Field
 from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
+from casualcms.domain.exceptions import MissingMetaError
+
 uuid = str
 SettingType = Type["AbstractSetting"]
 
@@ -39,10 +41,6 @@ def resolve_setting_type(key: str) -> SettingType:
     return SettingTypeList().resolve_type(key)
 
 
-class MissingMetaSettingError(Exception):
-    ...
-
-
 class AbstractSettingError(Exception):
     ...
 
@@ -56,20 +54,24 @@ class SettingMeta(BaseModel):
 class SettingMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
+        short_name = f"{namespace['__qualname__']}"
+        long_name = f"{namespace['__module__']}:{short_name}"
         setting_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
-            key = getattr(meta, "key", f"{namespace['__module__']}:{name}")
+            key = getattr(meta, "key", long_name)
             setting_meta = SettingMeta(
                 abstract=getattr(meta, "abstract", False),
                 key=key,
-                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", key)),
+                title=getattr(
+                    meta,
+                    "title",
+                    re.sub("([A-Z])", r" \g<0>", short_name).strip(),
+                ),
             )
             new_namespace["__meta__"] = setting_meta
         else:
-            raise MissingMetaSettingError(
-                f"Meta class is missing for setting {namespace['__module__']}:{name}"
-            )
+            raise MissingMetaError(long_name)
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
         if setting_meta:
             ret.__config__.title = setting_meta.title  # type: ignore

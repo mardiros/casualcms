@@ -44,7 +44,7 @@ async def test_api_create_snippet(
         "key": "header",
         "metadata": {
             "type": "blog:HeaderSnippet",
-            "title": "blog: Header Snippet",
+            "title": "Header Snippet",
         },
     }
     async with uow as uow:
@@ -136,7 +136,7 @@ async def test_api_list_snippet(
         {
             "metadata": {
                 "type": "blog:HeaderSnippet",
-                "title": "blog: Header Snippet",
+                "title": "Header Snippet",
             },
             "key": "alt-header",
         },
@@ -150,7 +150,7 @@ async def test_api_list_snippet(
         {
             "metadata": {
                 "type": "blog:HeaderSnippet",
-                "title": "blog: Header Snippet",
+                "title": "Header Snippet",
             },
             "key": "header",
         },
@@ -175,14 +175,14 @@ async def test_api_list_snippet_filter(
         {
             "metadata": {
                 "type": "blog:HeaderSnippet",
-                "title": "blog: Header Snippet",
+                "title": "Header Snippet",
             },
             "key": "alt-header",
         },
         {
             "metadata": {
                 "type": "blog:HeaderSnippet",
-                "title": "blog: Header Snippet",
+                "title": "Header Snippet",
             },
             "key": "header",
         },
@@ -225,7 +225,7 @@ async def test_api_patch_snippet(
     assert resp.json() == {
         "metadata": {
             "type": "blog:HeaderSnippet",
-            "title": "blog: Header Snippet",
+            "title": "Header Snippet",
         },
         "key": "new-key",
     }
@@ -297,7 +297,7 @@ async def test_api_get_snippet(
         ],
         "metadata": {
             "type": "blog:HeaderSnippet",
-            "title": "blog: Header Snippet",
+            "title": "Header Snippet",
         },
         "key": "header",
         "title": "A personal blog",

@@ -37,8 +37,8 @@ async def test_list_page_types_for_childs(client: TestClient, authntoken: AuthnT
     )
     assert resp.status_code == 200
     assert resp.json() == [
-        {"title": "blog: Category Page", "type": "blog:CategoryPage"},
-        {"title": "blog: Section Page", "type": "blog:SectionPage"},
+        {"title": "Category Page", "type": "blog:CategoryPage"},
+        {"title": "Section Page", "type": "blog:SectionPage"},
     ]
 
 

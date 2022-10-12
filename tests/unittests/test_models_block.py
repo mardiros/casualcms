@@ -25,7 +25,7 @@ from tests.casualblog.models import BlockInSnippet, Box
             "expected_schema": {
                 "properties": {"title": {"title": "Title", "type": "string"}},
                 "required": ["title"],
-                "title": "tests.casualblog.models: Block In Snippet",
+                "title": "Block In Snippet",
                 "type": "object",
             },
         },

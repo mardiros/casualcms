@@ -8,6 +8,8 @@ from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
+from casualcms.domain.exceptions import MissingMetaError
+
 
 class Slug(ConstrainedStr):
     regex = re.compile("^[^/]+$")
@@ -78,34 +80,35 @@ class PageMeta(BaseModel):
 class PageMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
+        short_name = f"{namespace['__qualname__']}"
+        long_name = f"{namespace['__module__']}:{short_name}"
         page_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
-            type_ = getattr(
-                meta,
-                "type",
-                f"{namespace['__module__']}:{namespace['__qualname__']}",
-            )
+            type_ = getattr(meta, "type", long_name)
             page_meta = PageMeta(
                 template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
                 parent_types=getattr(meta, "parent_types", []),
                 type=type_,
-                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", type_)),
+                title=getattr(
+                    meta,
+                    "title",
+                    re.sub("([A-Z])", r" \g<0>", short_name).strip(),
+                ),
             )
-
             new_namespace["__meta__"] = page_meta
+        else:
+            raise MissingMetaError(long_name)
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
-        if page_meta:
-            # inject jsonschema title in pydantic config here
-            ret.__config__.title = page_meta.title  # type: ignore
-            if not page_meta.abstract:
-                TypeTree().register(
-                    # ret is a metaclass for pylance
-                    ret,  # type: ignore
-                    page_meta.parent_types or None,
-                )
-
+        # inject jsonschema title in pydantic config here
+        ret.__config__.title = page_meta.title  # type: ignore
+        if not page_meta.abstract:
+            TypeTree().register(
+                # ret is a metaclass for pylance
+                ret,  # type: ignore
+                page_meta.parent_types or None,
+            )
         return ret
 
 

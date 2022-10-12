@@ -9,9 +9,9 @@ Feature: As a user, I can create a site
     Then I see the text "127.0.0.1:6556"
     And I see the text "localhost"
     When I click on the "first" link "Edit Settings"
-    Then I see the text "contact"
+    Then I see the text "Contact Setting"
     And I see the text "Feature Flag"
-    When I click on the "contact" link
+    When I click on the "Contact Setting" link
     Then I see the text "New Setting"
 
   Scenario: Create a Setting
@@ -23,7 +23,7 @@ Feature: As a user, I can create a site
     Then I see the text "New Setting"
     When I fill the field "email" with "bob@alice.net"
     And I click on the "Submit" button
-    When I click on the "contact" link
+    When I click on the "Contact Setting" link
     Then I see the text "Edit Setting"
     And the setting "contact" on "localhost" contains
       | email         |

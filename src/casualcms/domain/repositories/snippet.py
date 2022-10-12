@@ -3,7 +3,7 @@ import abc
 import enum
 from typing import Any, Optional, Sequence
 
-from casualcms.domain.model.abstract_snippet import Snippet_contra
+from casualcms.domain.model import Snippet_contra
 
 from ..model import Snippet
 from .base import AbstractRepository, OperationResult, RepositoryResult

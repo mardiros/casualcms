@@ -7,6 +7,8 @@ from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
+from casualcms.domain.exceptions import MissingMetaError
+
 SnippetType = Type["AbstractSnippet"]
 
 
@@ -61,21 +63,25 @@ class SnippetMeta(BaseModel):
 class SnippetMetaclass(ModelMetaclass):
     def __new__(mcls, name, bases, namespace, **kwargs):  # type: ignore
         new_namespace = {**namespace}
+        short_name = f"{namespace['__qualname__']}"
+        long_name = f"{namespace['__module__']}:{short_name}"
         snippet_meta = None
         if "Meta" in namespace:
             meta = cast(object, namespace.pop("Meta"))
-            type_ = getattr(
-                meta,
-                "type",
-                f"{namespace['__module__']}:{namespace['__qualname__']}",
-            )
+            type_ = getattr(meta, "type", long_name)
             snippet_meta = SnippetMeta(
                 template=getattr(meta, "template", ""),
                 abstract=getattr(meta, "abstract", False),
                 type=type_,
-                title=getattr(meta, "title", re.sub("([A-Z])", r" \g<0>", type_)),
+                title=getattr(
+                    meta,
+                    "title",
+                    re.sub("([A-Z])", r" \g<0>", short_name).strip(),
+                ),
             )
             new_namespace["__meta__"] = snippet_meta
+        else:
+            raise MissingMetaError(long_name)
         ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
         if snippet_meta and not snippet_meta.abstract:
             ret.__config__.title = snippet_meta.title  # type: ignore

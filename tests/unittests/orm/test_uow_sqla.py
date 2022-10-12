@@ -673,6 +673,7 @@ async def test_snippet_list(
     rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list()
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
+    assert {s.id: s.key for s in snips} == {s.id: s.key for s in snippets}
     sk = [s.key for s in snips]
     assert sk == ["snip-it", "snip-that", "snip-this"]
 

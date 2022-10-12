@@ -1,3 +1,4 @@
+import logging
 from typing import Any, MutableMapping, Optional, Sequence, cast
 
 from fastapi import Body, Depends, HTTPException, Request, Response
@@ -24,6 +25,8 @@ from casualcms.domain.repositories.snippet import (
 )
 
 from .base import MappingWithKey, get_token_info
+
+log = logging.getLogger(__name__)
 
 
 def get_snippet_type_body(type: SnippetKey = Body(...)) -> SnippetType:
@@ -105,7 +108,7 @@ async def get_new_validated_payload(
         rtype = resolve_snippet_type(snippet.type)
         if rtype.is_err():
             raise HTTPException(
-                status_code=500,
+                status_code=422,
                 detail=[
                     {
                         "loc": ["path", "key"],
@@ -179,8 +182,8 @@ async def list_snippets(
             status_code=500,
             detail=[{"msg": "Internal Server Error"}],
         )
-    snips = snippets.unwrap()
 
+    snips = snippets.unwrap()
     return [
         PartialSnippet(
             key=s.key,

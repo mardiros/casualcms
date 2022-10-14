@@ -1,6 +1,6 @@
 import React from "react";
 import validator from "@rjsf/validator-ajv6";
-import { Box, Heading, useToast } from "@chakra-ui/react";
+import { Box, Heading, Stack, useToast } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useSearchParams } from "react-router-dom";
@@ -98,7 +98,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       {page && (
         <>
           <Heading>{page.title}</Heading>
@@ -107,19 +107,22 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       )}
 
       <ApiErrorUI error={error} />
-
-      {pageType && page && (
-        <Form
-          schema={pageType.schema}
-          uiSchema={pageType.uiSchema}
-          formData={page}
-          validator={validator}
-          // onChange={() => console.log("changed")}
-          onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
-        />
-      )}
-      <PageEditButtons token={token} pagePath={pagePath} />
+      <Box maxW="720px">
+        {pageType && page && (
+          <Form
+            schema={pageType.schema}
+            uiSchema={pageType.uiSchema}
+            formData={page}
+            validator={validator}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
+            // onError={() => console.log("errors")}
+          />
+        )}
+      </Box>
+      <Stack paddingTop={5} direction="row" align="right">
+        <PageEditButtons token={token} pagePath={pagePath} />
+      </Stack>
     </Box>
   );
 };

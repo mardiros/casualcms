@@ -87,58 +87,60 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
 
   return (
     site && (
-      <Box maxW="720px">
+      <Box minW="720px">
         <SiteBreadcrumb site={site} />
         <Heading>Edit Site</Heading>
         {/* {<SiteBreadcrumb title="new page" />} */}
         <ApiErrorUI error={error} />
-        <form onSubmit={handleSubmit}>
-          <FormControl>
-            <FormLabel>Hostname</FormLabel>
-            <Input
-              type="text"
-              name="hostname"
-              placeholder="hostname"
-              defaultValue={site.hostname}
-            />
-            <FormHelperText>Hostname for this site.</FormHelperText>
-          </FormControl>
-          <FormControl>
-            <FormLabel>Root Page</FormLabel>
-            <Input
-              type="text"
-              name="root_page_path"
-              placeholder="/index"
-              defaultValue={site.root_page_path}
-            />
-            <FormHelperText>
-              Path of the page, that will be the index page for this site (paged
-              used for /).
-            </FormHelperText>
-          </FormControl>
-          <FormControl>
-            <Checkbox name="default" value="true" defaultChecked={site.default}>
-              Default
-            </Checkbox>
-            <FormHelperText>
-              If no site match, fallback to this one.
-            </FormHelperText>
-          </FormControl>
-          <FormControl>
-            <Checkbox name="secure" value="true" defaultChecked={site.secure}>
-              Secure
-            </Checkbox>
-            <FormHelperText>Use https.</FormHelperText>
-          </FormControl>
-          <FormControl>
-            <Stack p={4} spacing={4} direction="row" align="right">
-              <Button type="submit" colorScheme="cyan">
-                Submit
-              </Button>
-              <SiteDeletePopoverForm curSite={site} />
-            </Stack>
-          </FormControl>
-        </form>
+        <Box maxW="720px">
+          <form onSubmit={handleSubmit}>
+            <FormControl>
+              <FormLabel>Hostname</FormLabel>
+              <Input
+                type="text"
+                name="hostname"
+                placeholder="hostname"
+                defaultValue={site.hostname}
+              />
+              <FormHelperText>Hostname for this site.</FormHelperText>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Root Page</FormLabel>
+              <Input
+                type="text"
+                name="root_page_path"
+                placeholder="/index"
+                defaultValue={site.root_page_path}
+              />
+              <FormHelperText>
+                Path of the page, that will be the index page for this site (paged
+                used for /).
+              </FormHelperText>
+            </FormControl>
+            <FormControl>
+              <Checkbox name="default" value="true" defaultChecked={site.default}>
+                Default
+              </Checkbox>
+              <FormHelperText>
+                If no site match, fallback to this one.
+              </FormHelperText>
+            </FormControl>
+            <FormControl>
+              <Checkbox name="secure" value="true" defaultChecked={site.secure}>
+                Secure
+              </Checkbox>
+              <FormHelperText>Use https.</FormHelperText>
+            </FormControl>
+            <FormControl>
+              <Stack p={4} spacing={4} direction="row" align="right">
+                <Button type="submit" colorScheme="cyan">
+                  Submit
+                </Button>
+                <SiteDeletePopoverForm curSite={site} />
+              </Stack>
+            </FormControl>
+          </form>
+        </Box>
       </Box>
     )
   );

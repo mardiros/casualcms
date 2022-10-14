@@ -86,21 +86,23 @@ export const PageNew: React.FunctionComponent<{}> = () => {
 
   const data = {};
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <Heading>New Page</Heading>
       {parentPage && <PageBreadcrumb page={parentPage} title="new page" />}
       <ApiErrorUI error={error} />
-      {pageType && (
-        <Form
-          schema={pageType.schema}
-          uiSchema={pageType.uiSchema}
-          formData={data}
-          validator={validator}
-          // onChange={() => console.log("changed")}
-          onSubmit={onsubmit}
+      <Box maxW="720px">
+        {pageType && (
+          <Form
+            schema={pageType.schema}
+            uiSchema={pageType.uiSchema}
+            formData={data}
+            validator={validator}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
           // onError={() => console.log("errors")}
-        />
-      )}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

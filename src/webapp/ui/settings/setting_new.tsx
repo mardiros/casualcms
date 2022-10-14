@@ -64,22 +64,24 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
 
   const data = {};
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <SettingBreadcrumb hostname={hostname} title={settingKey} />
       <Heading>New Setting</Heading>
       {/* <SettingBreadcrumb title="new setting" /> */}
       <ApiErrorUI error={error} />
-      {settingType && (
-        <Form
-          schema={settingType.schema}
-          uiSchema={settingType.uiSchema}
-          formData={data}
-          validator={validator}
-          // onChange={() => console.log("changed")}
-          onSubmit={onsubmit}
+      <Box maxW="720px">
+        {settingType && (
+          <Form
+            schema={settingType.schema}
+            uiSchema={settingType.uiSchema}
+            formData={data}
+            validator={validator}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
           // onError={() => console.log("errors")}
-        />
-      )}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

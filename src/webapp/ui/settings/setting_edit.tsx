@@ -1,6 +1,6 @@
 import React from "react";
 import validator from "@rjsf/validator-ajv6";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, Stack } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useParams } from "react-router-dom";
@@ -89,25 +89,29 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
   };
 
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <SettingBreadcrumb hostname={hostname} title={settingKey} />
       <Heading>Edit Setting</Heading>
       {/* <SettingBreadcrumb setting={setting} /> */}
       <ApiErrorUI error={error} />
-      {setting && settingType && (
-        <>
-          <Form
-            schema={settingType.schema}
-            uiSchema={settingType.uiSchema}
-            formData={setting}
-            validator={validator}
-            // onChange={() => console.log("changed")}
-            onSubmit={onsubmit}
+      <Box maxW="720px">
+        {setting && settingType && (
+          <>
+            <Form
+              schema={settingType.schema}
+              uiSchema={settingType.uiSchema}
+              formData={setting}
+              validator={validator}
+              // onChange={() => console.log("changed")}
+              onSubmit={onsubmit}
             // onError={() => console.log("errors")}
-          />
-          <SettingDeletePopoverForm curSetting={setting} />
-        </>
-      )}
+            />
+            <Stack paddingTop={5} direction="row" align="right">
+              <SettingDeletePopoverForm curSetting={setting} />
+            </Stack>
+          </>
+        )}
+      </Box>
     </Box>
   );
 };

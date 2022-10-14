@@ -250,7 +250,7 @@ export const PageEditButtons: React.FunctionComponent<PublishButtonProps> = (
   props: PublishButtonProps
 ) => {
   return (
-    <Stack direction="row" align="right">
+    <Stack paddingTop={5} direction="row" align="right">
       <PublishButton token={props.token} pagePath={props.pagePath} />
     </Stack>
   );

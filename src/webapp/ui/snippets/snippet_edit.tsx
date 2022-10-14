@@ -1,6 +1,6 @@
 import React from "react";
 import validator from "@rjsf/validator-ajv6";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Heading, Stack } from "@chakra-ui/react";
 import { withTheme } from "@rjsf/core";
 import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
@@ -79,24 +79,28 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   };
 
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <Heading>Edit Snippet</Heading>
       <SnippetBreadcrumb snippet={snippet} />
       <ApiErrorUI error={error} />
-      {snippet && snippetType && (
-        <>
-          <Form
-            schema={snippetType.schema}
-            uiSchema={snippetType.uiSchema}
-            formData={snippet}
-            validator={validator}
-            // onChange={() => console.log("changed")}
-            onSubmit={onsubmit}
+      <Box maxW="720px">
+        {snippet && snippetType && (
+          <>
+            <Form
+              schema={snippetType.schema}
+              uiSchema={snippetType.uiSchema}
+              formData={snippet}
+              validator={validator}
+              // onChange={() => console.log("changed")}
+              onSubmit={onsubmit}
             // onError={() => console.log("errors")}
-          />
-          <SnippetDeletePopoverForm curSnippet={snippet} />
-        </>
-      )}
+            />
+            <Stack paddingTop={5} direction="row" align="right">
+              <SnippetDeletePopoverForm curSnippet={snippet} />
+            </Stack>
+          </>
+        )}
+      </Box>
     </Box>
   );
 };

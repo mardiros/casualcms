@@ -52,45 +52,47 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <SiteBreadcrumb title="New Site" />
       <Heading>New Site</Heading>
       {/* {<SiteBreadcrumb title="new page" />} */}
       <ApiErrorUI error={error} />
-      <form onSubmit={handleSubmit}>
-        <FormControl>
-          <FormLabel>Hostname</FormLabel>
-          <Input type="text" name="hostname" placeholder="hostname" />
-          <FormHelperText>Hostname for this site.</FormHelperText>
-        </FormControl>
-        <FormControl>
-          <FormLabel>Root Page</FormLabel>
-          <Input type="text" name="root_page_path" placeholder="/index" />
-          <FormHelperText>
-            Path of the page, that will be the index page for this site (paged
-            used for /).
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Checkbox name="default" value="true">
-            Default
-          </Checkbox>
-          <FormHelperText>
-            If no site match, fallback to this one.
-          </FormHelperText>
-        </FormControl>
-        <FormControl>
-          <Checkbox name="secure" value="true">
-            Secure
-          </Checkbox>
-          <FormHelperText>Use https.</FormHelperText>
-        </FormControl>
-        <FormControl paddingTop={5}>
-          <Button type="submit" colorScheme="cyan">
-            Submit
-          </Button>
-        </FormControl>
-      </form>
+      <Box maxW="720px">
+        <form onSubmit={handleSubmit}>
+          <FormControl>
+            <FormLabel>Hostname</FormLabel>
+            <Input type="text" name="hostname" placeholder="hostname" />
+            <FormHelperText>Hostname for this site.</FormHelperText>
+          </FormControl>
+          <FormControl>
+            <FormLabel>Root Page</FormLabel>
+            <Input type="text" name="root_page_path" placeholder="/index" />
+            <FormHelperText>
+              Path of the page, that will be the index page for this site (paged
+              used for /).
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Checkbox name="default" value="true">
+              Default
+            </Checkbox>
+            <FormHelperText>
+              If no site match, fallback to this one.
+            </FormHelperText>
+          </FormControl>
+          <FormControl>
+            <Checkbox name="secure" value="true">
+              Secure
+            </Checkbox>
+            <FormHelperText>Use https.</FormHelperText>
+          </FormControl>
+          <FormControl paddingTop={5}>
+            <Button type="submit" colorScheme="cyan">
+              Submit
+            </Button>
+          </FormControl>
+        </form>
+      </Box>
     </Box>
   );
 };

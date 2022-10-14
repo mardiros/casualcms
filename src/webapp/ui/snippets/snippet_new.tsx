@@ -62,21 +62,23 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
 
   const data = {};
   return (
-    <Box maxW="720px">
+    <Box minW="720px">
       <Heading>New Snippet</Heading>
       <SnippetBreadcrumb title="new snippet" />
       <ApiErrorUI error={error} />
-      {snippetType && (
-        <Form
-          schema={snippetType.schema}
-          uiSchema={snippetType.uiSchema}
-          formData={data}
-          validator={validator}
-          // onChange={() => console.log("changed")}
-          onSubmit={onsubmit}
+      <Box maxW="720px">
+        {snippetType && (
+          <Form
+            schema={snippetType.schema}
+            uiSchema={snippetType.uiSchema}
+            formData={data}
+            validator={validator}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
           // onError={() => console.log("errors")}
-        />
-      )}
+          />
+        )}
+      </Box>
     </Box>
   );
 };

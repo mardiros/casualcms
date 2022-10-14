@@ -117,23 +117,19 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   }, [parentPath]);
 
   return (
-    <Container>
-      {
-        <>
-          <Heading>Choose A Type Of Page</Heading>
-          {parentPage && (
-            <PageBreadcrumb page={parentPage} title="type of template" />
-          )}
-          <Box paddingLeft={15}>
-            <ApiErrorUI error={error} />
-            <PageTypesTable
-              pageTypes={pageTypes}
-              parentPath={parentPath}
-              isLoading={isLoading}
-            />
-          </Box>
-        </>
-      }
-    </Container>
+    <Box minW="720px">
+      <Heading>Choose A Type Of Page</Heading>
+      {parentPage && (
+        <PageBreadcrumb page={parentPage} title="type of template" />
+      )}
+      <Box maxW="720px">
+        <ApiErrorUI error={error} />
+        <PageTypesTable
+          pageTypes={pageTypes}
+          parentPath={parentPath}
+          isLoading={isLoading}
+        />
+      </Box>
+    </Box>
   );
 };

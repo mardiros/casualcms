@@ -9,5 +9,6 @@ class HeaderSnippet(AbstractSnippet):
     links: list[Link] = Field(default_factory=list)
 
     class Meta:
-        template = "header.jinja2"
+        template = "snippets/header.jinja2"
         type = "HeaderSnippet"
+        title = "📰 Header Snippet"

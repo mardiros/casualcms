@@ -5,11 +5,11 @@ from casualcms.domain.model.abstract_page import AbstractPage
 from ...atoms.snippet_chooser import SnippetChoice
 
 
-class DocumentationHomePage(AbstractPage):
+class DocumentationPage(AbstractPage):
 
     menu: SnippetChoice | None = Field(None)
 
     class Meta:
-        parent_types = ["HomePage"]
-        type = "DocumentationHomePage"
-        template = "pages/documentation/index.jinja2"
+        parent_types = ["DocumentationHomePage"]
+        type = "DocumentationPage"
+        template = "pages/documentation/page.jinja2"

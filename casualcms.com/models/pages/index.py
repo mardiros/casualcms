@@ -10,3 +10,4 @@ class HomePage(AbstractPage):
         parent_types = None
         template = "pages/index.jinja2"
         type = "HomePage"
+        title = "🏠 Home Page"

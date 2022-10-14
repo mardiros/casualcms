@@ -1,7 +1,8 @@
-from casualcms_com.models.atoms.link import Link
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import AbstractSnippet
+
+from ..atoms.link import Link
 
 
 class Chapter(BaseModel):
@@ -11,8 +12,9 @@ class Chapter(BaseModel):
 
 class MenuSnippet(AbstractSnippet):
     title: str = Field()
-    chapter: list[Chapter] = Field(default_factory=list)
+    chapters: list[Chapter] = Field(default_factory=list)
 
     class Meta:
         template = "snippets/menu.jinja2"
         type = "MenuSnippet"
+        title = "📑 Menu Snippet"

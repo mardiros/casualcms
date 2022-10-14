@@ -50,7 +50,8 @@ async def serve_pages(
         renderer = Jinja2TemplateRender(
             uow, app.settings.template_search_path, hostname
         )
-        data = await renderer.render_page(rpage.unwrap().page)
+        visited_page = rpage.unwrap().page
+        data = await renderer.render_page(visited_page)
         await uow.rollback()
     return Response(data)
 

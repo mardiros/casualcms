@@ -5,6 +5,7 @@ from typing import (
     Any,
     Callable,
     Dict,
+    Iterator,
     Mapping,
     MutableMapping,
     Optional,
@@ -22,6 +23,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
 from sqlalchemy.ext.asyncio.engine import create_async_engine  # type: ignore
 from sqlalchemy.future import select  # type: ignore
 from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy.sql.expression import func  # type: ignore
 
 from casualcms.adapters.uow_sqla.setup_database import create_database_schema
 from casualcms.config import Settings
@@ -152,6 +154,17 @@ def format_setting(site_id: str, setting: Setting[Setting_contra]) -> Dict[str, 
         "value": setting.setting.dict(),
     }
     return formated_setting
+
+
+def build_parent_path(path: str) -> Iterator[str]:
+    path = path.strip("/")
+    hostname, *slugs = path.split("/")
+
+    new_path = f"//{hostname}"
+    yield new_path
+    for slug in slugs:
+        new_path = f"{new_path}/{slug}"
+        yield new_path
 
 
 class AccountSQLRepository(AbstractAccountRepository):
@@ -827,43 +840,66 @@ class PageSQLRepository(AbstractPageRepository):
         url_ = urlparse(url)
         scheme, hostname, path = url_.scheme, url_.netloc, url_.path
         path = f"//{hostname}{path.rstrip('/')}"
+
         qry = (
-            select(orm.pages, orm.sites)
+            select(orm.sites)
             .filter(orm.pages.c.site_id == orm.sites.c.id)
             .filter(orm.pages.c.path == path)
-            .limit(1)
+            .order_by(func.length(orm.pages.c.path))
         )
 
         orm_pages: CursorResult = await self.session.execute(qry)
-        result = orm_pages.first()
-        if not result:
+        site_row = orm_pages.first()
+        if not site_row:
             return Err(PageRepositoryError.page_not_found)
-        orm_page_split = mapped_result(qry.column_descriptions, result)
-        site = orm_page_split[orm.sites]
-        if site["secure"] and scheme == "http":
+
+        if site_row.secure and scheme == "http":  # type: ignore
             return Err(PageRepositoryError.page_not_found)
+
         rdraft: DraftRepositoryResult[Any] = await DraftSQLRepository(
             self.session
-        ).by_id(site["draft_id"])
+        ).by_id(site_row.draft_id)  # type: ignore
         if rdraft.is_err():
             return Err(PageRepositoryError.page_not_found)
         root = rdraft.unwrap()
 
-        orm_page = orm_page_split[orm.pages]
-        rtype = resolve_page_type(orm_page["type"])
-        if rtype.is_err():
-            return Err(PageRepositoryError.page_model_not_found)
-        typ = rtype.unwrap()
-        return Ok(
-            PublishedPage(
+        site = Site(root_page_path=root.path, **site_row)  # type: ignore
+
+        parent_path = list(build_parent_path(path))
+        qry = (
+            select(orm.pages, orm.sites)
+            .filter(orm.pages.c.site_id == orm.sites.c.id)
+            .filter(orm.pages.c.path.in_(parent_path))
+            .order_by(func.length(orm.pages.c.path))
+        )
+        orm_pages = await self.session.execute(qry)
+        page_result = orm_pages.all()
+        page_res: Row
+        parent = None
+        published_page = None
+        for idx, page_res in enumerate(page_result):
+            orm_page = mapped_result(qry.column_descriptions, page_res)[orm.pages]
+            rtype = resolve_page_type(orm_page["type"])
+            if rtype.is_err():
+                return Err(PageRepositoryError.page_model_not_found)
+            typ = rtype.unwrap()
+            page = typ(parent=parent, **orm_page["body"])
+            if idx == 0:
+                page.slug = f"/{hostname}"  # type: ignore
+
+            parent = page
+            published_page = PublishedPage(
                 id=orm_page["id"],
                 created_at=orm_page["created_at"],
                 draft_id=orm_page["draft_id"],
                 path=orm_page["path"],
-                site=Site(root_page_path=root.path, **site),
-                page=typ(**orm_page["body"]),
+                site=site,
+                page=page,
             )
-        )
+        if published_page is None:
+            # we can't enter this condition, until we have on query for site and pages
+            return Err(PageRepositoryError.page_not_found)  # coverage: ignore
+        return Ok(published_page)
 
     async def add(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
         """Append a new model to the repository."""

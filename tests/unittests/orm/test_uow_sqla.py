@@ -1,5 +1,5 @@
 from types import NoneType
-from typing import Any, Sequence
+from typing import Any, Mapping, Sequence
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
@@ -17,6 +17,7 @@ from casualcms.adapters.uow_sqla.uow_sqla import (
     SnippetSQLRepository,
     SQLUnitOfWork,
     SQLUnitOfWorkBySession,
+    build_parent_path,
 )
 from casualcms.config import Settings
 from casualcms.domain.model import (
@@ -94,6 +95,24 @@ blog_page = fake_draft_page(
     hero_title="SEO In Tech",
     body=[{"title": "SEO In Tech", "body": "U robot.txt"}],
 )
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "path": "//www/",
+            "expected_result": ["//www"],
+        },
+        {
+            "path": "//www/docs",
+            "expected_result": ["//www", "//www/docs"],
+        },
+    ],
+)
+def test_build_parent_path(params: Mapping[str, Any]):
+    parent_pathes = list(build_parent_path(params["path"]))
+    assert parent_pathes == params["expected_result"]
 
 
 @pytest.mark.parametrize(
@@ -1253,6 +1272,7 @@ async def test_sql_uow_account_by_username(
 
 site_1 = fake_site(draft_hp, hostname="www", secure=True)
 site_2 = fake_site(draft_hp, hostname="www2", secure=False)
+site_3 = fake_site(cat_page, hostname="www3", secure=False)
 
 
 @pytest.mark.parametrize(
@@ -1345,6 +1365,41 @@ async def test_sql_uow_page_by_url(
     rpage = await repo.by_url("https://www2/tech")
     assert rpage.is_err()
     assert rpage.unwrap_err().name == "page_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "drafts": [draft_hp, cat_page, blog_page],
+            "sites": [site_1, site_3],
+            "pages": [
+                fake_page(draft_hp, site_1),
+                fake_page(cat_page, site_1),
+                fake_page(blog_page, site_1),
+                fake_page(cat_page, site_3),
+                fake_page(blog_page, site_3),
+            ],
+        },
+    ],
+)
+async def test_sql_uow_page_by_url_choose_root_page(
+    params: Any,
+    sqla_session: AsyncSession,
+    sql_uow: SQLUnitOfWork,
+    pages: Sequence[PublishedPage[Any]],
+):
+    repo = PageSQLRepository(sqla_session)
+
+    rpage: PageRepositoryResult[Any] = await repo.by_url("https://www/tech/seo")
+    assert rpage.is_ok()
+    page = rpage.unwrap().page
+    assert page.path == "//www/tech/seo"
+
+    rpage = await repo.by_url("https://www3/seo")
+    assert rpage.is_ok()
+    page = rpage.unwrap().page
+    assert page.path == "//www3/seo"
 
 
 @pytest.mark.parametrize(

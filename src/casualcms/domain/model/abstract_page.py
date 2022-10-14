@@ -28,6 +28,22 @@ PageType = Type["AbstractPage"]
 LazyPageType = str | PageType
 
 
+class BreadCrumbItem(BaseModel):
+    """Metadata exposed to the API"""
+
+    slug: str
+    path: str
+    title: str
+
+
+class PublicMetadata(BaseModel):
+    """Metadata exposed to the API"""
+
+    breadcrumb: list[BreadCrumbItem]
+    type: str
+    path: str
+
+
 class TypeTree:
     _roots: Set[PageType] = set()
     _childs: dict[str, Set[PageType]] = defaultdict(set)
@@ -136,6 +152,28 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
             slugs.append(page.slug)
             page = page.parent
         return "/" + "/".join(reversed(slugs))
+
+    @property
+    def metadata(self) -> PublicMetadata:
+        breadcrumb: list[BreadCrumbItem] = []
+        p: AbstractPage = self
+        while True:
+            breadcrumb.append(
+                BreadCrumbItem(
+                    # on public page, the slug is f"/{hostname}""
+                    slug="" if p.slug.startswith("/") else p.slug,
+                    path=p.path,
+                    title=p.title,
+                ),
+            )
+            if p.parent is None:
+                break
+            p = p.parent
+        return PublicMetadata(
+            type=self.__meta__.type,
+            path=self.path,
+            breadcrumb=list(reversed(breadcrumb)),
+        )
 
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:

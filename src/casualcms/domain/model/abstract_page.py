@@ -9,6 +9,7 @@ from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
+from .breadcrumb import Breadcrumb, BreadcrumbItem
 
 
 class Slug(ConstrainedStr):
@@ -28,18 +29,10 @@ PageType = Type["AbstractPage"]
 LazyPageType = str | PageType
 
 
-class BreadCrumbItem(BaseModel):
-    """Metadata exposed to the API"""
-
-    slug: str
-    path: str
-    title: str
-
-
 class PublicMetadata(BaseModel):
     """Metadata exposed to the API"""
 
-    breadcrumb: list[BreadCrumbItem]
+    breadcrumb: Breadcrumb
     type: str
     path: str
 
@@ -91,6 +84,7 @@ class PageMeta(BaseModel):
     abstract: bool = Field(...)
     type: str = Field(...)
     title: str = Field(...)
+    root_url: str = Field(default="/")
 
 
 class PageMetaclass(ModelMetaclass):
@@ -149,30 +143,43 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
         slugs = []
         page: Optional["AbstractPage"] = self
         while page:
-            slugs.append(page.slug)
+            if page.slug:
+                # On published page, the root page is an empty slug
+                slugs.append(page.slug)
             page = page.parent
         return "/" + "/".join(reversed(slugs))
 
     @property
+    def canonical_url(self) -> str:
+        return self.__meta__.root_url
+
+    @property
     def metadata(self) -> PublicMetadata:
-        breadcrumb: list[BreadCrumbItem] = []
+        items: list[BreadcrumbItem] = []
         p: AbstractPage = self
+
         while True:
-            breadcrumb.append(
-                BreadCrumbItem(
-                    # on public page, the slug is f"/{hostname}""
-                    slug="" if p.slug.startswith("/") else p.slug,
-                    path=p.path,
+            items.append(
+                BreadcrumbItem(
+                    url=p.canonical_url,
                     title=p.title,
+                    position=0,
+                    slug=p.slug,
                 ),
             )
             if p.parent is None:
                 break
             p = p.parent
+
+        def set_pos(pos: int, item: BreadcrumbItem):
+            item.position = pos
+            return item
+
+        items = [set_pos(idx, i) for idx, i in enumerate(reversed(items), start=1)]
         return PublicMetadata(
             type=self.__meta__.type,
             path=self.path,
-            breadcrumb=list(reversed(breadcrumb)),
+            breadcrumb=Breadcrumb(items=items),
         )
 
     @classmethod

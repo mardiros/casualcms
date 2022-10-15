@@ -858,7 +858,9 @@ class PageSQLRepository(AbstractPageRepository):
 
         rdraft: DraftRepositoryResult[Any] = await DraftSQLRepository(
             self.session
-        ).by_id(site_row.draft_id)  # type: ignore
+        ).by_id(
+            site_row.draft_id
+        )  # type: ignore
         if rdraft.is_err():
             return Err(PageRepositoryError.page_not_found)
         root = rdraft.unwrap()
@@ -885,8 +887,9 @@ class PageSQLRepository(AbstractPageRepository):
             typ = rtype.unwrap()
             page = typ(parent=parent, **orm_page["body"])
             if idx == 0:
-                page.slug = f"/{hostname}"  # type: ignore
+                page.slug = f""  # type: ignore
 
+            page.__meta__.root_url = f"{scheme}://{hostname}/"
             parent = page
             published_page = PublishedPage(
                 id=orm_page["id"],

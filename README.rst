@@ -11,11 +11,13 @@ models. It does not requires to handle SQL migrations either.
 TODO
 ----
 
+* Fix Spacing for Publish and Delete button
+
+* After saving a page, redirect to the edit instead of the list
+
 * Page revision
 
 * Page tags, and search by tags in jinja2
-
-* Alembic SQL update
 
 * Historic
 

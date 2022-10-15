@@ -1,6 +1,8 @@
 <nav class="navbar is-spaced" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
-      <h1 class="title"><a href="/">{{ snippet.title }}</a></h1>
+    <a href="/" style="font-size:3em">
+      👕
+    </a>
   </div>
   <div class="navbar-menu">
     <div class="navbar-start">
@@ -9,7 +11,8 @@
       {%- endfor -%}
     </div>
   </div>
-  <br/>
-  {{page.metadata}}
-
+  <br />
 </nav>
+<div class="container is-fluid">
+  {% include "atoms/breadcrumb.jinja2" %}
+</div>

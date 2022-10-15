@@ -1,13 +1,15 @@
 {% set breadcrumb = page.metadata.breadcrumb %}
-{{breadcrumb.json()}}
 <nav class="breadcrumb is-medium" aria-label="breadcrumbs">
   <ul>
     {% for p in breadcrumb.items %}
-      <li {% if loop.last %}class="is-active"{% endif %}>
-        <a href="{{p.item}}" {% if loop.last %}aria-current="page"{% endif %}>
-          {{p.name}} [{{p.item}}]
-        </a>
-      </li>
+    <li {% if loop.last %}class="is-active" {% endif %}>
+      <a href="{{p.url}}" {% if loop.last %}aria-current="page" {% endif %}>
+        {{p.title}}
+      </a>
+    </li>
     {% endfor %}
   </ul>
 </nav>
+<script type="application/ld+json">
+{{breadcrumb.json(by_alias=True)}}
+</script>

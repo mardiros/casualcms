@@ -38,7 +38,8 @@ async def show_template(
     jsonschema = ptype.schema()
     jsonschema["definitions"].pop("Event", None)
     jsonschema["definitions"].pop("AbstractPage", None)
-    for key in ("id", "parent", "events", "created_at"):
+    jsonschema["definitions"].pop("Site", None)
+    for key in ("id", "parent", "site", "events", "created_at"):
         jsonschema["properties"].pop(key, None)
     return {
         "schema": jsonschema,

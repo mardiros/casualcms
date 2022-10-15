@@ -36,15 +36,14 @@ async def create_database(settings: Settings, engine: AsyncEngine) -> None:
     url = f"{dialect}+{driver}://{username}{password}@{host}/"
     engine = create_async_engine(url, future=True, echo=False)
     async with engine.begin() as conn:  # type: ignore
-        await conn.execute(text(f"ROLLBACK"))
+        await conn.execute(text("ROLLBACK"))
         await conn.execute(
             text(f'CREATE DATABASE "{database}" WITH OWNER "{username}"')
         )
-        await conn.execute(text(f"BEGIN"))
+        await conn.execute(text("BEGIN"))
 
 
 async def create_database_schema(settings: Settings, engine: AsyncEngine) -> None:
-
 
     try:
         database_exists = None

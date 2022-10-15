@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 import pytest
 
@@ -7,8 +7,20 @@ from casualcms.domain.model import (
     get_available_subtypes,
     resolve_page_type,
 )
+from casualcms.domain.model.abstract_page import PublicMetadata
+from casualcms.domain.model.breadcrumb import Breadcrumb, BreadcrumbItem
+from casualcms.domain.model.site import Site
 
 from ..casualblog.models import BasePage, BlogPage, CategoryPage, HomePage, SectionPage
+
+site = Site(
+    id="xxx",
+    hostname="www",
+    root_page_path="/index",
+    default=False,
+    secure=True,
+    draft_id=None,  # handled by the repository
+)
 
 
 def test_page_metadata():
@@ -33,7 +45,31 @@ def test_page_abstract_raise():
     assert str(context.value) == "Page BasePage is abstract"
 
 
-def test_page_tree():
+@pytest.mark.parametrize(
+    "params",
+    [
+        {"root_url": "", "expected_root_path": "/index", "site": None},
+        {"root_url": "https://www/", "expected_root_path": "", "site": site},
+    ],
+)
+def test_page_tree(params: Mapping[str, Any]):
+    root_url = params["root_url"]
+    expected_root_path = params["expected_root_path"]
+    expected_root_breadcrumb = BreadcrumbItem(
+        position=1,
+        name="awesome",
+        item=root_url,
+        slug="index",
+        path=expected_root_path,
+    )
+    expected_sub_breadcrumb = BreadcrumbItem(
+        position=2,
+        name="sub",
+        item=f"{root_url}sub",
+        slug="sub",
+        path=f"{expected_root_path}/sub",
+    )
+
     page = HomePage(
         id="a",
         slug="index",
@@ -41,8 +77,14 @@ def test_page_tree():
         hero_title="awesome",
         description="",
         body=[{"body": "Hello!"}],
+        site=params["site"],
     )
-    assert page.path == "/index"
+    assert page.metadata == PublicMetadata(
+        breadcrumb=Breadcrumb(itemListElement=[expected_root_breadcrumb]),
+        type="blog:HomePage",
+        path=expected_root_path,
+        canonical_url=root_url,
+    )
 
     page2 = CategoryPage(
         id="b",
@@ -52,19 +94,49 @@ def test_page_tree():
         hero_title="awesome",
         parent=page,
         body=[{"body": "Hello!"}],
+        site=params["site"],
     )
-    assert page2.path == "/index/sub"
+
+    assert page2.metadata == PublicMetadata(
+        breadcrumb=Breadcrumb(
+            itemListElement=[
+                expected_root_breadcrumb,
+                expected_sub_breadcrumb,
+            ]
+        ),
+        type="blog:CategoryPage",
+        path=f"{expected_root_path}/sub",
+        canonical_url=f"{root_url}sub",
+    )
 
     page3 = BlogPage(
         id="b",
         slug="sum",
-        title="sum",
+        title="En sum sum",
         description="",
         hero_title="awesome",
         parent=page2,
         body=[{"body": "Hello!"}],
+        site=params["site"],
     )
-    assert page3.path == "/index/sub/sum"
+    assert page3.metadata == PublicMetadata(
+        breadcrumb=Breadcrumb(
+            itemListElement=[
+                expected_root_breadcrumb,
+                expected_sub_breadcrumb,
+                BreadcrumbItem(
+                    position=3,
+                    name="En sum sum",
+                    item=f"{root_url}sub/sum",
+                    path=f"{expected_root_path}/sub/sum",
+                    slug="sum",
+                ),
+            ]
+        ),
+        type="blog:BlogPage",
+        path=f"{expected_root_path}/sub/sum",
+        canonical_url=f"{root_url}sub/sum",
+    )
 
 
 def test_page_types():

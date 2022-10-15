@@ -9,7 +9,9 @@ from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
+
 from .breadcrumb import Breadcrumb, BreadcrumbItem
+from .site import Site
 
 
 class Slug(ConstrainedStr):
@@ -35,6 +37,7 @@ class PublicMetadata(BaseModel):
     breadcrumb: Breadcrumb
     type: str
     path: str
+    canonical_url: str
 
 
 class TypeTree:
@@ -84,7 +87,6 @@ class PageMeta(BaseModel):
     abstract: bool = Field(...)
     type: str = Field(...)
     title: str = Field(...)
-    root_url: str = Field(default="/")
 
 
 class PageMetaclass(ModelMetaclass):
@@ -128,6 +130,7 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
     slug: Slug = Field(...)
     title: str = Field(...)
     description: str = Field(...)
+    site: Optional["Site"] = Field(None, exclude=True)
     parent: Optional["AbstractPage"] = Field(None, exclude=True)
 
     class Meta:
@@ -139,54 +142,59 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
         super().__init__(**kwargs)
 
     @property
-    def path(self) -> str:
-        slugs = []
-        page: Optional["AbstractPage"] = self
-        while page:
-            if page.slug:
-                # On published page, the root page is an empty slug
-                slugs.append(page.slug)
-            page = page.parent
-        return "/" + "/".join(reversed(slugs))
-
-    @property
-    def canonical_url(self) -> str:
-        return self.__meta__.root_url
-
-    @property
     def metadata(self) -> PublicMetadata:
         items: list[BreadcrumbItem] = []
         p: AbstractPage = self
 
         while True:
-            items.append(
-                BreadcrumbItem(
-                    url=p.canonical_url,
-                    title=p.title,
-                    position=0,
-                    slug=p.slug,
-                ),
+            item = BreadcrumbItem(
+                item="",
+                name=p.title,
+                position=0,
+                slug=p.slug,
             )
+            items.append(item)
             if p.parent is None:
+                if self.site:
+                    item.url = self.site.url + "/"
+                    # Published page root page has no slug
+                    item.path = ""
+                else:
+                    # Draft page case
+                    item.url = ""
+                    item.path = f"/{p.slug}"
                 break
             p = p.parent
 
-        def set_pos(pos: int, item: BreadcrumbItem):
-            item.position = pos
-            return item
+        last_item = None
+        ordered_items: list[BreadcrumbItem] = []
 
-        items = [set_pos(idx, i) for idx, i in enumerate(reversed(items), start=1)]
+        for pos, item in enumerate(reversed(items), start=1):
+            item.position = pos
+            if last_item is not None and pos == 2:
+                item.url = last_item.url + item.slug
+                item.path = last_item.path + f"/{item.slug}"
+            elif last_item is not None:
+                item.url = last_item.url + f"/{item.slug}"
+                item.path = last_item.path + f"/{item.slug}"
+            last_item = item
+            ordered_items.append(item)
+
         return PublicMetadata(
             type=self.__meta__.type,
-            path=self.path,
-            breadcrumb=Breadcrumb(items=items),
+            path=ordered_items[-1].path,
+            canonical_url=ordered_items[-1].url,
+            breadcrumb=Breadcrumb(itemListElement=ordered_items),
         )
 
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}
         for key, val in cls.__fields__.items():
-            if key in ("parent",):
+            if key in (
+                "parent",
+                "site",
+            ):
                 continue
             ret[key] = cls.get_widget(val)
         return ret

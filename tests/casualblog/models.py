@@ -94,7 +94,7 @@ class HomePage(BasePage):
 
 class CategoryPage(BasePage):
 
-    intro: Optional[Paragraph] = Field()
+    intro: Optional[Paragraph] = Field(default=None)
 
     class Meta:
         parent_types = [HomePage]

@@ -334,7 +334,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         parent_draft = None
         if model.page.parent:
             rparent_draft: DraftRepositoryResult[Any] = await self.by_path(
-                model.page.parent.path
+                model.page.parent.metadata.path
             )
             if rparent_draft.is_err():
                 return Err(DraftRepositoryError.page_not_found)
@@ -885,11 +885,9 @@ class PageSQLRepository(AbstractPageRepository):
             if rtype.is_err():
                 return Err(PageRepositoryError.page_model_not_found)
             typ = rtype.unwrap()
-            page = typ(parent=parent, **orm_page["body"])
+            page = typ(site=site, parent=parent, **orm_page["body"])
             if idx == 0:
-                page.slug = f""  # type: ignore
-
-            page.__meta__.root_url = f"{scheme}://{hostname}/"
+                page.slug = ""  # type: ignore
             parent = page
             published_page = PublishedPage(
                 id=orm_page["id"],

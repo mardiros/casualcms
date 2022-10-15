@@ -28,6 +28,7 @@ from casualcms.domain.model import (
     Site,
     Snippet,
 )
+from casualcms.domain.model.abstract_page import AbstractPage
 from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.repositories.draft import (
     DraftRepositoryResult,
@@ -69,7 +70,6 @@ draft_hp = fake_draft_page(
     slug="root",
     hero_title="lorem atchoum",
 )
-
 
 cat_page = fake_draft_page(
     type="blog:CategoryPage",
@@ -288,18 +288,19 @@ async def test_draft_by_id(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(params["id"])
-    assert root_page.is_ok()
-    rok = root_page.unwrap()
-    assert rok.slug == params["expected_slug"]
-    assert rok.path == params["expected_path"]
+    r_draft_page: DraftRepositoryResult[HomePage] = await repo.by_id(params["id"])
+    assert r_draft_page.is_ok()
+    draft_page = r_draft_page.unwrap()
+    # draft_page.page.__meta__.root_url = ""
+    assert draft_page.slug == params["expected_slug"]
+    assert draft_page.path == params["expected_path"]
 
 
 async def test_draft_by_id_err(sqla_session: AsyncSession):
     repo = DraftSQLRepository(sqla_session)
-    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(
+    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(  # type:ignore
         draft_hp.id
-    )  # type:ignore
+    )
     assert root_page.is_err()
     err = root_page.unwrap_err()
     assert err.name == "page_not_found"
@@ -1393,13 +1394,15 @@ async def test_sql_uow_page_by_url_choose_root_page(
 
     rpage: PageRepositoryResult[Any] = await repo.by_url("https://www/tech/seo")
     assert rpage.is_ok()
-    page = rpage.unwrap().page
-    assert page.path == "//www/tech/seo"
+    page: AbstractPage = rpage.unwrap().page
+    assert page.metadata.path == "/tech/seo"
+    assert page.metadata.canonical_url == "https://www/tech/seo"
 
     rpage = await repo.by_url("https://www3/seo")
     assert rpage.is_ok()
     page = rpage.unwrap().page
-    assert page.path == "//www3/seo"
+    assert page.metadata.path == "/seo"
+    assert page.metadata.canonical_url == "http://www3/seo"
 
 
 @pytest.mark.parametrize(

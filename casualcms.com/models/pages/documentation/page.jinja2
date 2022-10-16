@@ -5,10 +5,15 @@
       <h1 class="title">Casual Documentation</h1>
     </div>
   </section>
-  <div class="container">
+  <div class="container is-fluid">
     <div class="columns">
       <div class="column">
+        <div class="box">
         {{ include_block(page.menu) }}
+      </div>
+      </div>
+      <div class="column is-four-fifths">
+        ...
       </div>
       {# {% for column in block.items %}
         <div class="column">

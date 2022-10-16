@@ -226,13 +226,15 @@ async def test_get_draft_403(
                 "metadata": {
                     "type": "blog:HomePage",
                     "path": "/home",
-                    "breadcrumb": [
-                        {
-                            "slug": "home",
-                            "title": "hello world - casualcms",
-                            "path": "/home",
-                        }
-                    ],
+                    "breadcrumb": {
+                        "items": [
+                            {
+                                "slug": "home",
+                                "title": "hello world - casualcms",
+                                "path": "/home",
+                            }
+                        ]
+                    },
                 },
                 "slug": "home",
                 "title": "hello world - casualcms",
@@ -247,18 +249,20 @@ async def test_get_draft_403(
                 "metadata": {
                     "type": "blog:CategoryPage",
                     "path": "/home/sub",
-                    "breadcrumb": [
-                        {
-                            "slug": "home",
-                            "title": "hello world - casualcms",
-                            "path": "/home",
-                        },
-                        {
-                            "slug": "sub",
-                            "title": "a sub page",
-                            "path": "/home/sub",
-                        },
-                    ],
+                    "breadcrumb": {
+                        "items": [
+                            {
+                                "slug": "home",
+                                "title": "hello world - casualcms",
+                                "path": "/home",
+                            },
+                            {
+                                "slug": "sub",
+                                "title": "a sub page",
+                                "path": "/home/sub",
+                            },
+                        ]
+                    },
                 },
                 "slug": "sub",
                 "title": "a sub page",

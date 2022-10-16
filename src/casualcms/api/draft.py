@@ -166,7 +166,23 @@ async def show_draft(
     draft_page: DraftPage[Any] = Depends(draft_by_path),
 ) -> Mapping[str, Any]:
     ret = draft_page.page.dict()
-    ret["metadata"] = draft_page.metadata
+    ret["metadata"] = draft_page.metadata.dict(
+        by_alias=False,
+        include={
+            "type": True,
+            "slug": True,
+            "path": True,
+            "breadcrumb": {
+                "items": {
+                    "__all__": {
+                        "slug": True,
+                        "title": True,
+                        "path": True,
+                    }
+                },
+            },
+        },
+    )
     return ret
 
 

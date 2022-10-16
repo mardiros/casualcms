@@ -53,18 +53,20 @@ describe("As a user, I can delete a page", () => {
       metadata: {
         path: "/home/sub1",
         type: "casual:HomePage",
-        breadcrumb: [
-          {
-            path: "/home",
-            title: "home",
-            slug: "home",
-          },
-          {
-            path: "/home/sub1",
-            title: "sub",
-            slug: "sub1",
-          },
-        ],
+        breadcrumb: {
+          items: [
+            {
+              path: "/home",
+              title: "home",
+              slug: "home",
+            },
+            {
+              path: "/home/sub1",
+              title: "sub",
+              slug: "sub1",
+            },
+          ],
+        },
       },
     };
 

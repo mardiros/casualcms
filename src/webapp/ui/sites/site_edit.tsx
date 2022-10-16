@@ -113,12 +113,16 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
                 defaultValue={site.root_page_path}
               />
               <FormHelperText>
-                Path of the page, that will be the index page for this site (paged
-                used for /).
+                Path of the page, that will be the index page for this site
+                (paged used for /).
               </FormHelperText>
             </FormControl>
             <FormControl>
-              <Checkbox name="default" value="true" defaultChecked={site.default}>
+              <Checkbox
+                name="default"
+                value="true"
+                defaultChecked={site.default}
+              >
                 Default
               </Checkbox>
               <FormHelperText>

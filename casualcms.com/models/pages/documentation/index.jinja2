@@ -1,27 +1,25 @@
 {% extends "layout.jinja2" %}
 {% block body %}
-  <section class="hero is-small is-primary">
-    <div class="hero-body">
-      <h1 class="title">Casual Documentation</h1>
-    </div>
-  </section>
-
-  <div class="container is-fluid">
-    <div class="columns">
-      <div class="column">
-        <div class="box">
-          {{ include_block(page.menu) }}
-        </div>
-      </div>
-      <div class="column is-four-fifths">
-        ...
-      </div>
-      {# {% for column in block.items %}
-        <div class="column">
-          {{ include_block(column.item) }}
-        </div>
-      {% endfor %} #}
-    </div>
-
+<section class="hero is-small is-primary">
+  <div class="hero-body">
+    <h1 class="title">Casual Documentation</h1>
   </div>
+</section>
+
+<div class="container is-fluid">
+  <div class="columns">
+    <div class="column">
+      {{ include_block(page.menu) }}
+    </div>
+    <div class="column is-four-fifths">
+      ...
+    </div>
+    {# {% for column in block.items %}
+    <div class="column">
+      {{ include_block(column.item) }}
+    </div>
+    {% endfor %} #}
+  </div>
+
+</div>
 {% endblock %}

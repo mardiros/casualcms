@@ -136,7 +136,7 @@ class FakePageApi implements IPageApi {
       type: type,
       title: titles[type],
       path: `${parent || ""}/${payload.slug}`,
-      breadcrumb: [],
+      breadcrumb: { items: [] },
     };
     this.pages.push(payload);
     return ok(true);

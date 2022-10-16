@@ -36,10 +36,14 @@ export type BreadCrumbItem = {
   title: string;
 };
 
+export type BreadCrumb = {
+  items: BreadCrumbItem[];
+};
+
 export type PageMeta = {
   path: string;
   type: string;
-  breadcrumb: BreadCrumbItem[];
+  breadcrumb: BreadCrumb;
 };
 
 export type Draft = {

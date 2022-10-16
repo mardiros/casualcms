@@ -75,7 +75,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
             validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
+            // onError={() => console.log("errors")}
           />
         )}
       </Box>

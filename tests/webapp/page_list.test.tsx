@@ -154,7 +154,7 @@ describe("As a user, I can list pages", () => {
       metadata: {
         path: "/home",
         type: "casual:HomePage",
-        breadcrumb: [],
+        breadcrumb: { items: [] },
       },
       slug: "home",
       title: "Home Page",
@@ -182,18 +182,20 @@ describe("As a user, I can list pages", () => {
       metadata: {
         path: "/home/sub1",
         type: "casual:HomePage",
-        breadcrumb: [
-          {
-            path: "/home",
-            title: "home",
-            slug: "home",
-          },
-          {
-            path: "/home/sub1",
-            title: "sub",
-            slug: "sub1",
-          },
-        ],
+        breadcrumb: {
+          items: [
+            {
+              path: "/home",
+              title: "home",
+              slug: "home",
+            },
+            {
+              path: "/home/sub1",
+              title: "sub",
+              slug: "sub1",
+            },
+          ],
+        },
       },
       slug: "sub1",
       title: "sub",

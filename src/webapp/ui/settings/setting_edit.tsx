@@ -104,7 +104,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
               validator={validator}
               // onChange={() => console.log("changed")}
               onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+              // onError={() => console.log("errors")}
             />
             <Stack paddingTop={5} direction="row" align="right">
               <SettingDeletePopoverForm curSetting={setting} />

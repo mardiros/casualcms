@@ -106,7 +106,9 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
           .map((page: Draft) => setParentPage(page))
           .mapErr((err: ApiError) => setError(err));
       } else {
-        setParentPage({ metadata: { path: "", type: "", breadcrumb: [] } });
+        setParentPage({
+          metadata: { path: "", type: "", breadcrumb: { items: [] } },
+        });
       }
     }
     loadPage();

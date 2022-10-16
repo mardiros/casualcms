@@ -93,7 +93,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
               validator={validator}
               // onChange={() => console.log("changed")}
               onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+              // onError={() => console.log("errors")}
             />
             <Stack paddingTop={5} direction="row" align="right">
               <SnippetDeletePopoverForm curSnippet={snippet} />

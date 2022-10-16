@@ -16,18 +16,20 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     const metadata: PageMeta = {
       path: "",
       type: "",
-      breadcrumb: [
-        {
-          path: "/home",
-          title: "Home page",
-          slug: "home",
-        },
-        {
-          path: "/home/cat",
-          title: "Categogo",
-          slug: "cat",
-        },
-      ],
+      breadcrumb: {
+        items: [
+          {
+            path: "/home",
+            title: "Home page",
+            slug: "home",
+          },
+          {
+            path: "/home/cat",
+            title: "Categogo",
+            slug: "cat",
+          },
+        ],
+      },
     };
     const page = {
       metadata: metadata,
@@ -52,18 +54,20 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     const metadata: PageMeta = {
       path: "",
       type: "",
-      breadcrumb: [
-        {
-          path: "/home",
-          title: "Home page",
-          slug: "home",
-        },
-        {
-          path: "/home/cat",
-          title: "Categogo",
-          slug: "cat",
-        },
-      ],
+      breadcrumb: {
+        items: [
+          {
+            path: "/home",
+            title: "Home page",
+            slug: "home",
+          },
+          {
+            path: "/home/cat",
+            title: "Categogo",
+            slug: "cat",
+          },
+        ],
+      },
     };
     const page = { metadata: metadata };
     renderWithRouter(

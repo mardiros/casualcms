@@ -60,7 +60,9 @@ export const PageNew: React.FunctionComponent<{}> = () => {
           .map((page: Draft) => setParentPage(page))
           .mapErr((err: ApiError) => setError(err));
       } else {
-        setParentPage({ metadata: { path: "", type: "", breadcrumb: [] } });
+        setParentPage({
+          metadata: { path: "", type: "", breadcrumb: { items: [] } },
+        });
       }
     }
     loadPage();
@@ -99,7 +101,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
             validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
+            // onError={() => console.log("errors")}
           />
         )}
       </Box>

@@ -1,8 +1,14 @@
-from typing import Optional
+from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet, Block
+from casualcms.domain.model import (
+    AbstractPage,
+    AbstractSetting,
+    AbstractSnippet,
+    Block,
+    GenericBlock,
+)
 
 
 class Link(BaseModel):
@@ -124,10 +130,21 @@ class SnippetBlockPage(AbstractPage):
         type = "blog:SnippetBlockPage"
 
 
+T = TypeVar("T")
+
+
+class ListBlock(GenericBlock, Generic[T]):
+    items: list[T] = Field(default_factory=list)
+
+    class Meta:
+        template = "list_block.jinja2"
+
+
 class SectionPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
-    box: Box
+    box: Box = Field()
+    boxes: ListBlock[Box] = Field(default_factory=lambda: ListBlock(items=[]))
 
     class Meta:
         parent_types = [HomePage]

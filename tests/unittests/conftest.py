@@ -214,6 +214,49 @@ async def section_page(
 
 
 @pytest.fixture
+async def generic_section_page(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    draft_hp: DraftPage[HomePage],
+) -> AsyncGenerator[DraftPage[SectionPage], None]:
+    async with uow as uow:
+        page_id = generate_id()
+        await messagebus.handle(
+            CreatePage(
+                id=page_id,
+                type="blog:SectionPage",
+                payload={
+                    "parent": draft_hp.page,
+                    "slug": "sub",
+                    "title": "a sub page",
+                    "description": "I am so glad to be a sub page",
+                    "hero_title": "section",
+                    "box": {
+                        "title": "a mandatory box",
+                        "paragraph": "lolo",
+                    },
+                    "boxes": {
+                        "items": [
+                            {
+                                "title": "a box",
+                                "paragraph": "lorem ipsum",
+                            },
+                            {
+                                "title": "another box",
+                                "paragraph": "lorem atchoum",
+                            },
+                        ]
+                    },
+                },
+            ),
+            uow,
+        )
+        page = await uow.drafts.by_id(page_id)  # type: ignore
+        yield page.unwrap()
+
+
+@pytest.fixture
 async def header_snippet(
     app: FastAPI,
     uow: AbstractUnitOfWork,

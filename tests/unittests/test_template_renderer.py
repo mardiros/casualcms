@@ -152,6 +152,42 @@ async def test_render_template_with_block(
     )
 
 
+async def test_render_template_with_generic_block(
+    uow: AbstractUnitOfWork,
+    app_settings: Settings,
+    default_site: Site,
+    generic_section_page: DraftPage[SectionPage],
+):
+    async with uow as uow:
+        renderer = Jinja2TemplateRender(
+            uow, app_settings.template_search_path, default_site.hostname
+        )
+        data = await renderer.render_page(generic_section_page.page)
+    assert (
+        data.strip()
+        == textwrap.dedent(
+            """\
+            <body>
+              <h1>section</h1>
+              <div>
+              <h4>a mandatory box</h4>
+              <p>lolo</p>
+            </div>
+              <ul>
+              <li><div>
+              <h4>a box</h4>
+              <p>lorem ipsum</p>
+            </div><div>
+              <h4>another box</h4>
+              <p>lorem atchoum</p>
+            </div></li>
+            </ul>
+            </body>
+            """
+        ).strip()
+    )
+
+
 async def test_render_page_with_snippet_and_block(
     uow: AbstractUnitOfWork,
     app_settings: Settings,

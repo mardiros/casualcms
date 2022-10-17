@@ -1,0 +1,19 @@
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">
+      {{block.title}}
+    </p>
+  </header>
+  <div class="card-content">
+    <div class="content">
+      {{block.content}}
+    </div>
+  </div>
+  {% if card.footer_links %}
+  <footer class="card-footer">
+    {%- for link in card.footer_links -%}
+    {{ include_block(link, class_name="card-footer-item") }}
+    {%- endfor -%}
+  </footer>
+  {% endif %}
+</div>

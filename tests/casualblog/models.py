@@ -144,12 +144,40 @@ class SectionPage(BasePage):
 
     intro: Optional[Paragraph] = Field()
     box: Box = Field()
-    boxes: ListBlock[Box] = Field(default_factory=lambda: ListBlock(items=[]))
+    boxes: ListBlock[Box] = Field(default_factory=ListBlock)
 
     class Meta:
         parent_types = [HomePage]
         type = "blog:SectionPage"
         template = "section.jinja2"
+
+
+K = TypeVar("K")
+V = TypeVar("V")
+
+
+class DefinitionBlock(Block):
+    body: str = Field(widget="textarea")
+
+    class Meta:
+        template = "definition.jinja2"
+
+
+class StructBlock(GenericBlock, Generic[K, V]):
+    items: dict[K, V] = Field(default_factory=dict)
+
+    class Meta:
+        template = "struct_block.jinja2"
+
+
+class GlossaryPage(BasePage):
+
+    words: StructBlock[str, DefinitionBlock] = Field(default_factory=StructBlock)
+
+    class Meta:
+        parent_types = ["blog:SectionPage"]
+        type = "blog:GlossaryPage"
+        template = "glossary.jinja2"
 
 
 class BlogPage(BasePage):

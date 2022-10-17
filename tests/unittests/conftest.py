@@ -35,6 +35,7 @@ from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.casualblog.models import (
     CategoryPage,
+    GlossaryPage,
     HomePage,
     SectionPage,
     SnippetBlock,
@@ -219,13 +220,47 @@ async def generic_section_page(
     uow: AbstractUnitOfWork,
     messagebus: MessageRegistry,
     draft_hp: DraftPage[HomePage],
+    section_page: DraftPage[SectionPage],
+) -> AsyncGenerator[DraftPage[GlossaryPage], None]:
+    async with uow as uow:
+        page_id = generate_id()
+        await messagebus.handle(
+            CreatePage(
+                id=page_id,
+                type="blog:GlossaryPage",
+                payload={
+                    "parent": section_page.page,
+                    "slug": "glossary",
+                    "title": "glossary",
+                    "description": "glossary",
+                    "hero_title": "glossary",
+                    "words": {
+                        "items": {
+                            "a box": {"body": "lorem ipsum"},
+                            "another box": {"body": "lorem atchoum"},
+                        },
+                    },
+                },
+            ),
+            uow,
+        )
+        page = await uow.drafts.by_id(page_id)  # type: ignore
+        yield page.unwrap()
+
+
+@pytest.fixture
+async def generic_kv_page(
+    app: FastAPI,
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    draft_hp: DraftPage[HomePage],
 ) -> AsyncGenerator[DraftPage[SectionPage], None]:
     async with uow as uow:
         page_id = generate_id()
         await messagebus.handle(
             CreatePage(
                 id=page_id,
-                type="blog:SectionPage",
+                type="blog:GlossaryPage",
                 payload={
                     "parent": draft_hp.page,
                     "slug": "sub",

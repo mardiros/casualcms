@@ -1,9 +1,7 @@
 {% if block.items -%}
 <ul>
-  <li>
-    {%- for b in block.items -%}
-    {{ include_block(b) }}
-    {%- endfor -%}
-  </li>
+  {%- for b in block.items -%}
+  <li>{{ include_block(b) }}</li>
+  {%- endfor -%}
 </ul>
 {%- endif %}

@@ -167,22 +167,9 @@ async def test_render_template_with_generic_block(
         data.strip()
         == textwrap.dedent(
             """\
-            <body>
-              <h1>section</h1>
-              <div>
-              <h4>a mandatory box</h4>
-              <p>lolo</p>
-            </div>
-              <ul>
-              <li><div>
-              <h4>a box</h4>
-              <p>lorem ipsum</p>
-            </div><div>
-              <h4>another box</h4>
-              <p>lorem atchoum</p>
-            </div></li>
-            </ul>
-            </body>
+            <body><dl><dt>a box</dt>
+                <dd><div>lorem ipsum</div></dd><dt>another box</dt>
+                <dd><div>lorem atchoum</div></dd></dl></body>
             """
         ).strip()
     )

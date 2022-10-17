@@ -1,0 +1,8 @@
+{% if block.items -%}
+<dl>
+    {%- for k, v  in block.items.items() -%}
+    <dt>{{ k }}</dt>
+    <dd>{{ include_block(v) }}</dd>
+    {%- endfor -%}
+</dl>
+{%- endif %}

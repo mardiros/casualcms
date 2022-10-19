@@ -11,4 +11,4 @@ class Card(Block):
     footer_links: list[Link] = Field(...)
 
     class Meta:
-        template = "atoms/link.jinja2"
+        template = "molecules/card.jinja2"

@@ -1,12 +1,13 @@
+{% set card = block %}
 <div class="card">
   <header class="card-header">
     <p class="card-header-title">
-      {{block.title}}
+      {{card.title}}
     </p>
   </header>
   <div class="card-content">
     <div class="content">
-      {{block.content}}
+      {{card.content}}
     </div>
   </div>
   {% if card.footer_links %}

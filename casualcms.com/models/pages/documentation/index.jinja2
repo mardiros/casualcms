@@ -1,6 +1,6 @@
 {% extends "layout.jinja2" %}
 {% block body %}
-<section class="hero is-small is-primary">
+<section class="hero is-small is-primary mb-5">
   <div class="hero-body">
     <h1 class="title">Casual Documentation</h1>
   </div>
@@ -12,7 +12,7 @@
       {{ include_block(page.menu) }}
     </div>
     <div class="column is-four-fifths">
-      ...
+      {{ include_block(page.cards, column_count=2) }}
     </div>
     {# {% for column in block.items %}
     <div class="column">

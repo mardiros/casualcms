@@ -7,7 +7,7 @@ from casualcms.domain.model import (
     get_available_subtypes,
     resolve_page_type,
 )
-from casualcms.domain.model.abstract_page import PublicMetadata
+from casualcms.domain.model.abstract_page import AbstractPage, PublicMetadata
 from casualcms.domain.model.breadcrumb import Breadcrumb, BreadcrumbItem
 from casualcms.domain.model.site import Site
 
@@ -43,6 +43,61 @@ def test_page_abstract_raise():
             hero_title="You are awesome",
         )
     assert str(context.value) == "Page BasePage is abstract"
+
+
+@pytest.mark.parametrize(
+    "page_type,expected",
+    [
+        (
+            HomePage,
+            {
+                "body": {
+                    "items": {
+                        "body": {"ui:placeholder": "body", "ui:widget": "textarea"},
+                        "title": {"ui:placeholder": "title", "ui:widget": "text"},
+                    }
+                },
+                "description": {"ui:placeholder": "description", "ui:widget": "text"},
+                "hero_title": {"ui:placeholder": "hero_title", "ui:widget": "text"},
+                "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
+                "title": {"ui:placeholder": "title", "ui:widget": "text"},
+            },
+        ),
+        (
+            SectionPage,
+            {
+                "box": {
+                    "paragraph": {
+                        "ui:placeholder": "paragraph",
+                        "ui:widget": "textarea",
+                    },
+                    "title": {"ui:placeholder": "title", "ui:widget": "text"},
+                },
+                "boxes": {
+                    "items": {
+                        "items": {
+                            "paragraph": {
+                                "ui:placeholder": "paragraph",
+                                "ui:widget": "textarea",
+                            },
+                            "title": {"ui:placeholder": "title", "ui:widget": "text"},
+                        }
+                    }
+                },
+                "description": {"ui:placeholder": "description", "ui:widget": "text"},
+                "hero_title": {"ui:placeholder": "hero_title", "ui:widget": "text"},
+                "intro": {
+                    "body": {"ui:placeholder": "body", "ui:widget": "textarea"},
+                    "title": {"ui:placeholder": "title", "ui:widget": "text"},
+                },
+                "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
+                "title": {"ui:placeholder": "title", "ui:widget": "text"},
+            },
+        ),
+    ],
+)
+def test_page_ui_schema(page_type: AbstractPage, expected: Mapping[str, Any]):
+    assert page_type.ui_schema() == expected
 
 
 @pytest.mark.parametrize(

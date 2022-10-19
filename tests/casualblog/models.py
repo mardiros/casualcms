@@ -18,7 +18,7 @@ class Link(BaseModel):
 
 class Box(Block):
     title: str = Field()
-    paragraph: str = Field()
+    paragraph: str = Field(widget="textarea")
 
     class Meta:
         template = "box.jinja2"

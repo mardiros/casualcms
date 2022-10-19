@@ -12,7 +12,11 @@ from tests.casualblog.models import BlockInSnippet, Box
             "block": Box,
             "expected_schema": {
                 "properties": {
-                    "paragraph": {"title": "Paragraph", "type": "string"},
+                    "paragraph": {
+                        "title": "Paragraph",
+                        "type": "string",
+                        "widget": "textarea",
+                    },
                     "title": {"title": "Title", "type": "string"},
                 },
                 "required": ["title", "paragraph"],

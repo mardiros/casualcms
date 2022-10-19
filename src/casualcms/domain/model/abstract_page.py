@@ -1,7 +1,17 @@
 import enum
 import re
 from collections import defaultdict
-from typing import Any, Iterable, Mapping, Optional, Set, Type, TypeVar, cast
+from typing import (
+    Any,
+    Iterable,
+    Mapping,
+    MutableMapping,
+    Optional,
+    Set,
+    Type,
+    TypeVar,
+    cast,
+)
 
 from pydantic import BaseModel, ConstrainedStr, Field
 from pydantic.fields import ModelField
@@ -211,13 +221,17 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
             return widget
 
         if field.is_complex():
-
             if isinstance(field.get_default(), list):
                 items = {}
                 for key, val in field.type_.__fields__.items():
                     items[key] = cls.get_widget(val)
                 ret: Mapping[str, Any] = {"items": items}
                 return ret
+            else:
+                subtype: MutableMapping[str, Mapping[str, Any]] = {}
+                for key, val in field.type_.__fields__.items():
+                    subtype[key] = cls.get_widget(val)
+                return subtype
 
         return {
             "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),

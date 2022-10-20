@@ -2,9 +2,9 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { renderWithRouter } from "./helpers";
-import config from "./config";
-import { SettingDeletePopoverForm } from "../../src/webapp/ui/settings/settings_delete";
+import { renderWithRouter } from "../helpers";
+import config from "../config";
+import { SettingDeletePopoverForm } from "../../../src/webapp/ui/settings/settings_delete";
 
 describe("As a user, I can delete a setting", () => {
   before(async () => {

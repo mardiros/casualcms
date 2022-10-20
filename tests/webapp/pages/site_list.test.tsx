@@ -2,15 +2,15 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { renderWithRouter } from "./helpers";
-import config from "./config";
+import { renderWithRouter } from "../helpers";
+import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SiteList,
   SiteListButtons,
   SiteListTable,
   SiteRow,
-} from "../../src/webapp/ui/sites/site_list";
+} from "../../../src/webapp/ui/sites/site_list";
 
 describe("As a user, I can list settings per sites", () => {
   before(async () => {

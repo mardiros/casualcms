@@ -2,14 +2,14 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { renderWithRouter } from "./helpers";
-import config from "./config";
+import { renderWithRouter } from "../helpers";
+import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SettingSiteList,
   SettingSiteListTable,
   SettingSiteRow,
-} from "../../src/webapp/ui/settings/settings_sites_list";
+} from "../../../src/webapp/ui/settings/settings_sites_list";
 
 describe("As a user, I can list sites in settings", () => {
   before(async () => {

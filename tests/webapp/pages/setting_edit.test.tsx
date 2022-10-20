@@ -2,9 +2,9 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { renderWithRouter, waitForPath } from "./helpers";
-import config from "./config";
-import { SettingEdit } from "../../src/webapp/ui/settings/setting_edit";
+import { renderWithRouter, waitForPath } from "../helpers";
+import config from "../config";
+import { SettingEdit } from "../../../src/webapp/ui/settings/setting_edit";
 
 describe("As a user, I can list setting", () => {
   before(async () => {

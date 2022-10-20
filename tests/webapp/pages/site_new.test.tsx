@@ -2,10 +2,10 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { SiteNew } from "../../src/webapp/ui/sites/site_new";
-import { SiteList } from "../../src/webapp/ui/sites/site_list";
-import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
-import config from "./config";
+import { SiteNew } from "../../../src/webapp/ui/sites/site_new";
+import { SiteList } from "../../../src/webapp/ui/sites/site_list";
+import { renderWithRouter, waitForLoadingLabel, waitForPath } from "../helpers";
+import config from "../config";
 
 describe("As a user, I can create a new site", () => {
   before(async () => {

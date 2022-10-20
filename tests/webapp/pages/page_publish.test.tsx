@@ -7,9 +7,9 @@ import {
   PublishResultBox,
   SelectableHostname,
   SiteCheckBox,
-} from "../../src/webapp/ui/pages/page_publish";
-import { renderWithRouter, waitForPath } from "./helpers";
-import config from "./config";
+} from "../../../src/webapp/ui/pages/page_publish";
+import { renderWithRouter, waitForPath } from "../helpers";
+import config from "../config";
 import { err, ok } from "neverthrow";
 
 describe("As a user, I can publish existing pages", () => {

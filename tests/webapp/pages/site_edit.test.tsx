@@ -2,10 +2,10 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { SiteEdit } from "../../src/webapp/ui/sites/site_edit";
-import { SiteList } from "../../src/webapp/ui/sites/site_list";
-import { renderWithRouter, waitForLoadingLabel } from "./helpers";
-import config from "./config";
+import { SiteEdit } from "../../../src/webapp/ui/sites/site_edit";
+import { SiteList } from "../../../src/webapp/ui/sites/site_list";
+import { renderWithRouter, waitForLoadingLabel } from "../helpers";
+import config from "../config";
 
 describe("As a user, I can edit existing sites", () => {
   before(async () => {

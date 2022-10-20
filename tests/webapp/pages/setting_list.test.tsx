@@ -2,14 +2,14 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
-import { renderWithRouter } from "./helpers";
-import config from "./config";
+import { renderWithRouter } from "../helpers";
+import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SettingRow,
   SettingsTable,
   SettingList,
-} from "../../src/webapp/ui/settings/settings_list";
+} from "../../../src/webapp/ui/settings/settings_list";
 
 describe("As a user, I can list settings of a given site", () => {
   before(async () => {

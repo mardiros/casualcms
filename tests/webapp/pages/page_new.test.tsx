@@ -2,9 +2,9 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { PageNew } from "../../src/webapp/ui/pages/page_new";
-import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
-import config from "./config";
+import { PageNew } from "../../../src/webapp/ui/pages/page_new";
+import { renderWithRouter, waitForLoadingLabel, waitForPath } from "../helpers";
+import config from "../config";
 
 describe("As a user, I can create the root page", () => {
   it("<PageNew />: Create the root page from the web form", async () => {

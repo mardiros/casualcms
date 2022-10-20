@@ -6,9 +6,9 @@ import {
   PageRow,
   PageListTable,
   PageListButtons,
-} from "../../src/webapp/ui/pages/page_list";
-import { renderWithRouter, waitForLoadingLabel } from "./helpers";
-import config from "./config";
+} from "../../../src/webapp/ui/pages/page_list";
+import { renderWithRouter, waitForLoadingLabel } from "../helpers";
+import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";
 
 describe("As a user, I can list pages", () => {

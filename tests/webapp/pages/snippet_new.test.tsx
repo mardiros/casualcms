@@ -2,9 +2,9 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { renderWithRouter, waitForLoadingLabel, waitForPath } from "./helpers";
-import { SnippetNew } from "../../src/webapp/ui/snippets/snippet_new";
-import config from "./config";
+import { renderWithRouter, waitForLoadingLabel, waitForPath } from "../helpers";
+import { SnippetNew } from "../../../src/webapp/ui/snippets/snippet_new";
+import config from "../config";
 
 describe("As a user, I can list snippet", () => {
   it("<SnippetNew />: Create the snippet using the web form", async () => {

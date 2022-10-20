@@ -2,11 +2,11 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen } from "@testing-library/react";
-import { renderWithRouter, waitForLoadingLabel } from "./helpers";
+import { renderWithRouter, waitForLoadingLabel } from "../helpers";
 import {
   SnippetTypeList,
   SnippetTypesTable,
-} from "../../src/webapp/ui/snippets/snippet_types_list";
+} from "../../../src/webapp/ui/snippets/snippet_types_list";
 
 describe("As a user, I can list snippet", () => {
   it("<SnippetTypesTable />: render a spinner while loading", async () => {

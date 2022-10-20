@@ -2,15 +2,15 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { renderWithRouter } from "./helpers";
-import config from "./config";
+import { renderWithRouter } from "../helpers";
+import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";
 import {
   SnippetList,
   SnippetListButtons,
   SnippetListTable,
   SnippetRow,
-} from "../../src/webapp/ui/snippets/snippet_list";
+} from "../../../src/webapp/ui/snippets/snippet_list";
 
 describe("As a user, I can list snippet", () => {
   before(async () => {

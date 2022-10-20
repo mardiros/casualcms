@@ -2,10 +2,10 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
-import { PageEdit } from "../../src/webapp/ui/pages/page_edit";
-import { PageList } from "../../src/webapp/ui/pages/page_list";
-import { renderWithRouter, renderWithRouterWithTheme } from "./helpers";
-import config from "./config";
+import { PageEdit } from "../../../src/webapp/ui/pages/page_edit";
+import { PageList } from "../../../src/webapp/ui/pages/page_list";
+import { renderWithRouter, renderWithRouterWithTheme } from "../helpers";
+import config from "../config";
 
 describe("As a user, I can edit existing pages", () => {
   before(async () => {

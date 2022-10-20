@@ -7,7 +7,7 @@ import {
   PublishResultBox,
   SelectableHostname,
   SiteCheckBox,
-} from "../../../src/webapp/ui/pages/page_publish";
+} from "../../../src/webapp/ui/pages/pages/page_publish";
 import { renderWithRouter, waitForPath } from "../helpers";
 import config from "../config";
 import { err, ok } from "neverthrow";

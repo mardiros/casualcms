@@ -4,7 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { renderWithRouter } from "../helpers";
 import config from "../config";
-import { PageDeletePopoverForm } from "../../../src/webapp/ui/pages/page_delete";
+import { PageDeletePopoverForm } from "../../../src/webapp/ui/pages/pages/page_delete";
 
 describe("As a user, I can delete a page", () => {
   before(async () => {

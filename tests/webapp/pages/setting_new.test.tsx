@@ -3,7 +3,7 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
 import { renderWithRouter, waitForPath } from "../helpers";
-import { SettingNew } from "../../../src/webapp/ui/settings/setting_new";
+import { SettingNew } from "../../../src/webapp/ui/pages/settings/setting_new";
 import config from "../config";
 
 describe("As a user, I can list setting", () => {

@@ -2,8 +2,8 @@ import { expect } from "chai";
 import React from "react";
 import { Route } from "react-router-dom";
 import { fireEvent, screen } from "@testing-library/react";
-import { SiteEdit } from "../../../src/webapp/ui/sites/site_edit";
-import { SiteList } from "../../../src/webapp/ui/sites/site_list";
+import { SiteEdit } from "../../../src/webapp/ui/pages/sites/site_edit";
+import { SiteList } from "../../../src/webapp/ui/pages/sites/site_list";
 import { renderWithRouter, waitForLoadingLabel } from "../helpers";
 import config from "../config";
 

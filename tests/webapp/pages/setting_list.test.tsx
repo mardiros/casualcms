@@ -9,7 +9,7 @@ import {
   SettingRow,
   SettingsTable,
   SettingList,
-} from "../../../src/webapp/ui/settings/settings_list";
+} from "../../../src/webapp/ui/pages/settings/settings_list";
 
 describe("As a user, I can list settings of a given site", () => {
   before(async () => {

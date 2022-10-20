@@ -10,7 +10,7 @@ import {
   SnippetListButtons,
   SnippetListTable,
   SnippetRow,
-} from "../../../src/webapp/ui/snippets/snippet_list";
+} from "../../../src/webapp/ui/pages/snippets/snippet_list";
 
 describe("As a user, I can list snippet", () => {
   before(async () => {

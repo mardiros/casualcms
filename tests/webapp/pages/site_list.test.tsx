@@ -10,7 +10,7 @@ import {
   SiteListButtons,
   SiteListTable,
   SiteRow,
-} from "../../../src/webapp/ui/sites/site_list";
+} from "../../../src/webapp/ui/pages/sites/site_list";
 
 describe("As a user, I can list settings per sites", () => {
   before(async () => {

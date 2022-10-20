@@ -4,7 +4,7 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { renderWithRouter } from "../helpers";
 import config from "../config";
-import { SiteDeletePopoverForm } from "../../../src/webapp/ui/sites/site_delete";
+import { SiteDeletePopoverForm } from "../../../src/webapp/ui/pages/sites/site_delete";
 
 describe("As a user, I can delete a site", () => {
   before(async () => {

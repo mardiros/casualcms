@@ -6,7 +6,7 @@ import {
   PageRow,
   PageListTable,
   PageListButtons,
-} from "../../../src/webapp/ui/pages/page_list";
+} from "../../../src/webapp/ui/pages/pages/page_list";
 import { renderWithRouter, waitForLoadingLabel } from "../helpers";
 import config from "../config";
 import { Table, Tbody } from "@chakra-ui/react";

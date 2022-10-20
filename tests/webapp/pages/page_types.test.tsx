@@ -5,7 +5,7 @@ import { screen } from "@testing-library/react";
 import {
   PageTypeList,
   PageTypesTable,
-} from "../../../src/webapp/ui/pages/page_types_list";
+} from "../../../src/webapp/ui/pages/pages/page_types_list";
 import { renderWithRouter, waitForLoadingLabel } from "../helpers";
 
 describe("As a user, I can choose a root templates type", () => {

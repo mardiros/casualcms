@@ -5,7 +5,7 @@ import { Routes } from "react-router-dom";
 
 import config from "./config";
 
-import { AuthContext } from "../../src/webapp/ui/login/hooks";
+import { AuthContext } from "../../src/webapp/ui/pages/login/hooks";
 import { Account } from "../../src/webapp/casualcms/domain/model";
 import { AppContext } from "../../src/webapp/config";
 import { ChakraProvider } from "@chakra-ui/react";

@@ -4,8 +4,8 @@ import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { renderWithRouter, waitForLoadingLabel, waitForPath } from "../helpers";
 import config from "../config";
-import { SnippetList } from "../../../src/webapp/ui/snippets/snippet_list";
-import { SnippetEdit } from "../../../src/webapp/ui/snippets/snippet_edit";
+import { SnippetList } from "../../../src/webapp/ui/pages/snippets/snippet_list";
+import { SnippetEdit } from "../../../src/webapp/ui/pages/snippets/snippet_edit";
 
 describe("As a user, I can edit existing snippet", () => {
   before(async () => {

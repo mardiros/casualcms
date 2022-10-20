@@ -9,7 +9,7 @@ import {
   SettingSiteList,
   SettingSiteListTable,
   SettingSiteRow,
-} from "../../../src/webapp/ui/settings/settings_sites_list";
+} from "../../../src/webapp/ui/pages/settings/settings_sites_list";
 
 describe("As a user, I can list sites in settings", () => {
   before(async () => {

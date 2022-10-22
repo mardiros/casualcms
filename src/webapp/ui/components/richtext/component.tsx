@@ -3,11 +3,7 @@ import React from "react";
 
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
-import {
-  Editable,
-  withReact,
-  Slate,
-} from "slate-react";
+import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
 
 type RichTextEditorProps = {
@@ -18,13 +14,13 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
   props: RichTextEditorProps
 ) => {
   const { value } = props;
-  const editor = React.useMemo(() => withHistory(withReact(createEditor())), []);
+  const editor = React.useMemo(
+    () => withHistory(withReact(createEditor())),
+    []
+  );
   return (
     <Box minW="720px">
-      <Slate
-        editor={editor}
-        value={fromHtml(value)}
-      >
+      <Slate editor={editor} value={fromHtml(value)}>
         <Box padding={"15px 5px"}>
           <Editable
             placeholder="Lorem ipsum dolor sit amet, ..."
@@ -32,8 +28,6 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
           />
         </Box>
       </Slate>
-
-
     </Box>
   );
 };

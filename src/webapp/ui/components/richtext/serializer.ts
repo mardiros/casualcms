@@ -6,7 +6,7 @@ import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
 const serializeNode = (type: NodeType, el: Editor): string => {
   switch (type) {
     case "paragraph":
-      return `<p>${serializeNodes(el.children)}</p>`;
+      return `<p>${toHtml(el.children)}</p>`;
   }
   return "";
 };
@@ -27,12 +27,10 @@ const serializeElement = (el: TypedNode | TypedLeaf): string => {
   }
 };
 
-export const serializeNodes = (els: SlateModel | Descendant[]): string => {
-  return els.map((el: any) => {
-    return serializeElement(el);
-  }).join("");
-};
-
-export const toHtml = (mdl: SlateModel): string => {
-  return serializeNodes(mdl);
+export const toHtml = (els: SlateModel | Descendant[]): string => {
+  return els
+    .map((el: any) => {
+      return serializeElement(el);
+    })
+    .join("");
 };

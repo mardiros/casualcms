@@ -40,5 +40,4 @@ describe("Convert Html to slate model", () => {
     const html = toHtml(model);
     expect(html).eql("<p>My <strong>lazy</strong> dog</p>");
   });
-
 });

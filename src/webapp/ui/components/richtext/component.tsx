@@ -1,8 +1,13 @@
 import isHotkey from "is-hotkey";
 import React, { useCallback } from "react";
-import { Editor, Element} from "slate";
+import { Descendant, Editor, Element } from "slate";
 import { HistoryEditor } from "slate-history";
-import { ReactEditor, RenderElementProps, RenderLeafProps, useSlate } from "slate-react";
+import {
+  ReactEditor,
+  RenderElementProps,
+  RenderLeafProps,
+  useSlate,
+} from "slate-react";
 import {
   Box,
   HStack,
@@ -20,6 +25,7 @@ import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
 import { MdFormatBold } from "react-icons/md";
 import { NodeType, TypedLeaf } from "./types";
+import { toHtml } from "./serializer";
 
 const HOTKEYS: { [hotkey: string]: string } = {
   "mod+b": "bold",
@@ -28,21 +34,15 @@ const HOTKEYS: { [hotkey: string]: string } = {
   "mod+`": "code",
 };
 
-type RichTextEditorProps = {
-  value: string;
-};
-
 type EditorProps = Editor | ReactEditor | HistoryEditor;
-
 
 interface MyElement extends Element {
   type: NodeType;
 }
 
 interface MyRenderElementProps extends RenderElementProps {
-  element: MyElement
+  element: MyElement;
 }
-
 
 interface MyRenderLeafProps extends RenderLeafProps {
   leaf: TypedLeaf;
@@ -53,9 +53,10 @@ const BlockquoteStyle: React.CSSProperties | undefined = {
   padding: "0.5em 10px",
 };
 
-
 const isMarkActive = (editor: EditorProps, format: string) => {
   const marks = Editor.marks(editor);
+  console.log("??????????????????????????????????????????");
+  console.log(marks);
   if (marks) {
     const myMarks = marks as TypedLeaf;
     const myFormat = format as keyof TypedLeaf;
@@ -72,7 +73,6 @@ export const toggleMark = (editor: EditorProps, format: string): void => {
     Editor.addMark(editor, format, true);
   }
 };
-
 
 export const MyRenderElement = ({
   attributes,
@@ -114,16 +114,17 @@ export const MyRenderElement = ({
   }
 };
 
-
-export const MyRenderLeaf = ({ attributes, children, leaf }: MyRenderLeafProps) => {
-
+export const MyRenderLeaf = ({
+  attributes,
+  children,
+  leaf,
+}: MyRenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
 
   return <span {...attributes}>{children}</span>;
 };
-
 
 export const MarkButton = ({
   format,
@@ -163,24 +164,36 @@ const Toolbar: React.FunctionComponent<{}> = () => {
   );
 };
 
+type RichTextEditorProps = {
+  value: string;
+  onChange: (value: string) => void;
+};
 
 export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
   props: RichTextEditorProps
 ) => {
-  const { value } = props;
+  const { value, onChange } = props;
   const editor = React.useMemo(
     () => withHistory(withReact(createEditor())),
     []
   );
 
   const renderElement = useCallback(
-    (props: RenderElementProps) => <MyRenderElement {...props as MyRenderElementProps} />,
+    (props: RenderElementProps) => (
+      <MyRenderElement {...(props as MyRenderElementProps)} />
+    ),
     []
   );
   const renderLeaf = useCallback(
-    (props: RenderLeafProps) => <MyRenderLeaf {...props as MyRenderLeafProps} />,
+    (props: RenderLeafProps) => (
+      <MyRenderLeaf {...(props as MyRenderLeafProps)} />
+    ),
     []
   );
+
+  const onModelChange = useCallback((childs: Descendant[]) => {
+    onChange(toHtml(childs));
+  }, []);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     for (const hotkey in HOTKEYS) {
@@ -192,10 +205,9 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
     }
   };
 
-
   return (
     <Box minW="720px">
-      <Slate editor={editor} value={fromHtml(value)}>
+      <Slate editor={editor} value={fromHtml(value)} onChange={onModelChange}>
         <Box padding={"15px 5px"}>
           <Toolbar />
           <Editable

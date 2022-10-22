@@ -78,7 +78,7 @@ class RelatedPostSnippet(AbstractFooterSnippet):
 
 class Paragraph(BaseModel):
     title: Optional[str] = Field()
-    body: str = Field(widget="textarea")
+    body: str = Field(widget="richtext")
 
 
 class BasePage(AbstractPage):

@@ -1,28 +1,29 @@
-import { NodeType, SlateModel, TypedNode } from "./model";
+import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
 const NODE_TYPE_TEXT = 3;
 
-export const createTextNode = (content: string | null): TypedNode => {
-  return { type: "TEXT", text: content || "" };
+export const createLeaf = (
+  text: string | null,
+  attrs?: { [key: string]: any }
+): TypedLeaf => {
+  return {
+    bold: attrs?.bold,
+    text: text || "",
+  };
 };
 
 export const createNode = (
   type: NodeType,
-  children: TypedNode[] = [{ type: "TEXT", text: "" }],
-  attrs?: { [key: string]: any }
+  children: SlateModel = []
 ): TypedNode => {
-  if (type == "TEXT") {
-    return { type: "TEXT", text: "" };
-  }
   return {
     type: type,
-    attrs: attrs || {},
     children: children,
   };
 };
 
-const deserializeNode = (el: ChildNode): TypedNode => {
+const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
   if (el.nodeType == NODE_TYPE_TEXT) {
-    return createTextNode(el.textContent);
+    return createLeaf(el.textContent);
   }
 
   switch (el.nodeName) {
@@ -30,17 +31,18 @@ const deserializeNode = (el: ChildNode): TypedNode => {
       return createNode("paragraph", deserializeChildNodes(el));
     case "B":
     case "STRONG":
-      return createNode("strong", deserializeChildNodes(el));
+      return createLeaf(el.textContent, { bold: true });
   }
-  return createTextNode("");
+
+  return createLeaf("");
 };
 
-const deserializeChildNodes = (el: ChildNode): TypedNode[] => {
+const deserializeChildNodes = (el: ChildNode): SlateModel => {
   if (!el.hasChildNodes()) {
-    return [createTextNode(el.textContent)];
+    return [createLeaf(el.textContent)];
   }
 
-  const nodes: TypedNode[] = [];
+  const nodes: SlateModel = [];
   el.childNodes.forEach((e) => nodes.push(deserializeNode(e)));
   return nodes;
 };
@@ -87,12 +89,4 @@ export const fromHtml = (html: string): SlateModel => {
     nodes.push(deserializeNode(node));
   });
   return nodes;
-
-  // // deserialize DOM document into an array of nodes
-  // const nodes: SlateModel = deserialize(document.body);
-
-  // // normalize nodes to Slate compatible format
-  // nodes.forEach((node) => normalize(node));
-
-  // return nodes;
 };

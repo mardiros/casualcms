@@ -7,19 +7,18 @@ import {
 
 describe.only("Convert Html to slate model", () => {
   it("Parse empty textgenerate the empty paragraph", () => {
-    const html = fromHtml("");
-    expect(html).eql(defaultModel());
+    const mdl = fromHtml("");
+    expect(mdl).eql(defaultModel());
   });
 
   it("Parse paragraph extract the text", () => {
-    const html = fromHtml("<html><p>My lazy dog</p></html>");
-    expect(html).eql([
+    const mdl = fromHtml("<p>My lazy dog</p>");
+    expect(mdl).eql([
       {
-        attrs: {},
         children: [
           {
             text: "My lazy dog",
-            type: "TEXT",
+            bold: undefined,
           },
         ],
         type: "paragraph",
@@ -28,28 +27,21 @@ describe.only("Convert Html to slate model", () => {
   });
 
   it("Parse paragraph extract bold text", () => {
-    const html = fromHtml("<html><p>My <b>lazy</b> dog</p></html>");
-    expect(html).eql([
+    const mdl = fromHtml("<p>My <b>lazy</b> dog</p>");
+    expect(mdl).eql([
       {
-        attrs: {},
         children: [
           {
             text: "My ",
-            type: "TEXT",
+            bold: undefined,
           },
           {
-            attrs: {},
-            children: [
-              {
-                text: "lazy",
-                type: "TEXT",
-              },
-            ],
-            type: "strong",
+            text: "lazy",
+            bold: true,
           },
           {
             text: " dog",
-            type: "TEXT",
+            bold: undefined,
           },
         ],
         type: "paragraph",

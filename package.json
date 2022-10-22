@@ -16,7 +16,12 @@
     "neverthrow": "^4.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.3.0"
+    "react-icons": "^4.6.0",
+    "react-router-dom": "^6.3.0",
+    "slate": "^0.82.1",
+    "slate-history": "^0.66.0",
+    "slate-hyperscript": "^0.77.0",
+    "slate-react": "^0.83.2"
   },
   "devDependencies": {
     "@babel/core": "^7.18.10",
@@ -40,7 +45,7 @@
     "typescript": "^4.7.4"
   },
   "scripts": {
-    "test": "mocha -r ts-node/register -r tests/webapp/hook/register tests/webapp/**/*.test.ts*",
+    "test": "mocha -r ts-node/register -r tests/webapp/hook/register \"tests/webapp/**/*.test.ts*\"",
     "cov": "nyc mocha -r ts-node/register -r global-jsdom/register tests/webapp/**/*.test.ts*",
     "watch": "parcel watch src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled  --log-level info",
     "build_dev": "parcel build src/webapp/index.html --public-url /admin/ --dist-dir ./src/casualcms/ui/webapp_compiled --no-optimize --log-level info",

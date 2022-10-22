@@ -1,8 +1,7 @@
-import { Node } from "slate";
+import { Node, Text } from "slate";
 
 export type NodeType =
   | "paragraph"
-  | "strong"
   | "heading1"
   | "heading2"
   | "heading3"
@@ -15,12 +14,14 @@ export type NodeType =
   | "link"
   | "list-item"
   | "numbered-list"
-  | "pre"
-  | "TEXT";
+  | "pre";
 
 export type TypedNode = Node & {
   type: NodeType;
-  attrs?: { [key: string]: any } | undefined;
 };
 
-export type SlateModel = Array<TypedNode>;
+export type TypedLeaf = Text & {
+  bold?: boolean;
+};
+
+export type SlateModel = Array<TypedNode | TypedLeaf>;

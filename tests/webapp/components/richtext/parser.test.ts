@@ -92,4 +92,79 @@ describe.only("Convert Html to slate model", () => {
       },
     ]);
   });
+  it("Parse unordered list", () => {
+    const mdl = fromHtml("<ul><li>Dog</li><li>Cat</li><li>Lezard</li></ul>");
+    expect(mdl).eql([
+      {
+        type: "ul",
+        children: [
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Dog",
+              },
+            ],
+          },
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Cat",
+              },
+            ],
+          },
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Lezard",
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
+
+  it("Parse ordered list", () => {
+    const mdl = fromHtml("<ol><li>Dog</li><li>Cat</li><li>Lezard</li></ol>");
+    expect(mdl).eql([
+      {
+        type: "ol",
+        children: [
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Dog",
+              },
+            ],
+          },
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Cat",
+              },
+            ],
+          },
+          {
+            type: "li",
+            children: [
+              {
+                bold: undefined,
+                text: "Lezard",
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+  });
 });

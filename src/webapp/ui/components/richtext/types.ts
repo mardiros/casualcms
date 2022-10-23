@@ -8,12 +8,12 @@ export type NodeType =
   | "h4"
   | "h5"
   | "h6"
+  | "ul"
+  | "ol"
+  | "li"
   | "block-quote"
-  | "bulleted-list"
   | "image"
   | "link"
-  | "list-item"
-  | "numbered-list"
   | "pre";
 
 export type TypedNode = Node & {

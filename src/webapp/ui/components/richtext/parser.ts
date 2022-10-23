@@ -33,6 +33,12 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
       return createNode("h2", deserializeChildNodes(el));
     case "P":
       return createNode("paragraph", deserializeChildNodes(el));
+    case "UL":
+      return createNode("ul", deserializeChildNodes(el));
+    case "OL":
+      return createNode("ol", deserializeChildNodes(el));
+    case "LI":
+      return createNode("li", deserializeChildNodes(el));
     case "B":
     case "STRONG":
       return createLeaf(el.textContent, { bold: true });

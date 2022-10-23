@@ -9,6 +9,12 @@ const serializeNode = (type: NodeType, el: Editor): string => {
       return `<h1>${toHtml(el.children)}</h1>`;
     case "h2":
       return `<h2>${toHtml(el.children)}</h2>`;
+    case "ul":
+      return `<ul>${toHtml(el.children)}</ul>`;
+    case "ol":
+      return `<ol>${toHtml(el.children)}</ol>`;
+    case "li":
+      return `<li>${toHtml(el.children)}</li>`;
     case "paragraph":
       return `<p>${toHtml(el.children)}</p>`;
   }

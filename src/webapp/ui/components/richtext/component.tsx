@@ -1,6 +1,6 @@
 import isHotkey from "is-hotkey";
 import React, { useCallback } from "react";
-import { Descendant, Editor, Element, Transforms } from "slate";
+import { BaseEditor, Descendant, Editor, Element, Transforms } from "slate";
 import { HistoryEditor } from "slate-history";
 import {
   ReactEditor,
@@ -23,7 +23,7 @@ import { createEditor, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
-import { MdFormatBold, MdLooksOne, MdLooksTwo } from "react-icons/md";
+import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdLooksOne, MdLooksTwo } from "react-icons/md";
 import { NodeType, TypedLeaf, TypedNode } from "./types";
 import { toHtml } from "./serializer";
 
@@ -90,13 +90,37 @@ export const toggleMark = (editor: EditorProps, format: string): void => {
 
 
 export const toggleBlock = (editor: EditorProps, format: NodeType) => {
-  const isActive = isBlockActive(editor, format);
+  const isActivating = !isBlockActive(editor, format);
 
   const newProperties: Partial<MyElement> = {
-    type: isActive ? "paragraph": format,
+    type: isActivating ? format : "paragraph",
   };
   Transforms.setNodes(editor, newProperties);
 };
+
+export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
+
+  const isActivating = !isBlockActive(editor, format);
+
+  const newProperties: Partial<MyElement> = {
+    type: isActivating ? "li" : "paragraph",
+  };
+  Transforms.setNodes(editor, newProperties);
+
+  if (isActivating) {
+    const block = { type: format, children: [] }
+    Transforms.wrapNodes(editor, block)
+  }
+  else {
+    Transforms.unwrapNodes(editor, {
+      match: n =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        ["ul", "ol", "li"].includes((n as TypedNode).type),
+      split: true,
+    })
+  }
+}
 
 
 export const MyRenderElement = ({
@@ -116,24 +140,16 @@ export const MyRenderElement = ({
     //       {children}
     //     </chakra.blockquote>
     //   );
-    // case "list-item":
-    //   return <ListItem {...attributes}>{children}</ListItem>;
-    // case "numbered-list":
-    //   return <OrderedList {...attributes}>{children}</OrderedList>;
-    // case "bulleted-list":
-    //   return <UnorderedList {...attributes}>{children}</UnorderedList>;
     case "h1":
-      return (
-        <Heading as="h1" size="3xl" {...attributes}>
-          {children}
-        </Heading>
-      );
+      return <Heading as="h1" size="3xl" {...attributes}>{children}</Heading>;
     case "h2":
-      return (
-        <Heading as="h2" size="2xl" {...attributes}>
-          {children}
-        </Heading>
-      );
+      return <Heading as="h2" size="2xl" {...attributes}>{children}</Heading>;
+    case "ul":
+      return <UnorderedList {...attributes}>{children}</UnorderedList>;
+    case "ol":
+      return <OrderedList {...attributes}>{children}</OrderedList>;
+    case "li":
+      return <ListItem {...attributes}>{children}</ListItem>;
     default:
       return <p {...attributes}>{children}</p>;
   }
@@ -176,22 +192,26 @@ export const MarkButton = ({
   );
 };
 
+type BlockButtonProps = {
+  format: NodeType;
+  icon: React.ReactElement;
+  toggleFn?: (editor: EditorProps, format: NodeType) => void;
+}
 export const BlockButton = ({
   format,
   icon,
-}: {
-  format: NodeType;
-  icon: React.ReactElement;
-}) => {
+  toggleFn,
+}: BlockButtonProps) => {
   const editor = useSlate();
+  const callback = toggleFn || toggleBlock;
   return (
     <IconButton
       variant="outline"
-      colorScheme="twitter"
+      colorScheme="green"
       isActive={isBlockActive(editor, format)}
       onMouseDown={(event) => {
         event.preventDefault();
-        toggleBlock(editor, format);
+        callback(editor, format);
       }}
       aria-label={format}
       icon={icon}
@@ -212,6 +232,8 @@ const Toolbar: React.FunctionComponent<{}> = () => {
       <MarkButton format="bold" icon={<MdFormatBold />} />
       <BlockButton format="h1" icon={<MdLooksOne />} />
       <BlockButton format="h2" icon={<MdLooksTwo />} />
+      <BlockButton format="ul" icon={<MdFormatListBulleted />} toggleFn={toggleListBlock} />
+      <BlockButton format="ol" icon={<MdFormatListNumbered />} toggleFn={toggleListBlock} />
     </HStack>
   );
 };

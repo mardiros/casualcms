@@ -11,10 +11,10 @@ export type NodeType =
   | "ul"
   | "ol"
   | "li"
-  | "block-quote"
+  | "blockquote"
+  | "code"
   | "image"
-  | "link"
-  | "pre";
+  | "link";
 
 export type TypedNode = Node & {
   type: NodeType;

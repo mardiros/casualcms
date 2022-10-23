@@ -23,7 +23,22 @@ import { createEditor, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
-import { MdFormatBold, MdFormatItalic, MdFormatListBulleted, MdFormatListNumbered, MdFormatStrikethrough, MdFormatUnderlined, MdLooks3, MdLooks4, MdLooks5, MdLooks6, MdLooksOne, MdLooksTwo } from "react-icons/md";
+import {
+  MdCode,
+  MdFormatBold,
+  MdFormatItalic,
+  MdFormatListBulleted,
+  MdFormatListNumbered,
+  MdFormatQuote,
+  MdFormatStrikethrough,
+  MdFormatUnderlined,
+  MdLooks3,
+  MdLooks4,
+  MdLooks5,
+  MdLooks6,
+  MdLooksOne,
+  MdLooksTwo,
+} from "react-icons/md";
 import { NodeType, TypedLeaf, TypedNode } from "./types";
 import { toHtml } from "./serializer";
 
@@ -48,11 +63,6 @@ interface MyRenderLeafProps extends RenderLeafProps {
   leaf: TypedLeaf;
 }
 
-const BlockquoteStyle: React.CSSProperties | undefined = {
-  margin: "1.5em 10px",
-  padding: "0.5em 10px",
-};
-
 const isMarkActive = (editor: EditorProps, format: string) => {
   const marks = Editor.marks(editor);
   if (marks) {
@@ -67,8 +77,10 @@ const isBlockActive = (editor: EditorProps, format: string) => {
   const nodeGen = Editor.nodes(editor, {
     match: (node) => {
       const n = node as TypedNode;
-      return !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format;
-    }
+      return (
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format
+      );
+    },
   });
 
   let node = nodeGen.next();
@@ -78,7 +90,6 @@ const isBlockActive = (editor: EditorProps, format: string) => {
   return false;
 };
 
-
 export const toggleMark = (editor: EditorProps, format: string): void => {
   const isActive = isMarkActive(editor, format);
   if (isActive) {
@@ -87,7 +98,6 @@ export const toggleMark = (editor: EditorProps, format: string): void => {
     Editor.addMark(editor, format, true);
   }
 };
-
 
 export const toggleBlock = (editor: EditorProps, format: NodeType) => {
   const isActivating = !isBlockActive(editor, format);
@@ -99,7 +109,6 @@ export const toggleBlock = (editor: EditorProps, format: NodeType) => {
 };
 
 export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
-
   const isActivating = !isBlockActive(editor, format);
 
   const newProperties: Partial<MyElement> = {
@@ -108,20 +117,40 @@ export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
   Transforms.setNodes(editor, newProperties);
 
   if (isActivating) {
-    const block = { type: format, children: [] }
-    Transforms.wrapNodes(editor, block)
-  }
-  else {
+    const block = { type: format, children: [] };
+    Transforms.wrapNodes(editor, block);
+  } else {
     Transforms.unwrapNodes(editor, {
-      match: n =>
+      match: (n) =>
         !Editor.isEditor(n) &&
         SlateElement.isElement(n) &&
         ["ul", "ol", "li"].includes((n as TypedNode).type),
       split: true,
-    })
+    });
   }
-}
+};
 
+export const toggleMultilineBlock = (editor: EditorProps, format: NodeType) => {
+  const isActivating = !isBlockActive(editor, format);
+
+  const newProperties: Partial<MyElement> = {
+    type: isActivating ? format : "paragraph",
+  };
+  Transforms.setNodes(editor, newProperties);
+
+  if (isActivating) {
+    const block = { type: format, children: [] };
+    Transforms.wrapNodes(editor, block);
+  } else {
+    Transforms.unwrapNodes(editor, {
+      match: (n) =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        [format].includes((n as TypedNode).type),
+      split: true,
+    });
+  }
+};
 
 export const MyRenderElement = ({
   attributes,
@@ -129,35 +158,71 @@ export const MyRenderElement = ({
   element,
 }: MyRenderElementProps) => {
   switch (element.type) {
-    // case "block-quote":
-    //   return (
-    //     <chakra.blockquote
-    //       style={BlockquoteStyle}
-    //       borderLeftWidth={"10px"}
-    //       borderLeftColor={"gray.200"}
-    //       {...attributes}
-    //     >
-    //       {children}
-    //     </chakra.blockquote>
-    //   );
     case "h1":
-      return <Heading as="h1" size="3xl" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h1" size="3xl" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "h2":
-      return <Heading as="h2" size="2xl" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h2" size="2xl" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "h3":
-      return <Heading as="h3" size="xl" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h3" size="xl" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "h4":
-      return <Heading as="h4" size="lg" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h4" size="lg" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "h5":
-      return <Heading as="h5" size="sd" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h5" size="sd" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "h6":
-      return <Heading as="h6" size="sm" {...attributes}>{children}</Heading>;
+      return (
+        <Heading as="h6" size="sm" {...attributes}>
+          {children}
+        </Heading>
+      );
     case "ul":
       return <UnorderedList {...attributes}>{children}</UnorderedList>;
     case "ol":
       return <OrderedList {...attributes}>{children}</OrderedList>;
     case "li":
       return <ListItem {...attributes}>{children}</ListItem>;
+    case "code":
+      return (
+        <chakra.blockquote
+          padding={"3px"}
+          backgroundColor={"gray.200"}
+          fontFamily={"monospace"}
+        >
+          {children}
+        </chakra.blockquote>
+      );
+
+    case "blockquote":
+      return (
+        <chakra.blockquote
+          borderLeftWidth={"10px"}
+          borderLeftColor={"gray.200"}
+          fontFamily={"serif"}
+          {...attributes}
+        >
+          {children}
+        </chakra.blockquote>
+      );
+
     default:
       return <p {...attributes}>{children}</p>;
   }
@@ -212,12 +277,8 @@ type BlockButtonProps = {
   format: NodeType;
   icon: React.ReactElement;
   toggleFn?: (editor: EditorProps, format: NodeType) => void;
-}
-export const BlockButton = ({
-  format,
-  icon,
-  toggleFn,
-}: BlockButtonProps) => {
+};
+export const BlockButton = ({ format, icon, toggleFn }: BlockButtonProps) => {
   const editor = useSlate();
   const callback = toggleFn || toggleBlock;
   return (
@@ -255,8 +316,26 @@ const Toolbar: React.FunctionComponent<{}> = () => {
       <BlockButton format="h4" icon={<MdLooks4 />} />
       <BlockButton format="h5" icon={<MdLooks5 />} />
       <BlockButton format="h6" icon={<MdLooks6 />} />
-      <BlockButton format="ul" icon={<MdFormatListBulleted />} toggleFn={toggleListBlock} />
-      <BlockButton format="ol" icon={<MdFormatListNumbered />} toggleFn={toggleListBlock} />
+      <BlockButton
+        format="ul"
+        icon={<MdFormatListBulleted />}
+        toggleFn={toggleListBlock}
+      />
+      <BlockButton
+        format="ol"
+        icon={<MdFormatListNumbered />}
+        toggleFn={toggleListBlock}
+      />
+      <BlockButton
+        format="blockquote"
+        icon={<MdFormatQuote />}
+        toggleFn={toggleMultilineBlock}
+      />
+      <BlockButton
+        format="code"
+        icon={<MdCode />}
+        toggleFn={toggleMultilineBlock}
+      />
     </HStack>
   );
 };

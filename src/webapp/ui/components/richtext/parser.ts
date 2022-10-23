@@ -3,11 +3,14 @@ const NODE_TYPE_TEXT = 3;
 
 export const createLeaf = (
   text: string | null,
-  attrs?: { [key: string]: any }
+  attrs?: { [key: string]: boolean }
 ): TypedLeaf => {
   return {
-    bold: attrs?.bold,
     text: text || "",
+    bold: attrs?.bold || false,
+    italic: attrs?.italic || false,
+    underline: attrs?.underline || false,
+    strikethrough: attrs?.strikethrough || false,
   };
 };
 
@@ -31,6 +34,14 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
       return createNode("h1", deserializeChildNodes(el));
     case "H2":
       return createNode("h2", deserializeChildNodes(el));
+    case "H3":
+      return createNode("h3", deserializeChildNodes(el));
+    case "H4":
+      return createNode("h4", deserializeChildNodes(el));
+    case "H5":
+      return createNode("h5", deserializeChildNodes(el));
+    case "H6":
+      return createNode("h6", deserializeChildNodes(el));
     case "P":
       return createNode("paragraph", deserializeChildNodes(el));
     case "UL":
@@ -39,9 +50,15 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
       return createNode("ol", deserializeChildNodes(el));
     case "LI":
       return createNode("li", deserializeChildNodes(el));
-    case "B":
+    // case "B":
     case "STRONG":
       return createLeaf(el.textContent, { bold: true });
+    case "EM":
+      return createLeaf(el.textContent, { italic: true });
+    case "U":
+      return createLeaf(el.textContent, { underline: true });
+    case "S":
+      return createLeaf(el.textContent, { strikethrough: true });
   }
 
   return createLeaf("");

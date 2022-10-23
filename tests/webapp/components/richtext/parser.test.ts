@@ -18,7 +18,10 @@ describe.only("Convert Html to slate model", () => {
         children: [
           {
             text: "My lazy dog",
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
           },
         ],
         type: "paragraph",
@@ -27,21 +30,30 @@ describe.only("Convert Html to slate model", () => {
   });
 
   it("Parse paragraph extract bold text", () => {
-    const mdl = fromHtml("<p>My <b>lazy</b> dog</p>");
+    const mdl = fromHtml("<p>My <strong>lazy</strong> dog</p>");
     expect(mdl).eql([
       {
         children: [
           {
             text: "My ",
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
           },
           {
             text: "lazy",
             bold: true,
+            italic: false,
+            underline: false,
+            strikethrough: false,
           },
           {
             text: " dog",
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
           },
         ],
         type: "paragraph",
@@ -58,7 +70,10 @@ describe.only("Convert Html to slate model", () => {
         type: "h1",
         children: [
           {
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
             text: "Title",
           },
         ],
@@ -67,7 +82,10 @@ describe.only("Convert Html to slate model", () => {
         type: "paragraph",
         children: [
           {
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
             text: "My lazy dog",
           },
         ],
@@ -76,7 +94,10 @@ describe.only("Convert Html to slate model", () => {
         type: "h2",
         children: [
           {
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
             text: "Subtitle",
           },
         ],
@@ -85,7 +106,10 @@ describe.only("Convert Html to slate model", () => {
         type: "paragraph",
         children: [
           {
-            bold: undefined,
+            bold: false,
+            italic: false,
+            underline: false,
+            strikethrough: false,
             text: "ha ha!",
           },
         ],
@@ -102,7 +126,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Dog",
               },
             ],
@@ -111,7 +138,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Cat",
               },
             ],
@@ -120,7 +150,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Lezard",
               },
             ],
@@ -140,7 +173,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Dog",
               },
             ],
@@ -149,7 +185,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Cat",
               },
             ],
@@ -158,7 +197,10 @@ describe.only("Convert Html to slate model", () => {
             type: "li",
             children: [
               {
-                bold: undefined,
+                bold: false,
+                italic: false,
+                underline: false,
+                strikethrough: false,
                 text: "Lezard",
               },
             ],

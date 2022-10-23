@@ -23,7 +23,7 @@ import { createEditor, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
-import { MdFormatBold, MdFormatListBulleted, MdFormatListNumbered, MdLooksOne, MdLooksTwo } from "react-icons/md";
+import { MdFormatBold, MdFormatItalic, MdFormatListBulleted, MdFormatListNumbered, MdFormatStrikethrough, MdFormatUnderlined, MdLooks3, MdLooks4, MdLooks5, MdLooks6, MdLooksOne, MdLooksTwo } from "react-icons/md";
 import { NodeType, TypedLeaf, TypedNode } from "./types";
 import { toHtml } from "./serializer";
 
@@ -144,6 +144,14 @@ export const MyRenderElement = ({
       return <Heading as="h1" size="3xl" {...attributes}>{children}</Heading>;
     case "h2":
       return <Heading as="h2" size="2xl" {...attributes}>{children}</Heading>;
+    case "h3":
+      return <Heading as="h3" size="xl" {...attributes}>{children}</Heading>;
+    case "h4":
+      return <Heading as="h4" size="lg" {...attributes}>{children}</Heading>;
+    case "h5":
+      return <Heading as="h5" size="sd" {...attributes}>{children}</Heading>;
+    case "h6":
+      return <Heading as="h6" size="sm" {...attributes}>{children}</Heading>;
     case "ul":
       return <UnorderedList {...attributes}>{children}</UnorderedList>;
     case "ol":
@@ -163,7 +171,15 @@ export const MyRenderLeaf = ({
   if (leaf.bold) {
     children = <strong>{children}</strong>;
   }
-
+  if (leaf.italic) {
+    children = <em>{children}</em>;
+  }
+  if (leaf.underline) {
+    children = <u>{children}</u>;
+  }
+  if (leaf.strikethrough) {
+    children = <s>{children}</s>;
+  }
   return <span {...attributes}>{children}</span>;
 };
 
@@ -230,8 +246,15 @@ const Toolbar: React.FunctionComponent<{}> = () => {
       wrap={"wrap"}
     >
       <MarkButton format="bold" icon={<MdFormatBold />} />
+      <MarkButton format="italic" icon={<MdFormatItalic />} />
+      <MarkButton format="underline" icon={<MdFormatUnderlined />} />
+      <MarkButton format="strikethrough" icon={<MdFormatStrikethrough />} />
       <BlockButton format="h1" icon={<MdLooksOne />} />
       <BlockButton format="h2" icon={<MdLooksTwo />} />
+      <BlockButton format="h3" icon={<MdLooks3 />} />
+      <BlockButton format="h4" icon={<MdLooks4 />} />
+      <BlockButton format="h5" icon={<MdLooks5 />} />
+      <BlockButton format="h6" icon={<MdLooks6 />} />
       <BlockButton format="ul" icon={<MdFormatListBulleted />} toggleFn={toggleListBlock} />
       <BlockButton format="ol" icon={<MdFormatListNumbered />} toggleFn={toggleListBlock} />
     </HStack>

@@ -22,6 +22,9 @@ export type TypedNode = Node & {
 
 export type TypedLeaf = Text & {
   bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  strikethrough?: boolean;
 };
 
 export type SlateModel = Array<TypedNode | TypedLeaf>;

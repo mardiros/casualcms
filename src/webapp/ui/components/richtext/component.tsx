@@ -1,6 +1,6 @@
 import isHotkey from "is-hotkey";
 import React, { useCallback } from "react";
-import { Descendant, Editor, Element } from "slate";
+import { Descendant, Editor, Element, Transforms } from "slate";
 import { HistoryEditor } from "slate-history";
 import {
   ReactEditor,
@@ -19,12 +19,12 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 
-import { createEditor } from "slate";
+import { createEditor, Element as SlateElement } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
-import { MdFormatBold } from "react-icons/md";
-import { NodeType, TypedLeaf } from "./types";
+import { MdFormatBold, MdLooksOne, MdLooksTwo } from "react-icons/md";
+import { NodeType, TypedLeaf, TypedNode } from "./types";
 import { toHtml } from "./serializer";
 
 const HOTKEYS: { [hotkey: string]: string } = {
@@ -55,8 +55,6 @@ const BlockquoteStyle: React.CSSProperties | undefined = {
 
 const isMarkActive = (editor: EditorProps, format: string) => {
   const marks = Editor.marks(editor);
-  console.log("??????????????????????????????????????????");
-  console.log(marks);
   if (marks) {
     const myMarks = marks as TypedLeaf;
     const myFormat = format as keyof TypedLeaf;
@@ -64,6 +62,22 @@ const isMarkActive = (editor: EditorProps, format: string) => {
   }
   return false;
 };
+
+const isBlockActive = (editor: EditorProps, format: string) => {
+  const nodeGen = Editor.nodes(editor, {
+    match: (node) => {
+      const n = node as TypedNode;
+      return !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format;
+    }
+  });
+
+  let node = nodeGen.next();
+  while (!node.done) {
+    return true;
+  }
+  return false;
+};
+
 
 export const toggleMark = (editor: EditorProps, format: string): void => {
   const isActive = isMarkActive(editor, format);
@@ -74,36 +88,47 @@ export const toggleMark = (editor: EditorProps, format: string): void => {
   }
 };
 
+
+export const toggleBlock = (editor: EditorProps, format: NodeType) => {
+  const isActive = isBlockActive(editor, format);
+
+  const newProperties: Partial<MyElement> = {
+    type: isActive ? "paragraph": format,
+  };
+  Transforms.setNodes(editor, newProperties);
+};
+
+
 export const MyRenderElement = ({
   attributes,
   children,
   element,
 }: MyRenderElementProps) => {
   switch (element.type) {
-    case "block-quote":
-      return (
-        <chakra.blockquote
-          style={BlockquoteStyle}
-          borderLeftWidth={"10px"}
-          borderLeftColor={"gray.200"}
-          {...attributes}
-        >
-          {children}
-        </chakra.blockquote>
-      );
-    case "list-item":
-      return <ListItem {...attributes}>{children}</ListItem>;
-    case "numbered-list":
-      return <OrderedList {...attributes}>{children}</OrderedList>;
-    case "bulleted-list":
-      return <UnorderedList {...attributes}>{children}</UnorderedList>;
-    case "heading1":
+    // case "block-quote":
+    //   return (
+    //     <chakra.blockquote
+    //       style={BlockquoteStyle}
+    //       borderLeftWidth={"10px"}
+    //       borderLeftColor={"gray.200"}
+    //       {...attributes}
+    //     >
+    //       {children}
+    //     </chakra.blockquote>
+    //   );
+    // case "list-item":
+    //   return <ListItem {...attributes}>{children}</ListItem>;
+    // case "numbered-list":
+    //   return <OrderedList {...attributes}>{children}</OrderedList>;
+    // case "bulleted-list":
+    //   return <UnorderedList {...attributes}>{children}</UnorderedList>;
+    case "h1":
       return (
         <Heading as="h1" size="3xl" {...attributes}>
           {children}
         </Heading>
       );
-    case "heading2":
+    case "h2":
       return (
         <Heading as="h2" size="2xl" {...attributes}>
           {children}
@@ -151,6 +176,31 @@ export const MarkButton = ({
   );
 };
 
+export const BlockButton = ({
+  format,
+  icon,
+}: {
+  format: NodeType;
+  icon: React.ReactElement;
+}) => {
+  const editor = useSlate();
+  return (
+    <IconButton
+      variant="outline"
+      colorScheme="twitter"
+      isActive={isBlockActive(editor, format)}
+      onMouseDown={(event) => {
+        event.preventDefault();
+        toggleBlock(editor, format);
+      }}
+      aria-label={format}
+      icon={icon}
+      borderWidth={0}
+      fontSize={"20px"}
+    />
+  );
+};
+
 const Toolbar: React.FunctionComponent<{}> = () => {
   return (
     <HStack
@@ -160,6 +210,8 @@ const Toolbar: React.FunctionComponent<{}> = () => {
       wrap={"wrap"}
     >
       <MarkButton format="bold" icon={<MdFormatBold />} />
+      <BlockButton format="h1" icon={<MdLooksOne />} />
+      <BlockButton format="h2" icon={<MdLooksTwo />} />
     </HStack>
   );
 };

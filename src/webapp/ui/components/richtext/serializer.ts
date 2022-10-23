@@ -5,6 +5,10 @@ import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
 
 const serializeNode = (type: NodeType, el: Editor): string => {
   switch (type) {
+    case "h1":
+      return `<h1>${toHtml(el.children)}</h1>`;
+    case "h2":
+      return `<h2>${toHtml(el.children)}</h2>`;
     case "paragraph":
       return `<p>${toHtml(el.children)}</p>`;
   }

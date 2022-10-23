@@ -27,6 +27,10 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
   }
 
   switch (el.nodeName) {
+    case "H1":
+      return createNode("h1", deserializeChildNodes(el));
+    case "H2":
+      return createNode("h2", deserializeChildNodes(el));
     case "P":
       return createNode("paragraph", deserializeChildNodes(el));
     case "B":

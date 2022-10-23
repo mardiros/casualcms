@@ -48,4 +48,48 @@ describe.only("Convert Html to slate model", () => {
       },
     ]);
   });
+
+  it("Parse titles and paragraphs", () => {
+    const mdl = fromHtml(
+      "<h1>Title</h1><p>My lazy dog</p><h2>Subtitle</h2><p>ha ha!</p>"
+    );
+    expect(mdl).eql([
+      {
+        type: "h1",
+        children: [
+          {
+            bold: undefined,
+            text: "Title",
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        children: [
+          {
+            bold: undefined,
+            text: "My lazy dog",
+          },
+        ],
+      },
+      {
+        type: "h2",
+        children: [
+          {
+            bold: undefined,
+            text: "Subtitle",
+          },
+        ],
+      },
+      {
+        type: "paragraph",
+        children: [
+          {
+            bold: undefined,
+            text: "ha ha!",
+          },
+        ],
+      },
+    ]);
+  });
 });

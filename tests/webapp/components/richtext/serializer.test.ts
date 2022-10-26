@@ -3,7 +3,7 @@ import { expect } from "chai";
 import { toHtml } from "../../../../src/webapp/ui/components/richtext/serializer";
 import { SlateModel } from "../../../../src/webapp/ui/components/richtext/types";
 
-describe.only("Convert Html to slate model", () => {
+describe("Convert Html to slate model", () => {
   it("Rebuild html paragraph extract the text", () => {
     const model: SlateModel = [
       {
@@ -157,5 +157,25 @@ describe.only("Convert Html to slate model", () => {
     ];
     const html = toHtml(model);
     expect(html).eql("<ol><li>Dog</li><li>Cat</li><li>Lezard</li></ol>");
+  });
+  it.only("Serialize image", () => {
+    const model: any = [
+      {
+        type: "paragraph",
+        children: [
+          {
+            type: "image",
+            attrs: {
+              src: "https://2.cv/logo.jpg",
+              alt: "la dodoche",
+            },
+          },
+        ],
+      },
+    ];
+    const html = toHtml(model);
+    expect(html).eql(
+      '<p><img src="https://2.cv/logo.jpg" alt="la dodoche"/></p>'
+    );
   });
 });

@@ -52,25 +52,23 @@ export const DeletePopoverForm: React.FunctionComponent<
   const { onOpen, onClose, isOpen } = useDisclosure();
 
   return (
-    <>
-      <Popover
-        isOpen={isOpen}
-        onOpen={onOpen}
-        onClose={onClose}
-        placement="right"
-      >
-        <PopoverTrigger>
-          <Button colorScheme="red">
-            <Icon as={DeleteIcon} marginEnd={2} />
-            {props.button_label}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent p={25}>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <ConfirmDelete onCancel={onClose} onSubmit={props.onSubmit} />
-        </PopoverContent>
-      </Popover>
-    </>
+    <Popover
+      isOpen={isOpen}
+      onOpen={onOpen}
+      onClose={onClose}
+      placement="right"
+    >
+      <PopoverTrigger>
+        <Button colorScheme="red">
+          <Icon as={DeleteIcon} marginEnd={2} />
+          {props.button_label}
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent p={25}>
+        <PopoverArrow />
+        <PopoverCloseButton />
+        <ConfirmDelete onCancel={onClose} onSubmit={props.onSubmit} />
+      </PopoverContent>
+    </Popover>
   );
 };

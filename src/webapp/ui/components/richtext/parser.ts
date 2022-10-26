@@ -1,11 +1,12 @@
 import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
 const NODE_TYPE_TEXT = 3;
 
-export const createLeaf = (
+export const createText = (
   text: string | null,
   attrs?: { [key: string]: boolean }
 ): TypedLeaf => {
   return {
+    type: "TEXT",
     text: text || "",
     bold: attrs?.bold || false,
     italic: attrs?.italic || false,
@@ -14,19 +15,28 @@ export const createLeaf = (
   };
 };
 
+export const createImage = (attrs: Record<string, string>): TypedLeaf => {
+  return {
+    type: "image",
+    text: attrs?.src || "#",
+    alt: attrs?.alt,
+  };
+};
+
 export const createNode = (
   type: NodeType,
   children: SlateModel = []
 ): TypedNode => {
-  return {
+  const ret: TypedNode = {
     type: type,
     children: children,
   };
+  return ret;
 };
 
 const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
   if (el.nodeType == NODE_TYPE_TEXT) {
-    return createLeaf(el.textContent);
+    return createText(el.textContent);
   }
 
   switch (el.nodeName) {
@@ -54,56 +64,37 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
       return createNode("code", deserializeChildNodes(el));
     case "BLOCKQUOTE":
       return createNode("blockquote", deserializeChildNodes(el));
+
+    case "IMG":
+      return createImage({
+        src: (el as any).getAttribute("src"),
+        alt: (el as any).getAttribute("alt"),
+      });
+
     // Leafs
     // case "B":
     case "STRONG":
-      return createLeaf(el.textContent, { bold: true });
+      return createText(el.textContent, { bold: true });
     case "EM":
-      return createLeaf(el.textContent, { italic: true });
+      return createText(el.textContent, { italic: true });
     case "U":
-      return createLeaf(el.textContent, { underline: true });
+      return createText(el.textContent, { underline: true });
     case "S":
-      return createLeaf(el.textContent, { strikethrough: true });
+      return createText(el.textContent, { strikethrough: true });
   }
 
-  return createLeaf("");
+  return createText("");
 };
 
 const deserializeChildNodes = (el: ChildNode): SlateModel => {
   if (!el.hasChildNodes()) {
-    return [createLeaf(el.textContent)];
+    return [createText(el.textContent)];
   }
 
   const nodes: SlateModel = [];
   el.childNodes.forEach((e) => nodes.push(deserializeNode(e)));
   return nodes;
 };
-
-//   // A: (el) => ({
-//   //   type: "link",
-//   //   attrs: {
-//   //     url: el.getAttribute("href"),
-//   //     openInNewTab: el.getAttribute("target") === "_blank",
-//   //   },
-//   // }),
-//   BLOCKQUOTE: () => createNode("block-quote"),
-//   H1: () => ({ type: "heading1" }),
-//   H2: () => ({ type: "heading2" }),
-//   H3: () => ({ type: "heading3" }),
-//   H4: () => ({ type: "heading4" }),
-//   H5: () => ({ type: "heading5" }),
-//   H6: () => ({ type: "heading6" }),
-//   IMG: (el) => ({
-//     type: "image",
-//     url: el.getAttribute("src"),
-//     alt: el.getAttribute("alt"),
-//   }),
-//   LI: () => ({ type: "list-item" }),
-//   OL: () => ({ type: "numbered-list" }),
-//   P: () => ({ type: "paragraph" }),
-//   PRE: () => ({ type: "pre" }),
-//   UL: () => ({ type: "bulleted-list" }),
-// };
 
 export const defaultModel = (): SlateModel => {
   return [createNode("paragraph")];

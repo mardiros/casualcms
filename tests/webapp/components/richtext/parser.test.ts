@@ -5,7 +5,7 @@ import {
   defaultModel,
 } from "../../../../src/webapp/ui/components/richtext/parser";
 
-describe.only("Convert Html to slate model", () => {
+describe("Convert Html to slate model", () => {
   it("Parse empty textgenerate the empty paragraph", () => {
     const mdl = fromHtml("");
     expect(mdl).eql(defaultModel());

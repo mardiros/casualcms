@@ -1,0 +1,181 @@
+import React from "react";
+import { Editor, Element, Transforms } from "slate";
+import { RenderElementProps, RenderLeafProps, useSlate } from "slate-react";
+import {
+  chakra,
+  ListItem,
+  OrderedList,
+  UnorderedList,
+  Heading,
+  IconButton,
+  Image,
+} from "@chakra-ui/react";
+
+import { Element as SlateElement } from "slate";
+import { MdDelete } from "react-icons/md";
+import {
+  NodeType,
+  TypedLeaf,
+  TypedLeafImage,
+  TypedLink,
+  TypedNode,
+  TypedText,
+} from "./types";
+import { InlineLink } from "./toolbar/popover_button";
+
+export interface MyElement extends Element {
+  type: NodeType;
+}
+
+export interface MyRenderElementProps extends RenderElementProps {
+  element: MyElement;
+}
+
+export interface MyRenderLeafProps extends RenderLeafProps {
+  leaf: TypedLeaf;
+}
+
+export const MyRenderElement = ({
+  attributes,
+  children,
+  element,
+}: MyRenderElementProps) => {
+  console.log(`Render Element ${element.type}`);
+  switch (element.type) {
+    case "h1":
+      return (
+        <Heading as="h1" size="3xl" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "h2":
+      return (
+        <Heading as="h2" size="2xl" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "h3":
+      return (
+        <Heading as="h3" size="xl" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "h4":
+      return (
+        <Heading as="h4" size="lg" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "h5":
+      return (
+        <Heading as="h5" size="sd" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "h6":
+      return (
+        <Heading as="h6" size="sm" {...attributes}>
+          {children}
+        </Heading>
+      );
+    case "ul":
+      return <UnorderedList {...attributes}>{children}</UnorderedList>;
+    case "ol":
+      return <OrderedList {...attributes}>{children}</OrderedList>;
+    case "li":
+      return <ListItem {...attributes}>{children}</ListItem>;
+    case "code":
+      return (
+        <chakra.blockquote
+          padding={"3px"}
+          backgroundColor={"gray.200"}
+          fontFamily={"monospace"}
+        >
+          {children}
+        </chakra.blockquote>
+      );
+    case "blockquote":
+      return (
+        <chakra.blockquote
+          borderLeftWidth={"10px"}
+          borderLeftColor={"gray.200"}
+          fontFamily={"serif"}
+          {...attributes}
+        >
+          {children}
+        </chakra.blockquote>
+      );
+
+    case "link":
+      const link = element as TypedLink;
+      return (
+        <InlineLink href={link.href} slate_attributes={attributes}>
+          {children}
+        </InlineLink>
+      );
+    case "paragraph":
+      return <p {...attributes}>{children}</p>;
+
+    default:
+      return <div {...attributes}>{children}</div>;
+  }
+};
+
+export const MyRenderLeaf = ({
+  attributes,
+  children,
+  leaf,
+}: MyRenderLeafProps) => {
+  console.log(`Render Leaf ${leaf.type}`);
+  const editor = useSlate();
+  switch (leaf.type) {
+    case "image":
+      const img = leaf as TypedLeafImage;
+      return (
+        <>
+          <IconButton
+            icon={<MdDelete />}
+            variant="outline"
+            position={"relative"}
+            left={"1.25em"}
+            aria-label="delete"
+            onClick={() => {
+              Transforms.unwrapNodes(editor, {
+                match: (n) =>
+                  !Editor.isEditor(n) &&
+                  SlateElement.isElement(n) &&
+                  ["p"].includes((n as TypedNode).type),
+                split: true,
+              });
+              Transforms.removeNodes(editor, {
+                match: (node) => {
+                  const n = node as TypedLeafImage;
+                  console.log(n);
+                  console.log(img.id);
+                  return n.type == "image" && n.id === img.id;
+                },
+              });
+            }}
+          />
+          <Image src={img.text} alt={img.alt} />
+        </>
+      );
+
+    case "TEXT":
+      const txt = leaf as TypedText;
+      if (txt.bold) {
+        children = <strong>{children}</strong>;
+      }
+      if (txt.italic) {
+        children = <em>{children}</em>;
+      }
+      if (txt.underline) {
+        children = <u>{children}</u>;
+      }
+      if (txt.strikethrough) {
+        children = <s>{children}</s>;
+      }
+      return <span {...attributes}>{children}</span>;
+  }
+  return <></>;
+};

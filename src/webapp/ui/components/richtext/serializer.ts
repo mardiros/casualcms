@@ -1,7 +1,14 @@
 import { Descendant, Editor, Text } from "slate";
 import { escapeHtml } from "./strutil";
 
-import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
+import {
+  NodeType,
+  SlateModel,
+  TypedLeaf,
+  TypedLeafImage,
+  TypedNode,
+  TypedText,
+} from "./types";
 
 const serializeNode = (type: NodeType, el: Editor): string => {
   switch (type) {
@@ -28,26 +35,38 @@ const serializeNode = (type: NodeType, el: Editor): string => {
     case "blockquote":
       return `<blockquote>${toHtml(el.children)}</blockquote>`;
     case "paragraph":
+      // render paragraph as div while editing...
       return `<p>${toHtml(el.children)}</p>`;
+    // case "image":
+    //   const attrs = (el as TypedNode).attrs;
+    //   return `<img src="${attrs?.src}" alt="${attrs?.alt}" />`;
   }
   return "";
 };
 
 const serializeLeaf = (el: TypedLeaf): string => {
-  let html = escapeHtml(el.text);
-  if (el.bold) {
-    html = `<strong>${html}</strong>`;
+  switch (el.type) {
+    case "image":
+      const img = el as TypedLeafImage;
+      return `<img src="${el.text}" alt="${img.alt}" />`;
+    case "TEXT":
+      const txt = el as TypedText;
+      let html = escapeHtml(el.text);
+      if (txt.bold) {
+        html = `<strong>${html}</strong>`;
+      }
+      if (txt.italic) {
+        html = `<em>${html}</em>`;
+      }
+      if (txt.underline) {
+        html = `<u>${html}</u>`;
+      }
+      if (txt.strikethrough) {
+        html = `<s>${html}</s>`;
+      }
+      return html;
   }
-  if (el.italic) {
-    html = `<em>${html}</em>`;
-  }
-  if (el.underline) {
-    html = `<u>${html}</u>`;
-  }
-  if (el.strikethrough) {
-    html = `<s>${html}</s>`;
-  }
-  return html;
+  return "";
 };
 
 const serializeElement = (el: TypedNode | TypedLeaf): string => {

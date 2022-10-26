@@ -1,46 +1,23 @@
-import isHotkey from "is-hotkey";
-import React, { useCallback } from "react";
-import { BaseEditor, Descendant, Editor, Element, Transforms } from "slate";
-import { HistoryEditor } from "slate-history";
-import {
-  ReactEditor,
-  RenderElementProps,
-  RenderLeafProps,
-  useSlate,
-} from "slate-react";
-import {
-  Box,
-  HStack,
-  chakra,
-  ListItem,
-  OrderedList,
-  UnorderedList,
-  Heading,
-  IconButton,
-} from "@chakra-ui/react";
+import isHotkey, { isKeyHotkey } from "is-hotkey";
+import React from "react";
+import { Descendant, Editor, Transforms } from "slate";
+import { RenderElementProps, RenderLeafProps } from "slate-react";
+import { Box } from "@chakra-ui/react";
 
-import { createEditor, Element as SlateElement } from "slate";
+import { createEditor, Range as SlateRange } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
-import {
-  MdCode,
-  MdFormatBold,
-  MdFormatItalic,
-  MdFormatListBulleted,
-  MdFormatListNumbered,
-  MdFormatQuote,
-  MdFormatStrikethrough,
-  MdFormatUnderlined,
-  MdLooks3,
-  MdLooks4,
-  MdLooks5,
-  MdLooks6,
-  MdLooksOne,
-  MdLooksTwo,
-} from "react-icons/md";
-import { NodeType, TypedLeaf, TypedNode } from "./types";
 import { toHtml } from "./serializer";
+import {
+  MyRenderElement,
+  MyRenderElementProps,
+  MyRenderLeaf,
+  MyRenderLeafProps,
+} from "./renderer";
+import { Toolbar } from "./toolbar/component";
+import { toggleMark } from "./toolbar/mark_btn";
+import { EditorProps, TypedNode } from "./types";
 
 const HOTKEYS: { [hotkey: string]: string } = {
   "mod+b": "bold",
@@ -49,300 +26,35 @@ const HOTKEYS: { [hotkey: string]: string } = {
   "mod+`": "code",
 };
 
-type EditorProps = Editor | ReactEditor | HistoryEditor;
-
-interface MyElement extends Element {
-  type: NodeType;
-}
-
-interface MyRenderElementProps extends RenderElementProps {
-  element: MyElement;
-}
-
-interface MyRenderLeafProps extends RenderLeafProps {
-  leaf: TypedLeaf;
-}
-
-const isMarkActive = (editor: EditorProps, format: string) => {
-  const marks = Editor.marks(editor);
-  if (marks) {
-    const myMarks = marks as TypedLeaf;
-    const myFormat = format as keyof TypedLeaf;
-    return myMarks[myFormat] === true;
-  }
-  return false;
-};
-
-const isBlockActive = (editor: EditorProps, format: string) => {
-  const nodeGen = Editor.nodes(editor, {
-    match: (node) => {
-      const n = node as TypedNode;
-      return (
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format
-      );
-    },
-  });
-
-  let node = nodeGen.next();
-  while (!node.done) {
-    return true;
-  }
-  return false;
-};
-
-export const toggleMark = (editor: EditorProps, format: string): void => {
-  const isActive = isMarkActive(editor, format);
-  if (isActive) {
-    Editor.removeMark(editor, format);
-  } else {
-    Editor.addMark(editor, format, true);
-  }
-};
-
-export const toggleBlock = (editor: EditorProps, format: NodeType) => {
-  const isActivating = !isBlockActive(editor, format);
-
-  const newProperties: Partial<MyElement> = {
-    type: isActivating ? format : "paragraph",
-  };
-  Transforms.setNodes(editor, newProperties);
-};
-
-export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
-  const isActivating = !isBlockActive(editor, format);
-
-  const newProperties: Partial<MyElement> = {
-    type: isActivating ? "li" : "paragraph",
-  };
-  Transforms.setNodes(editor, newProperties);
-
-  if (isActivating) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  } else {
-    Transforms.unwrapNodes(editor, {
-      match: (n) =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        ["ul", "ol", "li"].includes((n as TypedNode).type),
-      split: true,
-    });
-  }
-};
-
-export const toggleMultilineBlock = (editor: EditorProps, format: NodeType) => {
-  const isActivating = !isBlockActive(editor, format);
-
-  const newProperties: Partial<MyElement> = {
-    type: isActivating ? format : "paragraph",
-  };
-  Transforms.setNodes(editor, newProperties);
-
-  if (isActivating) {
-    const block = { type: format, children: [] };
-    Transforms.wrapNodes(editor, block);
-  } else {
-    Transforms.unwrapNodes(editor, {
-      match: (n) =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        [format].includes((n as TypedNode).type),
-      split: true,
-    });
-  }
-};
-
-export const MyRenderElement = ({
-  attributes,
-  children,
-  element,
-}: MyRenderElementProps) => {
-  switch (element.type) {
-    case "h1":
-      return (
-        <Heading as="h1" size="3xl" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "h2":
-      return (
-        <Heading as="h2" size="2xl" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "h3":
-      return (
-        <Heading as="h3" size="xl" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "h4":
-      return (
-        <Heading as="h4" size="lg" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "h5":
-      return (
-        <Heading as="h5" size="sd" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "h6":
-      return (
-        <Heading as="h6" size="sm" {...attributes}>
-          {children}
-        </Heading>
-      );
-    case "ul":
-      return <UnorderedList {...attributes}>{children}</UnorderedList>;
-    case "ol":
-      return <OrderedList {...attributes}>{children}</OrderedList>;
-    case "li":
-      return <ListItem {...attributes}>{children}</ListItem>;
-    case "code":
-      return (
-        <chakra.blockquote
-          padding={"3px"}
-          backgroundColor={"gray.200"}
-          fontFamily={"monospace"}
-        >
-          {children}
-        </chakra.blockquote>
-      );
-
-    case "blockquote":
-      return (
-        <chakra.blockquote
-          borderLeftWidth={"10px"}
-          borderLeftColor={"gray.200"}
-          fontFamily={"serif"}
-          {...attributes}
-        >
-          {children}
-        </chakra.blockquote>
-      );
-
-    default:
-      return <p {...attributes}>{children}</p>;
-  }
-};
-
-export const MyRenderLeaf = ({
-  attributes,
-  children,
-  leaf,
-}: MyRenderLeafProps) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>;
-  }
-  if (leaf.italic) {
-    children = <em>{children}</em>;
-  }
-  if (leaf.underline) {
-    children = <u>{children}</u>;
-  }
-  if (leaf.strikethrough) {
-    children = <s>{children}</s>;
-  }
-  return <span {...attributes}>{children}</span>;
-};
-
-export const MarkButton = ({
-  format,
-  icon,
-}: {
-  format: string;
-  icon: React.ReactElement;
-}) => {
-  const editor = useSlate();
-  return (
-    <IconButton
-      variant="outline"
-      colorScheme="blue"
-      isActive={isMarkActive(editor, format)}
-      onMouseDown={(event) => {
-        event.preventDefault();
-        toggleMark(editor, format);
-      }}
-      aria-label={format}
-      icon={icon}
-      borderWidth={0}
-      fontSize={"20px"}
-    />
-  );
-};
-
-type BlockButtonProps = {
-  format: NodeType;
-  icon: React.ReactElement;
-  toggleFn?: (editor: EditorProps, format: NodeType) => void;
-};
-export const BlockButton = ({ format, icon, toggleFn }: BlockButtonProps) => {
-  const editor = useSlate();
-  const callback = toggleFn || toggleBlock;
-  return (
-    <IconButton
-      variant="outline"
-      colorScheme="green"
-      isActive={isBlockActive(editor, format)}
-      onMouseDown={(event) => {
-        event.preventDefault();
-        callback(editor, format);
-      }}
-      aria-label={format}
-      icon={icon}
-      borderWidth={0}
-      fontSize={"20px"}
-    />
-  );
-};
-
-const Toolbar: React.FunctionComponent<{}> = () => {
-  return (
-    <HStack
-      borderWidth={"0 0 1px 0"}
-      padding={"10px 5px"}
-      spacing={"5px"}
-      wrap={"wrap"}
-    >
-      <MarkButton format="bold" icon={<MdFormatBold />} />
-      <MarkButton format="italic" icon={<MdFormatItalic />} />
-      <MarkButton format="underline" icon={<MdFormatUnderlined />} />
-      <MarkButton format="strikethrough" icon={<MdFormatStrikethrough />} />
-      <BlockButton format="h1" icon={<MdLooksOne />} />
-      <BlockButton format="h2" icon={<MdLooksTwo />} />
-      <BlockButton format="h3" icon={<MdLooks3 />} />
-      <BlockButton format="h4" icon={<MdLooks4 />} />
-      <BlockButton format="h5" icon={<MdLooks5 />} />
-      <BlockButton format="h6" icon={<MdLooks6 />} />
-      <BlockButton
-        format="ul"
-        icon={<MdFormatListBulleted />}
-        toggleFn={toggleListBlock}
-      />
-      <BlockButton
-        format="ol"
-        icon={<MdFormatListNumbered />}
-        toggleFn={toggleListBlock}
-      />
-      <BlockButton
-        format="blockquote"
-        icon={<MdFormatQuote />}
-        toggleFn={toggleMultilineBlock}
-      />
-      <BlockButton
-        format="code"
-        icon={<MdCode />}
-        toggleFn={toggleMultilineBlock}
-      />
-    </HStack>
-  );
-};
-
 type RichTextEditorProps = {
   value: string;
   onChange: (value: string) => void;
+};
+
+const withInlines = (editor: any) => {
+  const { insertData, insertText, isInline } = editor;
+
+  editor.isInline = (element: TypedNode) =>
+    ["link"].includes(element.type) || isInline(element);
+
+  // editor.insertText = text => {
+  //   if (text && isUrl(text)) {
+  //     wrapLink(editor, text)
+  //   } else {
+  //     insertText(text)
+  //   }
+  // }
+  // editor.insertData = (data: any) => {
+  //   const text = data.getData('text/plain')
+
+  //   if (text && isUrl(text)) {
+  //     wrapLink(editor, text)
+  //   } else {
+  //     insertData(data)
+  //   }
+  // }
+
+  return editor;
 };
 
 export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
@@ -350,25 +62,32 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
 ) => {
   const { value, onChange } = props;
   const editor = React.useMemo(
-    () => withHistory(withReact(createEditor())),
+    () => withInlines(withHistory(withReact(createEditor()))),
     []
   );
 
-  const renderElement = useCallback(
+  const renderElement = React.useCallback(
     (props: RenderElementProps) => (
       <MyRenderElement {...(props as MyRenderElementProps)} />
     ),
     []
   );
-  const renderLeaf = useCallback(
+  const renderLeaf = React.useCallback(
     (props: RenderLeafProps) => (
       <MyRenderLeaf {...(props as MyRenderLeafProps)} />
     ),
     []
   );
 
-  const onModelChange = useCallback((childs: Descendant[]) => {
-    onChange(toHtml(childs));
+  const onModelChange = React.useCallback((childs: Descendant[]) => {
+    // FIXME: antispam here
+    console.log(childs);
+    console.log(toHtml(childs));
+    try {
+      onChange(toHtml(childs));
+    } catch (e) {
+      console.log(e);
+    }
   }, []);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -379,6 +98,28 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
         toggleMark(editor, mark);
       }
     }
+
+    // https://github.com/ianstormtaylor/slate/blob/5e7815eded3677177334f0b511944460687f3ded/site/examples/inlines.tsx#L69
+
+    // Default left/right behavior is unit:'character'.
+    // This fails to distinguish between two cursor positions, such as
+    // <inline>foo<cursor/></inline> vs <inline>foo</inline><cursor/>.
+    // Here we modify the behavior to unit:'offset'.
+    // This lets the user step into and out of the inline without stepping over characters.
+    // You may wish to customize this further to only use unit:'offset' in specific cases.
+    // if (editor.selection && SlateRange.isCollapsed(editor.selection)) {
+    //   const { nativeEvent } = event
+    //   if (isKeyHotkey('left', nativeEvent)) {
+    //     event.preventDefault()
+    //     Transforms.move(editor, { unit: 'offset', reverse: true })
+    //     return
+    //   }
+    //   if (isKeyHotkey('right', nativeEvent)) {
+    //     event.preventDefault()
+    //     Transforms.move(editor, { unit: 'offset' })
+    //     return
+    //   }
+    // }
   };
 
   return (
@@ -391,7 +132,12 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
             renderElement={renderElement}
             renderLeaf={renderLeaf}
             onKeyDown={onKeyDown}
-            style={{ minHeight: "150px", overflow: "auto" }}
+            style={{
+              minHeight: "150px",
+              resize: "both",
+              overflow: "auto",
+              width: "100%",
+            }}
           />
         </Box>
       </Slate>

@@ -22,6 +22,7 @@ export type NodeType =
 
 export type TypedNode = {
   type: NodeType;
+  children: SlateModel;
 };
 
 export type TypedLink = TypedNode & {
@@ -48,7 +49,7 @@ export type TypedLeafImage = {
 
 export type TypedLeaf = TypedLeafImage & TypedText;
 
-export type SlateModel = Array<TypedNode | TypedLeaf>;
+export type SlateModel = TypedNode[] | TypedLeaf[];
 
 export type MyEditor = BaseEditor & ReactEditor & HistoryEditor
 

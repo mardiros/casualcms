@@ -1,4 +1,4 @@
-import { Descendant, Editor, Text } from "slate";
+import { Descendant, Text } from "slate";
 import { escapeHtml } from "./strutil";
 
 import {
@@ -6,11 +6,12 @@ import {
   SlateModel,
   TypedLeaf,
   TypedLeafImage,
+  TypedLink,
   TypedNode,
   TypedText,
 } from "./types";
 
-const serializeNode = (type: NodeType, el: Editor): string => {
+const serializeNode = (type: NodeType, el: TypedNode): string => {
   switch (type) {
     case "h1":
       return `<h1>${toHtml(el.children)}</h1>`;
@@ -37,6 +38,13 @@ const serializeNode = (type: NodeType, el: Editor): string => {
     case "paragraph":
       // render paragraph as div while editing...
       return `<p>${toHtml(el.children)}</p>`;
+
+    case "link":
+      // render paragraph as div while editing...
+      return `<a href="${escapeHtml((el as TypedLink).href)}">${toHtml(
+        el.children
+      )}</a>`;
+
     // case "image":
     //   const attrs = (el as TypedNode).attrs;
     //   return `<img src="${attrs?.src}" alt="${attrs?.alt}" />`;
@@ -73,7 +81,7 @@ const serializeElement = (el: TypedNode | TypedLeaf): string => {
   if (Text.isText(el)) {
     return serializeLeaf(el);
   } else {
-    return serializeNode(el.type, el as Editor);
+    return serializeNode(el.type, el);
   }
 };
 

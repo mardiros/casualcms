@@ -20,7 +20,6 @@ import {
   NodeType,
   TypedLeafImage,
   TypedLink,
-  TypedNode,
 } from "../types";
 import {
   Editor,
@@ -134,7 +133,7 @@ const isLinkActive = (editor: MyEditor) => {
     match: (n) =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      (n as TypedNode).type === "link",
+      n.type === "link",
   });
   return !!link;
 };
@@ -147,7 +146,7 @@ const unwrapLink = (editor: MyEditor) => {
       return (
         !Editor.isEditor(n) &&
         SlateElement.isElement(n) &&
-        (n as TypedNode).type === "link"
+        n.type === "link"
       );
     },
   });
@@ -195,10 +194,12 @@ const LinkFieldSet: React.FunctionComponent<{
     };
 
     if (isCollapsed) {
-      Transforms.insertNodes(editor, [
+      console.log(editor.selection)
+      Transforms.insertNodes(editor,
         link,
+        { hanging: true },
         // { type: "TEXT", text: " " } as any,
-      ]);
+      );
     } else {
       Transforms.wrapNodes(editor, link as any, { split: true });
       Transforms.collapse(editor, { edge: "end" });

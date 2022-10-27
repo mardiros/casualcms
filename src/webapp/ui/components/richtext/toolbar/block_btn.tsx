@@ -4,13 +4,13 @@ import { useSlate } from "slate-react";
 import { IconButton } from "@chakra-ui/react";
 
 import { Element as SlateElement } from "slate";
-import { EditorProps, NodeType, TypedNode } from "../types";
+import { MyEditor, NodeType, TypedNode } from "../types";
 import { MyElement } from "../renderer";
+import { useMyEditor } from "../hooks";
 
-const isBlockActive = (editor: EditorProps, format: string) => {
+const isBlockActive = (editor: MyEditor, format: string) => {
   const nodeGen = Editor.nodes(editor, {
-    match: (node) => {
-      const n = node as TypedNode;
+    match: (n) => {
       return (
         !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format
       );
@@ -24,7 +24,7 @@ const isBlockActive = (editor: EditorProps, format: string) => {
   return false;
 };
 
-const toggleBlock = (editor: EditorProps, format: NodeType) => {
+const toggleBlock = (editor: MyEditor, format: NodeType) => {
   const isActivating = !isBlockActive(editor, format);
 
   const newProperties: Partial<MyElement> = {
@@ -33,7 +33,7 @@ const toggleBlock = (editor: EditorProps, format: NodeType) => {
   Transforms.setNodes(editor, newProperties);
 };
 
-export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
+export const toggleListBlock = (editor: MyEditor, format: NodeType) => {
   const isActivating = !isBlockActive(editor, format);
 
   const newProperties: Partial<MyElement> = {
@@ -49,13 +49,13 @@ export const toggleListBlock = (editor: EditorProps, format: NodeType) => {
       match: (n) =>
         !Editor.isEditor(n) &&
         SlateElement.isElement(n) &&
-        ["ul", "ol", "li"].includes((n as TypedNode).type),
+        ["ul", "ol", "li"].includes(n.type),
       split: true,
     });
   }
 };
 
-export const toggleMultilineBlock = (editor: EditorProps, format: NodeType) => {
+export const toggleMultilineBlock = (editor: MyEditor, format: NodeType) => {
   const isActivating = !isBlockActive(editor, format);
 
   const newProperties: Partial<MyElement> = {
@@ -71,7 +71,7 @@ export const toggleMultilineBlock = (editor: EditorProps, format: NodeType) => {
       match: (n) =>
         !Editor.isEditor(n) &&
         SlateElement.isElement(n) &&
-        [format].includes((n as TypedNode).type),
+        [format].includes(n.type),
       split: true,
     });
   }
@@ -80,11 +80,11 @@ export const toggleMultilineBlock = (editor: EditorProps, format: NodeType) => {
 type BlockButtonProps = {
   format: NodeType;
   icon: React.ReactElement;
-  toggleFn?: (editor: EditorProps, format: NodeType) => void;
+  toggleFn?: (editor: MyEditor, format: NodeType) => void;
 };
 
 export const BlockButton = ({ format, icon, toggleFn }: BlockButtonProps) => {
-  const editor = useSlate();
+  const editor = useMyEditor();
   const callback = toggleFn || toggleBlock;
   return (
     <IconButton

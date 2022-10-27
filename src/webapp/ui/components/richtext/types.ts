@@ -1,4 +1,4 @@
-import { Editor, Node, Text } from "slate";
+import { BaseEditor } from "slate";
 import { HistoryEditor } from "slate-history";
 import { ReactEditor } from "slate-react";
 
@@ -20,7 +20,7 @@ export type NodeType =
   | "LINKTEXT"
   | "link";
 
-export type TypedNode = Node & {
+export type TypedNode = {
   type: NodeType;
 };
 
@@ -30,22 +30,32 @@ export type TypedLink = TypedNode & {
   children: TypedText[];
 };
 
-export type TypedText = Text & {
+export type TypedText = {
   type: NodeType;
+  text: string;
   bold?: boolean;
   italic?: boolean;
   underline?: boolean;
   strikethrough?: boolean;
 };
 
-export type TypedLeafImage = Text & {
+export type TypedLeafImage = {
   type: NodeType;
   id: string;
+  text: string;  // serialized as src attribute
   alt?: string;
 };
 
-export type TypedLeaf = TypedLeafImage | TypedText;
+export type TypedLeaf = TypedLeafImage & TypedText;
 
 export type SlateModel = Array<TypedNode | TypedLeaf>;
 
-export type EditorProps = Editor | ReactEditor | HistoryEditor;
+export type MyEditor = BaseEditor & ReactEditor & HistoryEditor
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor
+    Element: TypedNode
+    Text: TypedLeaf
+  }
+}

@@ -1,10 +1,10 @@
-import isHotkey, { isKeyHotkey } from "is-hotkey";
+import isHotkey from "is-hotkey";
 import React from "react";
-import { Descendant, Editor, Transforms } from "slate";
+import { Descendant } from "slate";
 import { RenderElementProps, RenderLeafProps } from "slate-react";
 import { Box } from "@chakra-ui/react";
 
-import { createEditor, Range as SlateRange } from "slate";
+import { createEditor } from "slate";
 import { withHistory } from "slate-history";
 import { Editable, withReact, Slate } from "slate-react";
 import { fromHtml } from "./parser";
@@ -17,7 +17,7 @@ import {
 } from "./renderer";
 import { Toolbar } from "./toolbar/component";
 import { toggleMark } from "./toolbar/mark_btn";
-import { EditorProps, TypedNode } from "./types";
+import { TypedNode } from "./types";
 
 const HOTKEYS: { [hotkey: string]: string } = {
   "mod+b": "bold",

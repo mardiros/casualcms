@@ -1,5 +1,5 @@
 import React from "react";
-import { useSelected, useSlate } from "slate-react";
+import { useSelected } from "slate-react";
 import {
   IconButton,
   useDisclosure,
@@ -16,12 +16,11 @@ import {
 
 import { MdImage, MdLink } from "react-icons/md";
 import {
-  EditorProps,
+  MyEditor,
   NodeType,
   TypedLeafImage,
   TypedLink,
   TypedNode,
-  TypedText,
 } from "../types";
 import {
   Editor,
@@ -30,6 +29,7 @@ import {
   Range as SlateRange,
   Text as SlateText,
 } from "slate";
+import { useMyEditor } from "../hooks";
 
 type ModalBoxProps = {
   isOpen: boolean;
@@ -50,7 +50,6 @@ const ModalBox: React.FunctionComponent<ModalBoxProps> = ({
   children,
   isActive,
 }) => {
-  const editor = useSlate();
   const cancelRef = React.useRef<any>();
   return (
     <>
@@ -83,7 +82,7 @@ const ImageFieldSet: React.FunctionComponent<{ onClose: () => void }> = ({
 }) => {
   const [imageURL, setImageURL] = React.useState("");
   const [altText, setAltText] = React.useState("");
-  const editor = useSlate();
+  const editor = useMyEditor();
 
   const onClick = () => {
     const image: TypedLeafImage = {
@@ -130,7 +129,7 @@ export const ImgButton: React.FunctionComponent<{}> = () => {
   );
 };
 
-const isLinkActive = (editor: EditorProps) => {
+const isLinkActive = (editor: MyEditor) => {
   const [link] = Editor.nodes(editor, {
     match: (n) =>
       !Editor.isEditor(n) &&
@@ -140,7 +139,7 @@ const isLinkActive = (editor: EditorProps) => {
   return !!link;
 };
 
-const unwrapLink = (editor: EditorProps) => {
+const unwrapLink = (editor: MyEditor) => {
   let text = "";
   const node = Transforms.unwrapNodes(editor, {
     match: (n) => {
@@ -168,7 +167,7 @@ const LinkFieldSet: React.FunctionComponent<{
   onClose: () => void;
   href?: string;
 }> = ({ onClose, href }) => {
-  const editor = useSlate();
+  const editor = useMyEditor();
   const { selection } = editor;
   const isCollapsed = selection && SlateRange.isCollapsed(selection);
 
@@ -178,7 +177,7 @@ const LinkFieldSet: React.FunctionComponent<{
       const nodes = Editor.node(editor, selection as any);
       if (nodes.length) {
         if (SlateText.isText(nodes[0])) {
-          defaultText = (nodes[0] as SlateText).text;
+          defaultText = nodes[0].text;
         }
       }
     } else {
@@ -198,7 +197,7 @@ const LinkFieldSet: React.FunctionComponent<{
     if (isCollapsed) {
       Transforms.insertNodes(editor, [
         link,
-        { type: "TEXT", text: " " } as any,
+        // { type: "TEXT", text: " " } as any,
       ]);
     } else {
       Transforms.wrapNodes(editor, link as any, { split: true });
@@ -242,7 +241,7 @@ const LinkFieldSet: React.FunctionComponent<{
 };
 
 export const LinkButton: React.FunctionComponent<{}> = () => {
-  const editor = useSlate();
+  const editor = useMyEditor();
   const { onOpen, onClose, isOpen } = useDisclosure();
   return (
     <ModalBox

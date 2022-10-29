@@ -5,7 +5,6 @@ import {
   NodeType,
   SlateModel,
   TypedLeaf,
-  TypedLeafImage,
   TypedLink,
   TypedNode,
   TypedText,
@@ -54,9 +53,6 @@ const serializeNode = (type: NodeType, el: TypedNode): string => {
 
 const serializeLeaf = (el: TypedLeaf): string => {
   switch (el.type) {
-    case "image":
-      const img = el as TypedLeafImage;
-      return `<img src="${el.text}" alt="${img.alt}" />`;
     case "TEXT":
       const txt = el as TypedText;
       let html = escapeHtml(el.text);

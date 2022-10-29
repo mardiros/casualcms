@@ -81,7 +81,6 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
 
   const onModelChange = React.useCallback((childs: Descendant[]) => {
     // FIXME: antispam here
-    console.log(childs);
     console.log(toHtml(childs));
     try {
       onChange(toHtml(childs));

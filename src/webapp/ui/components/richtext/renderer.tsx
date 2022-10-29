@@ -13,14 +13,7 @@ import {
 
 import { Element as SlateElement } from "slate";
 import { MdDelete } from "react-icons/md";
-import {
-  NodeType,
-  TypedLeaf,
-  TypedLeafImage,
-  TypedLink,
-  TypedNode,
-  TypedText,
-} from "./types";
+import { NodeType, TypedLeaf, TypedLink, TypedNode, TypedText } from "./types";
 import { InlineLink } from "./toolbar/popover_button";
 
 export interface MyElement extends Element {
@@ -126,41 +119,8 @@ export const MyRenderLeaf = ({
   children,
   leaf,
 }: MyRenderLeafProps) => {
-  console.log(`Render Leaf ${leaf.type}`);
   const editor = useSlate();
   switch (leaf.type) {
-    case "image":
-      const img = leaf as TypedLeafImage;
-      return (
-        <>
-          <IconButton
-            icon={<MdDelete />}
-            variant="outline"
-            position={"relative"}
-            left={"1.25em"}
-            aria-label="delete"
-            onClick={() => {
-              Transforms.unwrapNodes(editor, {
-                match: (n) =>
-                  !Editor.isEditor(n) &&
-                  SlateElement.isElement(n) &&
-                  ["p"].includes((n as TypedNode).type),
-                split: true,
-              });
-              Transforms.removeNodes(editor, {
-                match: (node) => {
-                  const n = node as TypedLeafImage;
-                  console.log(n);
-                  console.log(img.id);
-                  return n.type == "image" && n.id === img.id;
-                },
-              });
-            }}
-          />
-          <Image src={img.text} alt={img.alt} />
-        </>
-      );
-
     case "TEXT":
       const txt = leaf as TypedText;
       if (txt.bold) {

@@ -14,13 +14,8 @@ import {
   AlertDialogContent,
 } from "@chakra-ui/react";
 
-import { MdImage, MdLink } from "react-icons/md";
-import {
-  MyEditor,
-  NodeType,
-  TypedLeafImage,
-  TypedLink,
-} from "../types";
+import { MdLink } from "react-icons/md";
+import { MyEditor, NodeType, TypedLink } from "../types";
 import {
   Editor,
   Transforms,
@@ -76,89 +71,50 @@ const ModalBox: React.FunctionComponent<ModalBoxProps> = ({
   );
 };
 
-const ImageFieldSet: React.FunctionComponent<{ onClose: () => void }> = ({
-  onClose,
-}) => {
-  const [imageURL, setImageURL] = React.useState("");
-  const [altText, setAltText] = React.useState("");
-  const editor = useMyEditor();
-
-  const onClick = () => {
-    const image: TypedLeafImage = {
-      type: "image",
-      text: imageURL,
-      alt: altText,
-      id: crypto.randomUUID(),
-    };
-    Transforms.insertNodes(editor, image);
-    onClose();
-  };
-
-  return (
-    <Stack spacing={2}>
-      <InputGroup>
-        <FormLabel minWidth="150px">Image URL</FormLabel>
-        <Input onChange={(e) => setImageURL(e.currentTarget.value)} />
-      </InputGroup>
-      <InputGroup>
-        <FormLabel textAlign="left" minWidth="150px">
-          Alternative text
-        </FormLabel>
-        <Input onChange={(e) => setAltText(e.currentTarget.value)} />
-      </InputGroup>
-      <Button variant="solid" size="md" onClick={onClick}>
-        Submit
-      </Button>
-    </Stack>
-  );
-};
-
-export const ImgButton: React.FunctionComponent<{}> = () => {
-  const { onOpen, onClose, isOpen } = useDisclosure();
-  return (
-    <ModalBox
-      format="image"
-      icon={<MdImage />}
-      onOpen={onOpen}
-      onClose={onClose}
-      isOpen={isOpen}
-    >
-      <ImageFieldSet onClose={onClose} />
-    </ModalBox>
-  );
-};
-
 const isLinkActive = (editor: MyEditor) => {
   const [link] = Editor.nodes(editor, {
     match: (n) =>
-      !Editor.isEditor(n) &&
-      SlateElement.isElement(n) &&
-      n.type === "link",
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link",
   });
   return !!link;
 };
 
 const unwrapLink = (editor: MyEditor) => {
-  let text = "";
-  const node = Transforms.unwrapNodes(editor, {
+  Transforms.unwrapNodes(editor, {
     match: (n) => {
-      console.log(n);
       return (
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        n.type === "link"
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link"
       );
     },
   });
-  console.log("#===>");
-  console.log(node);
+};
+
+const wrapLink = (editor: MyEditor, href: string, text: string) => {
+  if (isLinkActive(editor)) {
+    unwrapLink(editor);
+  }
+
+  const { selection } = editor;
+  const isCollapsed = selection && SlateRange.isCollapsed(selection);
+  const link: TypedLink = {
+    type: "link",
+    href,
+    children: isCollapsed ? [{ type: "TEXT", text }] : [],
+  };
+
+  if (isCollapsed) {
+    Transforms.insertNodes(editor, link);
+  } else {
+    Transforms.wrapNodes(editor, link, { split: true });
+    Transforms.collapse(editor, { edge: "end" });
+  }
 };
 
 // Put this at the start and end of an inline component to work around this Chromium bug:
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
 const InlineChromiumBugfix = () => (
   <span contentEditable={false} style={{ fontSize: 0 }}>
-    ${String.fromCodePoint(160) /* Non-breaking space */}
+    &nbsp;
   </span>
 );
 
@@ -184,26 +140,32 @@ const LinkFieldSet: React.FunctionComponent<{
     }
   }
   const [url, setUrl] = React.useState(href || "");
-  const [text, setText] = React.useState(defaultText);
+  const [newText, setText] = React.useState(defaultText);
 
   const onClick = () => {
-    const link: TypedLink = {
-      type: "link",
-      href: url,
-      children: [{ type: "TEXT", text }],
-    };
+    wrapLink(editor, url, newText);
+    // // If it was a link, we need to rewrite it
+    // if (isLinkActive(editor)) {
+    //   unwrapLink(editor)
+    // }
 
-    if (isCollapsed) {
-      console.log(editor.selection)
-      Transforms.insertNodes(editor,
-        link,
-        { hanging: true },
-        // { type: "TEXT", text: " " } as any,
-      );
-    } else {
-      Transforms.wrapNodes(editor, link as any, { split: true });
-      Transforms.collapse(editor, { edge: "end" });
-    }
+    // const link: TypedLink = {
+    //   type: "link",
+    //   href: url,
+    //   children: [{ type: "TEXT", text }],
+    // };
+
+    // if (isCollapsed) {
+    //   console.log(editor.selection)
+    //   Transforms.insertNodes(editor,
+    //     link,
+    //     // { type: "TEXT", text: " " } as any,
+    //   );
+    // } else {
+    //   console.log("//////////////////////////////////////");
+    //   Transforms.wrapNodes(editor, link as any, { split: true });
+    //   Transforms.collapse(editor, { edge: "end" });
+    // }
 
     setUrl("");
     setText("");
@@ -228,7 +190,7 @@ const LinkFieldSet: React.FunctionComponent<{
             Text Label
           </FormLabel>
           <Input
-            value={text}
+            value={newText}
             onChange={(e) => setText(e.currentTarget.value)}
             minWidth={"250px"}
           />
@@ -260,6 +222,7 @@ export const LinkButton: React.FunctionComponent<{}> = () => {
 
 type InlineLinkProps = {
   href: string;
+  text: string;
   slate_attributes: any;
   children: React.ReactNode;
 };
@@ -279,7 +242,6 @@ export const InlineLink: React.FunctionComponent<InlineLinkProps> = (
         display="inline"
         textDecoration="underline"
         boxShadow={selected ? "0 0 0 2px #c0c0e0" : "0"}
-        onClick={onOpen}
       >
         {children}
       </Text>
@@ -297,6 +259,7 @@ export const InlineLink: React.FunctionComponent<InlineLinkProps> = (
           <LinkFieldSet onClose={onClose} href={href} />
         </AlertDialogContent>
       </AlertDialog>
+      <InlineChromiumBugfix />
     </span>
   );
 };

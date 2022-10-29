@@ -40,23 +40,16 @@ export type TypedText = {
   strikethrough?: boolean;
 };
 
-export type TypedLeafImage = {
-  type: NodeType;
-  id: string;
-  text: string;  // serialized as src attribute
-  alt?: string;
-};
-
-export type TypedLeaf = TypedLeafImage & TypedText;
+export type TypedLeaf = TypedText;
 
 export type SlateModel = TypedNode[] | TypedLeaf[];
 
-export type MyEditor = BaseEditor & ReactEditor & HistoryEditor
+export type MyEditor = BaseEditor & ReactEditor & HistoryEditor;
 
-declare module 'slate' {
+declare module "slate" {
   interface CustomTypes {
-    Editor: BaseEditor
-    Element: TypedNode
-    Text: TypedLeaf
+    Editor: BaseEditor;
+    Element: TypedNode;
+    Text: TypedLeaf;
   }
 }

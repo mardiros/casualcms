@@ -1,24 +1,14 @@
 import enum
 import re
 from collections import defaultdict
-from typing import (
-    Any,
-    Iterable,
-    Mapping,
-    MutableMapping,
-    Optional,
-    Set,
-    Type,
-    TypeVar,
-    cast,
-)
+from typing import Any, Iterable, Optional, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, ConstrainedStr, Field
-from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
+from casualcms.domain.model.abstract import BaseUIModel
 
 from .breadcrumb import Breadcrumb, BreadcrumbItem
 from .site import Site
@@ -122,7 +112,9 @@ class PageMetaclass(ModelMetaclass):
             new_namespace["__meta__"] = page_meta
         else:
             raise MissingMetaError(long_name)
-        ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
+        ret = super().__new__(  # type: ignore
+            mcls, name, bases, new_namespace, **kwargs  # type: ignore
+        )
         # inject jsonschema title in pydantic config here
         ret.__config__.title = page_meta.title  # type: ignore
         if not page_meta.abstract:
@@ -131,10 +123,10 @@ class PageMetaclass(ModelMetaclass):
                 ret,  # type: ignore
                 page_meta.parent_types or None,
             )
-        return ret
+        return ret  # type: ignore
 
 
-class AbstractPage(BaseModel, metaclass=PageMetaclass):
+class AbstractPage(BaseUIModel, metaclass=PageMetaclass):
     __meta__: PageMeta
 
     slug: Slug = Field(...)
@@ -196,47 +188,6 @@ class AbstractPage(BaseModel, metaclass=PageMetaclass):
             canonical_url=ordered_items[-1].url,
             breadcrumb=Breadcrumb(itemListElement=ordered_items),
         )
-
-    @classmethod
-    def ui_schema(cls) -> Mapping[str, Any]:
-        ret: dict[str, Any] = {}
-        for key, val in cls.__fields__.items():
-            if key in (
-                "parent",
-                "site",
-            ):
-                continue
-            ret[key] = cls.get_widget(val)
-        return ret
-
-    @classmethod
-    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
-
-        if "widget" in field.field_info.extra:
-            widget = {"ui:widget": field.field_info.extra["widget"]}
-            if field.field_info.extra["widget"] != "hidden":
-                widget["ui:placeholder"] = field.field_info.extra.get(
-                    "placeholder", field.name
-                )
-            return widget
-
-        if field.is_complex():
-            if isinstance(field.get_default(), list):
-                items = {}
-                for key, val in field.type_.__fields__.items():
-                    items[key] = cls.get_widget(val)
-                ret: Mapping[str, Any] = {"items": items}
-                return ret
-            else:
-                subtype: MutableMapping[str, Mapping[str, Any]] = {}
-                for key, val in field.type_.__fields__.items():
-                    subtype[key] = cls.get_widget(val)
-                return subtype
-
-        return {
-            "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),
-            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
-        }
 
 
 Page_contra = TypeVar("Page_contra", bound=AbstractPage, contravariant=True)

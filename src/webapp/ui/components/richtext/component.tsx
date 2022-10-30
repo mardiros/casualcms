@@ -3,6 +3,7 @@ import React from "react";
 import { Descendant } from "slate";
 import { RenderElementProps, RenderLeafProps } from "slate-react";
 import { Box } from "@chakra-ui/react";
+import { RJSFSchema, UiSchema, WidgetProps } from "@rjsf/utils";
 
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -17,18 +18,13 @@ import {
 } from "./renderer";
 import { Toolbar } from "./toolbar/component";
 import { toggleMark } from "./toolbar/mark_btn";
-import { TypedNode } from "./types";
+import { FeatureType, TypedNode } from "./types";
 
 const HOTKEYS: { [hotkey: string]: string } = {
   "mod+b": "bold",
   "mod+i": "italic",
   "mod+u": "underline",
   "mod+`": "code",
-};
-
-type RichTextEditorProps = {
-  value: string;
-  onChange: (value: string) => void;
 };
 
 const withInlines = (editor: any) => {
@@ -57,10 +53,11 @@ const withInlines = (editor: any) => {
   return editor;
 };
 
-export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
-  props: RichTextEditorProps
+export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
+  props: WidgetProps
 ) => {
-  const { value, onChange } = props;
+  const { options, value, onChange } = props;
+  const features = options.features;
   const editor = React.useMemo(
     () => withInlines(withHistory(withReact(createEditor()))),
     []
@@ -125,7 +122,7 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
     <Box minW="720px">
       <Slate editor={editor} value={fromHtml(value)} onChange={onModelChange}>
         <Box padding={"15px 5px"}>
-          <Toolbar />
+          <Toolbar features={features} />
           <Editable
             placeholder="Lorem ipsum dolor sit amet, ..."
             renderElement={renderElement}
@@ -143,3 +140,22 @@ export const RichTextEditor: React.FunctionComponent<RichTextEditorProps> = (
     </Box>
   );
 };
+
+
+
+RichTextEditor.defaultProps = {
+  options: {
+    features: [
+      "bold",
+      "italic",
+      "underline",
+      "h4",
+      "h5",
+      "h6",
+      "ul",
+      "ol",
+      "blockquote",
+      "link",
+    ]
+  }
+}

@@ -53,7 +53,11 @@ def test_page_abstract_raise():
             {
                 "body": {
                     "items": {
-                        "body": {"ui:placeholder": "body", "ui:widget": "textarea"},
+                        "body": {
+                            "ui:placeholder": "body",
+                            "ui:widget": "richtext",
+                            "ui:options": {"features": ["bold", "italic", "h5"]},
+                        },
                         "title": {"ui:placeholder": "title", "ui:widget": "text"},
                     }
                 },
@@ -87,7 +91,11 @@ def test_page_abstract_raise():
                 "description": {"ui:placeholder": "description", "ui:widget": "text"},
                 "hero_title": {"ui:placeholder": "hero_title", "ui:widget": "text"},
                 "intro": {
-                    "body": {"ui:placeholder": "body", "ui:widget": "textarea"},
+                    "body": {
+                        "ui:placeholder": "body",
+                        "ui:widget": "richtext",
+                        "ui:options": {"features": ["bold", "italic", "h5"]},
+                    },
                     "title": {"ui:placeholder": "title", "ui:widget": "text"},
                 },
                 "slug": {"ui:placeholder": "slug", "ui:widget": "text"},

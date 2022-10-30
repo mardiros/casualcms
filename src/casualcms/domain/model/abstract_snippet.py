@@ -3,11 +3,11 @@ import re
 from typing import Any, Mapping, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, ConstrainedStr, Field
-from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
+from casualcms.domain.model.abstract import BaseUIModel
 
 SnippetType = Type["AbstractSnippet"]
 
@@ -82,14 +82,16 @@ class SnippetMetaclass(ModelMetaclass):
             new_namespace["__meta__"] = snippet_meta
         else:
             raise MissingMetaError(long_name)
-        ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
+        ret = super().__new__(  # type: ignore
+            mcls, name, bases, new_namespace, **kwargs  # type: ignore
+        )
         if snippet_meta and not snippet_meta.abstract:
             ret.__config__.title = snippet_meta.title  # type: ignore
             SnippetTypeList().register(ret)  # type: ignore
-        return ret
+        return ret  # type: ignore
 
 
-class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
+class AbstractSnippet(BaseUIModel, metaclass=SnippetMetaclass):
     __meta__: SnippetMeta
 
     key: SnippetKey = Field(...)
@@ -114,31 +116,6 @@ class AbstractSnippet(BaseModel, metaclass=SnippetMetaclass):
         for key, val in cls.__fields__.items():
             ret[key] = cls.get_widget(val)
         return ret
-
-    @classmethod
-    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
-
-        if "widget" in field.field_info.extra:
-            widget = {"ui:widget": field.field_info.extra["widget"]}
-            if field.field_info.extra["widget"] != "hidden":
-                widget["ui:placeholder"] = field.field_info.extra.get(
-                    "placeholder", field.name
-                )
-            return widget
-
-        if field.is_complex():
-
-            if isinstance(field.get_default(), list):
-                items = {}
-                for key, val in field.type_.__fields__.items():
-                    items[key] = cls.get_widget(val)
-                ret: Mapping[str, Any] = {"items": items}
-                return ret
-
-        return {
-            "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),
-            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
-        }
 
 
 Snippet_contra = TypeVar("Snippet_contra", bound=AbstractSnippet, contravariant=True)

@@ -1,4 +1,4 @@
-import { JSONSchema7 } from "json-schema";
+import { RJSFSchema, UiSchema } from "@rjsf/utils";
 
 export type Account = {
   id: string;
@@ -14,8 +14,8 @@ export type PartialPageType = {
 
 export type PageType = {
   // type:string;
-  schema: JSONSchema7;
-  uiSchema: any;
+  schema: RJSFSchema;
+  uiSchema: UiSchema;
 };
 
 export type PartialPageMeta = {

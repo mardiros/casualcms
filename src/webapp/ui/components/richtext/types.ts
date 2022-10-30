@@ -2,6 +2,25 @@ import { BaseEditor } from "slate";
 import { HistoryEditor } from "slate-history";
 import { ReactEditor } from "slate-react";
 
+export type FeatureType =
+  | "bold"
+  | "italic"
+  | "underline"
+  | "strikethrough"
+  | "paragraph"
+  | "h1"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "ul"
+  | "ol"
+  | "li"
+  | "blockquote"
+  | "code"
+  | "link";
+
 export type NodeType =
   | "paragraph"
   | "h1"
@@ -15,9 +34,7 @@ export type NodeType =
   | "li"
   | "blockquote"
   | "code"
-  | "image"
   | "TEXT"
-  | "LINKTEXT"
   | "link";
 
 export type TypedNode = {

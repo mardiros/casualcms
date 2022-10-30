@@ -1,11 +1,11 @@
 import re
-from typing import Any, Mapping, Set, Type, TypeVar, cast
+from typing import Any, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, Field
-from pydantic.fields import ModelField
 from pydantic.main import ModelMetaclass
 
 from casualcms.domain.exceptions import MissingMetaError
+from casualcms.domain.model.abstract import BaseUIModel
 
 uuid = str
 SettingType = Type["AbstractSetting"]
@@ -72,15 +72,17 @@ class SettingMetaclass(ModelMetaclass):
             new_namespace["__meta__"] = setting_meta
         else:
             raise MissingMetaError(long_name)
-        ret = super().__new__(mcls, name, bases, new_namespace, **kwargs)
+        ret = super().__new__(  # type: ignore
+            mcls, name, bases, new_namespace, **kwargs  # type: ignore
+        )
         if setting_meta:
             ret.__config__.title = setting_meta.title  # type: ignore
             if not setting_meta.abstract:
                 SettingTypeList().register(ret)  # type: ignore
-        return ret
+        return ret  # type: ignore
 
 
-class AbstractSetting(BaseModel, metaclass=SettingMetaclass):
+class AbstractSetting(BaseUIModel, metaclass=SettingMetaclass):
     __meta__: SettingMeta
 
     class Meta:
@@ -90,38 +92,6 @@ class AbstractSetting(BaseModel, metaclass=SettingMetaclass):
         if self.__meta__.abstract is True:
             raise AbstractSettingError(f"Setting {self.__class__.__name__} is abstract")
         super().__init__(**kwargs)
-
-    @classmethod
-    def ui_schema(cls) -> Mapping[str, Any]:
-        ret: dict[str, Any] = {}
-        for key, val in cls.__fields__.items():
-            ret[key] = cls.get_widget(val)
-        return ret
-
-    @classmethod
-    def get_widget(cls, field: ModelField) -> Mapping[str, Any]:
-
-        if "widget" in field.field_info.extra:
-            widget = {"ui:widget": field.field_info.extra["widget"]}
-            if field.field_info.extra["widget"] != "hidden":
-                widget["ui:placeholder"] = field.field_info.extra.get(
-                    "placeholder", field.name
-                )
-            return widget
-
-        if field.is_complex():
-
-            if isinstance(field.get_default(), list):
-                items = {}
-                for key, val in field.type_.__fields__.items():
-                    items[key] = cls.get_widget(val)
-                ret: Mapping[str, Any] = {"items": items}
-                return ret
-
-        return {
-            "ui:widget": {bool: "checkbox"}.get(field.type_, "text"),
-            "ui:placeholder": field.field_info.extra.get("placeholder", field.name),
-        }
 
 
 Setting_contra = TypeVar("Setting_contra", bound=AbstractSetting, contravariant=True)

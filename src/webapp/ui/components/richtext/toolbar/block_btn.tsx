@@ -1,10 +1,9 @@
 import React from "react";
 import { Editor, Transforms } from "slate";
-import { useSlate } from "slate-react";
 import { IconButton } from "@chakra-ui/react";
 
 import { Element as SlateElement } from "slate";
-import { MyEditor, NodeType, TypedNode } from "../types";
+import { MyEditor, NodeType } from "../types";
 import { MyElement } from "../renderer";
 import { useMyEditor } from "../hooks";
 

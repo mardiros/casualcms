@@ -64,7 +64,9 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                         "body": {
                             "title": "Body",
                             "type": "string",
-                            "widget": "textarea",  # FIXME
+                            # FIXME
+                            "widget": "richtext",
+                            "features": ["bold", "italic", "h5"],
                         },
                         "title": {"title": "Title", "type": "string"},
                     },
@@ -105,7 +107,11 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
             "body": {
                 "items": {
                     "title": {"ui:widget": "text", "ui:placeholder": "title"},
-                    "body": {"ui:widget": "textarea", "ui:placeholder": "body"},
+                    "body": {
+                        "ui:widget": "richtext",
+                        "ui:placeholder": "body",
+                        "ui:options": {"features": ["bold", "italic", "h5"]},
+                    },
                 }
             },
         },

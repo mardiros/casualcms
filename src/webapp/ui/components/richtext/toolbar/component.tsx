@@ -24,8 +24,58 @@ import {
   toggleMultilineBlock,
 } from "./block_btn";
 import { LinkButton } from "./popover_button";
+import { FeatureType } from "../types";
 
-export const Toolbar: React.FunctionComponent<{}> = () => {
+type FunctionComponentProps = {
+  features: FeatureType[];
+};
+
+export const Toolbar: React.FunctionComponent<FunctionComponentProps> = (
+  { features }: FunctionComponentProps
+) => {
+  const buttons = {
+    bold: <MarkButton format="bold" icon={<MdFormatBold />} />,
+    italic: <MarkButton format="italic" icon={<MdFormatItalic />} />,
+    underline: <MarkButton format="underline" icon={<MdFormatUnderlined />} />,
+    strikethrough: (
+      <MarkButton format="strikethrough" icon={<MdFormatStrikethrough />} />
+    ),
+    h1: <BlockButton format="h1" icon={<MdLooksOne />} />,
+    h2: <BlockButton format="h2" icon={<MdLooksTwo />} />,
+    h3: <BlockButton format="h3" icon={<MdLooks3 />} />,
+    h4: <BlockButton format="h4" icon={<MdLooks4 />} />,
+    h5: <BlockButton format="h5" icon={<MdLooks5 />} />,
+    h6: <BlockButton format="h6" icon={<MdLooks6 />} />,
+    ul: (
+      <BlockButton
+        format="ul"
+        icon={<MdFormatListBulleted />}
+        toggleFn={toggleListBlock}
+      />
+    ),
+    ol: (
+      <BlockButton
+        format="ol"
+        icon={<MdFormatListNumbered />}
+        toggleFn={toggleListBlock}
+      />
+    ),
+    blockquote: (
+      <BlockButton
+        format="blockquote"
+        icon={<MdFormatQuote />}
+        toggleFn={toggleMultilineBlock}
+      />
+    ),
+    code: (
+      <BlockButton
+        format="code"
+        icon={<MdCode />}
+        toggleFn={toggleMultilineBlock}
+      />
+    ),
+    link: <LinkButton />,
+  };
   return (
     <HStack
       borderWidth={"0 0 1px 0"}
@@ -33,37 +83,9 @@ export const Toolbar: React.FunctionComponent<{}> = () => {
       spacing={"5px"}
       wrap={"wrap"}
     >
-      <MarkButton format="bold" icon={<MdFormatBold />} />
-      <MarkButton format="italic" icon={<MdFormatItalic />} />
-      <MarkButton format="underline" icon={<MdFormatUnderlined />} />
-      <MarkButton format="strikethrough" icon={<MdFormatStrikethrough />} />
-      <BlockButton format="h1" icon={<MdLooksOne />} />
-      <BlockButton format="h2" icon={<MdLooksTwo />} />
-      <BlockButton format="h3" icon={<MdLooks3 />} />
-      <BlockButton format="h4" icon={<MdLooks4 />} />
-      <BlockButton format="h5" icon={<MdLooks5 />} />
-      <BlockButton format="h6" icon={<MdLooks6 />} />
-      <BlockButton
-        format="ul"
-        icon={<MdFormatListBulleted />}
-        toggleFn={toggleListBlock}
-      />
-      <BlockButton
-        format="ol"
-        icon={<MdFormatListNumbered />}
-        toggleFn={toggleListBlock}
-      />
-      <BlockButton
-        format="blockquote"
-        icon={<MdFormatQuote />}
-        toggleFn={toggleMultilineBlock}
-      />
-      <BlockButton
-        format="code"
-        icon={<MdCode />}
-        toggleFn={toggleMultilineBlock}
-      />
-      <LinkButton />
+      {features.map((feat: FeatureType) => {
+        return <>{buttons[feat]}</>;
+      })}
     </HStack>
   );
 };

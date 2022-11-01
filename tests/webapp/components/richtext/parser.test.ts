@@ -5,7 +5,7 @@ import {
   defaultModel,
 } from "../../../../src/webapp/ui/components/richtext/parser";
 
-describe("Convert Html to slate model", () => {
+describe("Convert Html to SlateModel", () => {
   it("Parse empty textgenerate the empty paragraph", () => {
     const mdl = fromHtml("");
     expect(mdl).eql(defaultModel());
@@ -17,6 +17,7 @@ describe("Convert Html to slate model", () => {
       {
         children: [
           {
+            type: "TEXT",
             text: "My lazy dog",
             bold: false,
             italic: false,
@@ -35,6 +36,7 @@ describe("Convert Html to slate model", () => {
       {
         children: [
           {
+            type: "TEXT",
             text: "My ",
             bold: false,
             italic: false,
@@ -42,6 +44,7 @@ describe("Convert Html to slate model", () => {
             strikethrough: false,
           },
           {
+            type: "TEXT",
             text: "lazy",
             bold: true,
             italic: false,
@@ -49,6 +52,7 @@ describe("Convert Html to slate model", () => {
             strikethrough: false,
           },
           {
+            type: "TEXT",
             text: " dog",
             bold: false,
             italic: false,
@@ -74,6 +78,7 @@ describe("Convert Html to slate model", () => {
             italic: false,
             underline: false,
             strikethrough: false,
+            type: "TEXT",
             text: "Title",
           },
         ],
@@ -86,6 +91,7 @@ describe("Convert Html to slate model", () => {
             italic: false,
             underline: false,
             strikethrough: false,
+            type: "TEXT",
             text: "My lazy dog",
           },
         ],
@@ -98,6 +104,7 @@ describe("Convert Html to slate model", () => {
             italic: false,
             underline: false,
             strikethrough: false,
+            type: "TEXT",
             text: "Subtitle",
           },
         ],
@@ -110,6 +117,7 @@ describe("Convert Html to slate model", () => {
             italic: false,
             underline: false,
             strikethrough: false,
+            type: "TEXT",
             text: "ha ha!",
           },
         ],
@@ -130,6 +138,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Dog",
               },
             ],
@@ -142,6 +151,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Cat",
               },
             ],
@@ -154,6 +164,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Lezard",
               },
             ],
@@ -177,6 +188,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Dog",
               },
             ],
@@ -189,6 +201,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Cat",
               },
             ],
@@ -201,6 +214,7 @@ describe("Convert Html to slate model", () => {
                 italic: false,
                 underline: false,
                 strikethrough: false,
+                type: "TEXT",
                 text: "Lezard",
               },
             ],

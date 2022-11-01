@@ -15,14 +15,6 @@ export const createText = (
   };
 };
 
-export const createImage = (attrs: Record<string, string>): TypedLeaf => {
-  return {
-    type: "image",
-    text: attrs?.src || "#",
-    alt: attrs?.alt,
-  };
-};
-
 export const createNode = (
   type: NodeType,
   children: SlateModel = []
@@ -64,12 +56,6 @@ const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
       return createNode("code", deserializeChildNodes(el));
     case "BLOCKQUOTE":
       return createNode("blockquote", deserializeChildNodes(el));
-
-    case "IMG":
-      return createImage({
-        src: (el as any).getAttribute("src"),
-        alt: (el as any).getAttribute("alt"),
-      });
 
     // Leafs
     // case "B":

@@ -1,6 +1,7 @@
 import { BaseEditor } from "slate";
 import { HistoryEditor } from "slate-history";
 import { ReactEditor } from "slate-react";
+import { Type } from "typescript";
 
 export type FeatureType =
   | "bold"
@@ -57,9 +58,11 @@ export type TypedText = {
   strikethrough?: boolean;
 };
 
+export type TextMark = keyof Omit<TypedText, "type" | "text">;
+
 export type TypedLeaf = TypedText;
 
-export type SlateModel = TypedNode[] | TypedLeaf[];
+export type SlateModel = Array<TypedNode | TypedLink | TypedLeaf>;
 
 export type MyEditor = BaseEditor & ReactEditor & HistoryEditor;
 

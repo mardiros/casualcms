@@ -18,13 +18,12 @@ import {
 } from "./renderer";
 import { Toolbar } from "./toolbar/component";
 import { toggleMark } from "./toolbar/mark_btn";
-import { FeatureType, TypedNode } from "./types";
+import { FeatureType, TextMark, TypedNode } from "./types";
 
-const HOTKEYS: { [hotkey: string]: string } = {
+const HOTKEYS: { [hotkey: string]: TextMark } = {
   "mod+b": "bold",
   "mod+i": "italic",
   "mod+u": "underline",
-  "mod+`": "code",
 };
 
 const withInlines = (editor: any) => {
@@ -57,7 +56,7 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
   props: WidgetProps
 ) => {
   const { options, value, onChange } = props;
-  const features = options.features;
+  const features = options.features as FeatureType[];
   const editor = React.useMemo(
     () => withInlines(withHistory(withReact(createEditor()))),
     []
@@ -141,8 +140,6 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
   );
 };
 
-
-
 RichTextEditor.defaultProps = {
   options: {
     features: [
@@ -156,6 +153,6 @@ RichTextEditor.defaultProps = {
       "ol",
       "blockquote",
       "link",
-    ]
-  }
-}
+    ],
+  },
+};

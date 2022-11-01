@@ -222,7 +222,6 @@ export const LinkButton: React.FunctionComponent<{}> = () => {
 
 type InlineLinkProps = {
   href: string;
-  text: string;
   slate_attributes: any;
   children: React.ReactNode;
 };

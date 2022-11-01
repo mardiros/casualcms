@@ -25,15 +25,16 @@ import {
 } from "./block_btn";
 import { LinkButton } from "./popover_button";
 import { FeatureType } from "../types";
+import { JsxElement } from "typescript";
 
 type FunctionComponentProps = {
   features: FeatureType[];
 };
 
-export const Toolbar: React.FunctionComponent<FunctionComponentProps> = (
-  { features }: FunctionComponentProps
-) => {
-  const buttons = {
+export const Toolbar: React.FunctionComponent<FunctionComponentProps> = ({
+  features,
+}: FunctionComponentProps) => {
+  const buttons: Record<FeatureType, JSX.Element> = {
     bold: <MarkButton format="bold" icon={<MdFormatBold />} />,
     italic: <MarkButton format="italic" icon={<MdFormatItalic />} />,
     underline: <MarkButton format="underline" icon={<MdFormatUnderlined />} />,
@@ -75,6 +76,8 @@ export const Toolbar: React.FunctionComponent<FunctionComponentProps> = (
       />
     ),
     link: <LinkButton />,
+    paragraph: <></>,
+    li: <></>,
   };
   return (
     <HStack

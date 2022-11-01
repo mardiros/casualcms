@@ -2,18 +2,18 @@ import React from "react";
 import { Editor } from "slate";
 import { IconButton } from "@chakra-ui/react";
 
-import { MyEditor, TypedText } from "../types";
+import { MyEditor, TextMark } from "../types";
 import { useMyEditor } from "../hooks";
 
-const isMarkActive = (editor: MyEditor, format: string) => {
+const isMarkActive = (editor: MyEditor, format: TextMark) => {
   const marks = Editor.marks(editor);
   if (marks) {
-    return marks[format] === true;
+    return (marks[format] as boolean) === true;
   }
   return false;
 };
 
-export const toggleMark = (editor: MyEditor, format: string): void => {
+export const toggleMark = (editor: MyEditor, format: TextMark): void => {
   const isActive = isMarkActive(editor, format);
   if (isActive) {
     Editor.removeMark(editor, format);
@@ -26,7 +26,7 @@ export const MarkButton = ({
   format,
   icon,
 }: {
-  format: string;
+  format: TextMark;
   icon: React.ReactElement;
 }) => {
   const editor = useMyEditor();

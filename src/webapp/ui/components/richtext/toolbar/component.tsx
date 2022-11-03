@@ -86,8 +86,8 @@ export const Toolbar: React.FunctionComponent<FunctionComponentProps> = ({
       spacing={"5px"}
       wrap={"wrap"}
     >
-      {features.map((feat: FeatureType) => {
-        return <>{buttons[feat]}</>;
+      {features.map((feat: FeatureType, index: number) => {
+        return <React.Fragment key={index}>{buttons[feat]}</React.Fragment>;
       })}
     </HStack>
   );

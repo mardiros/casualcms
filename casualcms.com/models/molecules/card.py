@@ -7,7 +7,7 @@ from ..atoms.link import Link
 
 class Card(Block):
     title: str = Field(...)
-    content: str = Field(widget="textarea")
+    content: str = Field(widget="richtext")
     footer_links: list[Link] = Field(...)
 
     class Meta:

@@ -83,7 +83,7 @@ const deserializeChildNodes = (el: ChildNode): SlateModel => {
 };
 
 export const defaultModel = (): SlateModel => {
-  return [createNode("paragraph")];
+  return [createNode("paragraph", [createText("")])];
 };
 
 export const fromHtml = (html: string): SlateModel => {

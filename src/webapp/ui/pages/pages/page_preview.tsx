@@ -20,7 +20,7 @@ export const PagePreview: React.FunctionComponent<{}> = () => {
   React.useEffect(() => {
     async function loadPage() {
       const page = await config.api.page.previewDraft(token, pagePath || "");
-      console.log(page);
+      // console.log(page);
       page
         .map((page: string) => setPreviewContent(page))
         .mapErr((err: ApiError) => setError(err));

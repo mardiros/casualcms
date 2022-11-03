@@ -27,28 +27,10 @@ const HOTKEYS: { [hotkey: string]: TextMark } = {
 };
 
 const withInlines = (editor: any) => {
-  const { insertData, insertText, isInline } = editor;
+  const isInline = editor.isInline;
 
   editor.isInline = (element: TypedNode) =>
     ["link"].includes(element.type) || isInline(element);
-
-  // editor.insertText = text => {
-  //   if (text && isUrl(text)) {
-  //     wrapLink(editor, text)
-  //   } else {
-  //     insertText(text)
-  //   }
-  // }
-  // editor.insertData = (data: any) => {
-  //   const text = data.getData('text/plain')
-
-  //   if (text && isUrl(text)) {
-  //     wrapLink(editor, text)
-  //   } else {
-  //     insertData(data)
-  //   }
-  // }
-
   return editor;
 };
 
@@ -75,14 +57,28 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
     []
   );
 
+  let isSaving = false;
   const onModelChange = React.useCallback((childs: Descendant[]) => {
-    // FIXME: antispam here
-    console.log(toHtml(childs));
-    try {
-      onChange(toHtml(childs));
-    } catch (e) {
-      console.log(e);
+    function saveChange() {
+      if (isSaving) {
+        return
+      }
+      isSaving = true;
+      setTimeout(
+        () => {
+          try {
+            onChange(toHtml(childs));
+          } catch (e) {
+            console.log(e);
+          }
+          finally {
+            isSaving=false;
+          }
+        },
+        150
+      )
     }
+    saveChange()
   }, []);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -117,9 +113,11 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
     // }
   };
 
+  const val = fromHtml(value);
+  console.log(val)
   return (
     <Box minW="720px">
-      <Slate editor={editor} value={fromHtml(value)} onChange={onModelChange}>
+      <Slate editor={editor} value={val} onChange={onModelChange}>
         <Box padding={"15px 5px"}>
           <Toolbar features={features} />
           <Editable

@@ -1,0 +1,4 @@
+<h2 id="{{block.anchor}}" class="title is-2 mt-4">{{block.title}}</h2>
+{% for item in block.body %}
+  {{ include_block(item) }}
+{% endfor %}

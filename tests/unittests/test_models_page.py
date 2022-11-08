@@ -59,6 +59,11 @@ def test_page_abstract_raise():
                             "ui:options": {"features": ["bold", "italic", "h5"]},
                         },
                         "title": {"ui:placeholder": "title", "ui:widget": "text"},
+                        "code": {"ui:placeholder": "code", "ui:widget": "textarea"},
+                        "language": {
+                            "ui:placeholder": "language",
+                            "ui:widget": "select",
+                        },
                     }
                 },
                 "description": {"ui:placeholder": "description", "ui:widget": "text"},

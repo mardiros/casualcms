@@ -1,6 +1,6 @@
 <div class="container is-fluid">
   {% for item in block.items %}
-  {% if (loop.index % column_count) == 1 %}
+  {% if column_count == 1 or (loop.index % column_count) == 1 %}
   <div class="columns">
     {% endif %}
     <div class="column">
@@ -9,7 +9,7 @@
     {% if (loop.index % column_count) != 0 and loop.last %}
     <div class="column"></div>
     {% endif %}
-    {% if (loop.index % column_count) == 0 or loop.last %}
+    {% if column_count == 1 or (loop.index % column_count) == 0 or loop.last %}
   </div>
   {% endif %}
   {% endfor %}

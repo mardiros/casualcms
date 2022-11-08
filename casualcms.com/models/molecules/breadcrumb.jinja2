@@ -1,5 +1,5 @@
 {% set breadcrumb = page.metadata.breadcrumb %}
-<nav class="breadcrumb is-medium" aria-label="breadcrumbs">
+<nav class="breadcrumb is-small" aria-label="breadcrumbs">
   <ul>
     {% for p in breadcrumb.items %}
     <li {% if loop.last %}class="is-active" {% endif %}>

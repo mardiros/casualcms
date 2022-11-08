@@ -162,7 +162,6 @@ const LinkFieldSet: React.FunctionComponent<{
     //     // { type: "TEXT", text: " " } as any,
     //   );
     // } else {
-    //   console.log("//////////////////////////////////////");
     //   Transforms.wrapNodes(editor, link as any, { split: true });
     //   Transforms.collapse(editor, { edge: "end" });
     // }

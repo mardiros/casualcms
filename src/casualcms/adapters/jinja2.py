@@ -1,13 +1,17 @@
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import Any, MutableMapping
+from typing import Any, MutableMapping, MutableSet
 
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
+from markupsafe import Markup
+from pygments import highlight  # type: ignore
+from pygments.formatters import HtmlFormatter
+from pygments.lexers import get_lexer_by_name
 
 from casualcms.domain.model import AbstractPage
 from casualcms.domain.model.abstract_snippet import AbstractSnippet
-from casualcms.domain.model.block import Block
+from casualcms.domain.model.block import Block, CodeBlock
 from casualcms.domain.repositories.setting import SettingRepositoryResult
 from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -26,6 +30,12 @@ def build_searchpath(template_search_path: str) -> list[str]:
 
 class AbstractTemplateRenderer(ABC):
     @abstractmethod
+    async def include_block(
+        self, block: Block, page: AbstractPage, **kwargs: Any
+    ) -> str:
+        ...
+
+    @abstractmethod
     async def render_page(self, page: AbstractPage) -> str:
         ...
 
@@ -35,6 +45,12 @@ class AbstractTemplateRenderer(ABC):
 
     @abstractmethod
     async def render_block(self, block: Block, page: AbstractPage) -> str:
+        ...
+
+    @abstractmethod
+    async def render_codeblock(
+        self, block: CodeBlock, page: AbstractPage, **kwargs: Any
+    ) -> str:
         ...
 
 
@@ -55,11 +71,15 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         )
         self.hostname = hostname
         self._settings: MutableMapping[str, Any] = {}
+        self._formatter: MutableMapping[int, MutableSet[str]] = {}
 
     async def include_block(
         self, block: Block, page: AbstractPage, **kwargs: Any
     ) -> str:
-        ret = await self.render_block(block=block, page=page, **kwargs)
+        if isinstance(block, CodeBlock):
+            ret = await self.render_codeblock(block=block, page=page, **kwargs)
+        else:
+            ret = await self.render_block(block=block, page=page, **kwargs)
         return ret
 
     async def include_snippet(self, key: str, page: AbstractPage, **kwargs: Any) -> str:
@@ -107,8 +127,11 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         )
 
     async def render_page(self, page: AbstractPage) -> str:
+        self._formatter[id(page)] = set()
         tpl = self.get_template(page, page.__meta__.template)
-        return await tpl.render_async(page=page)
+        ret = await tpl.render_async(page=page)
+        del self._formatter[id(page)]
+        return ret
 
     async def render_snippet(
         self, snippet: AbstractSnippet, page: AbstractPage, **kwargs: Any
@@ -124,3 +147,21 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
     ) -> str:
         tpl = self.get_template(page, block.__meta__.template)
         return await tpl.render_async(block=block, page=page, **kwargs)
+
+    async def render_codeblock(
+        self, block: CodeBlock, page: AbstractPage, **kwargs: Any
+    ) -> str:
+        lexer = get_lexer_by_name(block.language)
+        formatter: HtmlFormatter[Any] = (
+            block.__fields__["code"].field_info.extra.get("formatter")
+            or HtmlFormatter()
+        )
+        formatters: MutableSet[str] = self._formatter[id(page)]
+        fmt = formatter.style.__class__
+        name = f"{fmt.__module__}:{fmt.__qualname__}"
+        if name in formatters:
+            return Markup(highlight(block.code, lexer, formatter))
+        else:
+            formatters.add(name)
+            style_output: str = f"<style>{formatter.get_style_defs()}</style>"
+            return Markup(f"{style_output}{highlight(block.code, lexer, formatter)}")

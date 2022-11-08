@@ -10,13 +10,16 @@ from casualcms.domain.model import DraftPage, Setting, Site, Snippet
 from casualcms.domain.repositories.setting import SettingRepositoryError
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.casualblog.models import (
+    CodeBlock,
     ContactSetting,
     FeatureFlagSetting,
     HeaderSnippet,
     HomePage,
+    ParagraphBlock,
     SectionPage,
     SnippetBlockPage,
 )
+from .long_text import EXPECTED_CODEBLOCK
 
 
 def test_build_searchpath():
@@ -199,3 +202,25 @@ async def test_render_page_with_snippet_and_block(
             """
         ).strip()
     )
+
+
+async def test_render_template_with_many_blocks(
+    uow: AbstractUnitOfWork,
+    app_settings: Settings,
+    draft_hp: DraftPage[HomePage],
+    default_site: Site,
+):
+    draft_hp.page.body = [
+        ParagraphBlock(title="Ici un truc", body="bla bla"),
+        CodeBlock(language="Python", code="""async def main():\n    ...\n"""),
+        ParagraphBlock(title="Other", body="stuff"),
+        CodeBlock(language="Python", code="""def main():\n    ...\n"""),
+    ]
+    ...
+
+    async with uow as uow:
+        renderer = Jinja2TemplateRender(
+            uow, app_settings.template_search_path, default_site.hostname
+        )
+        data = await renderer.render_page(draft_hp.page)
+    assert data.strip() == EXPECTED_CODEBLOCK

@@ -1,3 +1,4 @@
+from types import UnionType
 from typing import Any, Mapping, MutableMapping
 
 from pydantic import BaseModel
@@ -34,8 +35,13 @@ class BaseUIModel(BaseModel):
         if field.is_complex():
             if isinstance(field.get_default(), list):
                 items = {}
-                for key, val in field.type_.__fields__.items():
-                    items[key] = cls.get_widget(val)
+                if isinstance(field.type_, UnionType):
+                    for type_ in field.type_.__args__:
+                        for key, val in type_.__fields__.items():
+                            items[key] = cls.get_widget(val)
+                else:
+                    for key, val in field.type_.__fields__.items():
+                        items[key] = cls.get_widget(val)
                 ret: Mapping[str, Any] = {"items": items}
                 return ret
             else:

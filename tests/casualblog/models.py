@@ -9,6 +9,7 @@ from casualcms.domain.model import (
     Block,
     GenericBlock,
 )
+from casualcms.domain.model.block import CodeBlock
 
 
 class Link(BaseModel):
@@ -81,6 +82,14 @@ class Paragraph(BaseModel):
     body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
 
 
+class ParagraphBlock(Block):
+    title: Optional[str] = Field()
+    body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
+
+    class Meta:
+        template = "paragraph_block.jinja2"
+
+
 class BasePage(AbstractPage):
     hero_title: str = Field(description="Title of the hero section")
 
@@ -89,7 +98,7 @@ class BasePage(AbstractPage):
 
 
 class HomePage(BasePage):
-    body: list[Paragraph] = []
+    body: list[ParagraphBlock | CodeBlock] = []
 
     class Meta:
         parent_types = None
@@ -182,7 +191,7 @@ class GlossaryPage(BasePage):
 
 class BlogPage(BasePage):
 
-    body: list[Paragraph] = []
+    body: list[Paragraph | CodeBlock] = []
     related_post_snippet: str = ""
 
     class Meta:

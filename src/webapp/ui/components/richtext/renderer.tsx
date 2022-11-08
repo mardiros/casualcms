@@ -33,7 +33,7 @@ export const MyRenderElement = ({
   children,
   element,
 }: MyRenderElementProps) => {
-  console.log(`Render Element ${element.type}`);
+  // console.log(`Render Element ${element.type}`);
   switch (element.type) {
     case "h1":
       return (

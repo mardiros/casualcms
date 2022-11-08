@@ -43,6 +43,7 @@ services:
       - "./src:/srv/casualcms/src"
       - "./alembic.ini:/srv/casualcms/alembic.ini"
       - "./sql-migrations:/srv/casualcms/sql-migrations"
+      - "/home/guillaume/.cache/pypoetry/virtualenvs/casualcms-tjAUXo7J-py3.10/lib/python3.10/site-packages/fastapi:/home/casualcms/.cache/pypoetry/virtualenvs/casualcms-i5MnOS1q-py3.10/lib/python3.10/site-packages/fastapi"
 
   postgresql:
     image: "postgres:12-alpine"

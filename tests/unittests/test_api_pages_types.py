@@ -59,40 +59,69 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
     assert resp.json() == {
         "schema": {
             "definitions": {
-                "Paragraph": {
+                "CodeBlock": {
+                    "properties": {
+                        "code": {
+                            "title": "Code",
+                            "type": "string",
+                            "widget": "textarea",
+                        },
+                        "language": {
+                            "enum": [
+                                "Bash",
+                                "Go",
+                                "Java",
+                                "JavaScript",
+                                "Python",
+                                "Ruby",
+                                "Rust",
+                                "SQL",
+                                "Typescript",
+                            ],
+                            "title": "Language",
+                            "type": "string",
+                            "widget": "select",
+                        },
+                    },
+                    "required": ["language", "code"],
+                    "title": "Code Block",
+                    "description": "Code block to render code with pygment",
+                    "type": "object",
+                },
+                "ParagraphBlock": {
                     "properties": {
                         "body": {
+                            "features": ["bold", "italic", "h5"],
                             "title": "Body",
                             "type": "string",
-                            # FIXME
                             "widget": "richtext",
-                            "features": ["bold", "italic", "h5"],
                         },
                         "title": {"title": "Title", "type": "string"},
                     },
                     "required": ["body"],
-                    "title": "Paragraph",
+                    "title": "Paragraph Block",
                     "type": "object",
-                }
+                },
             },
             "properties": {
                 "body": {
+                    "default": [],
+                    "items": {
+                        "anyOf": [
+                            {"$ref": "#/definitions/ParagraphBlock"},
+                            {"$ref": "#/definitions/CodeBlock"},
+                        ]
+                    },
                     "title": "Body",
                     "type": "array",
-                    "default": [],
-                    "items": {"$ref": "#/definitions/Paragraph"},
                 },
                 "description": {"title": "Description", "type": "string"},
                 "hero_title": {
+                    "description": "Title of the hero " "section",
                     "title": "Hero Title",
                     "type": "string",
-                    "description": "Title of the hero section",
                 },
-                "slug": {
-                    "title": "Slug",
-                    "type": "string",
-                    "pattern": "^[^/]+$",
-                },
+                "slug": {"pattern": "^[^/]+$", "title": "Slug", "type": "string"},
                 "title": {"title": "Title", "type": "string"},
             },
             "required": ["slug", "title", "description", "hero_title"],
@@ -100,19 +129,21 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
             "type": "object",
         },
         "uiSchema": {
-            "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
-            "hero_title": {"ui:widget": "text", "ui:placeholder": "hero_title"},
-            "title": {"ui:widget": "text", "ui:placeholder": "title"},
-            "description": {"ui:widget": "text", "ui:placeholder": "description"},
             "body": {
                 "items": {
-                    "title": {"ui:widget": "text", "ui:placeholder": "title"},
                     "body": {
-                        "ui:widget": "richtext",
-                        "ui:placeholder": "body",
                         "ui:options": {"features": ["bold", "italic", "h5"]},
+                        "ui:placeholder": "body",
+                        "ui:widget": "richtext",
                     },
+                    "code": {"ui:placeholder": "code", "ui:widget": "textarea"},
+                    "language": {"ui:placeholder": "language", "ui:widget": "select"},
+                    "title": {"ui:placeholder": "title", "ui:widget": "text"},
                 }
             },
+            "description": {"ui:placeholder": "description", "ui:widget": "text"},
+            "hero_title": {"ui:placeholder": "hero_title", "ui:widget": "text"},
+            "slug": {"ui:placeholder": "slug", "ui:widget": "text"},
+            "title": {"ui:placeholder": "title", "ui:widget": "text"},
         },
     }

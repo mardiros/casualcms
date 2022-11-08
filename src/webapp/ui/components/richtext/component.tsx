@@ -3,7 +3,7 @@ import React from "react";
 import { Descendant } from "slate";
 import { RenderElementProps, RenderLeafProps } from "slate-react";
 import { Box } from "@chakra-ui/react";
-import { RJSFSchema, UiSchema, WidgetProps } from "@rjsf/utils";
+import { WidgetProps } from "@rjsf/utils";
 
 import { createEditor } from "slate";
 import { withHistory } from "slate-history";
@@ -114,7 +114,7 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
   };
 
   const val = fromHtml(value);
-  console.log(val)
+  // console.log(val)
   return (
     <Box minW="720px">
       <Slate editor={editor} value={val} onChange={onModelChange}>

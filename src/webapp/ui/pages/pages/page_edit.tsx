@@ -13,6 +13,7 @@ import { Loader } from "../../components/loader";
 import { PageBreadcrumb } from "../../components/breadcrumb";
 import { PageEditButtons } from "./page_publish";
 import { RichTextEditor } from "../../components/richtext/component";
+import { CodeEditor } from "../../components/code/component";
 
 const Form = withTheme(ChakraUITheme);
 
@@ -98,7 +99,10 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     return <Loader label="loading page and page type..." />;
   }
 
-  const widgets = { richtext: RichTextEditor };
+  const widgets = {
+    richtext: RichTextEditor,
+    code: CodeEditor,
+  };
   return (
     <Box minW="720px">
       {page && (
@@ -119,7 +123,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
             validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
           />
         )}
       </Box>

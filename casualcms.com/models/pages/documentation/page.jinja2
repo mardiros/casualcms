@@ -11,14 +11,8 @@
       {{ include_block(page.menu) }}
     </div>
     <div class="column is-four-fifths">
-      ...
+      {{ include_block(page.body, column_count=1) }}
     </div>
-    {# {% for column in block.items %}
-    <div class="column">
-      {{ include_block(column.item) }}
-    </div>
-    {% endfor %} #}
   </div>
-
 </div>
 {% endblock %}

@@ -33,8 +33,8 @@ const serializeNode = (type: NodeType, el: TypedNode): string => {
     case "code":
       return `<pre>${toHtml(el.children)}</pre>`;
     case "blockquote":
-      console.log("######################")
-      console.log(el)
+      console.log("######################");
+      console.log(el);
       return `<blockquote>${toHtml(el.children)}</blockquote>`;
     case "paragraph":
       // render paragraph as div while editing...

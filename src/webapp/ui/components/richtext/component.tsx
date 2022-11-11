@@ -63,21 +63,17 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
       if (isSaving) {
         clearTimeout(isSaving);
       }
-      isSaving = setTimeout(
-        () => {
-          try {
-            onChange(toHtml(childs));
-          } catch (e) {
-            console.log(e);
-          }
-          finally {
-            isSaving = null;
-          }
-        },
-        150
-      )
+      isSaving = setTimeout(() => {
+        try {
+          onChange(toHtml(childs));
+        } catch (e) {
+          console.log(e);
+        } finally {
+          isSaving = null;
+        }
+      }, 150);
     }
-    saveChange()
+    saveChange();
   }, []);
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -116,10 +112,14 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
   // console.log(val)
   return (
     <Box minW="720px">
-      <FormControl isDisabled={props.disabled} mt={4} isReadOnly={props.readonly} isRequired={props.required} isInvalid={!!props.rawErrors?.length}>
-        <FormLabel>
-          {props.label}
-        </FormLabel>
+      <FormControl
+        isDisabled={props.disabled}
+        mt={4}
+        isReadOnly={props.readonly}
+        isRequired={props.required}
+        isInvalid={!!props.rawErrors?.length}
+      >
+        <FormLabel>{props.label}</FormLabel>
         <Slate editor={editor} value={val} onChange={onModelChange}>
           <Box padding={"15px 5px"}>
             <Toolbar features={features} />

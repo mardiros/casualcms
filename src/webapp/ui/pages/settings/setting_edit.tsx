@@ -1,8 +1,5 @@
 import React from "react";
-import validator from "@rjsf/validator-ajv6";
 import { Box, Heading, Stack } from "@chakra-ui/react";
-import { withTheme } from "@rjsf/core";
-import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -13,8 +10,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { SettingDeletePopoverForm } from "./settings_delete";
 // import { SettingBreadcrumb } from "../../components/breadcrumb";
-
-const Form = withTheme(ChakraUITheme);
+import { Form } from "../../components/jsonschema_form";
 
 export const SettingEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -94,24 +90,21 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
       <Heading>Edit Setting</Heading>
       {/* <SettingBreadcrumb setting={setting} /> */}
       <ApiErrorUI error={error} />
-      <Box maxW="720px">
-        {setting && settingType && (
-          <>
-            <Form
-              schema={settingType.schema}
-              uiSchema={settingType.uiSchema}
-              formData={setting}
-              validator={validator}
-              // onChange={() => console.log("changed")}
-              onSubmit={onsubmit}
-              // onError={() => console.log("errors")}
-            />
-            <Stack paddingTop={5} direction="row" align="right">
-              <SettingDeletePopoverForm curSetting={setting} />
-            </Stack>
-          </>
-        )}
-      </Box>
+      {setting && settingType && (
+        <>
+          <Form
+            schema={settingType.schema}
+            uiSchema={settingType.uiSchema}
+            formData={setting}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
+            // onError={() => console.log("errors")}
+          />
+          <Stack paddingTop={5} direction="row" align="right">
+            <SettingDeletePopoverForm curSetting={setting} />
+          </Stack>
+        </>
+      )}
     </Box>
   );
 };

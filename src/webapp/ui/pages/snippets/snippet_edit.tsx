@@ -1,9 +1,6 @@
 import React from "react";
-import validator from "@rjsf/validator-ajv6";
 import { Box, Heading, Stack } from "@chakra-ui/react";
-import { withTheme } from "@rjsf/core";
-import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
 import { AppContext } from "../../../config";
@@ -12,8 +9,7 @@ import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
 import { SnippetBreadcrumb } from "../../components/breadcrumb";
 import { SnippetDeletePopoverForm } from "./snippet_delete";
-
-const Form = withTheme(ChakraUITheme);
+import { Form } from "../../components/jsonschema_form";
 
 export const SnippetEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -83,24 +79,21 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       <Heading>Edit Snippet</Heading>
       <SnippetBreadcrumb snippet={snippet} />
       <ApiErrorUI error={error} />
-      <Box maxW="720px">
-        {snippet && snippetType && (
-          <>
-            <Form
-              schema={snippetType.schema}
-              uiSchema={snippetType.uiSchema}
-              formData={snippet}
-              validator={validator}
-              // onChange={() => console.log("changed")}
-              onSubmit={onsubmit}
-              // onError={() => console.log("errors")}
-            />
-            <Stack paddingTop={5} direction="row" align="right">
-              <SnippetDeletePopoverForm curSnippet={snippet} />
-            </Stack>
-          </>
-        )}
-      </Box>
+      {snippet && snippetType && (
+        <>
+          <Form
+            schema={snippetType.schema}
+            uiSchema={snippetType.uiSchema}
+            formData={snippet}
+            // onChange={() => console.log("changed")}
+            onSubmit={onsubmit}
+            // onError={() => console.log("errors")}
+          />
+          <Stack paddingTop={5} direction="row" align="right">
+            <SnippetDeletePopoverForm curSnippet={snippet} />
+          </Stack>
+        </>
+      )}
     </Box>
   );
 };

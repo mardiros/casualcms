@@ -111,7 +111,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
             formData={page}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
+            // onError={() => console.log("errors")}
           />
         )}
       </Box>

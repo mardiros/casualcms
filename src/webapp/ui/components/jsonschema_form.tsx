@@ -13,22 +13,26 @@ const widgets = {
 };
 
 type FormProps<T = any, F = any> = {
-  schema: RJSFSchema,
-  uiSchema: UiSchema,
-  formData: T,
-  onSubmit:(data: IChangeEvent<T, F>, event: React.FormEvent<any>) => void
-}
+  schema: RJSFSchema;
+  uiSchema: UiSchema;
+  formData: T;
+  onSubmit: (data: IChangeEvent<T, F>, event: React.FormEvent<any>) => void;
+};
 
-export const Form: React.FunctionComponent<FormProps<any>> = (props: FormProps) => {
+export const Form: React.FunctionComponent<FormProps<any>> = (
+  props: FormProps
+) => {
   const { schema, uiSchema, formData, onSubmit } = props;
-  return <RjsfForm
-    schema={schema}
-    uiSchema={uiSchema}
-    formData={formData}
-    widgets={widgets}
-    validator={validator}
-    // onChange={() => console.log("changed")}
-    onSubmit={onSubmit}
-  // onError={() => console.log("errors")}
-  />
-}
+  return (
+    <RjsfForm
+      schema={schema}
+      uiSchema={uiSchema}
+      formData={formData}
+      widgets={widgets}
+      validator={validator}
+      // onChange={() => console.log("changed")}
+      onSubmit={onSubmit}
+      // onError={() => console.log("errors")}
+    />
+  );
+};

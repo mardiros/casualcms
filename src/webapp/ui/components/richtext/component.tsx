@@ -2,7 +2,7 @@ import isHotkey from "is-hotkey";
 import React from "react";
 import { Descendant } from "slate";
 import { RenderElementProps, RenderLeafProps } from "slate-react";
-import { Box } from "@chakra-ui/react";
+import { Box, FormControl, FormLabel } from "@chakra-ui/react";
 import { WidgetProps } from "@rjsf/utils";
 
 import { createEditor } from "slate";
@@ -57,14 +57,13 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
     []
   );
 
-  let isSaving = false;
+  let isSaving: NodeJS.Timeout | null = null;
   const onModelChange = React.useCallback((childs: Descendant[]) => {
     function saveChange() {
       if (isSaving) {
-        return
+        clearTimeout(isSaving);
       }
-      isSaving = true;
-      setTimeout(
+      isSaving = setTimeout(
         () => {
           try {
             onChange(toHtml(childs));
@@ -72,7 +71,7 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
             console.log(e);
           }
           finally {
-            isSaving=false;
+            isSaving = null;
           }
         },
         150
@@ -117,23 +116,28 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
   // console.log(val)
   return (
     <Box minW="720px">
-      <Slate editor={editor} value={val} onChange={onModelChange}>
-        <Box padding={"15px 5px"}>
-          <Toolbar features={features} />
-          <Editable
-            placeholder="Lorem ipsum dolor sit amet, ..."
-            renderElement={renderElement}
-            renderLeaf={renderLeaf}
-            onKeyDown={onKeyDown}
-            style={{
-              minHeight: "150px",
-              resize: "both",
-              overflow: "auto",
-              width: "100%",
-            }}
-          />
-        </Box>
-      </Slate>
+      <FormControl isDisabled={props.disabled} mt={4} isReadOnly={props.readonly} isRequired={props.required} isInvalid={!!props.rawErrors?.length}>
+        <FormLabel>
+          {props.label}
+        </FormLabel>
+        <Slate editor={editor} value={val} onChange={onModelChange}>
+          <Box padding={"15px 5px"}>
+            <Toolbar features={features} />
+            <Editable
+              placeholder="Lorem ipsum dolor sit amet, ..."
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              onKeyDown={onKeyDown}
+              style={{
+                minHeight: "150px",
+                resize: "both",
+                overflow: "auto",
+                width: "100%",
+              }}
+            />
+          </Box>
+        </Slate>
+      </FormControl>
     </Box>
   );
 };

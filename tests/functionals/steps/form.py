@@ -1,3 +1,4 @@
+import time
 from behave import when  # type:ignore
 
 from tests.functionals.typing import Context
@@ -14,23 +15,22 @@ def fill_input(context: Context, placeholder: str, value: str):
     field.send_keys(value)
 
 
-@when('I fill the textarea field "{placeholder}" with "{value}"')
+@when('I fill the richtext field "{placeholder}" with "{value}"')
 def fill_textarea(context: Context, placeholder: str, value: str):
-    field = context.browser.find_element_by_xpath(
-        f"//textarea[@placeholder='{placeholder}']"
-    )
-    field.clear()
-    field.send_keys(value)
+    fill_textarea_pos(context, "first", placeholder, value)
 
 
-@when('I fill the "{position}" textarea field "{placeholder}" with "{value}"')
+@when('I fill the "{position}" richtext field "{placeholder}" with "{value}"')
 def fill_textarea_pos(context: Context, position: str, placeholder: str, value: str):
     pos = POSITIONS[position]
     field = context.browser.find_elements_by_xpath(
-        f"//textarea[@placeholder='{placeholder}']"
+        f"//div[@role='textbox']/p[@data-slate-node='element']"
     )
-    field[pos].clear()
-    field[pos].send_keys(value)
+    field[pos].click()
+    field = context.browser.find_elements_by_xpath(f"//div[@role='textbox']")
+    for k in value:
+        field[pos].send_keys([k])
+    time.sleep(0.2)
 
 
 @when('I fill the "{position}" field "{placeholder}" with "{value}"')

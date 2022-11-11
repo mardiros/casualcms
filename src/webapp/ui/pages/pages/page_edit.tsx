@@ -1,8 +1,5 @@
 import React from "react";
-import validator from "@rjsf/validator-ajv6";
 import { Box, Heading, Stack, useToast } from "@chakra-ui/react";
-import { withTheme } from "@rjsf/core";
-import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -12,10 +9,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { Loader } from "../../components/loader";
 import { PageBreadcrumb } from "../../components/breadcrumb";
 import { PageEditButtons } from "./page_publish";
-import { RichTextEditor } from "../../components/richtext/component";
-import { CodeEditor } from "../../components/code/component";
-
-const Form = withTheme(ChakraUITheme);
+import { Form } from "../../components/jsonschema_form";
 
 export const PageEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -99,10 +93,6 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     return <Loader label="loading page and page type..." />;
   }
 
-  const widgets = {
-    richtext: RichTextEditor,
-    code: CodeEditor,
-  };
   return (
     <Box minW="720px">
       {page && (
@@ -118,9 +108,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
           <Form
             schema={pageType.schema}
             uiSchema={pageType.uiSchema}
-            widgets={widgets}
             formData={page}
-            validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
           // onError={() => console.log("errors")}

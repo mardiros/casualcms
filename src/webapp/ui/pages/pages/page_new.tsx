@@ -1,8 +1,6 @@
 import React from "react";
 import validator from "@rjsf/validator-ajv6";
 import { Box, Heading } from "@chakra-ui/react";
-import { withTheme } from "@rjsf/core";
-import { Theme as ChakraUITheme } from "@rjsf/chakra-ui";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -11,8 +9,7 @@ import { Draft, PageType } from "../../../casualcms/domain/model";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
 import { PageBreadcrumb } from "../../components/breadcrumb";
-
-const Form = withTheme(ChakraUITheme);
+import { Form } from "../../components/jsonschema_form";
 
 export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("-------------------------------------------")
@@ -98,7 +95,6 @@ export const PageNew: React.FunctionComponent<{}> = () => {
             schema={pageType.schema}
             uiSchema={pageType.uiSchema}
             formData={data}
-            validator={validator}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
             // onError={() => console.log("errors")}

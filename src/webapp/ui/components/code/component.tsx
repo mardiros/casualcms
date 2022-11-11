@@ -17,15 +17,14 @@ export const CodeEditor: React.FunctionComponent<WidgetProps> = (
       onChange({ lang: lang, code: code })
     }
   }, []);
-  let isSaving = false;
+  let isSaving: NodeJS.Timeout | null = null;
   const onCodeChange = React.useCallback((evt: React.ChangeEvent<HTMLTextAreaElement>) => {
     evt.preventDefault();
     function saveChange() {
       if (isSaving) {
-        return
+        clearTimeout(isSaving);
       }
-      isSaving = true;
-      setTimeout(
+      isSaving = setTimeout(
         () => {
           try {
             code = evt.target?.value || "";
@@ -34,7 +33,7 @@ export const CodeEditor: React.FunctionComponent<WidgetProps> = (
             console.log(e);
           }
           finally {
-            isSaving = false;
+            isSaving = null;
           }
         },
         150

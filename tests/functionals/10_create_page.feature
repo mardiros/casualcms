@@ -22,11 +22,11 @@ Feature: As a user, I can create and publish new pages
     # First paragraph
     And I click on the "Add Item" button
     And I fill the "second" field "title" with "Intro"
-    And I fill the textarea field "body" with "<p>Welcome aboard!</p>"
+    And I fill the richtext field "body" with "Welcome aboard!"
     # Second paragraph
     And I click on the "Add Item" button
     And I fill the "third" field "title" with "Outro"
-    And I fill the "second" textarea field "body" with "<p>Rich text widget not implemented yet</p>"
+    And I fill the "second" richtext field "body" with "Rich text widget !"
     And I click on the "Submit" button
     # List pages
     Then I see the text "welcome home"

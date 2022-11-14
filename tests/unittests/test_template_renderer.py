@@ -19,6 +19,7 @@ from tests.casualblog.models import (
     SectionPage,
     SnippetBlockPage,
 )
+
 from .long_text import EXPECTED_CODEBLOCK
 
 

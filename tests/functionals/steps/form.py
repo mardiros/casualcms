@@ -1,4 +1,5 @@
 import time
+
 from behave import when  # type:ignore
 
 from tests.functionals.typing import Context
@@ -24,10 +25,10 @@ def fill_textarea(context: Context, placeholder: str, value: str):
 def fill_textarea_pos(context: Context, position: str, placeholder: str, value: str):
     pos = POSITIONS[position]
     field = context.browser.find_elements_by_xpath(
-        f"//div[@role='textbox']/p[@data-slate-node='element']"
+        "//div[@role='textbox']/p[@data-slate-node='element']"
     )
     field[pos].click()
-    field = context.browser.find_elements_by_xpath(f"//div[@role='textbox']")
+    field = context.browser.find_elements_by_xpath("//div[@role='textbox']")
     for k in value:
         field[pos].send_keys([k])
     time.sleep(0.2)

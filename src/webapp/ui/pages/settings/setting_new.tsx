@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -9,6 +9,7 @@ import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
 import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const SettingNew: React.FunctionComponent<{}> = () => {
   let { hostname, settingKey } = useParams<string>();
@@ -64,18 +65,27 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
       <Heading>New Setting</Heading>
       {/* <SettingBreadcrumb title="new setting" /> */}
       <ApiErrorUI error={error} />
-      <Box maxW="720px">
-        {settingType && (
-          <Form
-            schema={settingType.schema}
-            uiSchema={settingType.uiSchema}
-            formData={data}
-            // onChange={() => console.log("changed")}
-            onSubmit={onsubmit}
+      {settingType && (
+        <>
+          <Box maxW="720px">
+            <Form
+              id="new-setting"
+              schema={settingType.schema}
+              uiSchema={settingType.uiSchema}
+              formData={data}
+              // onChange={() => console.log("changed")}
+              onSubmit={onsubmit}
             // onError={() => console.log("errors")}
-          />
-        )}
-      </Box>
+            />
+          </Box>
+          <Stack paddingTop={5} direction="row" align="right">
+            <Button form="new-setting" type="submit" colorScheme="cyan">
+              <Icon as={DownloadIcon} marginEnd={2} />
+              Create Setting
+            </Button>
+          </Stack>
+        </>
+      )}
     </Box>
   );
 };

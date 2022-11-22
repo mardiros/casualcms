@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Stack } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -11,6 +11,7 @@ import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { SettingDeletePopoverForm } from "./settings_delete";
 // import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const SettingEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -92,15 +93,22 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
       <ApiErrorUI error={error} />
       {setting && settingType && (
         <>
-          <Form
-            schema={settingType.schema}
-            uiSchema={settingType.uiSchema}
-            formData={setting}
-            // onChange={() => console.log("changed")}
-            onSubmit={onsubmit}
+          <Box maxW="720px">
+            <Form
+              id="edit-setting"
+              schema={settingType.schema}
+              uiSchema={settingType.uiSchema}
+              formData={setting}
+              // onChange={() => console.log("changed")}
+              onSubmit={onsubmit}
             // onError={() => console.log("errors")}
-          />
+            />
+          </Box>
           <Stack paddingTop={5} direction="row" align="right">
+            <Button form="edit-setting" type="submit" colorScheme="cyan">
+              <Icon as={DownloadIcon} marginEnd={2} />
+              Save
+            </Button>
             <SettingDeletePopoverForm curSetting={setting} />
           </Stack>
         </>

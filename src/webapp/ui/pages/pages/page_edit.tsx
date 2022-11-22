@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Stack, useToast } from "@chakra-ui/react";
+import { Box, Button, Heading, Stack, useToast } from "@chakra-ui/react";
 import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -106,18 +106,17 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       <Box maxW="720px">
         {pageType && page && (
           <Form
+            id="edit-page"
             schema={pageType.schema}
             uiSchema={pageType.uiSchema}
             formData={page}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
           />
         )}
       </Box>
-      <Stack paddingTop={5} direction="row" align="right">
-        <PageEditButtons token={token} pagePath={pagePath} />
-      </Stack>
+      <PageEditButtons token={token} pagePath={pagePath} />
     </Box>
   );
 };

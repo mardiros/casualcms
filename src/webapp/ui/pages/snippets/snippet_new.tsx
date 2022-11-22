@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -9,6 +9,7 @@ import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
 import { SnippetBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const SnippetNew: React.FunctionComponent<{}> = () => {
   let { snippetTypeName } = useParams<string>();
@@ -63,14 +64,25 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
       <SnippetBreadcrumb title="new snippet" />
       <ApiErrorUI error={error} />
       {snippetType && (
-        <Form
-          schema={snippetType.schema}
-          uiSchema={snippetType.uiSchema}
-          formData={data}
-          // onChange={() => console.log("changed")}
-          onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
-        />
+        <>
+          <Box maxW="720px">
+            <Form
+              id="new-snippet"
+              schema={snippetType.schema}
+              uiSchema={snippetType.uiSchema}
+              formData={data}
+              // onChange={() => console.log("changed")}
+              onSubmit={onsubmit}
+            // onError={() => console.log("errors")}
+            />
+          </Box>
+          <Stack paddingTop={5} direction="row" align="right">
+            <Button form="new-snippet" type="submit" colorScheme="cyan">
+              <Icon as={DownloadIcon} marginEnd={2} />
+              Create Snippet
+            </Button>
+          </Stack>
+        </>
       )}
     </Box>
   );

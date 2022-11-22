@@ -13,6 +13,7 @@ const widgets = {
 };
 
 type FormProps<T = any, F = any> = {
+  id: string;
   schema: RJSFSchema;
   uiSchema: UiSchema;
   formData: T;
@@ -22,9 +23,12 @@ type FormProps<T = any, F = any> = {
 export const Form: React.FunctionComponent<FormProps<any>> = (
   props: FormProps
 ) => {
-  const { schema, uiSchema, formData, onSubmit } = props;
+  const { id, schema, uiSchema, formData, onSubmit } = props;
+  // the render button has to be
+  uiSchema["ui:submitButtonOptions"] = { "norender": true }
   return (
     <RjsfForm
+      id={id}
       schema={schema}
       uiSchema={uiSchema}
       formData={formData}
@@ -32,7 +36,7 @@ export const Form: React.FunctionComponent<FormProps<any>> = (
       validator={validator}
       // onChange={() => console.log("changed")}
       onSubmit={onSubmit}
-      // onError={() => console.log("errors")}
+    // onError={() => console.log("errors")}
     />
   );
 };

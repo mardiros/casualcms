@@ -15,7 +15,7 @@ import {
   Stack,
   useDisclosure,
 } from "@chakra-ui/react";
-import { SunIcon, ViewIcon } from "@chakra-ui/icons";
+import { DownloadIcon, SunIcon, ViewIcon } from "@chakra-ui/icons";
 import { ApiError, ApiResult } from "../../../casualcms/domain/ports";
 import { useConfig } from "../../../config";
 import { PartialSite } from "../../../casualcms/domain/model";
@@ -188,7 +188,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
     if (token && publishedState == "loading") {
       loadSites();
     }
-    return function cleanup() {};
+    return function cleanup() { };
   }, [token, publishedState]);
 
   return (
@@ -251,6 +251,10 @@ export const PageEditButtons: React.FunctionComponent<PublishButtonProps> = (
 ) => {
   return (
     <Stack paddingTop={5} direction="row" align="right">
+      <Button form="edit-page" type="submit" colorScheme="cyan">
+        <Icon as={DownloadIcon} marginEnd={2} />
+        Save
+      </Button>
       <PublishButton token={props.token} pagePath={props.pagePath} />
     </Stack>
   );

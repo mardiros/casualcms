@@ -1,6 +1,6 @@
 import React from "react";
 import validator from "@rjsf/validator-ajv6";
-import { Box, Heading } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -10,6 +10,7 @@ import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
 import { PageBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
+import { AddIcon } from "@chakra-ui/icons";
 
 export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("-------------------------------------------")
@@ -92,15 +93,22 @@ export const PageNew: React.FunctionComponent<{}> = () => {
       <Box maxW="720px">
         {pageType && (
           <Form
+            id="new-page"
             schema={pageType.schema}
             uiSchema={pageType.uiSchema}
             formData={data}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
           />
         )}
       </Box>
+      <Stack paddingTop={5} direction="row" align="right">
+        <Button form="new-page" type="submit" colorScheme="cyan">
+          <Icon as={AddIcon} marginEnd={2} />
+          Create Page
+        </Button>
+      </Stack>
     </Box>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Heading, Stack } from "@chakra-ui/react";
+import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -10,6 +10,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { SnippetBreadcrumb } from "../../components/breadcrumb";
 import { SnippetDeletePopoverForm } from "./snippet_delete";
 import { Form } from "../../components/jsonschema_form";
+import { DownloadIcon } from "@chakra-ui/icons";
 
 export const SnippetEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -82,14 +83,19 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       {snippet && snippetType && (
         <>
           <Form
+            id="edit-snippet"
             schema={snippetType.schema}
             uiSchema={snippetType.uiSchema}
             formData={snippet}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+          // onError={() => console.log("errors")}
           />
           <Stack paddingTop={5} direction="row" align="right">
+            <Button form="edit-snippet" type="submit" colorScheme="cyan">
+              <Icon as={DownloadIcon} marginEnd={2} />
+              Save
+            </Button>
             <SnippetDeletePopoverForm curSnippet={snippet} />
           </Stack>
         </>

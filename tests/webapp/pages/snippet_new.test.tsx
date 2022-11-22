@@ -7,7 +7,7 @@ import { SnippetNew } from "../../../src/webapp/ui/pages/snippets/snippet_new";
 import config from "../config";
 
 describe("As a user, I can list snippet", () => {
-  it("<SnippetNew />: Create the snippet using the web form", async () => {
+  it.only("<SnippetNew />: Create the snippet using the web form", async () => {
     renderWithRouter(
       <>
         <Route
@@ -27,7 +27,7 @@ describe("As a user, I can list snippet", () => {
     input = screen.getByLabelText("Title", { exact: false });
     fireEvent.change(input, { target: { value: "Casual Blog" } });
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", { name: "Create Snippet" });
     fireEvent.click(button);
 
     await waitForPath("/admin/snippets");

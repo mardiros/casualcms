@@ -21,7 +21,7 @@ Feature: As a user, I can create and publish snippets
     And I fill the "third" field "title" with "Dog"
     And I fill the "second" field "href" with "/home/dog"
     # Submit the form
-    And I click on the "Submit" button
+    And I click on the "Create Snippet" button
     Then I see the text "Header Snippet"
     And I see the text "header"
     And I see the text "Edit"

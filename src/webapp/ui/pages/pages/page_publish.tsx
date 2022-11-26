@@ -188,7 +188,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
     if (token && publishedState == "loading") {
       loadSites();
     }
-    return function cleanup() { };
+    return function cleanup() {};
   }, [token, publishedState]);
 
   return (
@@ -205,8 +205,11 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
       placement="right"
     >
       <PopoverTrigger>
-        <Button colorScheme="cyan" role="open_publish_popover">
-          <Icon as={SunIcon} marginEnd={2} />
+        <Button
+          colorScheme="cyan"
+          role="open_publish_popover"
+          leftIcon={<SunIcon />}
+        >
           Publish
         </Button>
       </PopoverTrigger>
@@ -251,8 +254,12 @@ export const PageEditButtons: React.FunctionComponent<PublishButtonProps> = (
 ) => {
   return (
     <Stack paddingTop={5} direction="row" align="right">
-      <Button form="edit-page" type="submit" colorScheme="cyan">
-        <Icon as={DownloadIcon} marginEnd={2} />
+      <Button
+        form="edit-page"
+        type="submit"
+        colorScheme="cyan"
+        leftIcon={<DownloadIcon />}
+      >
         Save
       </Button>
       <PublishButton token={props.token} pagePath={props.pagePath} />

@@ -22,7 +22,7 @@ Feature: As a user, I can create a site
     When I visit "/admin/settings/localhost/contact/new"
     Then I see the text "New Setting"
     When I fill the field "email" with "bob@alice.net"
-    And I click on the "Submit" button
+    And I click on the "Create Setting" button
     When I click on the "Contact Setting" link
     Then I see the text "Edit Setting"
     And the setting "contact" on "localhost" contains
@@ -39,7 +39,7 @@ Feature: As a user, I can create a site
     Then I see the text "Edit Setting"
     And I see the input "email" contains "alice@alice.net"
     When I fill the field "email" with "bob@alice.net"
-    And I click on the "Submit" button
+    And I click on the "Save" button
     Then I see the text "Setting Type"
     And the setting "contact" on "localhost" contains
       | email         |

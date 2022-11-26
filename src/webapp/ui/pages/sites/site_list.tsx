@@ -115,8 +115,8 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
       <Button
         colorScheme="cyan"
         onClick={() => navigate(`/admin/sites/new`, { replace: true })}
+        leftIcon={<AddIcon />}
       >
-        <Icon as={AddIcon} marginEnd={2} />
         Add new site
       </Button>
     </Stack>
@@ -129,10 +129,12 @@ export const SiteList: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
 
   return (
-    <Box>
+    <Box minW="1440px">
       <SiteBreadcrumb />
-      <SiteListTable config={config} token={token} />
-      <SiteListButtons />
+      <Box maxW="1440px">
+        <SiteListTable config={config} token={token} />
+        <SiteListButtons />
+      </Box>
     </Box>
   );
 };

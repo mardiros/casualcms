@@ -25,7 +25,7 @@ describe("As a user, I can list setting", () => {
     const input = await screen.findByLabelText("email", { exact: false });
     fireEvent.change(input, { target: { value: "alice@example.net" } });
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", {"name": "Create Setting"});
     fireEvent.click(button);
 
     await waitForPath("/admin/settings/www.localhost");

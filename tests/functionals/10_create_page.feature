@@ -27,7 +27,7 @@ Feature: As a user, I can create and publish new pages
     And I click on the "Add Item" button
     And I fill the "third" field "title" with "Outro"
     And I fill the "second" richtext field "body" with "Rich text widget !"
-    And I click on the "Submit" button
+    And I click on the "Create Page" button
     # List pages
     Then I see the text "welcome home"
     And I see the text "Edit"

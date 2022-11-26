@@ -5,7 +5,6 @@ import {
   Button,
   ButtonGroup,
   Heading,
-  Icon,
   Popover,
   PopoverArrow,
   PopoverCloseButton,
@@ -59,8 +58,7 @@ export const DeletePopoverForm: React.FunctionComponent<
       placement="right"
     >
       <PopoverTrigger>
-        <Button colorScheme="red">
-          <Icon as={DeleteIcon} marginEnd={2} />
+        <Button colorScheme="red" leftIcon={<DeleteIcon />}>
           {props.button_label}
         </Button>
       </PopoverTrigger>

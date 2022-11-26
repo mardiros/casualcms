@@ -1,6 +1,5 @@
 import React from "react";
-import validator from "@rjsf/validator-ajv6";
-import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
+import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -99,13 +98,17 @@ export const PageNew: React.FunctionComponent<{}> = () => {
             formData={data}
             // onChange={() => console.log("changed")}
             onSubmit={onsubmit}
-          // onError={() => console.log("errors")}
+            // onError={() => console.log("errors")}
           />
         )}
       </Box>
       <Stack paddingTop={5} direction="row" align="right">
-        <Button form="new-page" type="submit" colorScheme="cyan">
-          <Icon as={AddIcon} marginEnd={2} />
+        <Button
+          form="new-page"
+          type="submit"
+          colorScheme="cyan"
+          leftIcon={<AddIcon />}
+        >
           Create Page
         </Button>
       </Stack>

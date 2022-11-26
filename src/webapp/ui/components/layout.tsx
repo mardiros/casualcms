@@ -1,4 +1,5 @@
-import { Box, ColorModeProvider, CSSReset, Flex } from "@chakra-ui/react";
+import React from "react";
+import { Box, Flex } from "@chakra-ui/react";
 import { useLocation } from "react-router-dom";
 import { Header } from "./header";
 import { SideBar } from "./sidebar";
@@ -16,13 +17,13 @@ export const Layout: React.FunctionComponent<LayoutProps> = (
   }
   return (
     <>
-      <Box w="100%" p={4} bg="cyan.800" h="90px">
+      <Box w="100%" p={4} bg="MidnightBlue" h="90px">
         <Header />
       </Box>
-      <Box w="100%" bg="cyan.800" minH="calc(100vh - 90px)" color="cyan.900">
+      <Box w="100%" bg="#f9f6ee" minH="calc(100vh - 90px)">
         <Flex>
           <SideBar />
-          <Box bg="cyan.200" flex="1" padding={4}>
+          <Box bg="#fefefa" flex="1" padding={4} color="MidnightBlue">
             {props.routes}
           </Box>
         </Flex>

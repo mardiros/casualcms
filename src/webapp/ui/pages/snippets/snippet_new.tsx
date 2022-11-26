@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Button, Heading, Icon, Stack } from "@chakra-ui/react";
+import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
@@ -73,12 +73,16 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
               formData={data}
               // onChange={() => console.log("changed")}
               onSubmit={onsubmit}
-            // onError={() => console.log("errors")}
+              // onError={() => console.log("errors")}
             />
           </Box>
           <Stack paddingTop={5} direction="row" align="right">
-            <Button form="new-snippet" type="submit" colorScheme="cyan">
-              <Icon as={DownloadIcon} marginEnd={2} />
+            <Button
+              form="new-snippet"
+              type="submit"
+              colorScheme="cyan"
+              leftIcon={<DownloadIcon />}
+            >
               Create Snippet
             </Button>
           </Stack>

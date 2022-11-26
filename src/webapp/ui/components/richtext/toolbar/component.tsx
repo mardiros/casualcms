@@ -25,7 +25,6 @@ import {
 } from "./block_btn";
 import { LinkButton } from "./popover_button";
 import { FeatureType } from "../types";
-import { JsxElement } from "typescript";
 
 type FunctionComponentProps = {
   features: FeatureType[];

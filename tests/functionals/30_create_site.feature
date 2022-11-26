@@ -6,7 +6,7 @@ Feature: As a user, I can create a site
     When I click on the "Sites" link
     And I click on the "Add new site" button
     Then I see the text "New Site"
-    Then I see the text "Submit"
+    Then I see the text "Create Site"
 
   Scenario: Create a site
     Given user on the admin page
@@ -19,6 +19,6 @@ Feature: As a user, I can create a site
     When I visit "/admin/sites/new"
     And I fill the field "hostname" with "www.example.net"
     And I fill the field "/index" with "/home"
-    And I click on the "Submit" button
+    And I click on the "Create Site" button
     Then I see the text "www.example.net"
     And I see the text "/home"

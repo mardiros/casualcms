@@ -118,8 +118,8 @@ export const SnippetListButtons: React.FunctionComponent<
       <Button
         colorScheme="cyan"
         onClick={() => navigate(`/admin/snippets/new`, { replace: true })}
+        leftIcon={<AddIcon />}
       >
-        <Icon as={AddIcon} marginEnd={2} />
         Add new snippet
       </Button>
     </Stack>
@@ -132,10 +132,12 @@ export const SnippetList: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
 
   return (
-    <Box>
+    <Box minW="1440px">
       <SnippetBreadcrumb />
-      <SnippetListTable config={config} token={token} />
-      <SnippetListButtons />
+      <Box maxW="1440px">
+        <SnippetListTable config={config} token={token} />
+        <SnippetListButtons />
+      </Box>
     </Box>
   );
 };

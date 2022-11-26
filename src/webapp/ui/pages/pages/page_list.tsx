@@ -118,8 +118,8 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
             navigate(`/admin/pages/edit?${qsEdit}`, { replace: true })
           }
           colorScheme="cyan"
+          leftIcon={<EditIcon />}
         >
-          <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Button>
       )}
@@ -127,8 +127,8 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
       <Button
         onClick={() => navigate(`/admin/pages/new?${qs}`, { replace: true })}
         colorScheme="cyan"
+        leftIcon={<AddIcon />}
       >
-        <Icon as={AddIcon} marginEnd={2} />
         Add new page
       </Button>
 
@@ -231,10 +231,10 @@ export const PageList: React.FunctionComponent<{}> = () => {
     return <Loader label="Loading pages" />;
   }
   return (
-    <Box>
+    <Box minW="1440px">
       {curPage && <Heading>{curPage.title}</Heading>}
       <PageBreadcrumb page={curPage} />
-      <Box>
+      <Box maxW="1440px">
         <ApiErrorUI error={error} />
         <PageListTable
           config={config}

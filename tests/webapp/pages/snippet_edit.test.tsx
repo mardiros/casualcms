@@ -45,7 +45,7 @@ describe("As a user, I can edit existing snippet", () => {
     expect(input.getAttribute("value")).equal("Casual Blog");
   });
 
-  it("<SnippetList />: Update snippet using the edition form", async () => {
+  it("<SnippetEdit />: Update snippet using the edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/snippets" element={<SnippetList />}></Route>
@@ -62,7 +62,7 @@ describe("As a user, I can edit existing snippet", () => {
     let input = screen.getByLabelText("Title", { exact: false });
     fireEvent.change(input, { target: { value: "New Value" } });
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", { name: "Save" });
     expect(button).not.equal(null);
     fireEvent.click(button);
 

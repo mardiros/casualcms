@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  Container,
   Heading,
   Icon,
   Table,
@@ -119,12 +118,12 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   }, [parentPath]);
 
   return (
-    <Box minW="720px">
+    <Box minW="1440px">
       <Heading>Choose A Type Of Page</Heading>
       {parentPage && (
         <PageBreadcrumb page={parentPage} title="type of template" />
       )}
-      <Box maxW="720px">
+      <Box maxW="1440px">
         <ApiErrorUI error={error} />
         <PageTypesTable
           pageTypes={pageTypes}

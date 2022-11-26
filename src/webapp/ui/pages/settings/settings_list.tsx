@@ -144,14 +144,16 @@ export const SettingList: React.FunctionComponent<{}> = () => {
   }
 
   return (
-    <Box>
+    <Box minW="1440px">
       <SettingBreadcrumb hostname={hostname} />
-      <SettingsTable
-        config={config}
-        token={token}
-        hostname={hostname || ""}
-        settingTypes={settingTypes}
-      />
+      <Box maxW="1440px">
+        <SettingsTable
+          config={config}
+          token={token}
+          hostname={hostname || ""}
+          settingTypes={settingTypes}
+        />
+      </Box>
     </Box>
   );
 };

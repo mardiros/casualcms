@@ -1,3 +1,4 @@
+import React from "react";
 import { Box, SimpleGrid } from "@chakra-ui/react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -32,11 +33,11 @@ export const SideBarItem: React.FunctionComponent<SideBarItemProps> = (
 };
 
 export const SideBar: React.FunctionComponent<{}> = () => {
-  const selectedColor = ["cyan.50", "black", "true"];
-  let pagesColor = ["cyan.500", "white", "false"];
-  let sitesColor = ["cyan.500", "white", "false"];
-  let snippetsColor = ["cyan.500", "white", "false"];
-  let settingsColor = ["cyan.500", "white", "false"];
+  const selectedColor = ["#f3e5ab", "black", "true"];
+  let pagesColor = ["#e3dac9", "black", "false"];
+  let sitesColor = ["#e3dac9", "black", "false"];
+  let snippetsColor = ["#e3dac9", "black", "false"];
+  let settingsColor = ["#e3dac9", "black", "false"];
   const location = useLocation();
   if (
     location.pathname.startsWith("/admin/pages") ||

@@ -25,7 +25,7 @@ export const Form: React.FunctionComponent<FormProps<any>> = (
 ) => {
   const { id, schema, uiSchema, formData, onSubmit } = props;
   // the render button has to be
-  uiSchema["ui:submitButtonOptions"] = { "norender": true }
+  uiSchema["ui:submitButtonOptions"] = { norender: true };
   return (
     <RjsfForm
       id={id}
@@ -36,7 +36,7 @@ export const Form: React.FunctionComponent<FormProps<any>> = (
       validator={validator}
       // onChange={() => console.log("changed")}
       onSubmit={onSubmit}
-    // onError={() => console.log("errors")}
+      // onError={() => console.log("errors")}
     />
   );
 };

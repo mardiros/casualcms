@@ -88,7 +88,7 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
           </FormControl>
           <FormControl paddingTop={5}>
             <Button type="submit" colorScheme="cyan">
-              Submit
+              Create Site
             </Button>
           </FormControl>
         </form>

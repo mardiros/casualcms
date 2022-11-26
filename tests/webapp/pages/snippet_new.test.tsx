@@ -7,7 +7,7 @@ import { SnippetNew } from "../../../src/webapp/ui/pages/snippets/snippet_new";
 import config from "../config";
 
 describe("As a user, I can list snippet", () => {
-  it.only("<SnippetNew />: Create the snippet using the web form", async () => {
+  it("<SnippetNew />: Create the snippet using the web form", async () => {
     renderWithRouter(
       <>
         <Route

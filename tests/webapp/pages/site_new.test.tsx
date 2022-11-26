@@ -24,7 +24,7 @@ describe("As a user, I can create a new site", () => {
     await config.api.page.deleteDraft("", "/index");
   });
 
-  it("Create a site", async () => {
+  it("<SiteNew />: Create a site", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/sites/new" element={<SiteNew />}></Route>
@@ -39,7 +39,7 @@ describe("As a user, I can create a new site", () => {
     input = screen.getByLabelText("Root page", { exact: false });
     fireEvent.change(input, { target: { value: "/index" } });
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", { name: "Create Site" });
     expect(button).not.equal(null);
     fireEvent.click(button);
 

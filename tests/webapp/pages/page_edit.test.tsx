@@ -37,7 +37,7 @@ describe("As a user, I can edit existing pages", () => {
     await config.api.page.deleteDraft("", "/home");
   });
 
-  it("Load the root page in an edition form", async () => {
+  it("<PageEdit />: Load the root page in an edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
@@ -53,7 +53,7 @@ describe("As a user, I can edit existing pages", () => {
     expect(input.getAttribute("value")).equal("Home Page");
   });
 
-  it("Load the subpage page in an edition form", async () => {
+  it("<PageEdit />: Load the subpage page in an edition form", async () => {
     renderWithRouter(
       <>
         <Route path="/admin/pages" element={<PageList />}></Route>
@@ -72,7 +72,7 @@ describe("As a user, I can edit existing pages", () => {
     expect(input.getAttribute("value")).equal("first section");
   });
 
-  it("Update the root page using the edition form", async () => {
+  it("<PageEdit />: Update the root page using the edition form", async () => {
     renderWithRouterWithTheme(
       <>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
@@ -86,7 +86,7 @@ describe("As a user, I can edit existing pages", () => {
     input = screen.getByLabelText("Body", { exact: false });
     fireEvent.change(input, { target: { value: "Long time ago" } });
 
-    let button = screen.getByRole("button", { name: "Submit" });
+    let button = screen.getByRole("button", { name: "Save" });
     expect(button).not.equal(null);
     fireEvent.click(button);
 

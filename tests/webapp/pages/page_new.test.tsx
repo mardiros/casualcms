@@ -35,7 +35,7 @@ describe("As a user, I can create the root page", () => {
     // input = screen.getByLabelText("Id", {exact: false});
     // expect(input).equal(null);
 
-    let button = screen.getByText("Submit");
+    let button = screen.getByRole("button", { name: "Create Page" });
     fireEvent.click(button);
 
     await waitForPath("/admin/pages");

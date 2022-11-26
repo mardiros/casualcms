@@ -104,9 +104,11 @@ export const SettingSiteList: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
 
   return (
-    <Box>
+    <Box minW="1440px">
       <SettingBreadcrumb />
-      <SettingSiteListTable config={config} token={token} />
+      <Box maxW="1440px">
+        <SettingSiteListTable config={config} token={token} />
+      </Box>
     </Box>
   );
 };

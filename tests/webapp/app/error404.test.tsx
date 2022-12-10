@@ -7,10 +7,7 @@ import { renderWithRouter } from "../helpers";
 
 describe("As a user, I have beautiful 404 error", () => {
   it("Render an error 404 compontent", async () => {
-    renderWithRouter(
-      <Route path="/e404" element={<PageNotFound />} />,
-      "/e404"
-    );
+    renderWithRouter(<Route path="/e404" element={<PageNotFound />} />, "/e404");
     await screen.findByText("Page Not Found");
     const msg = screen.getByText("This is probably not a problem with npm.");
     expect(msg).not.equal(undefined);

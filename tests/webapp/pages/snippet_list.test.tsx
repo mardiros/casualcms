@@ -49,12 +49,12 @@ describe("As a user, I can list snippet", () => {
           </Table>
         }
       />,
-      "/admin/snippetrow"
+      "/admin/snippetrow",
     );
 
     let link = await screen.findByText("Edit", { exact: false });
     expect(link.getAttribute("href")).equal(
-      "/admin/snippets/edit/blog:HeaderSnippet/header"
+      "/admin/snippets/edit/blog:HeaderSnippet/header",
     );
   });
 
@@ -64,7 +64,7 @@ describe("As a user, I can list snippet", () => {
         path="/admin/snippets"
         element={<SnippetListTable config={config} token="x" />}
       />,
-      "/admin/snippets"
+      "/admin/snippets",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -73,7 +73,7 @@ describe("As a user, I can list snippet", () => {
   it("Render snippet lists from the API", async () => {
     renderWithRouter(
       <Route path="/admin/snippets" element={<SnippetList />} />,
-      "/admin/snippets"
+      "/admin/snippets",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -84,7 +84,7 @@ describe("As a user, I can list snippet", () => {
         <Route path="/admin/snippets" element={<SnippetListButtons />} />
         <Route path="/admin/snippets/new" element={<h4>New snippet page</h4>} />
       </>,
-      "/admin/snippets"
+      "/admin/snippets",
     );
     let link = screen.getByText("Add new snippet", { exact: false });
     fireEvent.click(link);

@@ -21,7 +21,7 @@ describe("As a user, I can list pages", () => {
         title: "Root Page",
         description: "describe the root home",
       },
-      null
+      null,
     );
     await config.api.page.createDraft(
       "",
@@ -31,7 +31,7 @@ describe("As a user, I can list pages", () => {
         title: "Home Page",
         description: "describe the home",
       },
-      null
+      null,
     );
     await config.api.page.createDraft(
       "",
@@ -41,7 +41,7 @@ describe("As a user, I can list pages", () => {
         title: "Section Page",
         description: "first section",
       },
-      "/home"
+      "/home",
     );
     await config.api.page.createDraft(
       "",
@@ -51,7 +51,7 @@ describe("As a user, I can list pages", () => {
         title: "Another Section Page",
         description: "second section",
       },
-      "/home"
+      "/home",
     );
   });
   after(async () => {
@@ -82,7 +82,7 @@ describe("As a user, I can list pages", () => {
           </Table>
         }
       />,
-      "/admin/pagerow"
+      "/admin/pagerow",
     );
     await waitForLoadingLabel("Loading pages list");
 
@@ -99,9 +99,7 @@ describe("As a user, I can list pages", () => {
 
     link = screen.getByText("Preview", { exact: false });
     expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal(
-      "/admin/pages/preview?page=%2Fhome"
-    );
+    expect(link.getAttribute("href")).equal("/admin/pages/preview?page=%2Fhome");
 
     link = screen.getByTestId("View child pages");
     expect(link).not.equal(undefined);
@@ -113,15 +111,10 @@ describe("As a user, I can list pages", () => {
       <Route
         path="/admin/pages"
         element={
-          <PageListTable
-            curPage={null}
-            parentPath={null}
-            config={config}
-            token=""
-          />
+          <PageListTable curPage={null} parentPath={null} config={config} token="" />
         }
       />,
-      "/admin/pages"
+      "/admin/pages",
     );
     await waitForLoadingLabel("Loading pages list");
     let links = screen.getAllByText("Edit", { exact: false });
@@ -134,15 +127,10 @@ describe("As a user, I can list pages", () => {
       <Route
         path="/admin/pages"
         element={
-          <PageListTable
-            curPage={null}
-            parentPath="/home"
-            config={config}
-            token=""
-          />
+          <PageListTable curPage={null} parentPath="/home" config={config} token="" />
         }
       />,
-      "/admin/pages?parent=/home"
+      "/admin/pages?parent=/home",
     );
     await waitForLoadingLabel("Loading pages list");
     let links = screen.getAllByText("Edit", { exact: false });
@@ -169,7 +157,7 @@ describe("As a user, I can list pages", () => {
         />
         <Route path="/admin/pages/new" element={<h4>New page page</h4>} />
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     let link = screen.getByText("Add new page", { exact: false });
     fireEvent.click(link);
@@ -210,7 +198,7 @@ describe("As a user, I can list pages", () => {
         />
         <Route path="/admin/pages" element={<h4>Page list</h4>} />
       </>,
-      "/admin/pages/btn"
+      "/admin/pages/btn",
     );
 
     let link = screen.getByText("Delete this page");

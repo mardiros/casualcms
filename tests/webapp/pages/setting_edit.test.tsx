@@ -18,14 +18,9 @@ describe("As a user, I can list setting", () => {
       secure: false,
       root_page_path: "/index",
     });
-    await config.api.setting.createSetting(
-      "",
-      "www.localhost",
-      "blog:contact",
-      {
-        email: "alice@bob.net",
-      }
-    );
+    await config.api.setting.createSetting("", "www.localhost", "blog:contact", {
+      email: "alice@bob.net",
+    });
   });
   after(async () => {
     await config.api.setting.deleteSetting("", {
@@ -47,7 +42,7 @@ describe("As a user, I can list setting", () => {
           element={<div>Settings list</div>}
         ></Route>
       </>,
-      "/admin/settings/www.localhost/blog:contact/edit"
+      "/admin/settings/www.localhost/blog:contact/edit",
     );
 
     const input = await screen.findByLabelText("email", { exact: false });
@@ -69,7 +64,7 @@ describe("As a user, I can list setting", () => {
     const contactSetting = await config.api.setting.showSetting(
       "",
       "www.localhost",
-      "blog:contact"
+      "blog:contact",
     );
     expect(contactSetting._unsafeUnwrap()).eql({
       email: "bob@example.net",

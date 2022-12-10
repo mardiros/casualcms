@@ -18,7 +18,7 @@ describe("As a user, I can edit existing pages", () => {
         title: "Home Page",
         description: "describe the home",
       },
-      null
+      null,
     );
     await config.api.page.createDraft(
       "",
@@ -29,7 +29,7 @@ describe("As a user, I can edit existing pages", () => {
         title: "Section Page",
         description: "first section",
       },
-      "/home"
+      "/home",
     );
   });
   after(async () => {
@@ -43,7 +43,7 @@ describe("As a user, I can edit existing pages", () => {
         <Route path="/admin/pages" element={<PageList />}></Route>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/pages/edit?page=/home"
+      "/admin/pages/edit?page=/home",
     );
 
     let input = await screen.findByLabelText("Slug", { exact: false });
@@ -59,7 +59,7 @@ describe("As a user, I can edit existing pages", () => {
         <Route path="/admin/pages" element={<PageList />}></Route>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/pages/edit?page=/home/sub0"
+      "/admin/pages/edit?page=/home/sub0",
     );
 
     let input = await screen.findByLabelText("Slug", { exact: false });
@@ -77,7 +77,7 @@ describe("As a user, I can edit existing pages", () => {
       <>
         <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
       </>,
-      "/admin/pages/edit?page=/home"
+      "/admin/pages/edit?page=/home",
     );
 
     let input = await screen.findByLabelText("Title", { exact: false });

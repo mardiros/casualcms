@@ -47,7 +47,7 @@ describe("As a user, I can list sites in settings", () => {
           </Table>
         }
       />,
-      "/admin/siterow"
+      "/admin/siterow",
     );
 
     let link = await screen.findByText("Edit", { exact: false });
@@ -60,7 +60,7 @@ describe("As a user, I can list sites in settings", () => {
         path="/admin/sites"
         element={<SettingSiteListTable config={config} token="x" />}
       />,
-      "/admin/sites"
+      "/admin/sites",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -68,15 +68,13 @@ describe("As a user, I can list sites in settings", () => {
     expect(links[1].nodeName).equal("A");
     expect(links[1].getAttribute("href")).equal("/admin/settings/*");
     expect(links[2].nodeName).equal("A");
-    expect(links[2].getAttribute("href")).equal(
-      "/admin/settings/www.localhost"
-    );
+    expect(links[2].getAttribute("href")).equal("/admin/settings/www.localhost");
   });
 
   it("Render sites lists from the API", async () => {
     renderWithRouter(
       <Route path="/admin/sites" element={<SettingSiteList />} />,
-      "/admin/sites"
+      "/admin/sites",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -84,8 +82,6 @@ describe("As a user, I can list sites in settings", () => {
     expect(links[1].nodeName).equal("A");
     expect(links[1].getAttribute("href")).equal("/admin/settings/*");
     expect(links[2].nodeName).equal("A");
-    expect(links[2].getAttribute("href")).equal(
-      "/admin/settings/www.localhost"
-    );
+    expect(links[2].getAttribute("href")).equal("/admin/settings/www.localhost");
   });
 });

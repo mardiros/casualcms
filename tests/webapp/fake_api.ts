@@ -56,7 +56,7 @@ class FakeAccountApi implements IAccountApi {
 class FakePageTypeApi implements IPageTypeApi {
   async listPageTypes(
     authntoken: string,
-    parentType: string | null
+    parentType: string | null,
   ): AsyncApiResult<PartialPageType[]> {
     return ok([
       {
@@ -65,10 +65,7 @@ class FakePageTypeApi implements IPageTypeApi {
       },
     ]);
   }
-  async showPageType(
-    authntoken: string,
-    pageType: string
-  ): AsyncApiResult<PageType> {
+  async showPageType(authntoken: string, pageType: string): AsyncApiResult<PageType> {
     if (pageType == "casual:HomePage") {
       return ok({
         uiSchema: {
@@ -127,7 +124,7 @@ class FakePageApi implements IPageApi {
     authntoken: string,
     type: string,
     payload: Payload,
-    parent: string | null
+    parent: string | null,
   ): AsyncApiResult<boolean> {
     const titles: Record<string, string> = {
       "casual:HomePage": "Home Page",
@@ -145,7 +142,7 @@ class FakePageApi implements IPageApi {
 
   async listDrafts(
     authntoken: string,
-    parent: string | null
+    parent: string | null,
   ): AsyncApiResult<PartialDraft[]> {
     let pages: PartialDraft[] = [];
 
@@ -155,9 +152,7 @@ class FakePageApi implements IPageApi {
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
         const pathLen = page.metadata.path.split("/").length;
-        return (
-          page.metadata.path.startsWith(starter) && pathLen == startLen + 1
-        );
+        return page.metadata.path.startsWith(starter) && pathLen == startLen + 1;
       })
       .map((page) =>
         pages.push({
@@ -168,15 +163,12 @@ class FakePageApi implements IPageApi {
             type: page.metadata.type,
             title: page.metadata.title,
           },
-        })
+        }),
       );
     return ok(pages);
   }
 
-  async showDraft(
-    authntoken: string,
-    path: string | null
-  ): AsyncApiResult<Draft> {
+  async showDraft(authntoken: string, path: string | null): AsyncApiResult<Draft> {
     let pages: Draft[] = [];
     this.pages
       .filter((page) => {
@@ -193,17 +185,14 @@ class FakePageApi implements IPageApi {
     }
   }
 
-  async previewDraft(
-    authntoken: string,
-    path: string | null
-  ): AsyncApiResult<string> {
+  async previewDraft(authntoken: string, path: string | null): AsyncApiResult<string> {
     return ok(`I preview ${path}`);
   }
 
   async updateDraft(
     authntoken: string,
     path: string,
-    page: Draft
+    page: Draft,
   ): AsyncApiResult<Draft> {
     let oldPage: any | null = null;
     const pages: any[] = [];
@@ -224,7 +213,7 @@ class FakePageApi implements IPageApi {
   async publishPage(
     authntoken: string,
     hostname: string,
-    path: string
+    path: string,
   ): AsyncApiResult<boolean> {
     return ok(true);
   }
@@ -247,17 +236,14 @@ export class FakeSiteApi implements ISiteApi {
   async createSite(
     authntoken: string,
     hostname: string,
-    payload: SiteOption
+    payload: SiteOption,
   ): AsyncApiResult<PartialSite> {
     const postBody = { hostname: hostname, ...payload };
     this.sites.push(postBody);
     return ok(postBody);
   }
 
-  async deleteSite(
-    authntoken: string,
-    hostname: string
-  ): AsyncApiResult<boolean> {
+  async deleteSite(authntoken: string, hostname: string): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
       return site.hostname != hostname;
     });
@@ -268,7 +254,7 @@ export class FakeSiteApi implements ISiteApi {
   async updateSite(
     authntoken: string,
     hostname: string,
-    site: Site
+    site: Site,
   ): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
       return site.hostname != hostname;
@@ -310,7 +296,7 @@ export class FakeSnippetApi implements ISnippetApi {
   async updateSnippet(
     authntoken: string,
     key: string,
-    snippet: Snippet
+    snippet: Snippet,
   ): AsyncApiResult<boolean> {
     const typ = snippet.metadata.type;
     let snippets = this.snippets.filter((snippet: PartialSnippet) => {
@@ -336,7 +322,7 @@ export class FakeSnippetApi implements ISnippetApi {
   async createSnippet(
     authntoken: string,
     type: string,
-    payload: Snippet
+    payload: Snippet,
   ): AsyncApiResult<boolean> {
     const titles: Record<string, string> = {
       "blog:HeaderSnippet": "Header Snippet",
@@ -346,10 +332,7 @@ export class FakeSnippetApi implements ISnippetApi {
     this.snippets.push(payload);
     return ok(true);
   }
-  async deleteSnippet(
-    authntoken: string,
-    snippet: Snippet
-  ): AsyncApiResult<boolean> {
+  async deleteSnippet(authntoken: string, snippet: Snippet): AsyncApiResult<boolean> {
     const snippets = this.snippets.filter((s: PartialSnippet) => {
       return s.key != snippet.key;
     });
@@ -359,9 +342,7 @@ export class FakeSnippetApi implements ISnippetApi {
 }
 
 class FakeSnippetTypeApi implements ISnippetTypeApi {
-  async listSnippetTypes(
-    authntoken: string
-  ): AsyncApiResult<PartialSnippetType[]> {
+  async listSnippetTypes(authntoken: string): AsyncApiResult<PartialSnippetType[]> {
     return ok([
       { title: "Header Snippet", type: "blog:HeaderSnippet" },
       { title: "Footer Snippet", type: "blog:FooterSnippet" },
@@ -369,7 +350,7 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
   }
   async showSnippetType(
     authntoken: string,
-    snippet_type: string
+    snippet_type: string,
   ): AsyncApiResult<SnippetType> {
     return ok({
       schema: {
@@ -420,7 +401,7 @@ export class FakeSettingApi implements ISettingApi {
 
   async listSettings(
     authntoken: string,
-    hostname: string
+    hostname: string,
   ): AsyncApiResult<PartialSetting[]> {
     const settings: PartialSetting[] = [];
     this.settings.map((s) => {
@@ -435,7 +416,7 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: Payload
+    payload: Payload,
   ): AsyncApiResult<boolean> {
     const setting = {
       metadata: { hostname: hostname, key: key },
@@ -447,7 +428,7 @@ export class FakeSettingApi implements ISettingApi {
   async showSetting(
     authntoken: string,
     hostname: string,
-    key: string
+    key: string,
   ): AsyncApiResult<Setting> {
     const settings = this.settings.map((s) => {
       if (s.metadata.hostname == hostname && s.metadata.key == key) {
@@ -462,10 +443,7 @@ export class FakeSettingApi implements ISettingApi {
     return err(errMap);
   }
 
-  async updateSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean> {
+  async updateSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean> {
     const settings: Setting[] = [];
     this.settings.map((s) => {
       if (
@@ -480,10 +458,7 @@ export class FakeSettingApi implements ISettingApi {
     return ok(true);
   }
 
-  async deleteSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean> {
+  async deleteSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean> {
     const key = setting.metadata.key;
     const hostname = setting.metadata.hostname;
     const settings = this.settings.filter((s: any) => {
@@ -495,18 +470,13 @@ export class FakeSettingApi implements ISettingApi {
 }
 
 export class FakeSettingTypeApi implements ISettingTypeApi {
-  async listSettingTypes(
-    authntoken: string
-  ): AsyncApiResult<PartialSettingType[]> {
+  async listSettingTypes(authntoken: string): AsyncApiResult<PartialSettingType[]> {
     return ok([
       { title: "Feature Flags", key: "blog:ff" },
       { title: "Contact", key: "blog:contact" },
     ]);
   }
-  async showSettingType(
-    authntoken: string,
-    key: string
-  ): AsyncApiResult<SettingType> {
+  async showSettingType(authntoken: string, key: string): AsyncApiResult<SettingType> {
     const resp: SettingType = {
       schema: {
         title: "ContactSetting",

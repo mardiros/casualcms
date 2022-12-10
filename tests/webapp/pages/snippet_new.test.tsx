@@ -16,7 +16,7 @@ describe("As a user, I can list snippet", () => {
         ></Route>
         <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>
       </>,
-      "/admin/snippets/new/blog:HeaderSnippet"
+      "/admin/snippets/new/blog:HeaderSnippet",
     );
 
     await waitForLoadingLabel("Loading form...");

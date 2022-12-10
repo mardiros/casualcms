@@ -13,7 +13,7 @@ describe("As a user, I can see which entry menu I am in", () => {
         <Route path="/admin/sites" element={<SideBar />} />
         <Route path="/admin/pages" element={<SideBar />} />
       </>,
-      "/admin/pages/new"
+      "/admin/pages/new",
     );
     let menuItem = screen.getByText("Pages");
     expect(menuItem.getAttribute("data-selected")).equal("true");

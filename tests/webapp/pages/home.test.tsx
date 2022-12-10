@@ -28,7 +28,7 @@ describe("As a user, I am redirected to the root list if one exists", () => {
         title: "dummy home",
         description: "describe the dummy home",
       },
-      null
+      null,
     );
     resp.mapErr((err: ApiError) => {
       throw err;
@@ -46,7 +46,7 @@ describe("As a user, I am redirected to the root list if one exists", () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/pages" element={<PageList />} />
       </>,
-      "/"
+      "/",
     );
     let tpl = await screen.findByText("dummy home");
     expect(tpl).not.equal(null);

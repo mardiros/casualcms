@@ -23,7 +23,7 @@ describe("As a user, I can publish existing pages", () => {
         title: "Home Page",
         description: "describe the home",
       },
-      null
+      null,
     );
     await config.api.page.createDraft(
       "",
@@ -34,7 +34,7 @@ describe("As a user, I can publish existing pages", () => {
         title: "Section Page",
         description: "first section",
       },
-      "/home"
+      "/home",
     );
 
     await config.api.site.createSite("", "www", {
@@ -119,7 +119,7 @@ describe("As a user, I can publish existing pages", () => {
           }
         ></Route>
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     const boxes = screen.getAllByRole("publication_result");
     expect(boxes.length).equal(3);
@@ -150,7 +150,7 @@ describe("As a user, I can publish existing pages", () => {
           element={<SiteCheckBox hostname={hostname} />}
         ></Route>
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     const cbx = screen.getByLabelText("www");
     // expect(cbx.getAttribute("checked")).equal(false);
@@ -171,7 +171,7 @@ describe("As a user, I can publish existing pages", () => {
           element={<SiteCheckBox hostname={hostname} />}
         ></Route>
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     const cbx = screen.getByLabelText("www");
     fireEvent.click(cbx);
@@ -185,7 +185,7 @@ describe("As a user, I can publish existing pages", () => {
           element={<PublishButton token="x" pagePath="/home" />}
         ></Route>
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     const btn = screen.getByText("Publish");
     fireEvent.click(btn);
@@ -218,7 +218,7 @@ describe("As a user, I can publish existing pages", () => {
           element={<PublishButton token="x" pagePath="/home" />}
         ></Route>
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
 
     const btn = screen.getByRole("open_publish_popover");

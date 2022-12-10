@@ -41,7 +41,7 @@ describe("As a user, I am redirect to the login page", () => {
     render(
       <AppContext.Provider value={config}>
         <App debugNode={<LocationDisplay />} />
-      </AppContext.Provider>
+      </AppContext.Provider>,
     );
     await waitForPath("/admin/login");
     let input = screen.getByLabelText("Username:");

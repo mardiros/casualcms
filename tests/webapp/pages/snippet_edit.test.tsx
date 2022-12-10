@@ -24,16 +24,13 @@ describe("As a user, I can edit existing snippet", () => {
   it("<SnippetEdit />: Load the snippet in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route
-          path="/admin/snippets/snippetTypeName"
-          element={<SnippetList />}
-        ></Route>
+        <Route path="/admin/snippets/snippetTypeName" element={<SnippetList />}></Route>
         <Route
           path="/admin/snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
         ></Route>
       </>,
-      "/admin/snippets/edit/blog:HeaderSnippet/header"
+      "/admin/snippets/edit/blog:HeaderSnippet/header",
     );
 
     await waitForLoadingLabel("Loading form...");
@@ -54,7 +51,7 @@ describe("As a user, I can edit existing snippet", () => {
           element={<SnippetEdit />}
         ></Route>
       </>,
-      "/admin/snippets/edit/blog:HeaderSnippet/header"
+      "/admin/snippets/edit/blog:HeaderSnippet/header",
     );
 
     await waitForLoadingLabel("Loading form...");

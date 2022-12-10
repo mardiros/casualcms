@@ -23,14 +23,9 @@ describe("As a user, I can list settings of a given site", () => {
       secure: false,
       root_page_path: "/index",
     });
-    await config.api.setting.createSetting(
-      "",
-      "www.localhost",
-      "blog:contact",
-      {
-        email: "alice@bob.net",
-      }
-    );
+    await config.api.setting.createSetting("", "www.localhost", "blog:contact", {
+      email: "alice@bob.net",
+    });
   });
   after(async () => {
     await config.api.site.deleteSite("", "www.localhost");
@@ -55,7 +50,7 @@ describe("As a user, I can list settings of a given site", () => {
           </Table>
         }
       />,
-      "/admin/settingrow"
+      "/admin/settingrow",
     );
 
     let link = await screen.findByText("Contact", { exact: false });
@@ -79,35 +74,31 @@ describe("As a user, I can list settings of a given site", () => {
           />
         }
       />,
-      "/admin/settings/table"
+      "/admin/settings/table",
     );
 
     const ff = await screen.findByText("Feature Flag", { exact: false });
     expect(ff.nodeName).equal("A");
-    expect(ff.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:ff/new"
-    );
+    expect(ff.getAttribute("href")).equal("/admin/settings/www.localhost/blog:ff/new");
 
     const contact = await screen.findByText("Contact", { exact: false });
     expect(contact.nodeName).equal("A");
     expect(contact.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:contact/edit"
+      "/admin/settings/www.localhost/blog:contact/edit",
     );
   });
 
   it("<SettingList />: Render settings lists from the API", async () => {
     renderWithRouter(
       <Route path="/admin/settings/:hostname" element={<SettingList />} />,
-      "/admin/settings/www.localhost"
+      "/admin/settings/www.localhost",
     );
     const ff = await screen.findByText("Feature Flag", { exact: false });
-    expect(ff.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:ff/new"
-    );
+    expect(ff.getAttribute("href")).equal("/admin/settings/www.localhost/blog:ff/new");
 
     const contact = await screen.findByText("Contact", { exact: false });
     expect(contact.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:contact/edit"
+      "/admin/settings/www.localhost/blog:contact/edit",
     );
   });
 });

@@ -31,7 +31,7 @@ describe("As a user, I can edit existing sites", () => {
         <Route path="/admin/sites" element={<SiteList />}></Route>
         <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
       </>,
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost",
     );
 
     let input = await screen.findByLabelText("hostname", { exact: false });
@@ -44,7 +44,7 @@ describe("As a user, I can edit existing sites", () => {
         <Route path="/admin/sites" element={<SiteList />}></Route>
         <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
       </>,
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost",
     );
 
     let input = await screen.findByLabelText("hostname", { exact: false });

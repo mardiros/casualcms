@@ -17,7 +17,7 @@ describe("As a user, I can create a new site", () => {
         title: "Home Page",
         description: "home sweet home",
       },
-      null
+      null,
     );
   });
   after(async () => {
@@ -30,7 +30,7 @@ describe("As a user, I can create a new site", () => {
         <Route path="/admin/sites/new" element={<SiteNew />}></Route>
         <Route path="/admin/sites" element={<h4>Site list</h4>}></Route>
       </>,
-      "/admin/sites/new"
+      "/admin/sites/new",
     );
 
     let input = screen.getByLabelText("Hostname", { exact: false });

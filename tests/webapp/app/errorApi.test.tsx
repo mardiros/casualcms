@@ -11,7 +11,7 @@ describe("As a user, I have beautiful api error", () => {
     error.set("username", "Bad username of password");
     renderWithRouter(
       <Route path="/errs" element={<ApiErrorUI error={error} />} />,
-      "/errs"
+      "/errs",
     );
     await screen.findByText("Errors encountered");
     const msg = screen.getByText("Bad username of password");

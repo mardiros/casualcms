@@ -16,13 +16,10 @@ describe("As a user, I can confirm deletion", () => {
       <Route
         path="/admin/popin"
         element={
-          <DeletePopoverForm
-            button_label="Delete this stuff"
-            onSubmit={onSubmit}
-          />
+          <DeletePopoverForm button_label="Delete this stuff" onSubmit={onSubmit} />
         }
       />,
-      "/admin/popin"
+      "/admin/popin",
     );
     let link = screen.getByText("Delete this stuff");
     fireEvent.click(link);
@@ -42,13 +39,10 @@ describe("As a user, I can confirm deletion", () => {
       <Route
         path="/admin/popin"
         element={
-          <DeletePopoverForm
-            button_label="Delete this stuff"
-            onSubmit={onSubmit}
-          />
+          <DeletePopoverForm button_label="Delete this stuff" onSubmit={onSubmit} />
         }
       />,
-      "/admin/popin"
+      "/admin/popin",
     );
     let link = screen.getByText("Delete this stuff");
     fireEvent.click(link);

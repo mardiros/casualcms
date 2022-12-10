@@ -57,12 +57,9 @@ describe("As a user, I can delete a setting", () => {
           path="/admin/settings/:hostname/:key"
           element={<SettingDeletePopoverForm curSetting={setting} />}
         />
-        <Route
-          path="/admin/settings/:hostname"
-          element={<h4>Setting list</h4>}
-        />
+        <Route path="/admin/settings/:hostname" element={<h4>Setting list</h4>} />
       </>,
-      "/admin/settings/www/blog:contact"
+      "/admin/settings/www/blog:contact",
     );
     let link = screen.getByText("Delete this setting");
     fireEvent.click(link);

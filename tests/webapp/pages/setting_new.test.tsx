@@ -19,7 +19,7 @@ describe("As a user, I can list setting", () => {
           element={<div>Settings list</div>}
         ></Route>
       </>,
-      "/admin/settings/www.localhost/blog:contact/new"
+      "/admin/settings/www.localhost/blog:contact/new",
     );
 
     const input = await screen.findByLabelText("email", { exact: false });
@@ -38,7 +38,7 @@ describe("As a user, I can list setting", () => {
     const contactSetting = await config.api.setting.showSetting(
       "",
       "www.localhost",
-      "blog:contact"
+      "blog:contact",
     );
     expect(contactSetting._unsafeUnwrap()).eql({
       email: "alice@example.net",

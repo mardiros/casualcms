@@ -16,7 +16,7 @@ describe("As a user, I can delete a page", () => {
         title: "Home Page",
         description: "describe the home",
       },
-      null
+      null,
     );
     await config.api.page.createDraft(
       "",
@@ -26,7 +26,7 @@ describe("As a user, I can delete a page", () => {
         title: "Section Page",
         description: "first section",
       },
-      "/home"
+      "/home",
     );
     await config.api.page.createDraft(
       "",
@@ -36,7 +36,7 @@ describe("As a user, I can delete a page", () => {
         title: "Another Section Page",
         description: "second section",
       },
-      "/home"
+      "/home",
     );
   });
   after(async () => {
@@ -72,13 +72,10 @@ describe("As a user, I can delete a page", () => {
 
     renderWithRouter(
       <>
-        <Route
-          path="/admin/popin"
-          element={<PageDeletePopoverForm curPage={page} />}
-        />
+        <Route path="/admin/popin" element={<PageDeletePopoverForm curPage={page} />} />
         <Route path="/admin/pages" element={<h4>Page list</h4>} />
       </>,
-      "/admin/popin"
+      "/admin/popin",
     );
     let link = screen.getByText("Delete this page");
     fireEvent.click(link);

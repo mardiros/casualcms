@@ -17,6 +17,7 @@ clean_frontend:
     rm -rf src/casualcms/ui/webapp_compiled/*.*
 
 prettier:
+    npx rome format --write src/webapp tests/webapp/
     ./node_modules/.bin/prettier --loglevel warn --write src/webapp/ tests/webapp/
 
 flake8:

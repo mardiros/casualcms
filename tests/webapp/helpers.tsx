@@ -53,14 +53,12 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
       }
       return loc;
     },
-    { interval: 25, timeout: 500 }
+    { interval: 25, timeout: 500 },
   );
   return resp;
 };
 
-export const waitForLoadingLabel = async (
-  spinner_label: string
-): Promise<boolean> => {
+export const waitForLoadingLabel = async (spinner_label: string): Promise<boolean> => {
   const resp = await waitFor((): boolean => {
     try {
       screen.getByText(spinner_label);
@@ -100,7 +98,7 @@ export class ErrorBoundary extends React.Component<{ children: any }> {
 export const renderWithRouter = async (
   routes: React.ReactNode,
   path: string,
-  options?: { isAuthenticated?: boolean }
+  options?: { isAuthenticated?: boolean },
 ): Promise<RenderResult> => {
   const isAuthent =
     options?.isAuthenticated === undefined ? true : options.isAuthenticated;
@@ -115,7 +113,7 @@ export const renderWithRouter = async (
         </FakeAuth>
       </AppContext.Provider>
     </ErrorBoundary>,
-    {}
+    {},
   );
   return ret;
 };
@@ -126,7 +124,7 @@ export const renderWithRouter = async (
 export const renderWithRouterWithTheme = async (
   routes: React.ReactNode,
   path: string,
-  options?: { isAuthenticated?: boolean }
+  options?: { isAuthenticated?: boolean },
 ): Promise<RenderResult> => {
   const isAuthent =
     options?.isAuthenticated === undefined ? true : options.isAuthenticated;
@@ -143,7 +141,7 @@ export const renderWithRouterWithTheme = async (
         </AppContext.Provider>
       </ChakraProvider>
     </ErrorBoundary>,
-    {}
+    {},
   );
   return ret;
 };

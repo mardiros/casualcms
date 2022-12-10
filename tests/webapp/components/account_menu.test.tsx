@@ -23,7 +23,7 @@ describe("As a user, I can safely logout", () => {
         <Route path="/admin/pages" element={<AccountMenu username="alice" />} />
         <Route path="/admin/login" element={<LogoutResult />} />
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     let link = screen.getByText("Logout");
     const evt = fireEvent.click(link);

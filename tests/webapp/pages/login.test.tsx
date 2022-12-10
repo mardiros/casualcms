@@ -2,12 +2,7 @@ import { expect } from "chai";
 import React from "react";
 import { Navigate, Routes, Route, MemoryRouter } from "react-router-dom";
 
-import {
-  render,
-  screen,
-  fireEvent,
-  RenderResult,
-} from "@testing-library/react";
+import { render, screen, fireEvent, RenderResult } from "@testing-library/react";
 import {
   AuthProvider,
   RequireAuth,
@@ -49,7 +44,7 @@ export const renderLogin = async (): Promise<RenderResult> => {
           </MemoryRouter>
         </AuthProvider>
       </AppContext.Provider>
-    </ErrorBoundary>
+    </ErrorBoundary>,
   );
   return ret;
 };

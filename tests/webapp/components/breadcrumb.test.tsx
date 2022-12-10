@@ -38,17 +38,13 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
       <>
         <Route path="/admin/pages" element={<PageBreadcrumb page={page} />} />
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     let link = screen.getByText("home");
-    expect(link.getAttribute("href")).to.be.equal(
-      "/admin/pages/?parent=%2Fhome"
-    );
+    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome");
 
     link = screen.getByText("cat");
-    expect(link.getAttribute("href")).to.be.equal(
-      "/admin/pages/?parent=%2Fhome%2Fcat"
-    );
+    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome%2Fcat");
   });
   it("Render links using the breadcrumb of the page meta with an appending text", async () => {
     const metadata: PageMeta = {
@@ -77,17 +73,13 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
           element={<PageBreadcrumb page={page} title="New page" />}
         />
       </>,
-      "/admin/pages"
+      "/admin/pages",
     );
     let link = screen.getByText("home");
-    expect(link.getAttribute("href")).to.be.equal(
-      "/admin/pages/?parent=%2Fhome"
-    );
+    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome");
 
     link = screen.getByText("cat");
-    expect(link.getAttribute("href")).to.be.equal(
-      "/admin/pages/?parent=%2Fhome%2Fcat"
-    );
+    expect(link.getAttribute("href")).to.be.equal("/admin/pages/?parent=%2Fhome%2Fcat");
 
     const title = screen.getByText("New page");
     expect(title.nodeName).to.be.equal("SPAN");
@@ -102,28 +94,20 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
     };
     renderWithRouter(
       <>
-        <Route
-          path="/admin/sites/edit"
-          element={<SiteBreadcrumb site={site} />}
-        />
+        <Route path="/admin/sites/edit" element={<SiteBreadcrumb site={site} />} />
       </>,
-      "/admin/sites/edit"
+      "/admin/sites/edit",
     );
     let link = screen.getByText("www");
-    expect(link.getAttribute("href")).to.be.equal(
-      "/admin/sites/edit?hostname=www"
-    );
+    expect(link.getAttribute("href")).to.be.equal("/admin/sites/edit?hostname=www");
   });
 
   it("Render links using the breadcrumb of the snippet", async () => {
     renderWithRouter(
       <>
-        <Route
-          path="/admin/sites/new"
-          element={<SiteBreadcrumb title="new site" />}
-        />
+        <Route path="/admin/sites/new" element={<SiteBreadcrumb title="new site" />} />
       </>,
-      "/admin/sites/new"
+      "/admin/sites/new",
     );
     const title = screen.getByText("new site");
     expect(title.nodeName).to.be.equal("SPAN");
@@ -141,11 +125,11 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
           element={<SnippetBreadcrumb snippet={snippet} />}
         />
       </>,
-      "/admin/snippets/edit/-"
+      "/admin/snippets/edit/-",
     );
     let link = screen.getByText("header");
     expect(link.getAttribute("href")).to.be.equal(
-      "/admin/snippets/edit/HeaderSnippet/header"
+      "/admin/snippets/edit/HeaderSnippet/header",
     );
   });
 
@@ -157,7 +141,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
           element={<SnippetBreadcrumb title="new snippet" />}
         />
       </>,
-      "/admin/snippets/new"
+      "/admin/snippets/new",
     );
     const title = screen.getByText("new snippet");
     expect(title.nodeName).to.be.equal("SPAN");
@@ -171,7 +155,7 @@ describe("As a user, I can navigate throw the breadcrumb", () => {
           element={<SettingBreadcrumb hostname="www" title="contact" />}
         />
       </>,
-      "/admin/settings/www/contact/edit"
+      "/admin/settings/www/contact/edit",
     );
     const link = screen.getByText("www");
     expect(link.nodeName).to.be.equal("A");

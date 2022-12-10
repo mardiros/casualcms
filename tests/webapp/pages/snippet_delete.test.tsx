@@ -43,7 +43,7 @@ describe("As a user, I can delete a snippet", () => {
         />
         <Route path="/admin/snippets" element={<h4>Snippet list</h4>} />
       </>,
-      "/admin/snippets/blog:HeaderSnippet"
+      "/admin/snippets/blog:HeaderSnippet",
     );
     let link = screen.getByText("Delete this snippet");
     fireEvent.click(link);

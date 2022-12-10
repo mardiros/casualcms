@@ -34,13 +34,10 @@ describe("As a user, I can delete a site", () => {
 
     renderWithRouter(
       <>
-        <Route
-          path="/admin/popin"
-          element={<SiteDeletePopoverForm curSite={site} />}
-        />
+        <Route path="/admin/popin" element={<SiteDeletePopoverForm curSite={site} />} />
         <Route path="/admin/sites" element={<h4>Site list</h4>} />
       </>,
-      "/admin/popin"
+      "/admin/popin",
     );
     let link = screen.getByText("Delete this site");
     fireEvent.click(link);

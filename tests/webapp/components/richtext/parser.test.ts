@@ -67,7 +67,7 @@ describe("Convert Html to SlateModel", () => {
 
   it("Parse titles and paragraphs", () => {
     const mdl = fromHtml(
-      "<h1>Title</h1><p>My lazy dog</p><h2>Subtitle</h2><p>ha ha!</p>"
+      "<h1>Title</h1><p>My lazy dog</p><h2>Subtitle</h2><p>ha ha!</p>",
     );
     expect(mdl).eql([
       {

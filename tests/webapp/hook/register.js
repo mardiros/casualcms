@@ -47,7 +47,7 @@ export default function installGlobalEnvironment(options = {}) {
     KEYS.push(
       ...Object.getOwnPropertyNames(window)
         .filter((k) => !k.startsWith("_"))
-        .filter((k) => !(k in global))
+        .filter((k) => !(k in global)),
     );
     // going to add our jsdom instance, see below
     KEYS.push("FormData");

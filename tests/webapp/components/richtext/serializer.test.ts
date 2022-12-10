@@ -85,9 +85,7 @@ describe("Convert SlateModel to HTML", () => {
       },
     ];
     const html = toHtml(model);
-    expect(html).eql(
-      "<h1>Title</h1><p>My lazy dog</p><h2>Subtitle</h2><p>ha ha!</p>"
-    );
+    expect(html).eql("<h1>Title</h1><p>My lazy dog</p><h2>Subtitle</h2><p>ha ha!</p>");
   });
   it("Parse unordered list", () => {
     const model: SlateModel = [
@@ -189,8 +187,6 @@ describe("Convert SlateModel to HTML", () => {
       },
     ];
     const html = toHtml(model);
-    expect(html).eql(
-      '<p><a href="https://2.cv/">la dodoche</a> is a french car.</p>'
-    );
+    expect(html).eql('<p><a href="https://2.cv/">la dodoche</a> is a french car.</p>');
   });
 });

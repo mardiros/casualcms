@@ -48,7 +48,7 @@ describe("As a user, I can list settings per sites", () => {
           </Table>
         }
       />,
-      "/admin/siterow"
+      "/admin/siterow",
     );
 
     let link = await screen.findByText("Edit", { exact: false });
@@ -61,7 +61,7 @@ describe("As a user, I can list settings per sites", () => {
         path="/admin/sites"
         element={<SiteListTable config={config} token="abc" />}
       />,
-      "/admin/sites"
+      "/admin/sites",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -70,14 +70,14 @@ describe("As a user, I can list settings per sites", () => {
     expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost",
     );
   });
 
   it("Render sites lists from the API", async () => {
     renderWithRouter(
       <Route path="/admin/sites" element={<SiteList />} />,
-      "/admin/sites"
+      "/admin/sites",
     );
     let links = await screen.findAllByText("Edit", { exact: false });
     expect(links.length).equal(3);
@@ -86,7 +86,7 @@ describe("As a user, I can list settings per sites", () => {
     expect(links[1].getAttribute("href")).equal("/admin/sites/edit?hostname=*");
     expect(links[2].nodeName).equal("A");
     expect(links[2].getAttribute("href")).equal(
-      "/admin/sites/edit?hostname=www.localhost"
+      "/admin/sites/edit?hostname=www.localhost",
     );
   });
   it("Redirect to the new site while clicking on the add button", async () => {
@@ -95,7 +95,7 @@ describe("As a user, I can list settings per sites", () => {
         <Route path="/admin/sites" element={<SiteListButtons />} />
         <Route path="/admin/sites/new" element={<h4>New web site page</h4>} />
       </>,
-      "/admin/sites"
+      "/admin/sites",
     );
     let link = screen.getByText("Add new site", { exact: false });
     fireEvent.click(link);

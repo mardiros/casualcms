@@ -4,13 +4,13 @@ import { Link, Navigate } from "react-router-dom";
 import { Box, Heading } from "@chakra-ui/react";
 import { PartialDraft } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 
 import { useAuth } from "../login/hooks";
 import { Loader } from "../../components/loader";
 
 export const HomePage: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [pages, setPages] = React.useState<PartialDraft[]>([]);

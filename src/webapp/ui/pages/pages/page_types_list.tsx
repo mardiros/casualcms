@@ -13,7 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { Draft, PartialPageType } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 
 import { useAuth } from "../login/hooks";
 import { Link, useSearchParams } from "react-router-dom";
@@ -64,7 +64,7 @@ export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
 };
 
 export const PageTypeList: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);

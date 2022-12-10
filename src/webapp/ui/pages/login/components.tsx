@@ -9,12 +9,11 @@ import {
   Heading,
   Input,
 } from "@chakra-ui/react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { Account } from "../../../casualcms/domain/model";
-import { AppContext, useConfig } from "../../../config";
+import { useConfig } from "../../../config";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { Loader } from "../../components/loader";
 import { useAuth, AuthContext } from "./hooks";
 
 export function AuthProvider({
@@ -45,7 +44,7 @@ export function RequireAuth({
 }): React.ReactElement {
   const navigate = useNavigate();
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const [authError, setAuthError] = React.useState<boolean>(false);
 
   React.useEffect(() => {

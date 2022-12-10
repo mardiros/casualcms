@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Site } from "../../../casualcms/domain/model";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 import { DeletePopoverForm } from "../../components/confirm";
 import { useAuth } from "../login/hooks";
 
@@ -13,7 +13,7 @@ export const SiteDeletePopoverForm: React.FunctionComponent<
   SiteDeletePopoverFormProps
 > = (props: SiteDeletePopoverFormProps) => {
   const navigate = useNavigate();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const curSite = props.curSite;

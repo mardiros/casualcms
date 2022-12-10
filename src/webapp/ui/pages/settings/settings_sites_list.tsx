@@ -15,7 +15,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { PartialSite } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppConfig, AppContext } from "../../../config";
+import { AppConfig, useConfig } from "../../../config";
 import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { ApiErrorUI } from "../../components/error_api";
 import { Loader } from "../../components/loader";
@@ -99,7 +99,7 @@ export const SettingSiteListTable: React.FunctionComponent<
 };
 
 export const SettingSiteList: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
 

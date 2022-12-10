@@ -12,12 +12,12 @@ import {
   Thead,
   Tr,
 } from "@chakra-ui/react";
-import { Snippet, PartialSnippetType } from "../../../casualcms/domain/model";
+import { PartialSnippetType } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 
 import { useAuth } from "../login/hooks";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "@chakra-ui/icons";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
@@ -61,7 +61,7 @@ export const SnippetTypesTable: React.FunctionComponent<
 };
 
 export const SnippetTypeList: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);

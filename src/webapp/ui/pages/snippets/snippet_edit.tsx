@@ -3,7 +3,7 @@ import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { AppContext, useConfig } from "../../../config";
 import { Snippet, SnippetType } from "../../../casualcms/domain/model";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
@@ -14,7 +14,7 @@ import { DownloadIcon } from "@chakra-ui/icons";
 
 export const SnippetEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [snippet, setSnippet] = React.useState<Snippet | null>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);

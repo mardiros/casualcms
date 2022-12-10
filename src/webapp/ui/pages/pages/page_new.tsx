@@ -3,7 +3,7 @@ import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 import { Draft, PageType } from "../../../casualcms/domain/model";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
@@ -16,7 +16,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("# Rendering page new")
   let { pageTypeName } = useParams<string>();
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [pageType, setPageType] = React.useState<PageType | null>(null);

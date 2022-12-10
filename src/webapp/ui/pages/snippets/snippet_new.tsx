@@ -3,7 +3,7 @@ import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 import { SnippetType } from "../../../casualcms/domain/model";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
@@ -14,7 +14,7 @@ import { DownloadIcon } from "@chakra-ui/icons";
 export const SnippetNew: React.FunctionComponent<{}> = () => {
   let { snippetTypeName } = useParams<string>();
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [snippetType, setSnippetType] = React.useState<SnippetType | null>(

@@ -3,7 +3,7 @@ import { Box, Button, Heading, Stack } from "@chakra-ui/react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../login/hooks";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppContext } from "../../../config";
+import { useConfig } from "../../../config";
 import { SettingType } from "../../../casualcms/domain/model";
 import { Loader } from "../../components/loader";
 import { ApiErrorUI } from "../../components/error_api";
@@ -14,7 +14,7 @@ import { DownloadIcon } from "@chakra-ui/icons";
 export const SettingNew: React.FunctionComponent<{}> = () => {
   let { hostname, settingKey } = useParams<string>();
   let auth = useAuth();
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [settingType, setSettingType] = React.useState<SettingType | null>(

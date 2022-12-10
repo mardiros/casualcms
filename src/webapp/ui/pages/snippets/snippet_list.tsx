@@ -14,10 +14,10 @@ import {
 } from "@chakra-ui/react";
 import { PartialSnippet } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppConfig, AppContext } from "../../../config";
+import { AppConfig, useConfig } from "../../../config";
 
 import { useAuth } from "../login/hooks";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AddIcon, EditIcon } from "@chakra-ui/icons";
 import { Result } from "neverthrow";
 import { Loader } from "../../components/loader";
@@ -127,7 +127,7 @@ export const SnippetListButtons: React.FunctionComponent<
 };
 
 export const SnippetList: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
 

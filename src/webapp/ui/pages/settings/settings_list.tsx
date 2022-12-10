@@ -15,7 +15,7 @@ import {
   PartialSettingType,
 } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppConfig, AppContext } from "../../../config";
+import { AppConfig, useConfig } from "../../../config";
 import { Loader } from "../../components/loader";
 import { useAuth } from "../login/hooks";
 import { SettingBreadcrumb } from "../../components/breadcrumb";
@@ -111,7 +111,7 @@ export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
 };
 
 export const SettingList: React.FunctionComponent<{}> = () => {
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   let { hostname, settingType } = useParams<string>();

@@ -16,7 +16,7 @@ import {
 } from "@chakra-ui/react";
 import { Draft, PartialDraft } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
-import { AppConfig, AppContext } from "../../../config";
+import { AppConfig, useConfig } from "../../../config";
 
 import { useAuth } from "../login/hooks";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
@@ -196,7 +196,7 @@ export const PageList: React.FunctionComponent<{}> = () => {
   // console.log("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
   // console.log("# Rendering page list")
 
-  const config = React.useContext(AppContext);
+  const config = useConfig();
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
 

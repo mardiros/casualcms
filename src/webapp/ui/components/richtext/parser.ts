@@ -1,10 +1,10 @@
-import { NodeType, SlateModel, TypedLeaf, TypedNode } from "./types";
+import { NodeType, SlateModel, TypedText, TypedNode } from "./types";
 const NODE_TYPE_TEXT = 3;
 
 export const createText = (
   text: string | null,
   attrs?: { [key: string]: boolean }
-): TypedLeaf => {
+): TypedText => {
   return {
     type: "TEXT",
     text: text || "",
@@ -26,7 +26,7 @@ export const createNode = (
   return ret;
 };
 
-const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
+const deserializeNode = (el: ChildNode): TypedNode | TypedText => {
   if (el.nodeType === NODE_TYPE_TEXT) {
     return createText(el.textContent);
   }

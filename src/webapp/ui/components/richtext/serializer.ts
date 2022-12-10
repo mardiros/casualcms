@@ -1,10 +1,10 @@
 import { Descendant, Text } from "slate";
+import { TypeNode } from "typescript";
 import { escapeHtml } from "./strutil";
 
 import {
   NodeType,
   SlateModel,
-  TypedLeaf,
   TypedLink,
   TypedNode,
   TypedText,
@@ -33,8 +33,6 @@ const serializeNode = (type: NodeType, el: TypedNode): string => {
     case "code":
       return `<pre>${toHtml(el.children)}</pre>`;
     case "blockquote":
-      console.log("######################");
-      console.log(el);
       return `<blockquote>${toHtml(el.children)}</blockquote>`;
     case "paragraph":
       // render paragraph as div while editing...
@@ -53,7 +51,7 @@ const serializeNode = (type: NodeType, el: TypedNode): string => {
   return "";
 };
 
-const serializeLeaf = (el: TypedLeaf): string => {
+const serializeLeaf = (el: TypedText): string => {
   switch (el.type) {
     case "TEXT":
       const txt = el as TypedText;
@@ -75,7 +73,7 @@ const serializeLeaf = (el: TypedLeaf): string => {
   return "";
 };
 
-const serializeElement = (el: any): string => {
+const serializeElement = (el: TypedNode | TypedText | TypedLink): string => {
   if (Text.isText(el)) {
     return serializeLeaf(el);
   } else {
@@ -85,7 +83,7 @@ const serializeElement = (el: any): string => {
 
 export const toHtml = (els: SlateModel | Descendant[]): string => {
   return els
-    .map((el: any) => {
+    .map((el: TypedNode | TypedText | TypedLink) => {
       return serializeElement(el);
     })
     .join("");

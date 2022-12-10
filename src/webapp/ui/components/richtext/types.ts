@@ -60,9 +60,7 @@ export type TypedText = {
 
 export type TextMark = keyof Omit<TypedText, "type" | "text">;
 
-export type TypedLeaf = TypedText;
-
-export type SlateModel = Array<TypedNode | TypedLink | TypedLeaf>;
+export type SlateModel = Array<TypedNode | TypedLink | TypedText>;
 
 export type MyEditor = BaseEditor & ReactEditor & HistoryEditor;
 
@@ -70,6 +68,6 @@ declare module "slate" {
   interface CustomTypes {
     Editor: BaseEditor;
     Element: TypedNode;
-    Text: TypedLeaf;
+    Text: TypedText;
   }
 }

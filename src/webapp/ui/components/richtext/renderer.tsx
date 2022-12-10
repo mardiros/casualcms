@@ -1,5 +1,5 @@
 import React from "react";
-import { Editor, Element, Transforms } from "slate";
+import { Element } from "slate";
 import { RenderElementProps, RenderLeafProps, useSlate } from "slate-react";
 import {
   chakra,
@@ -7,13 +7,9 @@ import {
   OrderedList,
   UnorderedList,
   Heading,
-  IconButton,
-  Image,
 } from "@chakra-ui/react";
 
-import { Element as SlateElement } from "slate";
-import { MdDelete } from "react-icons/md";
-import { NodeType, TypedLeaf, TypedLink, TypedNode, TypedText } from "./types";
+import { NodeType, TypedText, TypedLink } from "./types";
 import { InlineLink } from "./toolbar/popover_button";
 
 export interface MyElement extends Element {
@@ -25,7 +21,7 @@ export interface MyRenderElementProps extends RenderElementProps {
 }
 
 export interface MyRenderLeafProps extends RenderLeafProps {
-  leaf: TypedLeaf;
+  leaf: TypedText;
 }
 
 export const MyRenderElement = ({

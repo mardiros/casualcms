@@ -132,7 +132,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
         Add new page
       </Button>
 
-      {curPage && subPages.length == 0 && (
+      {curPage && subPages.length === 0 && (
         <PageDeletePopoverForm curPage={curPage} />
       )}
     </Stack>

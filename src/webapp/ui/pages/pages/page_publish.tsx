@@ -92,11 +92,11 @@ export const PublishResultBox: React.FunctionComponent<
                   <>
                     {hostname.hostname}
                     &nbsp;
-                    {(hostname.response && hostname.response.isOk() && (
+                    {(hostname.response?.isOk() && (
                       <a
                         role="view_publication_result"
                         target="_blank"
-                        href={get_url(hostname, pagePath)}
+                        href={get_url(hostname, pagePath)} rel="noreferrer"
                       >
                         <Icon
                           as={ViewIcon}
@@ -185,7 +185,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
       setPublishedState("begin");
       setHostnames(hostnamesLoaded);
     }
-    if (token && publishedState == "loading") {
+    if (token && publishedState === "loading") {
       loadSites();
     }
     return function cleanup() {};

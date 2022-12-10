@@ -45,8 +45,7 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
-      {page &&
-        page.metadata.breadcrumb.items.map((item, i) => (
+      {page?.metadata.breadcrumb.items.map((item, i) => (
           <BreadcrumbItem key={i}>
             <Link
               to={`/admin/pages/?${new URLSearchParams({

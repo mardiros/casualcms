@@ -72,7 +72,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const onsubmit = async (data: any) => {
     const snippet = data.formData;
     await config.api.snippet.updateSnippet(token, snippetKey, snippet);
-    navigate(`/admin/snippets`, { replace: true });
+    navigate("/admin/snippets", { replace: true });
   };
 
   return (

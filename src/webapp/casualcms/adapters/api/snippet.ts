@@ -6,7 +6,7 @@ import { ApiError, AsyncApiResult, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]> {
-    const response = await this.fetch(`/api/snippets`, {
+    const response = await this.fetch("/api/snippets", {
       method: "GET",
       headers: {
         Authorization: `Bearer ${authntoken}`,

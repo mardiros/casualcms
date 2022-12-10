@@ -114,7 +114,7 @@ export const SiteListButtons: React.FunctionComponent<{}> = () => {
     <Stack p={4} spacing={4} direction="row" align="right">
       <Button
         colorScheme="cyan"
-        onClick={() => navigate(`/admin/sites/new`, { replace: true })}
+        onClick={() => navigate("/admin/sites/new", { replace: true })}
         leftIcon={<AddIcon />}
       >
         Add new site

@@ -8,10 +8,10 @@ export const createText = (
   return {
     type: "TEXT",
     text: text || "",
-    bold: attrs?.bold || false,
-    italic: attrs?.italic || false,
-    underline: attrs?.underline || false,
-    strikethrough: attrs?.strikethrough || false,
+    bold: attrs?.bold,
+    italic: attrs?.italic,
+    underline: attrs?.underline,
+    strikethrough: attrs?.strikethrough,
   };
 };
 
@@ -27,7 +27,7 @@ export const createNode = (
 };
 
 const deserializeNode = (el: ChildNode): TypedNode | TypedLeaf => {
-  if (el.nodeType == NODE_TYPE_TEXT) {
+  if (el.nodeType === NODE_TYPE_TEXT) {
     return createText(el.textContent);
   }
 

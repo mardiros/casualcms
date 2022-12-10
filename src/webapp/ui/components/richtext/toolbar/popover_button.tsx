@@ -55,7 +55,7 @@ const ModalBox: React.FunctionComponent<ModalBoxProps> = ({
         borderWidth={0}
         fontSize={"20px"}
         onClick={onOpen}
-        isActive={isActive || false}
+        isActive={isActive}
       />
       <AlertDialog
         motionPreset="slideInBottom"

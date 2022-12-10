@@ -29,8 +29,8 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
     const hostname = formData.get("hostname") as string;
     const options = {
       root_page_path: formData.get("root_page_path") as string,
-      default: formData.get("default") == "true",
-      secure: formData.get("secure") == "true",
+      default: formData.get("default") === "true",
+      secure: formData.get("secure") === "true",
     };
     const siteResult = await config.api.site.createSite(
       auth.authenticatedUser?.token || "",

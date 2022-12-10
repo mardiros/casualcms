@@ -54,7 +54,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
       snippetTypeName || "",
       snippet
     );
-    navigate(`/admin/snippets`, { replace: true });
+    navigate("/admin/snippets", { replace: true });
   };
 
   const data = {};

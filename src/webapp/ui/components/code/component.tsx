@@ -52,13 +52,13 @@ export const CodeEditor: React.FunctionComponent<WidgetProps> = (
         variant="outline"
         size="md"
       >
-        <option value="python" selected={lang == "python"}>
+        <option value="python" selected={lang === "python"}>
           Python
         </option>
-        <option value="typescript" selected={lang == "typescript"}>
+        <option value="typescript" selected={lang === "typescript"}>
           Typescript
         </option>
-        <option value="bash" selected={lang == "bash"}>
+        <option value="bash" selected={lang === "bash"}>
           Bash
         </option>
       </Select>

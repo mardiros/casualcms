@@ -60,8 +60,8 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
     const site = {
       hostname: formData.get("hostname") as string,
       root_page_path: formData.get("root_page_path") as string,
-      default: formData.get("default") == "true",
-      secure: formData.get("secure") == "true",
+      default: formData.get("default") === "true",
+      secure: formData.get("secure") === "true",
     };
     const siteResult = await config.api.site.updateSite(
       auth.authenticatedUser?.token || "",

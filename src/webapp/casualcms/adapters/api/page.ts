@@ -87,8 +87,8 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
   ): AsyncApiResult<Draft> {
     // console.log(draft);
     const payload = { ...draft };
-    delete payload.type;
-    delete payload.path;
+    payload.type = undefined;
+    payload.path = undefined;
     // console.log(payload);
     const response = await this.fetch(`/api/drafts${path}`, {
       method: "PATCH",
@@ -109,7 +109,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     hostname: string,
     path: string
   ): AsyncApiResult<boolean> {
-    const response = await this.fetch(`/api/pages`, {
+    const response = await this.fetch("/api/pages", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${authntoken}`,

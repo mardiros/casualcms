@@ -41,7 +41,7 @@ export const SideBar: React.FunctionComponent<{}> = () => {
   const location = useLocation();
   if (
     location.pathname.startsWith("/admin/pages") ||
-    location.pathname == "/admin/"
+    location.pathname === "/admin/"
   ) {
     pagesColor = selectedColor;
   } else if (location.pathname.startsWith("/admin/sites")) {

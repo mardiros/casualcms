@@ -97,11 +97,11 @@ export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
           </Tr>
         </Thead>
         <Tbody>
-          {settingTypes.map((typ, i) => (
+          {settingTypes.map((typ) => (
             <SettingRow
               settingType={typ}
               settingUrl={settingsUrl[typ.key]}
-              key={i}
+              key={typ.key}
             />
           ))}
         </Tbody>

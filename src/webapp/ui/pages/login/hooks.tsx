@@ -4,8 +4,8 @@ import { Account } from "../../../casualcms/domain/model";
 
 interface IAuthContext {
   authenticatedUser: Account | null;
-  remember: (account: Account, callback: any) => void;
-  forget: (callback: any) => void;
+  remember: (account: Account, callback: () => void) => void;
+  forget: (callback: () => Promise<void>) => Promise<void>;
 }
 
 export const AuthContext = React.createContext<IAuthContext>(null!);

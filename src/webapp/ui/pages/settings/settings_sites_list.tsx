@@ -89,8 +89,8 @@ export const SettingSiteListTable: React.FunctionComponent<
           </Tr>
         </Thead>
         <Tbody>
-          {sites.map((site, i) => (
-            <SettingSiteRow site={site} key={i} />
+          {sites.map((site) => (
+            <SettingSiteRow site={site} key={site.hostname} />
           ))}
         </Tbody>
       </Table>

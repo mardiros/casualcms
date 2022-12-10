@@ -15,6 +15,7 @@ import {
   PartialSetting,
   Setting,
   SettingType,
+  Payload,
 } from "./model";
 
 export type ApiError = Map<string, string> | null;
@@ -43,7 +44,7 @@ export interface IPageApi {
   createDraft(
     authntoken: string,
     type: string,
-    payload: any,
+    payload: Payload,
     parent: string | null
   ): AsyncApiResult<boolean>;
   listDrafts(
@@ -91,7 +92,7 @@ export interface ISnippetApi {
   createSnippet(
     authntoken: string,
     type: string,
-    payload: any
+    payload: Payload
   ): AsyncApiResult<boolean>;
   listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]>;
   showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet>;
@@ -121,7 +122,7 @@ export interface ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: any
+    payload: Payload
   ): AsyncApiResult<boolean>;
   listSettings(
     authntoken: string,

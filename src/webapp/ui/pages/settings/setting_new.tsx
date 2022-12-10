@@ -10,6 +10,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { IChangeEvent } from "@rjsf/core";
 
 export const SettingNew: React.FunctionComponent<{}> = () => {
   let { hostname, settingKey } = useParams<string>();
@@ -47,7 +48,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     const setting = data.formData;
     await config.api.setting.createSetting(
       token,

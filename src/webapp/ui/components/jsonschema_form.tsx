@@ -12,15 +12,16 @@ const widgets = {
   code: CodeEditor,
 };
 
+// rome-ignore lint/suspicious/noExplicitAny: generic code that accept all payloads
 type FormProps<T = any, F = any> = {
   id: string;
   schema: RJSFSchema;
   uiSchema: UiSchema;
   formData: T;
-  onSubmit: (data: IChangeEvent<T, F>, event: React.FormEvent<any>) => void;
+  onSubmit: (data: IChangeEvent<T, F>, event: React.FormEvent) => void;
 };
 
-export const Form: React.FunctionComponent<FormProps<any>> = (
+export const Form: React.FunctionComponent<FormProps> = (
   props: FormProps
 ) => {
   const { id, schema, uiSchema, formData, onSubmit } = props;

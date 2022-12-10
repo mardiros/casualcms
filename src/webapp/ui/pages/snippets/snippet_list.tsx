@@ -99,8 +99,8 @@ export const SnippetListTable: React.FunctionComponent<
           </Tr>
         </Thead>
         <Tbody>
-          {snippets.map((snippet, i) => (
-            <SnippetRow snippet={snippet} key={i} />
+          {snippets.map((snippet) => (
+            <SnippetRow snippet={snippet} key={snippet.key} />
           ))}
         </Tbody>
       </Table>

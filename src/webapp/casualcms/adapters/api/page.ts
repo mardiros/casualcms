@@ -3,7 +3,7 @@ import { ok, err } from "neverthrow";
 import { AsyncApiResult, ApiError, IPageApi } from "casualcms/domain/ports";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
-import { PartialDraft, Draft } from "casualcms/domain/model";
+import { PartialDraft, Draft, Payload } from "casualcms/domain/model";
 
 export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async listDrafts(
@@ -27,10 +27,10 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async createDraft(
     authntoken: string,
     type: string,
-    payload: any,
+    payload: Payload,
     parent: string | null
   ): AsyncApiResult<boolean> {
-    let postBody: any = {
+    let postBody: Payload = {
       type: type,
       payload: payload,
     };

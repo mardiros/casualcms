@@ -99,8 +99,8 @@ export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
           </Tr>
         </Thead>
         <Tbody>
-          {sites.map((site, i) => (
-            <SiteRow site={site} key={i} />
+          {sites.map((site) => (
+            <SiteRow site={site} key={site.hostname} />
           ))}
         </Tbody>
       </Table>

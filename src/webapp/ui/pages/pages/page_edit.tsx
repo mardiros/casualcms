@@ -10,6 +10,7 @@ import { Loader } from "../../components/loader";
 import { PageBreadcrumb } from "../../components/breadcrumb";
 import { PageEditButtons } from "./page_publish";
 import { Form } from "../../components/jsonschema_form";
+import { IChangeEvent } from "@rjsf/core";
 
 export const PageEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -74,7 +75,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     };
   }, [auth, pagePath]);
 
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     if (!page) {
       return;
     }

@@ -12,6 +12,7 @@ import { SettingDeletePopoverForm } from "./settings_delete";
 // import { SettingBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { IChangeEvent } from "@rjsf/core";
 
 export const SettingEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -79,7 +80,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
     return <Loader label="Loading form..." />;
   }
 
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     const setting = data.formData;
     await config.api.setting.updateSetting(token, setting);
     navigate(`/admin/settings/${hostname}`, { replace: true });

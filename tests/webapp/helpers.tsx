@@ -33,8 +33,8 @@ export function FakeAuth(props: FakeAuthProps): React.ReactElement {
         };
 
   let [authenticatedUser, setUser] = React.useState<Account | null>(account);
-  let remember = (account: Account, callback: any) => {};
-  let forget = async (callback: () => Promise<boolean>) => {
+  let remember = (account: Account, callback: () => void) => {};
+  let forget = async (callback: () => Promise<void>) => {
     setUser(null);
     await callback();
   };

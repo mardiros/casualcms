@@ -1,7 +1,7 @@
 import { ok, err } from "neverthrow";
 
 import { BaseFetchApi, castError, FastApiError } from "./base";
-import { PartialSetting, Setting } from "../../domain/model";
+import { PartialSetting, Payload, Setting } from "../../domain/model";
 import { ApiError, AsyncApiResult, ISettingApi } from "../../domain/ports";
 
 export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
@@ -9,9 +9,9 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: any
+    payload: Payload
   ): AsyncApiResult<boolean> {
-    const setting: any = {
+    const setting = {
       key: key,
       payload: payload,
     };

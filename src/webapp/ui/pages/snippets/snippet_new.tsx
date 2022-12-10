@@ -10,6 +10,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { SnippetBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { IChangeEvent } from "@rjsf/core";
 
 export const SnippetNew: React.FunctionComponent<{}> = () => {
   let { snippetTypeName } = useParams<string>();
@@ -47,7 +48,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     const snippet = data.formData;
     await config.api.snippet.createSnippet(
       token,

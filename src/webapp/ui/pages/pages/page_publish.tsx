@@ -51,8 +51,8 @@ export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
     <>
       <CheckboxGroup>
         <Stack marginBottom={5} spacing={[5, 15]} direction={["column"]}>
-          {hostnames.map((hostname, i) => (
-            <SiteCheckBox key={i} hostname={hostname} />
+          {hostnames.map((hostname) => (
+            <SiteCheckBox key={hostname.hostname} hostname={hostname} />
           ))}
         </Stack>
       </CheckboxGroup>
@@ -84,8 +84,8 @@ export const PublishResultBox: React.FunctionComponent<
   return (
     <Box>
       <Stack p={4} spacing={4} direction="column" bg={"cyan.200"}>
-        {hostnames.map((hostname, i) => (
-          <Box key={i} role="publication_result">
+        {hostnames.map((hostname) => (
+          <Box key={hostname.hostname} role="publication_result">
             {
               {
                 true: (

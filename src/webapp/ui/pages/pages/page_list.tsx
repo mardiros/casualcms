@@ -181,8 +181,8 @@ export const PageListTable: React.FunctionComponent<PageListTableProps> = (
             </Tr>
           </Thead>
           <Tbody>
-            {subPages.map((page, i) => (
-              <PageRow page={page} key={i} />
+            {subPages.map((page) => (
+              <PageRow page={page} key={page.metadata.path} />
             ))}
           </Tbody>
         </Table>

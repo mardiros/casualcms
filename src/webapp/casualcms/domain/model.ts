@@ -1,5 +1,8 @@
 import { RJSFSchema, UiSchema } from "@rjsf/utils";
 
+// rome-ignore lint/suspicious/noExplicitAny: a dynamic type based on json schema
+export  type Payload<T = any> = Record<string, T>
+
 export type Account = {
   id: string;
   username: string;
@@ -48,8 +51,7 @@ export type PageMeta = {
 
 export type Draft = {
   metadata: PageMeta;
-  [k: string]: any;
-};
+} & Payload;
 
 export type PartialSite = {
   hostname: string;
@@ -79,8 +81,8 @@ export type PartialSnippetType = {
 
 export type SnippetType = {
   // type:string;
-  schema: JSONSchema7;
-  uiSchema: any;
+  schema: RJSFSchema;
+  uiSchema: UiSchema;
 };
 
 export type PartialSettingType = {
@@ -95,8 +97,8 @@ export type PartialSettingMetadata = {
 
 export type SettingType = {
   // key:string;
-  schema: JSONSchema7;
-  uiSchema: any;
+  schema: RJSFSchema;
+  uiSchema: UiSchema;
 };
 
 export type PartialSetting = {
@@ -105,5 +107,4 @@ export type PartialSetting = {
 
 export type Setting = {
   metadata: PartialSettingMetadata;
-  [k: string]: any;
-};
+} & Payload;

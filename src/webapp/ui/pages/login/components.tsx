@@ -22,12 +22,12 @@ export function AuthProvider({
   children: React.ReactNode;
 }): React.ReactElement {
   let [authenticatedUser, setUser] = React.useState<Account | null>(null);
-  let remember = (account: Account, callback: any) => {
+  let remember = (account: Account, callback: () => void) => {
     setUser(account);
     callback();
   };
 
-  let forget = async (callback: () => Promise<boolean>) => {
+  let forget = async (callback: () => Promise<void>) => {
     setUser(null);
     await callback();
   };
@@ -55,7 +55,7 @@ export function RequireAuth({
           .map((account: Account) => {
             auth.remember(account, () => {});
           })
-          .mapErr((err: any) => {
+          .mapErr(() => {
             setAuthError(true);
           });
       }

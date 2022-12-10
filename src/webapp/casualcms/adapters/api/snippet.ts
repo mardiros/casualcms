@@ -1,7 +1,7 @@
 import { ok, err } from "neverthrow";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
-import { PartialSnippet, Snippet } from "../../domain/model";
+import { PartialSnippet, Payload, Snippet } from "../../domain/model";
 import { ApiError, AsyncApiResult, ISnippetApi } from "../../domain/ports";
 
 export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
@@ -38,9 +38,9 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async createSnippet(
     authntoken: string,
     type: string,
-    payload: any
+    payload: Payload
   ): AsyncApiResult<boolean> {
-    let postBody: any = {
+    let postBody = {
       type: type,
       payload: payload,
     };

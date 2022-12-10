@@ -16,6 +16,7 @@ import {
   PartialSetting,
   Setting,
   SettingType,
+  Payload,
 } from "../../src/webapp/casualcms/domain/model";
 import {
   ApiError,
@@ -125,7 +126,7 @@ class FakePageApi implements IPageApi {
   async createDraft(
     authntoken: string,
     type: string,
-    payload: any,
+    payload: Payload,
     parent: string | null
   ): AsyncApiResult<boolean> {
     const titles: Record<string, string> = {
@@ -335,12 +336,8 @@ export class FakeSnippetApi implements ISnippetApi {
   async createSnippet(
     authntoken: string,
     type: string,
-    payload: any
+    payload: Snippet,
   ): AsyncApiResult<boolean> {
-    let postBody: any = {
-      type: type,
-      payload: payload,
-    };
     const titles: Record<string, string> = {
       "blog:HeaderSnippet": "Header Snippet",
       "blog:FooterSnippet": "Footer Snippet",
@@ -438,7 +435,7 @@ export class FakeSettingApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: any
+    payload: Payload
   ): AsyncApiResult<boolean> {
     const setting = {
       metadata: { hostname: hostname, key: key },

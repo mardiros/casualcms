@@ -1,3 +1,4 @@
+import React from "react";
 import { Breadcrumb, BreadcrumbItem, Icon } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
 import { Draft, Setting, Site, Snippet } from "../../casualcms/domain/model";
@@ -45,8 +46,8 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
           <Icon as={HomeIcon} />
         </Link>
       </BreadcrumbItem>
-      {page?.metadata.breadcrumb.items.map((item, i) => (
-          <BreadcrumbItem key={i}>
+      {page?.metadata.breadcrumb.items.map((item) => (
+          <BreadcrumbItem key={item.path}>
             <Link
               to={`/admin/pages/?${new URLSearchParams({
                 parent: item.path,

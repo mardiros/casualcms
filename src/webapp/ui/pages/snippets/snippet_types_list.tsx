@@ -44,8 +44,8 @@ export const SnippetTypesTable: React.FunctionComponent<
           </Tr>
         </Thead>
         <Tbody>
-          {snippetTypes.map((typ, i) => (
-            <Tr key={i}>
+          {snippetTypes.map((typ) => (
+            <Tr key={typ.type}>
               <Td>
                 <Link to={`/admin/snippets/new/${typ.type}`}>
                   <Icon as={ChevronRightIcon} w={6} h={6} />

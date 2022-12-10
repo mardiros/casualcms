@@ -11,6 +11,7 @@ import { SnippetBreadcrumb } from "../../components/breadcrumb";
 import { SnippetDeletePopoverForm } from "./snippet_delete";
 import { Form } from "../../components/jsonschema_form";
 import { DownloadIcon } from "@chakra-ui/icons";
+import { IChangeEvent } from "@rjsf/core";
 
 export const SnippetEdit: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
@@ -69,7 +70,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     const snippet = data.formData;
     await config.api.snippet.updateSnippet(token, snippetKey, snippet);
     navigate("/admin/snippets", { replace: true });

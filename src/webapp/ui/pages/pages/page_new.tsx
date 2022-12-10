@@ -10,6 +10,7 @@ import { ApiErrorUI } from "../../components/error_api";
 import { PageBreadcrumb } from "../../components/breadcrumb";
 import { Form } from "../../components/jsonschema_form";
 import { AddIcon } from "@chakra-ui/icons";
+import { IChangeEvent } from "@rjsf/core";
 
 export const PageNew: React.FunctionComponent<{}> = () => {
   // console.log("-------------------------------------------")
@@ -72,7 +73,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   if (isLoading) {
     return <Loader label="Loading form..." />;
   }
-  const onsubmit = async (data: any) => {
+  const onsubmit = async (data: IChangeEvent) => {
     const page = data.formData;
     await config.api.page.createDraft(
       token,

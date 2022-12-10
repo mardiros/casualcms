@@ -24,11 +24,11 @@ describe("As a user, I can edit existing snippet", () => {
   it("<SnippetEdit />: Load the snippet in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/snippets/snippetTypeName" element={<SnippetList />}></Route>
+        <Route path="/admin/snippets/snippetTypeName" element={<SnippetList />} />
         <Route
           path="/admin/snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
-        ></Route>
+        />
       </>,
       "/admin/snippets/edit/blog:HeaderSnippet/header",
     );
@@ -45,11 +45,11 @@ describe("As a user, I can edit existing snippet", () => {
   it("<SnippetEdit />: Update snippet using the edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/snippets" element={<SnippetList />}></Route>
+        <Route path="/admin/snippets" element={<SnippetList />} />
         <Route
           path="/admin/snippets/edit/:snippetTypeName/:snippetKey"
           element={<SnippetEdit />}
-        ></Route>
+        />
       </>,
       "/admin/snippets/edit/blog:HeaderSnippet/header",
     );

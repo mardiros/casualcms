@@ -48,7 +48,7 @@ export const waitForPath = async (path: string): Promise<HTMLElement> => {
     (): HTMLElement => {
       let loc = screen.getByTestId("location-display");
 
-      if (loc.innerHTML != path) {
+      if (loc.innerHTML !== path) {
         throw Error(`Path not ready: ${loc.innerHTML} (expected ${path})`);
       }
       return loc;

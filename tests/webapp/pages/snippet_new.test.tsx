@@ -13,8 +13,8 @@ describe("As a user, I can list snippet", () => {
         <Route
           path="/admin/snippets/new/:snippetTypeName"
           element={<SnippetNew />}
-        ></Route>
-        <Route path="/admin/snippets" element={<div>Snippet list</div>}></Route>
+        />
+        <Route path="/admin/snippets" element={<div>Snippet list</div>} />
       </>,
       "/admin/snippets/new/blog:HeaderSnippet",
     );

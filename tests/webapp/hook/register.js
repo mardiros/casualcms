@@ -20,9 +20,7 @@ virtualConsole.on("log", (message) => {
 export default function installGlobalEnvironment(options = {}) {
   // Idempotency
   if (
-    global.navigator &&
-    global.navigator.userAgent &&
-    global.navigator.userAgent.includes("Node.js") &&
+    global.navigator?.userAgent?.includes("Node.js") &&
     global.document &&
     typeof global.document.destroy === "function"
   ) {
@@ -64,7 +62,7 @@ export default function installGlobalEnvironment(options = {}) {
   // add access to our jsdom instance
   global.$jsdom = jsdom;
 
-  const cleanup = () => KEYS.forEach((key) => delete global[key]);
+  const cleanup = () => KEYS.forEach((key) => global[key] = undefined);
 
   document.destroy = cleanup;
 

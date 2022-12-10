@@ -36,7 +36,7 @@ import { IApi } from "../../src/webapp/casualcms/service/api";
 
 class FakeAccountApi implements IAccountApi {
   async byCredentials(creds: Credentials): AsyncApiResult<Account> {
-    if (creds.password != "itsmysecret") {
+    if (creds.password !== "itsmysecret") {
       let errMap = new Map();
       errMap.set("username", "Invalid username or password");
       return err(errMap);
@@ -66,7 +66,7 @@ class FakePageTypeApi implements IPageTypeApi {
     ]);
   }
   async showPageType(authntoken: string, pageType: string): AsyncApiResult<PageType> {
-    if (pageType == "casual:HomePage") {
+    if (pageType === "casual:HomePage") {
       return ok({
         uiSchema: {
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
@@ -87,7 +87,7 @@ class FakePageTypeApi implements IPageTypeApi {
       });
     }
 
-    if (pageType == "casual:SectionPage") {
+    if (pageType === "casual:SectionPage") {
       return ok({
         uiSchema: {
           slug: { "ui:widget": "text", "ui:placeholder": "slug" },
@@ -152,7 +152,7 @@ class FakePageApi implements IPageApi {
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
         const pathLen = page.metadata.path.split("/").length;
-        return page.metadata.path.startsWith(starter) && pathLen == startLen + 1;
+        return page.metadata.path.startsWith(starter) && pathLen === startLen + 1;
       })
       .map((page) =>
         pages.push({
@@ -172,7 +172,7 @@ class FakePageApi implements IPageApi {
     let pages: Draft[] = [];
     this.pages
       .filter((page) => {
-        return page.metadata.path == path;
+        return page.metadata.path === path;
       })
       .map((page) => pages.push(page));
     if (pages.length) {
@@ -196,7 +196,7 @@ class FakePageApi implements IPageApi {
   ): AsyncApiResult<Draft> {
     let oldPage: any | null = null;
     const pages: any[] = [];
-    this.pages.map((p) => (p.path == path ? (oldPage = p) : pages.push(page)));
+    this.pages.map((p) => (p.path === path ? (oldPage = p) : pages.push(page)));
     if (pages.length) {
       const newPage = { ...oldPage, ...page };
       const newPath: string[] = newPage.metadata.path.split("/");
@@ -219,7 +219,7 @@ class FakePageApi implements IPageApi {
   }
   async deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean> {
     const pages = this.pages.filter((page: PartialDraft) => {
-      return page.metadata.path != path;
+      return page.metadata.path !== path;
     });
     this.pages = pages;
     return ok(true);
@@ -245,7 +245,7 @@ export class FakeSiteApi implements ISiteApi {
 
   async deleteSite(authntoken: string, hostname: string): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
-      return site.hostname != hostname;
+      return site.hostname !== hostname;
     });
     this.sites = sites;
     return ok(true);
@@ -257,7 +257,7 @@ export class FakeSiteApi implements ISiteApi {
     site: Site,
   ): AsyncApiResult<boolean> {
     const sites = this.sites.filter((site: PartialSite) => {
-      return site.hostname != hostname;
+      return site.hostname !== hostname;
     });
     sites.push(site);
     this.sites = sites;
@@ -270,7 +270,7 @@ export class FakeSiteApi implements ISiteApi {
     let res: Result<Site, ApiError> = err(errors);
 
     this.sites.filter((site: PartialSite) => {
-      if (site.hostname == hostname) {
+      if (site.hostname === hostname) {
         res = ok(site);
       }
     });
@@ -300,7 +300,7 @@ export class FakeSnippetApi implements ISnippetApi {
   ): AsyncApiResult<boolean> {
     const typ = snippet.metadata.type;
     let snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.key != key;
+      return snippet.key !== key;
     });
     snippets.push(snippet);
     this.snippets = snippets;
@@ -309,9 +309,9 @@ export class FakeSnippetApi implements ISnippetApi {
 
   async showSnippet(authntoken: string, key: string): AsyncApiResult<Snippet> {
     const snippets = this.snippets.filter((snippet: PartialSnippet) => {
-      return snippet.key == key;
+      return snippet.key === key;
     });
-    if (snippets.length == 1) {
+    if (snippets.length === 1) {
       return ok(snippets[0]);
     }
     let apiError = new Map();
@@ -334,7 +334,7 @@ export class FakeSnippetApi implements ISnippetApi {
   }
   async deleteSnippet(authntoken: string, snippet: Snippet): AsyncApiResult<boolean> {
     const snippets = this.snippets.filter((s: PartialSnippet) => {
-      return s.key != snippet.key;
+      return s.key !== snippet.key;
     });
     this.snippets = snippets;
     return ok(true);
@@ -405,7 +405,7 @@ export class FakeSettingApi implements ISettingApi {
   ): AsyncApiResult<PartialSetting[]> {
     const settings: PartialSetting[] = [];
     this.settings.map((s) => {
-      if (s.metadata.hostname == hostname) {
+      if (s.metadata.hostname === hostname) {
         settings.push({ metadata: s.metadata });
       }
     });
@@ -431,11 +431,11 @@ export class FakeSettingApi implements ISettingApi {
     key: string,
   ): AsyncApiResult<Setting> {
     const settings = this.settings.map((s) => {
-      if (s.metadata.hostname == hostname && s.metadata.key == key) {
+      if (s.metadata.hostname === hostname && s.metadata.key === key) {
         return ok(s);
       }
     });
-    if (settings && settings[0]) {
+    if (settings?.[0]) {
       return settings[0];
     }
     let errMap = new Map();
@@ -447,8 +447,8 @@ export class FakeSettingApi implements ISettingApi {
     const settings: Setting[] = [];
     this.settings.map((s) => {
       if (
-        s.metadata.hostname != s.metadata.hostname ||
-        s.metadata.key != setting.metadata.key
+        s.metadata.hostname !== s.metadata.hostname ||
+        s.metadata.key !== setting.metadata.key
       ) {
         settings.push(s);
       }
@@ -462,7 +462,7 @@ export class FakeSettingApi implements ISettingApi {
     const key = setting.metadata.key;
     const hostname = setting.metadata.hostname;
     const settings = this.settings.filter((s: any) => {
-      return s.metadata.hostname != hostname || s.metadata.key != key;
+      return s.metadata.hostname !== hostname || s.metadata.key !== key;
     });
     this.settings = settings;
     return ok(true);

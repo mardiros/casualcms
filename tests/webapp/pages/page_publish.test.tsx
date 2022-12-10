@@ -117,7 +117,7 @@ describe("As a user, I can publish existing pages", () => {
               onClose={onClose}
             />
           }
-        ></Route>
+        />
       </>,
       "/admin/pages",
     );
@@ -148,7 +148,7 @@ describe("As a user, I can publish existing pages", () => {
         <Route
           path="/admin/pages"
           element={<SiteCheckBox hostname={hostname} />}
-        ></Route>
+        />
       </>,
       "/admin/pages",
     );
@@ -169,7 +169,7 @@ describe("As a user, I can publish existing pages", () => {
         <Route
           path="/admin/pages"
           element={<SiteCheckBox hostname={hostname} />}
-        ></Route>
+        />
       </>,
       "/admin/pages",
     );
@@ -183,7 +183,7 @@ describe("As a user, I can publish existing pages", () => {
         <Route
           path="/admin/pages"
           element={<PublishButton token="x" pagePath="/home" />}
-        ></Route>
+        />
       </>,
       "/admin/pages",
     );
@@ -216,7 +216,7 @@ describe("As a user, I can publish existing pages", () => {
         <Route
           path="/admin/pages"
           element={<PublishButton token="x" pagePath="/home" />}
-        ></Route>
+        />
       </>,
       "/admin/pages",
     );

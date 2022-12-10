@@ -40,8 +40,8 @@ describe("As a user, I can edit existing pages", () => {
   it("<PageEdit />: Load the root page in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/pages" element={<PageList />}></Route>
-        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages" element={<PageList />} />
+        <Route path="/admin/pages/edit" element={<PageEdit />} />
       </>,
       "/admin/pages/edit?page=/home",
     );
@@ -56,8 +56,8 @@ describe("As a user, I can edit existing pages", () => {
   it("<PageEdit />: Load the subpage page in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/pages" element={<PageList />}></Route>
-        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages" element={<PageList />} />
+        <Route path="/admin/pages/edit" element={<PageEdit />} />
       </>,
       "/admin/pages/edit?page=/home/sub0",
     );
@@ -75,7 +75,7 @@ describe("As a user, I can edit existing pages", () => {
   it("<PageEdit />: Update the root page using the edition form", async () => {
     renderWithRouterWithTheme(
       <>
-        <Route path="/admin/pages/edit" element={<PageEdit />}></Route>
+        <Route path="/admin/pages/edit" element={<PageEdit />} />
       </>,
       "/admin/pages/edit?page=/home",
     );

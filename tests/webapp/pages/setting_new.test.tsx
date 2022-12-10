@@ -13,11 +13,11 @@ describe("As a user, I can list setting", () => {
         <Route
           path="/admin/settings/:hostname/:settingKey/new"
           element={<SettingNew />}
-        ></Route>
+        />
         <Route
           path="/admin/settings/:hostname"
           element={<div>Settings list</div>}
-        ></Route>
+        />
       </>,
       "/admin/settings/www.localhost/blog:contact/new",
     );

@@ -28,8 +28,8 @@ describe("As a user, I can edit existing sites", () => {
   it("Load the site in an edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/sites" element={<SiteList />}></Route>
-        <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
+        <Route path="/admin/sites" element={<SiteList />} />
+        <Route path="/admin/sites/edit" element={<SiteEdit />} />
       </>,
       "/admin/sites/edit?hostname=www.localhost",
     );
@@ -41,8 +41,8 @@ describe("As a user, I can edit existing sites", () => {
   it("Update the site using the edition form", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/sites" element={<SiteList />}></Route>
-        <Route path="/admin/sites/edit" element={<SiteEdit />}></Route>
+        <Route path="/admin/sites" element={<SiteList />} />
+        <Route path="/admin/sites/edit" element={<SiteEdit />} />
       </>,
       "/admin/sites/edit?hostname=www.localhost",
     );

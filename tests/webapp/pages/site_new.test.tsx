@@ -27,8 +27,8 @@ describe("As a user, I can create a new site", () => {
   it("<SiteNew />: Create a site", async () => {
     renderWithRouter(
       <>
-        <Route path="/admin/sites/new" element={<SiteNew />}></Route>
-        <Route path="/admin/sites" element={<h4>Site list</h4>}></Route>
+        <Route path="/admin/sites/new" element={<SiteNew />} />
+        <Route path="/admin/sites" element={<h4>Site list</h4>} />
       </>,
       "/admin/sites/new",
     );

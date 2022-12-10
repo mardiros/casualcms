@@ -70,18 +70,26 @@ export const waitForLoadingLabel = async (spinner_label: string): Promise<boolea
   return resp;
 };
 
-export class ErrorBoundary extends React.Component<{ children: any }> {
+interface Props {
+  children?: React.ReactNode;
+}
+
+interface State {
+  hasError: boolean;
+}
+
+export class ErrorBoundary extends React.Component<Props, State> {
   state: { hasError: boolean };
-  constructor(props: any) {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: any) {
+  static getDerivedStateFromError(error: Error): State {
     // Update state so the next render will show the fallback UI.
     return { hasError: true };
   }
-  componentDidCatch(error: any, errorInfo: any) {
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // You can also log the error to an error reporting service
     console.log({ error, errorInfo });
   }

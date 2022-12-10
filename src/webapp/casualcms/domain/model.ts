@@ -46,6 +46,7 @@ export type BreadCrumb = {
 export type PageMeta = {
   path: string;
   type: string;
+  title: string;
   breadcrumb: BreadCrumb;
 };
 

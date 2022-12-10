@@ -67,7 +67,7 @@ describe("As a user, I can edit existing snippet", () => {
 
     const snippet = await config.api.snippet.showSnippet("", "header");
     expect(snippet.isOk()).equal(true);
-    const snip = snippet.unwrapOr({ title: "" }) as any;
+    const snip = snippet.unwrapOr({ title: "" });
     expect(snip.title).equal("New Value");
   });
 });

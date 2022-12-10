@@ -2,7 +2,7 @@ package := 'casualcms'
 default_test_suite := 'tests/unittests'
 default_functest_suite := 'tests/functionals/'
 
-fmt: black prettier
+fmt: black jsfmt
 
 test: flake8 mypy pytest jstest functest
 
@@ -16,9 +16,8 @@ cleandoc:
 clean_frontend:
     rm -rf src/casualcms/ui/webapp_compiled/*.*
 
-prettier:
+jsfmt:
     npx rome format --write src/webapp tests/webapp/
-    ./node_modules/.bin/prettier --loglevel warn --write src/webapp/ tests/webapp/
 
 flake8:
     poetry run flake8 && echo "$(tput setaf 10)Success: no lint issue$(tput setaf 7)"
@@ -36,6 +35,9 @@ pytest test_suite=default_test_suite:
 jscov:
     npm run cov
     firefox coverage/index.html
+
+jslint:
+    npx rome check src/webapp tests/webapp
 
 jstest:
     npm run test

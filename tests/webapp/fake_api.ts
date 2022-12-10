@@ -1,5 +1,4 @@
-import { err, Ok, ok, Result } from "neverthrow";
-import { string } from "prop-types";
+import { err, ok, Result } from "neverthrow";
 import {
   Account,
   PartialPageType,
@@ -115,7 +114,7 @@ class FakePageTypeApi implements IPageTypeApi {
 }
 
 class FakePageApi implements IPageApi {
-  pages: any[];
+  pages: Draft[];
 
   constructor() {
     this.pages = [];
@@ -136,7 +135,7 @@ class FakePageApi implements IPageApi {
       path: `${parent || ""}/${payload.slug}`,
       breadcrumb: { items: [] },
     };
-    this.pages.push(payload);
+    this.pages.push(payload as Draft);
     return ok(true);
   }
 
@@ -147,7 +146,7 @@ class FakePageApi implements IPageApi {
     let pages: PartialDraft[] = [];
 
     this.pages
-      .filter((page: PartialDraft) => {
+      .filter((page: Draft) => {
         let starter = parent || "";
         starter = starter.replace(/\\(.)/gm, "$1");
         const startLen = starter.split("/").length;
@@ -194,11 +193,11 @@ class FakePageApi implements IPageApi {
     path: string,
     page: Draft,
   ): AsyncApiResult<Draft> {
-    let oldPage: any | null = null;
-    const pages: any[] = [];
+    let oldPage: Draft | null = null;
+    const pages: Draft[] = [];
     this.pages.map((p) => (p.path === path ? (oldPage = p) : pages.push(page)));
-    if (pages.length) {
-      const newPage = { ...oldPage, ...page };
+    if (oldPage !== null) {
+      const newPage = { ...(oldPage as Draft), ...page };
       const newPath: string[] = newPage.metadata.path.split("/");
       newPath[newPath.length - 1] = page.slug;
       newPage.metadata.path = newPath.join("/");
@@ -218,7 +217,7 @@ class FakePageApi implements IPageApi {
     return ok(true);
   }
   async deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean> {
-    const pages = this.pages.filter((page: PartialDraft) => {
+    const pages = this.pages.filter((page: Draft) => {
       return page.metadata.path !== path;
     });
     this.pages = pages;
@@ -461,7 +460,7 @@ export class FakeSettingApi implements ISettingApi {
   async deleteSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean> {
     const key = setting.metadata.key;
     const hostname = setting.metadata.hostname;
-    const settings = this.settings.filter((s: any) => {
+    const settings = this.settings.filter((s: Setting) => {
       return s.metadata.hostname !== hostname || s.metadata.key !== key;
     });
     this.settings = settings;

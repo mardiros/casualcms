@@ -46,7 +46,7 @@ describe("Convert SlateModel to HTML", () => {
   });
 
   it("Rebuild html title and paragraph", () => {
-    const model: any = [
+    const model: SlateModel = [
       {
         type: "h1",
         children: [

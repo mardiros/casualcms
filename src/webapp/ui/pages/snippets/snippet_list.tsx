@@ -34,23 +34,19 @@ type SnippetListTableProps = {
 };
 
 export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
-  props: SnippetRowProps
+  props: SnippetRowProps,
 ) => {
   const snippet = props.snippet;
   return (
     <Tr>
       <Td>
-        <Link
-          to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}
-        >
+        <Link to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}>
           {snippet.key}
         </Link>
       </Td>
       <Td>{snippet.metadata.title}</Td>
       <Td>
-        <Link
-          to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}
-        >
+        <Link to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}>
           <Icon as={EditIcon} marginEnd={2} />
           Edit
         </Link>
@@ -59,9 +55,9 @@ export const SnippetRow: React.FunctionComponent<SnippetRowProps> = (
   );
 };
 
-export const SnippetListTable: React.FunctionComponent<
-  SnippetListTableProps
-> = (props: SnippetListTableProps) => {
+export const SnippetListTable: React.FunctionComponent<SnippetListTableProps> = (
+  props: SnippetListTableProps,
+) => {
   const { config, token } = props;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [snippets, setSnippets] = React.useState<PartialSnippet[]>([]);
@@ -109,9 +105,9 @@ export const SnippetListTable: React.FunctionComponent<
 };
 
 type SnippetListButtonsProps = {};
-export const SnippetListButtons: React.FunctionComponent<
-  SnippetListButtonsProps
-> = (props: SnippetListButtonsProps) => {
+export const SnippetListButtons: React.FunctionComponent<SnippetListButtonsProps> = (
+  props: SnippetListButtonsProps,
+) => {
   let navigate = useNavigate();
   return (
     <Stack p={4} spacing={4} direction="row" align="right">

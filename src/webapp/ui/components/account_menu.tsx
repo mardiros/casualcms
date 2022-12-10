@@ -17,7 +17,7 @@ type AccountMenuProps = {
 };
 
 export const AccountMenu: React.FunctionComponent<AccountMenuProps> = (
-  props: AccountMenuProps
+  props: AccountMenuProps,
 ): React.ReactElement => {
   const config = useConfig();
   const auth = useAuth();

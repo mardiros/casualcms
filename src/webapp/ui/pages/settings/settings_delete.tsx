@@ -30,7 +30,5 @@ export const SettingDeletePopoverForm: React.FunctionComponent<
     }
   }, [confirmed]);
 
-  return (
-    <DeletePopoverForm button_label="Delete this setting" onSubmit={onSubmit} />
-  );
+  return <DeletePopoverForm button_label="Delete this setting" onSubmit={onSubmit} />;
 };

@@ -4,8 +4,6 @@ type LoaderProps = {
   label: string;
 };
 
-export const Loader: React.FunctionComponent<LoaderProps> = (
-  props: LoaderProps
-) => {
+export const Loader: React.FunctionComponent<LoaderProps> = (props: LoaderProps) => {
   return <Spinner label={props.label} />;
 };

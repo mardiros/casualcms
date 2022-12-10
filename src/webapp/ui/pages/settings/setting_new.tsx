@@ -18,9 +18,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
   const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [settingType, setSettingType] = React.useState<SettingType | null>(
-    null
-  );
+  const [settingType, setSettingType] = React.useState<SettingType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
@@ -28,7 +26,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
     async function loadType() {
       const rtyp = await config.api.settingType.showSettingType(
         token,
-        settingKey || ""
+        settingKey || "",
       );
       rtyp
         .map((typ: SettingType) => setSettingType(typ))
@@ -54,7 +52,7 @@ export const SettingNew: React.FunctionComponent<{}> = () => {
       token,
       hostname || "",
       settingKey || "",
-      setting
+      setting,
     );
     navigate(`/admin/settings/${hostname}`, { replace: true });
   };

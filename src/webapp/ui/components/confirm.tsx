@@ -21,7 +21,7 @@ type ConfirmDeleteProps = {
 };
 
 const ConfirmDelete: React.FunctionComponent<ConfirmDeleteProps> = (
-  props: ConfirmDeleteProps
+  props: ConfirmDeleteProps,
 ) => {
   return (
     <Box>
@@ -45,18 +45,13 @@ type DeletePopoverFormProps = {
   onSubmit: MouseEventHandler<HTMLButtonElement>;
 };
 
-export const DeletePopoverForm: React.FunctionComponent<
-  DeletePopoverFormProps
-> = (props: DeletePopoverFormProps) => {
+export const DeletePopoverForm: React.FunctionComponent<DeletePopoverFormProps> = (
+  props: DeletePopoverFormProps,
+) => {
   const { onOpen, onClose, isOpen } = useDisclosure();
 
   return (
-    <Popover
-      isOpen={isOpen}
-      onOpen={onOpen}
-      onClose={onClose}
-      placement="right"
-    >
+    <Popover isOpen={isOpen} onOpen={onOpen} onClose={onClose} placement="right">
       <PopoverTrigger>
         <Button colorScheme="red" leftIcon={<DeleteIcon />}>
           {props.button_label}

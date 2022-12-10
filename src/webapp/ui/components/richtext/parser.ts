@@ -3,7 +3,7 @@ const NODE_TYPE_TEXT = 3;
 
 export const createText = (
   text: string | null,
-  attrs?: { [key: string]: boolean }
+  attrs?: { [key: string]: boolean },
 ): TypedText => {
   return {
     type: "TEXT",
@@ -15,10 +15,7 @@ export const createText = (
   };
 };
 
-export const createNode = (
-  type: NodeType,
-  children: SlateModel = []
-): TypedNode => {
+export const createNode = (type: NodeType, children: SlateModel = []): TypedNode => {
   const ret: TypedNode = {
     type: type,
     children: children,

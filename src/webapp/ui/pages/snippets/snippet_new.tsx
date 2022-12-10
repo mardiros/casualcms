@@ -18,9 +18,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
   const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(
-    null
-  );
+  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
@@ -28,7 +26,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
     async function loadType() {
       const rtyp = await config.api.snippetType.showSnippetType(
         token,
-        snippetTypeName || ""
+        snippetTypeName || "",
       );
       rtyp
         .map((typ: SnippetType) => setSnippetType(typ))
@@ -50,11 +48,7 @@ export const SnippetNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: IChangeEvent) => {
     const snippet = data.formData;
-    await config.api.snippet.createSnippet(
-      token,
-      snippetTypeName || "",
-      snippet
-    );
+    await config.api.snippet.createSnippet(token, snippetTypeName || "", snippet);
     navigate("/admin/snippets", { replace: true });
   };
 

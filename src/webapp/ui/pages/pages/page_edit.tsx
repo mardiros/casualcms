@@ -24,9 +24,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
   const pagePath = params.get("page") || "";
   const pagePathSplit = pagePath.split("/");
   pagePathSplit.pop();
-  const parentPath: string = pagePathSplit.length
-    ? pagePathSplit.join("/")
-    : "";
+  const parentPath: string = pagePathSplit.length ? pagePathSplit.join("/") : "";
   const q = parentPath
     ? new URLSearchParams({ parent: parentPath })
     : new URLSearchParams();
@@ -37,10 +35,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
       if (!page) {
         return;
       }
-      const rtyp = await config.api.pageType.showPageType(
-        token,
-        page.metadata.type
-      );
+      const rtyp = await config.api.pageType.showPageType(token, page.metadata.type);
       // console.log(rtyp);
       rtyp
         .map((typ: PageType) => setPageType(typ))
@@ -62,9 +57,7 @@ export const PageEdit: React.FunctionComponent<{}> = () => {
     async function loadPage() {
       const page = await config.api.page.showDraft(token, pagePath || "");
       // console.log(page)
-      page
-        .map((page: Draft) => setPage(page))
-        .mapErr((err: ApiError) => setError(err));
+      page.map((page: Draft) => setPage(page)).mapErr((err: ApiError) => setError(err));
     }
     if (token) {
       loadPage();

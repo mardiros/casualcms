@@ -9,9 +9,7 @@ export const PagePreview: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const config = useConfig();
   const token = auth.authenticatedUser?.token || "";
-  const [previewContent, setPreviewContent] = React.useState<string | null>(
-    null
-  );
+  const [previewContent, setPreviewContent] = React.useState<string | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [params, setParams] = useSearchParams();

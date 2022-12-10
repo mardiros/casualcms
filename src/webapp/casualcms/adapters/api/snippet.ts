@@ -38,7 +38,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async createSnippet(
     authntoken: string,
     type: string,
-    payload: Payload
+    payload: Payload,
   ): AsyncApiResult<boolean> {
     let postBody = {
       type: type,
@@ -62,7 +62,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
   async updateSnippet(
     authntoken: string,
     slug: string,
-    snippet: Snippet
+    snippet: Snippet,
   ): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/snippets/${slug}`, {
       method: "PATCH",
@@ -79,10 +79,7 @@ export class FetchSnippetApi extends BaseFetchApi implements ISnippetApi {
     return ok(true);
   }
 
-  async deleteSnippet(
-    authntoken: string,
-    snippet: Snippet
-  ): AsyncApiResult<boolean> {
+  async deleteSnippet(authntoken: string, snippet: Snippet): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/snippets/${snippet.key}`, {
       method: "DELETE",
       headers: {

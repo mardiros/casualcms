@@ -35,26 +35,24 @@ const withInlines = (editor: MyEditor) => {
 };
 
 export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
-  props: WidgetProps
+  props: WidgetProps,
 ) => {
   const { options, value, onChange } = props;
   const features = options.features as FeatureType[];
   const editor = React.useMemo(
     () => withInlines(withHistory(withReact(createEditor()))),
-    []
+    [],
   );
 
   const renderElement = React.useCallback(
     (props: RenderElementProps) => (
       <MyRenderElement {...(props as MyRenderElementProps)} />
     ),
-    []
+    [],
   );
   const renderLeaf = React.useCallback(
-    (props: RenderLeafProps) => (
-      <MyRenderLeaf {...(props as MyRenderLeafProps)} />
-    ),
-    []
+    (props: RenderLeafProps) => <MyRenderLeaf {...(props as MyRenderLeafProps)} />,
+    [],
   );
 
   let isSaving: NodeJS.Timeout | null = null;

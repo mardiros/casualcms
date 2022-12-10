@@ -31,7 +31,5 @@ export const SnippetDeletePopoverForm: React.FunctionComponent<
     }
   }, [confirmed]);
 
-  return (
-    <DeletePopoverForm button_label="Delete this snippet" onSubmit={onSubmit} />
-  );
+  return <DeletePopoverForm button_label="Delete this snippet" onSubmit={onSubmit} />;
 };

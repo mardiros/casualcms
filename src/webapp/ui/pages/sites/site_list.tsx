@@ -34,9 +34,7 @@ type SiteListTableProps = {
   token: string;
 };
 
-export const SiteRow: React.FunctionComponent<SiteRowProps> = (
-  props: SiteRowProps
-) => {
+export const SiteRow: React.FunctionComponent<SiteRowProps> = (props: SiteRowProps) => {
   const site = props.site;
   return (
     <Tr>
@@ -58,7 +56,7 @@ export const SiteRow: React.FunctionComponent<SiteRowProps> = (
 };
 
 export const SiteListTable: React.FunctionComponent<SiteListTableProps> = (
-  props: SiteListTableProps
+  props: SiteListTableProps,
 ) => {
   const config = props.config;
   const token = props.token;

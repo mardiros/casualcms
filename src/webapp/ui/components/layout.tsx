@@ -8,9 +8,7 @@ type LayoutProps = {
   routes: React.ReactNode;
 };
 
-export const Layout: React.FunctionComponent<LayoutProps> = (
-  props: LayoutProps
-) => {
+export const Layout: React.FunctionComponent<LayoutProps> = (props: LayoutProps) => {
   const location = useLocation();
   if (location.pathname.startsWith("/admin/pages/preview")) {
     return <></>;

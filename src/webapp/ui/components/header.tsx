@@ -17,14 +17,7 @@ export const Header: React.FunctionComponent<{}> = (): React.ReactElement => {
         {auth.authenticatedUser ? (
           <AccountMenu username={auth.authenticatedUser.username} />
         ) : (
-          <Box
-            as="button"
-            borderRadius="md"
-            bg="cyan"
-            color="white"
-            px={8}
-            h={8}
-          >
+          <Box as="button" borderRadius="md" bg="cyan" color="white" px={8} h={8}>
             <Link to="/admin/login" color="white">
               Sign In
             </Link>

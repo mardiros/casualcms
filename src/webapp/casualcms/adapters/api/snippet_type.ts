@@ -4,13 +4,8 @@ import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialSnippetType, SnippetType } from "../../domain/model";
 import { ApiError, AsyncApiResult, ISnippetTypeApi } from "../../domain/ports";
 
-export class FetchSnippetTypeApi
-  extends BaseFetchApi
-  implements ISnippetTypeApi
-{
-  async listSnippetTypes(
-    authntoken: string
-  ): AsyncApiResult<PartialSnippetType[]> {
+export class FetchSnippetTypeApi extends BaseFetchApi implements ISnippetTypeApi {
+  async listSnippetTypes(authntoken: string): AsyncApiResult<PartialSnippetType[]> {
     const response = await this.fetch("/api/snippets-types", {
       method: "GET",
       headers: {
@@ -27,7 +22,7 @@ export class FetchSnippetTypeApi
 
   async showSnippetType(
     authntoken: string,
-    snippetType: string
+    snippetType: string,
   ): AsyncApiResult<SnippetType> {
     // FIXME: snippet_type should be urlencoded
     const response = await this.fetch(`/api/snippets-types/${snippetType}`, {

@@ -9,7 +9,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: Payload
+    payload: Payload,
   ): AsyncApiResult<boolean> {
     const setting = {
       key: key,
@@ -31,7 +31,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
   }
   async listSettings(
     authntoken: string,
-    hostname: string
+    hostname: string,
   ): AsyncApiResult<PartialSetting[]> {
     const response = await this.fetch(`/api/settings/${hostname}`, {
       method: "GET",
@@ -49,7 +49,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
   async showSetting(
     authntoken: string,
     hostname: string,
-    key: string
+    key: string,
   ): AsyncApiResult<Setting> {
     const response = await this.fetch(`/api/settings/${hostname}/${key}`, {
       method: "GET",
@@ -65,10 +65,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     return ok(jsonData as Setting);
   }
 
-  async updateSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean> {
+  async updateSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean> {
     const response = await this.fetch(
       `/api/settings/${setting.metadata.hostname}/${setting.metadata.key}`,
       {
@@ -78,7 +75,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(setting),
-      }
+      },
     );
     const jsonData = await (response.json() as unknown);
     if (!response.ok) {
@@ -87,10 +84,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
     return ok(true);
   }
 
-  async deleteSetting(
-    authntoken: string,
-    setting: Setting
-  ): AsyncApiResult<boolean> {
+  async deleteSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean> {
     const response = await this.fetch(
       `/api/settings/${setting.metadata.hostname}/${setting.metadata.key}`,
       {
@@ -98,7 +92,7 @@ export class FetchSettingApi extends BaseFetchApi implements ISettingApi {
         headers: {
           Authorization: `Bearer ${authntoken}`,
         },
-      }
+      },
     );
     if (!response.ok) {
       const jsonData = await (response.json() as unknown);

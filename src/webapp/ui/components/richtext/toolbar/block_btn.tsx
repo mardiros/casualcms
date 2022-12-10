@@ -10,9 +10,7 @@ import { useMyEditor } from "../hooks";
 const isBlockActive = (editor: MyEditor, format: string) => {
   const nodeGen = Editor.nodes(editor, {
     match: (n) => {
-      return (
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format
-      );
+      return !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format;
     },
   });
 
@@ -68,9 +66,7 @@ export const toggleMultilineBlock = (editor: MyEditor, format: NodeType) => {
   } else {
     Transforms.unwrapNodes(editor, {
       match: (n) =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        [format].includes(n.type),
+        !Editor.isEditor(n) && SlateElement.isElement(n) && [format].includes(n.type),
       split: true,
     });
   }

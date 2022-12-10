@@ -2,18 +2,13 @@ import { ok, err } from "neverthrow";
 
 import { FastApiError, BaseFetchApi, castError } from "./base";
 import { PartialSite, Site } from "../../domain/model";
-import {
-  ApiError,
-  SiteOption,
-  ISiteApi,
-  AsyncApiResult,
-} from "../../domain/ports";
+import { ApiError, SiteOption, ISiteApi, AsyncApiResult } from "../../domain/ports";
 
 export class FetchSiteApi extends BaseFetchApi implements ISiteApi {
   async createSite(
     authntoken: string,
     hostname: string,
-    payload: SiteOption
+    payload: SiteOption,
   ): AsyncApiResult<PartialSite> {
     const postBody = { hostname: hostname, ...payload };
     const response = await this.fetch("/api/sites", {
@@ -62,7 +57,7 @@ export class FetchSiteApi extends BaseFetchApi implements ISiteApi {
   async updateSite(
     authntoken: string,
     hostname: string,
-    site: Site
+    site: Site,
   ): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/sites/${hostname}`, {
       method: "PATCH",
@@ -80,10 +75,7 @@ export class FetchSiteApi extends BaseFetchApi implements ISiteApi {
     return ok(true);
   }
 
-  async deleteSite(
-    authntoken: string,
-    hostname: string
-  ): AsyncApiResult<boolean> {
+  async deleteSite(authntoken: string, hostname: string): AsyncApiResult<boolean> {
     const response = await this.fetch(`/api/sites/${hostname}`, {
       method: "DELETE",
       headers: {

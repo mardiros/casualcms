@@ -35,7 +35,7 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
     const siteResult = await config.api.site.createSite(
       auth.authenticatedUser?.token || "",
       hostname,
-      options
+      options,
     );
 
     siteResult
@@ -68,17 +68,15 @@ export const SiteNew: React.FunctionComponent<{}> = () => {
             <FormLabel>Root Page</FormLabel>
             <Input type="text" name="root_page_path" placeholder="/index" />
             <FormHelperText>
-              Path of the page, that will be the index page for this site (paged
-              used for /).
+              Path of the page, that will be the index page for this site (paged used
+              for /).
             </FormHelperText>
           </FormControl>
           <FormControl>
             <Checkbox name="default" value="true">
               Default
             </Checkbox>
-            <FormHelperText>
-              If no site match, fallback to this one.
-            </FormHelperText>
+            <FormHelperText>If no site match, fallback to this one.</FormHelperText>
           </FormControl>
           <FormControl>
             <Checkbox name="secure" value="true">

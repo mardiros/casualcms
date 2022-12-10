@@ -22,9 +22,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
   const params = useParams();
   const snippetKey = params.snippetKey || "";
 
-  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(
-    null
-  );
+  const [snippetType, setSnippetType] = React.useState<SnippetType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
@@ -35,7 +33,7 @@ export const SnippetEdit: React.FunctionComponent<{}> = () => {
       }
       const rtyp = await config.api.snippetType.showSnippetType(
         token,
-        snippet.metadata.type
+        snippet.metadata.type,
       );
       rtyp
         .map((typ: SnippetType) => setSnippetType(typ))

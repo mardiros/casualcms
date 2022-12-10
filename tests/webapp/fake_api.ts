@@ -336,7 +336,7 @@ export class FakeSnippetApi implements ISnippetApi {
   async createSnippet(
     authntoken: string,
     type: string,
-    payload: Snippet,
+    payload: Snippet
   ): AsyncApiResult<boolean> {
     const titles: Record<string, string> = {
       "blog:HeaderSnippet": "Header Snippet",

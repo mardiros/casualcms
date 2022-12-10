@@ -8,7 +8,7 @@ import { PartialDraft, Draft, Payload } from "casualcms/domain/model";
 export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async listDrafts(
     authntoken: string,
-    parent: string | null
+    parent: string | null,
   ): AsyncApiResult<PartialDraft[]> {
     const qs = parent ? new URLSearchParams({ parent: parent }) : "";
     const response = await this.fetch(`/api/drafts?${qs}`, {
@@ -28,7 +28,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
     authntoken: string,
     type: string,
     payload: Payload,
-    parent: string | null
+    parent: string | null,
   ): AsyncApiResult<boolean> {
     let postBody: Payload = {
       type: type,
@@ -83,7 +83,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async updateDraft(
     authntoken: string,
     path: string,
-    draft: Draft
+    draft: Draft,
   ): AsyncApiResult<Draft> {
     // console.log(draft);
     const payload = { ...draft };
@@ -107,7 +107,7 @@ export class FetchPageApi extends BaseFetchApi implements IPageApi {
   async publishPage(
     authntoken: string,
     hostname: string,
-    path: string
+    path: string,
   ): AsyncApiResult<boolean> {
     const response = await this.fetch("/api/pages", {
       method: "POST",

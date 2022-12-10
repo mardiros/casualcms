@@ -37,9 +37,7 @@ type PageListTableProps = {
   curPage: Draft | null;
 };
 
-export const PageRow: React.FunctionComponent<PageRowProps> = (
-  props: PageRowProps
-) => {
+export const PageRow: React.FunctionComponent<PageRowProps> = (props: PageRowProps) => {
   const page = props.page;
   return (
     <Tr>
@@ -95,7 +93,7 @@ type PageListButtonsProps = {
 };
 
 export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
-  props: PageListButtonsProps
+  props: PageListButtonsProps,
 ) => {
   const { curPage, subPages } = props;
   let navigate = useNavigate();
@@ -114,9 +112,7 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
     <Stack p={4} spacing={4} direction="row" align="right">
       {qsEdit && (
         <Button
-          onClick={() =>
-            navigate(`/admin/pages/edit?${qsEdit}`, { replace: true })
-          }
+          onClick={() => navigate(`/admin/pages/edit?${qsEdit}`, { replace: true })}
           colorScheme="cyan"
           leftIcon={<EditIcon />}
         >
@@ -132,15 +128,13 @@ export const PageListButtons: React.FunctionComponent<PageListButtonsProps> = (
         Add new page
       </Button>
 
-      {curPage && subPages.length === 0 && (
-        <PageDeletePopoverForm curPage={curPage} />
-      )}
+      {curPage && subPages.length === 0 && <PageDeletePopoverForm curPage={curPage} />}
     </Stack>
   );
 };
 
 export const PageListTable: React.FunctionComponent<PageListTableProps> = (
-  props: PageListTableProps
+  props: PageListTableProps,
 ) => {
   const { config, parentPath, token } = props;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);

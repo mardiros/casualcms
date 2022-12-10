@@ -30,10 +30,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadPageType() {
-      const rtyp = await config.api.pageType.showPageType(
-        token,
-        pageTypeName || ""
-      );
+      const rtyp = await config.api.pageType.showPageType(token, pageTypeName || "");
       rtyp
         .map((typ: PageType) => setPageType(typ))
         .mapErr((err: ApiError) => setError(err));
@@ -75,12 +72,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
   }
   const onsubmit = async (data: IChangeEvent) => {
     const page = data.formData;
-    await config.api.page.createDraft(
-      token,
-      pageTypeName || "",
-      page,
-      parentPath
-    );
+    await config.api.page.createDraft(token, pageTypeName || "", page, parentPath);
     navigate(`/admin/pages?${params}`, { replace: true });
   };
 
@@ -104,12 +96,7 @@ export const PageNew: React.FunctionComponent<{}> = () => {
         )}
       </Box>
       <Stack paddingTop={5} direction="row" align="right">
-        <Button
-          form="new-page"
-          type="submit"
-          colorScheme="cyan"
-          leftIcon={<AddIcon />}
-        >
+        <Button form="new-page" type="submit" colorScheme="cyan" leftIcon={<AddIcon />}>
           Create Page
         </Button>
       </Stack>

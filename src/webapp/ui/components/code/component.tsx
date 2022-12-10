@@ -4,7 +4,7 @@ import { WidgetProps } from "@rjsf/utils";
 import { ChevronDownIcon } from "@chakra-ui/icons";
 
 export const CodeEditor: React.FunctionComponent<WidgetProps> = (
-  props: WidgetProps
+  props: WidgetProps,
 ) => {
   const { options, value, onChange } = props;
   let lang = value?.lang || null;
@@ -18,7 +18,7 @@ export const CodeEditor: React.FunctionComponent<WidgetProps> = (
         onChange({ lang: lang, code: code });
       }
     },
-    []
+    [],
   );
   let isSaving: NodeJS.Timeout | null = null;
   const onCodeChange = React.useCallback(
@@ -41,7 +41,7 @@ export const CodeEditor: React.FunctionComponent<WidgetProps> = (
       }
       saveChange();
     },
-    []
+    [],
   );
 
   return (

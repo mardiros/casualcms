@@ -24,18 +24,13 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
   const settingKey = params.settingKey || "";
   const hostname = params.hostname || "";
 
-  const [settingType, setSettingType] = React.useState<SettingType | null>(
-    null
-  );
+  const [settingType, setSettingType] = React.useState<SettingType | null>(null);
   const [error, setError] = React.useState<ApiError>(null);
   let navigate = useNavigate();
 
   React.useEffect(() => {
     async function loadSettingType() {
-      const rtyp = await config.api.settingType.showSettingType(
-        token,
-        settingKey
-      );
+      const rtyp = await config.api.settingType.showSettingType(token, settingKey);
       rtyp
         .map((typ: SettingType) => setSettingType(typ))
         .mapErr((err: ApiError) => setError(err));
@@ -55,7 +50,7 @@ export const SettingEdit: React.FunctionComponent<{}> = () => {
       const rsetting = await config.api.setting.showSetting(
         token,
         hostname,
-        settingKey
+        settingKey,
       );
       rsetting
         .map((setting: Setting) => setSetting(setting))

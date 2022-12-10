@@ -35,7 +35,7 @@ export interface IAccountApi {
 export interface IPageTypeApi {
   listPageTypes(
     authntoken: string,
-    parentType: string | null
+    parentType: string | null,
   ): AsyncApiResult<PartialPageType[]>;
   showPageType(authntoken: string, pageType: string): AsyncApiResult<PageType>;
 }
@@ -45,23 +45,16 @@ export interface IPageApi {
     authntoken: string,
     type: string,
     payload: Payload,
-    parent: string | null
+    parent: string | null,
   ): AsyncApiResult<boolean>;
-  listDrafts(
-    authntoken: string,
-    parent: string | null
-  ): AsyncApiResult<PartialDraft[]>;
+  listDrafts(authntoken: string, parent: string | null): AsyncApiResult<PartialDraft[]>;
   showDraft(authntoken: string, path: string): AsyncApiResult<Draft>;
   previewDraft(authntoken: string, path: string): AsyncApiResult<string>;
-  updateDraft(
-    authntoken: string,
-    path: string,
-    page: Draft
-  ): AsyncApiResult<Draft>;
+  updateDraft(authntoken: string, path: string, page: Draft): AsyncApiResult<Draft>;
   publishPage(
     authntoken: string,
     hostname: string,
-    path: string
+    path: string,
   ): AsyncApiResult<boolean>;
   deleteDraft(authntoken: string, path: string): AsyncApiResult<boolean>;
 }
@@ -76,15 +69,11 @@ export interface ISiteApi {
   createSite(
     authntoken: string,
     hostname: string,
-    payload: SiteOption
+    payload: SiteOption,
   ): AsyncApiResult<PartialSite>;
   listSites(authntoken: string): AsyncApiResult<PartialSite[]>;
   showSite(authntoken: string, hostname: string): AsyncApiResult<Site>;
-  updateSite(
-    authntoken: string,
-    hostname: string,
-    site: Site
-  ): AsyncApiResult<boolean>;
+  updateSite(authntoken: string, hostname: string, site: Site): AsyncApiResult<boolean>;
   deleteSite(authntoken: string, hostname: string): AsyncApiResult<boolean>;
 }
 
@@ -92,24 +81,21 @@ export interface ISnippetApi {
   createSnippet(
     authntoken: string,
     type: string,
-    payload: Payload
+    payload: Payload,
   ): AsyncApiResult<boolean>;
   listSnippets(authntoken: string): AsyncApiResult<PartialSnippet[]>;
   showSnippet(authntoken: string, slug: string): AsyncApiResult<Snippet>;
   updateSnippet(
     authntoken: string,
     slug: string,
-    snippet: Snippet
+    snippet: Snippet,
   ): AsyncApiResult<boolean>;
   deleteSnippet(authntoken: string, snippet: Snippet): AsyncApiResult<boolean>;
 }
 
 export interface ISnippetTypeApi {
   listSnippetTypes(authntoken: string): AsyncApiResult<PartialSnippetType[]>;
-  showSnippetType(
-    authntoken: string,
-    snippetType: string
-  ): AsyncApiResult<SnippetType>;
+  showSnippetType(authntoken: string, snippetType: string): AsyncApiResult<SnippetType>;
 }
 
 export interface ISettingTypeApi {
@@ -122,16 +108,13 @@ export interface ISettingApi {
     authntoken: string,
     hostname: string,
     key: string,
-    payload: Payload
+    payload: Payload,
   ): AsyncApiResult<boolean>;
-  listSettings(
-    authntoken: string,
-    hostname: string
-  ): AsyncApiResult<PartialSetting[]>;
+  listSettings(authntoken: string, hostname: string): AsyncApiResult<PartialSetting[]>;
   showSetting(
     authntoken: string,
     hostname: string,
-    key: string
+    key: string,
   ): AsyncApiResult<Setting>;
   updateSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean>;
   deleteSetting(authntoken: string, setting: Setting): AsyncApiResult<boolean>;

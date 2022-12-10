@@ -38,9 +38,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
       }
       const site = await config.api.site.showSite(token, hostname);
       // console.log(site);
-      site
-        .map((sit: Site) => setSite(sit))
-        .mapErr((err: ApiError) => setError(err));
+      site.map((sit: Site) => setSite(sit)).mapErr((err: ApiError) => setError(err));
       // console.log("setIsLoading");
       setIsLoading(false);
     }
@@ -66,7 +64,7 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
     const siteResult = await config.api.site.updateSite(
       auth.authenticatedUser?.token || "",
       hostname,
-      site
+      site,
     );
 
     siteResult
@@ -113,21 +111,15 @@ export const SiteEdit: React.FunctionComponent<{}> = () => {
                 defaultValue={site.root_page_path}
               />
               <FormHelperText>
-                Path of the page, that will be the index page for this site
-                (paged used for /).
+                Path of the page, that will be the index page for this site (paged used
+                for /).
               </FormHelperText>
             </FormControl>
             <FormControl>
-              <Checkbox
-                name="default"
-                value="true"
-                defaultChecked={site.default}
-              >
+              <Checkbox name="default" value="true" defaultChecked={site.default}>
                 Default
               </Checkbox>
-              <FormHelperText>
-                If no site match, fallback to this one.
-              </FormHelperText>
+              <FormHelperText>If no site match, fallback to this one.</FormHelperText>
             </FormControl>
             <FormControl>
               <Checkbox name="secure" value="true" defaultChecked={site.secure}>

@@ -27,9 +27,9 @@ type SnippetTypesTableProps = {
   isLoading: boolean;
   snippetTypes: PartialSnippetType[];
 };
-export const SnippetTypesTable: React.FunctionComponent<
-  SnippetTypesTableProps
-> = (props: SnippetTypesTableProps) => {
+export const SnippetTypesTable: React.FunctionComponent<SnippetTypesTableProps> = (
+  props: SnippetTypesTableProps,
+) => {
   if (props.isLoading) {
     return <Loader label="loading snippet types..." />;
   }
@@ -65,16 +65,12 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
   let auth = useAuth();
   const token = auth.authenticatedUser?.token || "";
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [snippetTypes, setSnippetTypes] = React.useState<PartialSnippetType[]>(
-    []
-  );
+  const [snippetTypes, setSnippetTypes] = React.useState<PartialSnippetType[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
 
   React.useEffect(() => {
     async function loadTypes() {
-      const snippetTemplates = await config.api.snippetType.listSnippetTypes(
-        token
-      );
+      const snippetTemplates = await config.api.snippetType.listSnippetTypes(token);
       snippetTemplates
         .map((tpls: PartialSnippetType[]) => setSnippetTypes(tpls))
         .mapErr((err: ApiError) => setError(err));
@@ -98,10 +94,7 @@ export const SnippetTypeList: React.FunctionComponent<{}> = () => {
           <SnippetBreadcrumb title="Choose type" />
           <Box paddingLeft={15}>
             <ApiErrorUI error={error} />
-            <SnippetTypesTable
-              snippetTypes={snippetTypes}
-              isLoading={isLoading}
-            />
+            <SnippetTypesTable snippetTypes={snippetTypes} isLoading={isLoading} />
           </Box>
         </>
       }

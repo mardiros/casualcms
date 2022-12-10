@@ -21,9 +21,7 @@ type FormProps<T = any, F = any> = {
   onSubmit: (data: IChangeEvent<T, F>, event: React.FormEvent) => void;
 };
 
-export const Form: React.FunctionComponent<FormProps> = (
-  props: FormProps
-) => {
+export const Form: React.FunctionComponent<FormProps> = (props: FormProps) => {
   const { id, schema, uiSchema, formData, onSubmit } = props;
   // the render button has to be
   uiSchema["ui:submitButtonOptions"] = { norender: true };

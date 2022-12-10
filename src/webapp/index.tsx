@@ -19,6 +19,6 @@ init().then(async (config: AppConfig) => {
   root.render(
     <AppContext.Provider value={config}>
       <App />
-    </AppContext.Provider>
+    </AppContext.Provider>,
   );
 });

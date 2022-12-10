@@ -36,7 +36,7 @@ export const HomeIcon = (): JSX.Element => {
 };
 
 export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
-  props: PageBreadcrumbProps
+  props: PageBreadcrumbProps,
 ) => {
   const { page, title } = props;
   return (
@@ -47,17 +47,17 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
         </Link>
       </BreadcrumbItem>
       {page?.metadata.breadcrumb.items.map((item) => (
-          <BreadcrumbItem key={item.path}>
-            <Link
-              to={`/admin/pages/?${new URLSearchParams({
-                parent: item.path,
-              })}`}
-              title={item.title}
-            >
-              {item.slug}
-            </Link>
-          </BreadcrumbItem>
-        ))}
+        <BreadcrumbItem key={item.path}>
+          <Link
+            to={`/admin/pages/?${new URLSearchParams({
+              parent: item.path,
+            })}`}
+            title={item.title}
+          >
+            {item.slug}
+          </Link>
+        </BreadcrumbItem>
+      ))}
       {title && (
         <BreadcrumbItem>
           <span>{title}</span>
@@ -68,7 +68,7 @@ export const PageBreadcrumb: React.FunctionComponent<PageBreadcrumbProps> = (
 };
 
 export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
-  props: SiteBreadcrumbProps
+  props: SiteBreadcrumbProps,
 ) => {
   const { site, title } = props;
   return (
@@ -94,9 +94,9 @@ export const SiteBreadcrumb: React.FunctionComponent<SiteBreadcrumbProps> = (
   );
 };
 
-export const SnippetBreadcrumb: React.FunctionComponent<
-  SnippetBreadcrumbProps
-> = (props: SnippetBreadcrumbProps) => {
+export const SnippetBreadcrumb: React.FunctionComponent<SnippetBreadcrumbProps> = (
+  props: SnippetBreadcrumbProps,
+) => {
   const { snippet, title } = props;
   return (
     <Breadcrumb padding={5}>
@@ -107,9 +107,7 @@ export const SnippetBreadcrumb: React.FunctionComponent<
       </BreadcrumbItem>
       {snippet && (
         <BreadcrumbItem>
-          <Link
-            to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}
-          >
+          <Link to={`/admin/snippets/edit/${snippet.metadata.type}/${snippet.key}`}>
             {snippet.key}
           </Link>
         </BreadcrumbItem>
@@ -123,9 +121,9 @@ export const SnippetBreadcrumb: React.FunctionComponent<
   );
 };
 
-export const SettingBreadcrumb: React.FunctionComponent<
-  SettingBreadcrumbProps
-> = (props: SettingBreadcrumbProps) => {
+export const SettingBreadcrumb: React.FunctionComponent<SettingBreadcrumbProps> = (
+  props: SettingBreadcrumbProps,
+) => {
   const { hostname, title } = props;
   return (
     <Breadcrumb padding={5}>

@@ -4,13 +4,8 @@ import { BaseFetchApi, castError, FastApiError } from "./base";
 import { PartialSettingType, SettingType } from "../../domain/model";
 import { ApiError, AsyncApiResult, ISettingTypeApi } from "../../domain/ports";
 
-export class FetchSettingTypeApi
-  extends BaseFetchApi
-  implements ISettingTypeApi
-{
-  async listSettingTypes(
-    authntoken: string
-  ): AsyncApiResult<PartialSettingType[]> {
+export class FetchSettingTypeApi extends BaseFetchApi implements ISettingTypeApi {
+  async listSettingTypes(authntoken: string): AsyncApiResult<PartialSettingType[]> {
     const response = await this.fetch("/api/settings-types", {
       method: "GET",
       headers: {
@@ -24,10 +19,7 @@ export class FetchSettingTypeApi
     }
     return ok(jsonData as PartialSettingType[]);
   }
-  async showSettingType(
-    authntoken: string,
-    key: string
-  ): AsyncApiResult<SettingType> {
+  async showSettingType(authntoken: string, key: string): AsyncApiResult<SettingType> {
     const response = await this.fetch(`/api/settings-types/${key}`, {
       method: "GET",
       headers: {

@@ -28,16 +28,14 @@ type PageTypesTableProps = {
   pageTypes: PartialPageType[];
 };
 export const PageTypesTable: React.FunctionComponent<PageTypesTableProps> = (
-  props: PageTypesTableProps
+  props: PageTypesTableProps,
 ) => {
   if (props.isLoading) {
     return <Loader label="loading page types..." />;
   }
 
   const pageTypes = props.pageTypes;
-  const qs = props.parentPath
-    ? new URLSearchParams({ parent: props.parentPath })
-    : "";
+  const qs = props.parentPath ? new URLSearchParams({ parent: props.parentPath }) : "";
   return (
     <TableContainer>
       <Table variant="simple">
@@ -77,10 +75,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
 
   React.useEffect(() => {
     async function loadTypes() {
-      const pageTypes = await config.api.pageType.listPageTypes(
-        token,
-        parentType
-      );
+      const pageTypes = await config.api.pageType.listPageTypes(token, parentType);
       pageTypes
         .map((tpls: PartialPageType[]) => setTypes(tpls))
         .mapErr((err: ApiError) => setError(err));
@@ -120,9 +115,7 @@ export const PageTypeList: React.FunctionComponent<{}> = () => {
   return (
     <Box minW="1440px">
       <Heading>Choose A Type Of Page</Heading>
-      {parentPage && (
-        <PageBreadcrumb page={parentPage} title="type of template" />
-      )}
+      {parentPage && <PageBreadcrumb page={parentPage} title="type of template" />}
       <Box maxW="1440px">
         <ApiErrorUI error={error} />
         <PageTypesTable

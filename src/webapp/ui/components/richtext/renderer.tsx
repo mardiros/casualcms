@@ -110,11 +110,7 @@ export const MyRenderElement = ({
   }
 };
 
-export const MyRenderLeaf = ({
-  attributes,
-  children,
-  leaf,
-}: MyRenderLeafProps) => {
+export const MyRenderLeaf = ({ attributes, children, leaf }: MyRenderLeafProps) => {
   const editor = useSlate();
   switch (leaf.type) {
     case "TEXT":

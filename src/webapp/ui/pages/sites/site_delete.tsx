@@ -31,7 +31,5 @@ export const SiteDeletePopoverForm: React.FunctionComponent<
     }
   }, [confirmed]);
 
-  return (
-    <DeletePopoverForm button_label="Delete this site" onSubmit={onSubmit} />
-  );
+  return <DeletePopoverForm button_label="Delete this site" onSubmit={onSubmit} />;
 };

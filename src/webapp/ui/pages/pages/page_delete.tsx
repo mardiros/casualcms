@@ -28,8 +28,7 @@ export const PageDeletePopoverForm: React.FunctionComponent<
   React.useEffect(() => {
     if (confirmed) {
       const bcItems = curPage.metadata.breadcrumb.items;
-      const nextPath =
-        bcItems.length >= 2 ? bcItems[bcItems.length - 2].path : "";
+      const nextPath = bcItems.length >= 2 ? bcItems[bcItems.length - 2].path : "";
       const qs = nextPath
         ? new URLSearchParams({
             parent: nextPath,
@@ -39,7 +38,5 @@ export const PageDeletePopoverForm: React.FunctionComponent<
     }
   }, [confirmed]);
 
-  return (
-    <DeletePopoverForm button_label="Delete this page" onSubmit={onSubmit} />
-  );
+  return <DeletePopoverForm button_label="Delete this page" onSubmit={onSubmit} />;
 };

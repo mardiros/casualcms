@@ -1,19 +1,7 @@
 import React from "react";
-import {
-  Box,
-  Table,
-  TableContainer,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from "@chakra-ui/react";
+import { Box, Table, TableContainer, Tbody, Td, Th, Thead, Tr } from "@chakra-ui/react";
 import { Link, useParams } from "react-router-dom";
-import {
-  PartialSetting,
-  PartialSettingType,
-} from "../../../casualcms/domain/model";
+import { PartialSetting, PartialSettingType } from "../../../casualcms/domain/model";
 import { ApiError } from "../../../casualcms/domain/ports";
 import { AppConfig, useConfig } from "../../../config";
 import { Loader } from "../../components/loader";
@@ -33,7 +21,7 @@ type SettingsTableProps = {
 };
 
 export const SettingRow: React.FunctionComponent<SettingRowProps> = (
-  props: SettingRowProps
+  props: SettingRowProps,
 ) => {
   const { settingUrl, settingType } = props;
   return (
@@ -46,7 +34,7 @@ export const SettingRow: React.FunctionComponent<SettingRowProps> = (
 };
 
 export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
-  props: SettingsTableProps
+  props: SettingsTableProps,
 ) => {
   const { config, token, hostname, settingTypes } = props;
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
@@ -63,9 +51,7 @@ export const SettingsTable: React.FunctionComponent<SettingsTableProps> = (
           const settingsObj: { [key: string]: string } = {};
           settingTypes.map(
             (val) =>
-              (settingsObj[
-                val.key
-              ] = `/admin/settings/${hostname}/${val.key}/new`)
+              (settingsObj[val.key] = `/admin/settings/${hostname}/${val.key}/new`),
           );
           typ.map((val) => {
             settingsObj[
@@ -116,9 +102,7 @@ export const SettingList: React.FunctionComponent<{}> = () => {
   const token = auth.authenticatedUser?.token || "";
   let { hostname, settingType } = useParams<string>();
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [settingTypes, setSettingTypes] = React.useState<PartialSettingType[]>(
-    []
-  );
+  const [settingTypes, setSettingTypes] = React.useState<PartialSettingType[]>([]);
   const [error, setError] = React.useState<ApiError>(null);
 
   React.useEffect(() => {

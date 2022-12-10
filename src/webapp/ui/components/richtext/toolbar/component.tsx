@@ -18,11 +18,7 @@ import {
   MdLooksTwo,
 } from "react-icons/md";
 import { MarkButton } from "./mark_btn";
-import {
-  BlockButton,
-  toggleListBlock,
-  toggleMultilineBlock,
-} from "./block_btn";
+import { BlockButton, toggleListBlock, toggleMultilineBlock } from "./block_btn";
 import { LinkButton } from "./popover_button";
 import { FeatureType } from "../types";
 
@@ -68,11 +64,7 @@ export const Toolbar: React.FunctionComponent<FunctionComponentProps> = ({
       />
     ),
     code: (
-      <BlockButton
-        format="code"
-        icon={<MdCode />}
-        toggleFn={toggleMultilineBlock}
-      />
+      <BlockButton format="code" icon={<MdCode />} toggleFn={toggleMultilineBlock} />
     ),
     link: <LinkButton />,
     paragraph: <></>,

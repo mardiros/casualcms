@@ -31,7 +31,7 @@ type SettingSiteListTableProps = {
 };
 
 export const SettingSiteRow: React.FunctionComponent<SettingSiteRowProps> = (
-  props: SettingSiteRowProps
+  props: SettingSiteRowProps,
 ) => {
   const site = props.site;
   return (
@@ -49,54 +49,53 @@ export const SettingSiteRow: React.FunctionComponent<SettingSiteRowProps> = (
   );
 };
 
-export const SettingSiteListTable: React.FunctionComponent<
-  SettingSiteListTableProps
-> = (props: SettingSiteListTableProps) => {
-  const config = props.config;
-  const token = props.token;
-  const [isLoading, setIsLoading] = React.useState<boolean>(true);
-  const [sites, setSites] = React.useState<PartialSite[]>([]);
-  const [error, setError] = React.useState<ApiError>(null);
+export const SettingSiteListTable: React.FunctionComponent<SettingSiteListTableProps> =
+  (props: SettingSiteListTableProps) => {
+    const config = props.config;
+    const token = props.token;
+    const [isLoading, setIsLoading] = React.useState<boolean>(true);
+    const [sites, setSites] = React.useState<PartialSite[]>([]);
+    const [error, setError] = React.useState<ApiError>(null);
 
-  React.useEffect(() => {
-    async function loadSites() {
-      let sites: Result<PartialSite[], ApiError>;
-      sites = await config.api.site.listSites(token);
-      sites
-        .map((sites: PartialSite[]) => setSites(sites))
-        .mapErr((err: ApiError) => setError(err)); // FIXME
-      setIsLoading(false);
-    }
-    if (token) {
-      loadSites();
-    }
-    return function cleanup() {};
-  }, [token]);
+    React.useEffect(() => {
+      async function loadSites() {
+        let sites: Result<PartialSite[], ApiError>;
+        sites = await config.api.site.listSites(token);
+        sites
+          .map((sites: PartialSite[]) => setSites(sites))
+          .mapErr((err: ApiError) => setError(err)); // FIXME
+        setIsLoading(false);
+      }
+      if (token) {
+        loadSites();
+      }
+      return function cleanup() {};
+    }, [token]);
 
-  if (isLoading) {
-    return <Loader label="Loading sites list" />;
-  }
-  if (error) {
-    return <ApiErrorUI error={error} />;
-  }
-  return (
-    <TableContainer>
-      <Table variant="simple">
-        <Thead>
-          <Tr>
-            <Th>Hostname</Th>
-            <Th>Edit</Th>
-          </Tr>
-        </Thead>
-        <Tbody>
-          {sites.map((site) => (
-            <SettingSiteRow site={site} key={site.hostname} />
-          ))}
-        </Tbody>
-      </Table>
-    </TableContainer>
-  );
-};
+    if (isLoading) {
+      return <Loader label="Loading sites list" />;
+    }
+    if (error) {
+      return <ApiErrorUI error={error} />;
+    }
+    return (
+      <TableContainer>
+        <Table variant="simple">
+          <Thead>
+            <Tr>
+              <Th>Hostname</Th>
+              <Th>Edit</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {sites.map((site) => (
+              <SettingSiteRow site={site} key={site.hostname} />
+            ))}
+          </Tbody>
+        </Table>
+      </TableContainer>
+    );
+  };
 
 export const SettingSiteList: React.FunctionComponent<{}> = () => {
   const config = useConfig();

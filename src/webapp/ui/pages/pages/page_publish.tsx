@@ -44,7 +44,7 @@ type SiteListBoxProps = {
 };
 
 export const SiteListBox: React.FunctionComponent<SiteListBoxProps> = (
-  props: SiteListBoxProps
+  props: SiteListBoxProps,
 ) => {
   const { hostnames, onSubmit } = props;
   return (
@@ -77,9 +77,9 @@ type PublishResultBoxProps = {
   onClose: React.MouseEventHandler<HTMLButtonElement>;
 };
 
-export const PublishResultBox: React.FunctionComponent<
-  PublishResultBoxProps
-> = (props: PublishResultBoxProps) => {
+export const PublishResultBox: React.FunctionComponent<PublishResultBoxProps> = (
+  props: PublishResultBoxProps,
+) => {
   const { hostnames, pagePath, onClose } = props;
   return (
     <Box>
@@ -96,7 +96,8 @@ export const PublishResultBox: React.FunctionComponent<
                       <a
                         role="view_publication_result"
                         target="_blank"
-                        href={get_url(hostname, pagePath)} rel="noreferrer"
+                        href={get_url(hostname, pagePath)}
+                        rel="noreferrer"
                       >
                         <Icon
                           as={ViewIcon}
@@ -124,7 +125,7 @@ export const PublishResultBox: React.FunctionComponent<
 };
 
 export const SiteCheckBox: React.FunctionComponent<SiteCheckBoxProps> = (
-  props: SiteCheckBoxProps
+  props: SiteCheckBoxProps,
 ) => {
   const { hostname } = props;
   return (
@@ -143,7 +144,7 @@ export const SiteCheckBox: React.FunctionComponent<SiteCheckBoxProps> = (
 };
 
 export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
-  props: PublishButtonProps
+  props: PublishButtonProps,
 ) => {
   const { token, pagePath } = props;
   const { onOpen, onClose, isOpen } = useDisclosure();
@@ -158,9 +159,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
       .filter((el) => el.selected)
       .map((el) => config.api.page.publishPage(token, el.hostname, pagePath));
     const resps = await Promise.all(pages);
-    hostnames
-      .filter((el) => el.selected)
-      .map((el) => (el.response = resps.shift()));
+    hostnames.filter((el) => el.selected).map((el) => (el.response = resps.shift()));
     setPublishedState("done");
   };
   React.useEffect(() => {
@@ -178,7 +177,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
                 selected: false,
                 secure: el.secure,
                 root_page_path: el.root_page_path,
-              })
+              }),
             );
         })
         .mapErr((err: ApiError) => setError(err)); // FIXME
@@ -205,11 +204,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
       placement="right"
     >
       <PopoverTrigger>
-        <Button
-          colorScheme="cyan"
-          role="open_publish_popover"
-          leftIcon={<SunIcon />}
-        >
+        <Button colorScheme="cyan" role="open_publish_popover" leftIcon={<SunIcon />}>
           Publish
         </Button>
       </PopoverTrigger>
@@ -231,9 +226,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
               {
                 closed: <></>,
                 loading: <Loader label="Loading sites" />,
-                begin: (
-                  <SiteListBox hostnames={hostnames} onSubmit={onSubmit} />
-                ),
+                begin: <SiteListBox hostnames={hostnames} onSubmit={onSubmit} />,
                 done: (
                   <PublishResultBox
                     hostnames={hostnames}
@@ -250,7 +243,7 @@ export const PublishButton: React.FunctionComponent<PublishButtonProps> = (
   );
 };
 export const PageEditButtons: React.FunctionComponent<PublishButtonProps> = (
-  props: PublishButtonProps
+  props: PublishButtonProps,
 ) => {
   return (
     <Stack paddingTop={5} direction="row" align="right">

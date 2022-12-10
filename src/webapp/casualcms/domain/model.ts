@@ -1,7 +1,7 @@
 import { RJSFSchema, UiSchema } from "@rjsf/utils";
 
 // rome-ignore lint/suspicious/noExplicitAny: a dynamic type based on json schema
-export  type Payload<T = any> = Record<string, T>
+export type Payload<T = any> = Record<string, T>;
 
 export type Account = {
   id: string;

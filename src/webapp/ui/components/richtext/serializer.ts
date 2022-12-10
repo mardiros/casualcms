@@ -2,13 +2,7 @@ import { Descendant, Text } from "slate";
 import { TypeNode } from "typescript";
 import { escapeHtml } from "./strutil";
 
-import {
-  NodeType,
-  SlateModel,
-  TypedLink,
-  TypedNode,
-  TypedText,
-} from "./types";
+import { NodeType, SlateModel, TypedLink, TypedNode, TypedText } from "./types";
 
 const serializeNode = (type: NodeType, el: TypedNode): string => {
   switch (type) {
@@ -41,7 +35,7 @@ const serializeNode = (type: NodeType, el: TypedNode): string => {
     case "link":
       // render paragraph as div while editing...
       return `<a href="${escapeHtml((el as TypedLink).href)}">${toHtml(
-        el.children
+        el.children,
       )}</a>`;
 
     // case "image":

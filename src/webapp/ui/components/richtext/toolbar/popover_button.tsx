@@ -75,8 +75,7 @@ const ModalBox: React.FunctionComponent<ModalBoxProps> = ({
 
 const isLinkActive = (editor: MyEditor) => {
   const [link] = Editor.nodes(editor, {
-    match: (n) =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link",
+    match: (n) => !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link",
   });
   return !!link;
 };
@@ -84,9 +83,7 @@ const isLinkActive = (editor: MyEditor) => {
 const unwrapLink = (editor: MyEditor) => {
   Transforms.unwrapNodes(editor, {
     match: (n) => {
-      return (
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link"
-      );
+      return !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === "link";
     },
   });
 };
@@ -228,7 +225,7 @@ type InlineLinkProps = {
   children: React.ReactNode;
 };
 export const InlineLink: React.FunctionComponent<InlineLinkProps> = (
-  props: InlineLinkProps
+  props: InlineLinkProps,
 ) => {
   const { href, children, slate_attributes } = props;
   const { onOpen, onClose, isOpen } = useDisclosure();

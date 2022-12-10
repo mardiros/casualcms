@@ -8,7 +8,7 @@ import { FastApiError, BaseFetchApi, castError } from "./base";
 export class FetchPageTypeApi extends BaseFetchApi implements IPageTypeApi {
   async listPageTypes(
     authntoken: string,
-    parentType: string | null
+    parentType: string | null,
   ): AsyncApiResult<PartialPageType[]> {
     const qs = parentType ? new URLSearchParams({ type: parentType }) : "";
     const response = await this.fetch(`/api/pages-types?${qs}`, {
@@ -25,10 +25,7 @@ export class FetchPageTypeApi extends BaseFetchApi implements IPageTypeApi {
     return ok(jsonData as Array<PartialPageType>);
   }
 
-  async showPageType(
-    authntoken: string,
-    pageType: string
-  ): AsyncApiResult<PageType> {
+  async showPageType(authntoken: string, pageType: string): AsyncApiResult<PageType> {
     // FIXME: pageType should be urlencoded
     const response = await this.fetch(`/api/pages-types/${pageType}`, {
       method: "GET",

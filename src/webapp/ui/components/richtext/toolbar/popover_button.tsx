@@ -22,6 +22,7 @@ import {
   Element as SlateElement,
   Range as SlateRange,
   Text as SlateText,
+  Location,
 } from "slate";
 import { useMyEditor } from "../hooks";
 
@@ -44,6 +45,7 @@ const ModalBox: React.FunctionComponent<ModalBoxProps> = ({
   children,
   isActive,
 }) => {
+  // rome-ignore lint/suspicious/noExplicitAny: FocusableElement type is not public
   const cancelRef = React.useRef<any>();
   return (
     <>
@@ -129,14 +131,14 @@ const LinkFieldSet: React.FunctionComponent<{
   let defaultText = "";
   if (!isCollapsed) {
     if (href) {
-      const nodes = Editor.node(editor, selection as any);
+      const nodes = Editor.node(editor, selection as Location);
       if (nodes.length) {
         if (SlateText.isText(nodes[0])) {
           defaultText = nodes[0].text;
         }
       }
     } else {
-      defaultText = Editor.string(editor, selection as any);
+      defaultText = Editor.string(editor, selection as Location);
     }
   }
   const [url, setUrl] = React.useState(href || "");
@@ -221,6 +223,7 @@ export const LinkButton: React.FunctionComponent<{}> = () => {
 
 type InlineLinkProps = {
   href: string;
+  // rome-ignore lint/suspicious/noExplicitAny: slate spreaded stuff
   slate_attributes: any;
   children: React.ReactNode;
 };
@@ -229,6 +232,7 @@ export const InlineLink: React.FunctionComponent<InlineLinkProps> = (
 ) => {
   const { href, children, slate_attributes } = props;
   const { onOpen, onClose, isOpen } = useDisclosure();
+  // rome-ignore lint/suspicious/noExplicitAny: FocusableElement type is not public
   const cancelRef = React.useRef<any>();
   const selected = useSelected();
   return (

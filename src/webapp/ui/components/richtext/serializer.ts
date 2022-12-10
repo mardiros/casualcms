@@ -75,7 +75,7 @@ const serializeLeaf = (el: TypedLeaf): string => {
   return "";
 };
 
-const serializeElement = (el: TypedNode | TypedLeaf): string => {
+const serializeElement = (el: any): string => {
   if (Text.isText(el)) {
     return serializeLeaf(el);
   } else {

@@ -18,7 +18,7 @@ import {
 } from "./renderer";
 import { Toolbar } from "./toolbar/component";
 import { toggleMark } from "./toolbar/mark_btn";
-import { FeatureType, TextMark, TypedNode } from "./types";
+import { FeatureType, MyEditor, TextMark, TypedNode } from "./types";
 
 const HOTKEYS: { [hotkey: string]: TextMark } = {
   "mod+b": "bold",
@@ -26,7 +26,7 @@ const HOTKEYS: { [hotkey: string]: TextMark } = {
   "mod+u": "underline",
 };
 
-const withInlines = (editor: any) => {
+const withInlines = (editor: MyEditor) => {
   const isInline = editor.isInline;
 
   editor.isInline = (element: TypedNode) =>
@@ -78,7 +78,7 @@ export const RichTextEditor: React.FunctionComponent<WidgetProps> = (
 
   const onKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     for (const hotkey in HOTKEYS) {
-      if (isHotkey(hotkey, event as any)) {
+      if (isHotkey(hotkey, event)) {
         event.preventDefault();
         const mark = HOTKEYS[hotkey];
         toggleMark(editor, mark);

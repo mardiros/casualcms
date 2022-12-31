@@ -62,7 +62,7 @@ export default function installGlobalEnvironment(options = {}) {
   // add access to our jsdom instance
   global.$jsdom = jsdom;
 
-  const cleanup = () => KEYS.forEach((key) => global[key] = undefined);
+  const cleanup = () => KEYS.forEach((key) => (global[key] = undefined));
 
   document.destroy = cleanup;
 

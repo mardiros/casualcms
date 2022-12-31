@@ -35,70 +35,80 @@ describe("As a user, I can list settings of a given site", () => {
     });
   });
 
-  it("<SettingRow />: Render a row for a setting", async () => {
-    renderWithRouter(
-      <Route
-        path="/admin/settingrow"
-        element={
-          <Table>
-            <Tbody>
-              <SettingRow
-                settingUrl={"/admin/settings/.../edit"}
-                settingType={{ title: "Contact", key: "contact" }}
-              />
-            </Tbody>
-          </Table>
-        }
-      />,
-      "/admin/settingrow",
-    );
+  describe("<SettingRow />", () => {
+    it("Render a row for a setting", async () => {
+      renderWithRouter(
+        <Route
+          path="/admin/settingrow"
+          element={
+            <Table>
+              <Tbody>
+                <SettingRow
+                  settingUrl={"/admin/settings/.../edit"}
+                  settingType={{ title: "Contact", key: "contact" }}
+                />
+              </Tbody>
+            </Table>
+          }
+        />,
+        "/admin/settingrow",
+      );
 
-    let link = await screen.findByText("Contact", { exact: false });
-    expect(link.getAttribute("href")).equal("/admin/settings/.../edit");
+      let link = await screen.findByText("Contact", { exact: false });
+      expect(link.getAttribute("href")).equal("/admin/settings/.../edit");
+    });
   });
 
-  it("<SettingsTable />: Render table if setting types are loaded", async () => {
-    const settingTypes = [
-      { title: "Feature Flag", key: "blog:ff" },
-      { title: "Contact", key: "blog:contact" },
-    ];
-    renderWithRouter(
-      <Route
-        path="/admin/settings/table"
-        element={
-          <SettingsTable
-            config={config}
-            token=""
-            hostname={"www.localhost"}
-            settingTypes={settingTypes}
-          />
-        }
-      />,
-      "/admin/settings/table",
-    );
+  describe("<SettingsTable />", () => {
+    it("Render table if setting types are loaded", async () => {
+      const settingTypes = [
+        { title: "Feature Flag", key: "blog:ff" },
+        { title: "Contact", key: "blog:contact" },
+      ];
+      renderWithRouter(
+        <Route
+          path="/admin/settings/table"
+          element={
+            <SettingsTable
+              config={config}
+              token=""
+              hostname={"www.localhost"}
+              settingTypes={settingTypes}
+            />
+          }
+        />,
+        "/admin/settings/table",
+      );
 
-    const ff = await screen.findByText("Feature Flag", { exact: false });
-    expect(ff.nodeName).equal("A");
-    expect(ff.getAttribute("href")).equal("/admin/settings/www.localhost/blog:ff/new");
+      const ff = await screen.findByText("Feature Flag", { exact: false });
+      expect(ff.nodeName).equal("A");
+      expect(ff.getAttribute("href")).equal(
+        "/admin/settings/www.localhost/blog:ff/new",
+      );
 
-    const contact = await screen.findByText("Contact", { exact: false });
-    expect(contact.nodeName).equal("A");
-    expect(contact.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:contact/edit",
-    );
+      const contact = await screen.findByText("Contact", { exact: false });
+      expect(contact.nodeName).equal("A");
+      expect(contact.getAttribute("href")).equal(
+        "/admin/settings/www.localhost/blog:contact/edit",
+      );
+    });
   });
 
-  it("<SettingList />: Render settings lists from the API", async () => {
-    renderWithRouter(
-      <Route path="/admin/settings/:hostname" element={<SettingList />} />,
-      "/admin/settings/www.localhost",
-    );
-    const ff = await screen.findByText("Feature Flag", { exact: false });
-    expect(ff.getAttribute("href")).equal("/admin/settings/www.localhost/blog:ff/new");
+  describe("<SettingList />", () => {
+    it("Render settings lists from the API", async () => {
+      renderWithRouter(
+        <Route path="/admin/settings/:hostname" element={<SettingList />} />,
+        "/admin/settings/www.localhost",
+      );
+      const ff = await screen.findByText("Feature Flag", { exact: false });
+      expect(ff.getAttribute("href")).equal(
+        "/admin/settings/www.localhost/blog:ff/new",
+      );
 
-    const contact = await screen.findByText("Contact", { exact: false });
-    expect(contact.getAttribute("href")).equal(
-      "/admin/settings/www.localhost/blog:contact/edit",
-    );
+      const contact = await screen.findByText("Contact", { exact: false });
+      expect(contact.getAttribute("href")).equal(
+        "/admin/settings/www.localhost/blog:contact/edit",
+      );
+    });
   });
 });

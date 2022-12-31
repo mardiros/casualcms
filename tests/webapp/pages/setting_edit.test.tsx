@@ -30,48 +30,47 @@ describe("As a user, I can list setting", () => {
     await config.api.site.deleteSite("", "*");
   });
 
-  it("<SettingEdit />: Update the setting using the web form", async () => {
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/settings/:hostname/:settingKey/edit"
-          element={<SettingEdit />}
-        />
-        <Route
-          path="/admin/settings/:hostname"
-          element={<div>Settings list</div>}
-        />
-      </>,
-      "/admin/settings/www.localhost/blog:contact/edit",
-    );
+  describe("<SettingEdit />", () => {
+    it("Update the setting using the web form", async () => {
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/settings/:hostname/:settingKey/edit"
+            element={<SettingEdit />}
+          />
+          <Route path="/admin/settings/:hostname" element={<div>Settings list</div>} />
+        </>,
+        "/admin/settings/www.localhost/blog:contact/edit",
+      );
 
-    const input = await screen.findByLabelText("email", { exact: false });
-    fireEvent.change(input, { target: { value: "bob@example.net" } });
+      const input = await screen.findByLabelText("email", { exact: false });
+      fireEvent.change(input, { target: { value: "bob@example.net" } });
 
-    let button = screen.getByRole("button", { name: "Save" });
-    fireEvent.click(button);
+      let button = screen.getByRole("button", { name: "Save" });
+      fireEvent.click(button);
 
-    await waitForPath("/admin/settings/www.localhost");
-    const settings = await config.api.setting.listSettings("", "www.localhost");
-    expect(settings._unsafeUnwrap()).eql([
-      {
+      await waitForPath("/admin/settings/www.localhost");
+      const settings = await config.api.setting.listSettings("", "www.localhost");
+      expect(settings._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            hostname: "www.localhost",
+            key: "blog:contact",
+          },
+        },
+      ]);
+      const contactSetting = await config.api.setting.showSetting(
+        "",
+        "www.localhost",
+        "blog:contact",
+      );
+      expect(contactSetting._unsafeUnwrap()).eql({
+        email: "bob@example.net",
         metadata: {
           hostname: "www.localhost",
           key: "blog:contact",
         },
-      },
-    ]);
-    const contactSetting = await config.api.setting.showSetting(
-      "",
-      "www.localhost",
-      "blog:contact",
-    );
-    expect(contactSetting._unsafeUnwrap()).eql({
-      email: "bob@example.net",
-      metadata: {
-        hostname: "www.localhost",
-        key: "blog:contact",
-      },
+      });
     });
   });
 });

@@ -3,7 +3,6 @@ import React from "react";
 import { Route } from "react-router-dom";
 import { screen, fireEvent } from "@testing-library/react";
 import { PageEdit } from "../../../src/webapp/ui/pages/pages/page_edit";
-import { PageList } from "../../../src/webapp/ui/pages/pages/page_list";
 import { renderWithRouter, renderWithRouterWithTheme } from "../helpers";
 import config from "../config";
 
@@ -36,65 +35,64 @@ describe("As a user, I can edit existing pages", () => {
     await config.api.page.deleteDraft("", "/home/sub0");
     await config.api.page.deleteDraft("", "/home");
   });
+  describe("<PageEdit />", () => {
+    it("Load the root page in an edition form", async () => {
+      renderWithRouter(
+        <>
+          <Route path="/admin/pages/edit" element={<PageEdit />} />
+        </>,
+        "/admin/pages/edit?page=/home",
+      );
 
-  it("<PageEdit />: Load the root page in an edition form", async () => {
-    renderWithRouter(
-      <>
-        <Route path="/admin/pages" element={<PageList />} />
-        <Route path="/admin/pages/edit" element={<PageEdit />} />
-      </>,
-      "/admin/pages/edit?page=/home",
-    );
+      let input = await screen.findByLabelText("Slug", { exact: false });
+      expect(input.getAttribute("value")).equal("home");
 
-    let input = await screen.findByLabelText("Slug", { exact: false });
-    expect(input.getAttribute("value")).equal("home");
+      input = screen.getByLabelText("Title", { exact: false });
+      expect(input.getAttribute("value")).equal("Home Page");
+    });
 
-    input = screen.getByLabelText("Title", { exact: false });
-    expect(input.getAttribute("value")).equal("Home Page");
-  });
+    it("Load the subpage page in an edition form", async () => {
+      renderWithRouter(
+        <>
+          <Route path="/admin/pages/edit" element={<PageEdit />} />
+        </>,
+        "/admin/pages/edit?page=/home/sub0",
+      );
 
-  it("<PageEdit />: Load the subpage page in an edition form", async () => {
-    renderWithRouter(
-      <>
-        <Route path="/admin/pages" element={<PageList />} />
-        <Route path="/admin/pages/edit" element={<PageEdit />} />
-      </>,
-      "/admin/pages/edit?page=/home/sub0",
-    );
+      let input = await screen.findByLabelText("Slug", { exact: false });
+      expect(input.getAttribute("value")).equal("sub0");
 
-    let input = await screen.findByLabelText("Slug", { exact: false });
-    expect(input.getAttribute("value")).equal("sub0");
+      input = screen.getByLabelText("Title", { exact: false });
+      expect(input.getAttribute("value")).equal("Section Page");
 
-    input = screen.getByLabelText("Title", { exact: false });
-    expect(input.getAttribute("value")).equal("Section Page");
+      input = screen.getByLabelText("Description", { exact: false });
+      expect(input.getAttribute("value")).equal("first section");
+    });
 
-    input = screen.getByLabelText("Description", { exact: false });
-    expect(input.getAttribute("value")).equal("first section");
-  });
+    it("Update the root page using the edition form", async () => {
+      renderWithRouterWithTheme(
+        <>
+          <Route path="/admin/pages/edit" element={<PageEdit />} />
+        </>,
+        "/admin/pages/edit?page=/home",
+      );
 
-  it("<PageEdit />: Update the root page using the edition form", async () => {
-    renderWithRouterWithTheme(
-      <>
-        <Route path="/admin/pages/edit" element={<PageEdit />} />
-      </>,
-      "/admin/pages/edit?page=/home",
-    );
+      let input = await screen.findByLabelText("Title", { exact: false });
+      fireEvent.change(input, { target: { value: "New Value" } });
 
-    let input = await screen.findByLabelText("Title", { exact: false });
-    fireEvent.change(input, { target: { value: "New Value" } });
+      input = screen.getByLabelText("Body", { exact: false });
+      fireEvent.change(input, { target: { value: "Long time ago" } });
 
-    input = screen.getByLabelText("Body", { exact: false });
-    fireEvent.change(input, { target: { value: "Long time ago" } });
+      let button = screen.getByRole("button", { name: "Save" });
+      expect(button).not.equal(null);
+      fireEvent.click(button);
 
-    let button = screen.getByRole("button", { name: "Save" });
-    expect(button).not.equal(null);
-    fireEvent.click(button);
+      let toastee = await screen.findByText("Draft page saved.");
+      expect(toastee).not.equal(null);
 
-    let toastee = await screen.findByText("Draft page saved.");
-    expect(toastee).not.equal(null);
-
-    const page = await config.api.page.showDraft("", "/home");
-    expect(page.isOk()).equal(true);
-    expect(page.unwrapOr({ title: "" }).title).equal("New Value");
+      const page = await config.api.page.showDraft("", "/home");
+      expect(page.isOk()).equal(true);
+      expect(page.unwrapOr({ title: "" }).title).equal("New Value");
+    });
   });
 });

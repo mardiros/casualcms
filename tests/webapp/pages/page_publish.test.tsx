@@ -75,153 +75,154 @@ describe("As a user, I can publish existing pages", () => {
     await config.api.page.deleteDraft("", "/home/sub0");
     await config.api.page.deleteDraft("", "/home");
   });
+  describe("<PublishResultBox />", () => {
+    it("display the publication result", async () => {
+      const errs = new Map();
+      errs.set("hostname", "deleted");
 
-  it("<PublishResultBox /> display the publication result", async () => {
-    const errs = new Map();
-    errs.set("hostname", "deleted");
+      const hostnames: SelectableHostname[] = [
+        {
+          hostname: "stage.alice.bob",
+          secure: true,
+          root_page_path: "/home",
+          selected: true,
+          response: ok(true),
+        },
+        {
+          hostname: "preprod.alice.bob",
+          secure: true,
+          root_page_path: "/home",
+          selected: true,
+          response: err(errs),
+        },
+        {
+          hostname: "www",
+          secure: true,
+          root_page_path: "/home",
+          selected: false,
+        },
+      ];
+      let closed = false;
+      function onClose() {
+        closed = true;
+      }
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/pages"
+            element={
+              <PublishResultBox
+                pagePath="/home"
+                hostnames={hostnames}
+                onClose={onClose}
+              />
+            }
+          />
+        </>,
+        "/admin/pages",
+      );
+      const boxes = screen.getAllByRole("publication_result");
+      expect(boxes.length).equal(3);
+      expect(boxes[0].textContent?.trim()).equal("stage.alice.bob View");
 
-    const hostnames: SelectableHostname[] = [
-      {
-        hostname: "stage.alice.bob",
-        secure: true,
-        root_page_path: "/home",
-        selected: true,
-        response: ok(true),
-      },
-      {
-        hostname: "preprod.alice.bob",
-        secure: true,
-        root_page_path: "/home",
-        selected: true,
-        response: err(errs),
-      },
-      {
+      const view_result = screen.getByRole("view_publication_result");
+      expect(view_result.getAttribute("href")).equal("https://stage.alice.bob");
+
+      expect(boxes[1].textContent?.trim()).equal("preprod.alice.bob ERROR");
+      expect(boxes[2].textContent?.trim()).equal("www Ignored");
+
+      const close = screen.getByRole("close_publish_popover");
+      fireEvent.click(close);
+      expect(closed).equal(true);
+    });
+  });
+
+  describe("<SiteCheckBox />", () => {
+    it("let configure sites to publish the page", async () => {
+      const hostname: SelectableHostname = {
         hostname: "www",
         secure: true,
         root_page_path: "/home",
         selected: false,
-      },
-    ];
-    let closed = false;
-    function onClose() {
-      closed = true;
-    }
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/pages"
-          element={
-            <PublishResultBox
-              pagePath="/home"
-              hostnames={hostnames}
-              onClose={onClose}
-            />
-          }
-        />
-      </>,
-      "/admin/pages",
-    );
-    const boxes = screen.getAllByRole("publication_result");
-    expect(boxes.length).equal(3);
-    expect(boxes[0].textContent?.trim()).equal("stage.alice.bob View");
+      };
+      renderWithRouter(
+        <>
+          <Route path="/admin/pages" element={<SiteCheckBox hostname={hostname} />} />
+        </>,
+        "/admin/pages",
+      );
+      const cbx = screen.getByLabelText("www");
+      // expect(cbx.getAttribute("checked")).equal(false);
+      fireEvent.click(cbx);
+      expect(hostname.selected).equal(true);
+    });
+    it("let remove site to publish the page", async () => {
+      const hostname: SelectableHostname = {
+        hostname: "www",
+        secure: true,
+        root_page_path: "/home",
+        selected: true,
+      };
+      renderWithRouter(
+        <>
+          <Route path="/admin/pages" element={<SiteCheckBox hostname={hostname} />} />
+        </>,
+        "/admin/pages",
+      );
+      const cbx = screen.getByLabelText("www");
+      fireEvent.click(cbx);
+      expect(hostname.selected).equal(false);
+    });
+  });
+  describe("<PublishButton />", () => {
+    it("display the publication popover", async () => {
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/pages"
+            element={<PublishButton token="x" pagePath="/home" />}
+          />
+        </>,
+        "/admin/pages",
+      );
+      const btn = screen.getByText("Publish");
+      fireEvent.click(btn);
+      const boxes = await screen.findAllByRole("select_site");
+      expect(boxes.length).equal(3);
+      expect(boxes[0].textContent).equal("stage");
+      expect(boxes[1].textContent).equal("preprod");
+      expect(boxes[2].textContent).equal("www");
 
-    const view_result = screen.getByRole("view_publication_result");
-    expect(view_result.getAttribute("href")).equal("https://stage.alice.bob");
+      fireEvent.click(boxes[0]);
+      fireEvent.click(boxes[1]);
 
-    expect(boxes[1].textContent?.trim()).equal("preprod.alice.bob ERROR");
-    expect(boxes[2].textContent?.trim()).equal("www Ignored");
+      const submitBtn = screen.getByRole("publish");
+      fireEvent.click(submitBtn);
+      const closeBtn = await screen.findByRole("close_publish_popover");
 
-    const close = screen.getByRole("close_publish_popover");
-    fireEvent.click(close);
-    expect(closed).equal(true);
+      const result = await screen.findAllByRole("publication_result");
+      expect(result.length).equal(3);
+      expect(result[0].textContent).equal("stage View");
+      expect(result[1].textContent).equal("preprod View");
+      expect(result[2].textContent).equal("www Ignored");
+      fireEvent.click(closeBtn);
+    });
   });
 
-  it("<SiteCheckBox /> let configure sites to publish the page", async () => {
-    const hostname: SelectableHostname = {
-      hostname: "www",
-      secure: true,
-      root_page_path: "/home",
-      selected: false,
-    };
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/pages"
-          element={<SiteCheckBox hostname={hostname} />}
-        />
-      </>,
-      "/admin/pages",
-    );
-    const cbx = screen.getByLabelText("www");
-    // expect(cbx.getAttribute("checked")).equal(false);
-    fireEvent.click(cbx);
-    expect(hostname.selected).equal(true);
-  });
-  it("<SiteCheckBox /> let remove site to publish the page", async () => {
-    const hostname: SelectableHostname = {
-      hostname: "www",
-      secure: true,
-      root_page_path: "/home",
-      selected: true,
-    };
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/pages"
-          element={<SiteCheckBox hostname={hostname} />}
-        />
-      </>,
-      "/admin/pages",
-    );
-    const cbx = screen.getByLabelText("www");
-    fireEvent.click(cbx);
-    expect(hostname.selected).equal(false);
-  });
-  it("<PublishButton /> display the publication popover", async () => {
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/pages"
-          element={<PublishButton token="x" pagePath="/home" />}
-        />
-      </>,
-      "/admin/pages",
-    );
-    const btn = screen.getByText("Publish");
-    fireEvent.click(btn);
-    const boxes = await screen.findAllByRole("select_site");
-    expect(boxes.length).equal(3);
-    expect(boxes[0].textContent).equal("stage");
-    expect(boxes[1].textContent).equal("preprod");
-    expect(boxes[2].textContent).equal("www");
+  describe("<PageEditButtons />", () => {
+    it("display the publish button", async () => {
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/pages"
+            element={<PublishButton token="x" pagePath="/home" />}
+          />
+        </>,
+        "/admin/pages",
+      );
 
-    fireEvent.click(boxes[0]);
-    fireEvent.click(boxes[1]);
-
-    const submitBtn = screen.getByRole("publish");
-    fireEvent.click(submitBtn);
-    const closeBtn = await screen.findByRole("close_publish_popover");
-
-    const result = await screen.findAllByRole("publication_result");
-    expect(result.length).equal(3);
-    expect(result[0].textContent).equal("stage View");
-    expect(result[1].textContent).equal("preprod View");
-    expect(result[2].textContent).equal("www Ignored");
-    fireEvent.click(closeBtn);
-  });
-
-  it("<PageEditButtons /> display the publish button", async () => {
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/pages"
-          element={<PublishButton token="x" pagePath="/home" />}
-        />
-      </>,
-      "/admin/pages",
-    );
-
-    const btn = screen.getByRole("open_publish_popover");
-    expect(btn).not.equal(undefined);
+      const btn = screen.getByRole("open_publish_popover");
+      expect(btn).not.equal(undefined);
+    });
   });
 });

@@ -50,57 +50,59 @@ export const renderLogin = async (): Promise<RenderResult> => {
 };
 
 describe("As a user, I can login to the app", () => {
-  it("I see an error message for invalid username or password", async () => {
-    await renderLogin();
-    await waitForPath("/admin/login");
+  describe("<RequireAuth>", () => {
+    it("display an error message for invalid username or password", async () => {
+      await renderLogin();
+      await waitForPath("/admin/login");
 
-    let input = screen.getByLabelText("Username:");
-    expect(input).not.equal(null);
-    fireEvent.change(input, { target: { value: "bob" } });
+      let input = screen.getByLabelText("Username:");
+      expect(input).not.equal(null);
+      fireEvent.change(input, { target: { value: "bob" } });
 
-    input = screen.getByLabelText("Password:");
-    expect(input).not.equal(null);
-    fireEvent.change(input, { target: { value: "justincase" } });
+      input = screen.getByLabelText("Password:");
+      expect(input).not.equal(null);
+      fireEvent.change(input, { target: { value: "justincase" } });
 
-    let button = screen.getByText("Sign In");
-    expect(button).not.equal(null);
-    fireEvent.click(button);
-    const title = await screen.findByText("Invalid username or password");
-    expect(title.nodeName).equal("DIV");
-  });
+      let button = screen.getByText("Sign In");
+      expect(button).not.equal(null);
+      fireEvent.click(button);
+      const title = await screen.findByText("Invalid username or password");
+      expect(title.nodeName).equal("DIV");
+    });
 
-  it("I am redirected to home after login with correct credentials", async () => {
-    await renderLogin();
-    await waitForPath("/admin/login");
+    it("redirected to home after login with correct credentials", async () => {
+      await renderLogin();
+      await waitForPath("/admin/login");
 
-    let input = screen.getByLabelText("Username:");
-    expect(input).not.equal(null);
-    fireEvent.change(input, { target: { value: "bob" } });
+      let input = screen.getByLabelText("Username:");
+      expect(input).not.equal(null);
+      fireEvent.change(input, { target: { value: "bob" } });
 
-    input = screen.getByLabelText("Password:");
-    expect(input).not.equal(null);
-    fireEvent.change(input, { target: { value: "itsmysecret" } });
+      input = screen.getByLabelText("Password:");
+      expect(input).not.equal(null);
+      fireEvent.change(input, { target: { value: "itsmysecret" } });
 
-    let button = screen.getByText("Sign In");
-    expect(button).not.equal(null);
-    fireEvent.click(button);
+      let button = screen.getByText("Sign In");
+      expect(button).not.equal(null);
+      fireEvent.click(button);
 
-    const title = await screen.findByText("Welcome bob");
-    expect(title.nodeName).equal("DIV");
-  });
+      const title = await screen.findByText("Welcome bob");
+      expect(title.nodeName).equal("DIV");
+    });
 
-  it("Reuse saved credentials on hard refresh", async () => {
-    const bob = {
-      id: "123",
-      username: "bob",
-      token: "abc",
-      lang: "en",
-    };
-    await config.uow.account.set(bob);
-    await renderLogin();
-    await waitForPath("/admin");
+    it("Reuse saved credentials on hard refresh", async () => {
+      const bob = {
+        id: "123",
+        username: "bob",
+        token: "abc",
+        lang: "en",
+      };
+      await config.uow.account.set(bob);
+      await renderLogin();
+      await waitForPath("/admin");
 
-    const title = await screen.findByText("Welcome bob");
-    expect(title.nodeName).equal("DIV");
+      const title = await screen.findByText("Welcome bob");
+      expect(title.nodeName).equal("DIV");
+    });
   });
 });

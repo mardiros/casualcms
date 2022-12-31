@@ -10,13 +10,13 @@ import { PageList } from "../../../src/webapp/ui/pages/pages/page_list";
 
 describe("As a user, I am onboarded with a distinct page", () => {
   describe("<HomePage />", () => {
-    it("should display onboarding message", async () => {
+    it("display onboarding message", async () => {
       renderWithRouter(<Route path="/" element={<HomePage />} />, "/");
       await screen.findByText("Welcome bob!");
       let link = screen.getByText("Create my first page");
       expect(link.getAttribute("href")).equal("/admin/pages/new");
     });
-    it("should redirect to root pages list if exists", async () => {
+    it("redirect to root pages list if exists", async () => {
       before(async function () {
         const resp = await config.api.page.createDraft(
           "",

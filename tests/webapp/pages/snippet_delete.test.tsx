@@ -26,58 +26,60 @@ describe("As a user, I can delete a snippet", () => {
     });
   });
 
-  it("<SnippetDeletePopoverForm />: Delete a snippet", async () => {
-    const snippet = {
-      key: "header",
-      metadata: {
-        type: "blog:HeaderSnippet",
-        title: "Header Snippet",
-      },
-    };
-
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/snippets/blog:HeaderSnippet"
-          element={<SnippetDeletePopoverForm curSnippet={snippet} />}
-        />
-        <Route path="/admin/snippets" element={<h4>Snippet list</h4>} />
-      </>,
-      "/admin/snippets/blog:HeaderSnippet",
-    );
-    let link = screen.getByText("Delete this snippet");
-    fireEvent.click(link);
-
-    let subList = await config.api.snippet.listSnippets("");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        metadata: {
-          type: "blog:HeaderSnippet",
-          title: "Header Snippet",
-        },
+  describe("<SnippetDeletePopoverForm />", () => {
+    it("Delete a snippet", async () => {
+      const snippet = {
         key: "header",
-      },
-      {
         metadata: {
           type: "blog:HeaderSnippet",
           title: "Header Snippet",
         },
-        key: "alt-header",
-      },
-    ]);
+      };
 
-    link = screen.getByText("Confirm Deletion");
-    fireEvent.click(link);
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/snippets/blog:HeaderSnippet"
+            element={<SnippetDeletePopoverForm curSnippet={snippet} />}
+          />
+          <Route path="/admin/snippets" element={<h4>Snippet list</h4>} />
+        </>,
+        "/admin/snippets/blog:HeaderSnippet",
+      );
+      let link = screen.getByText("Delete this snippet");
+      fireEvent.click(link);
 
-    subList = await config.api.snippet.listSnippets("");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        metadata: {
-          type: "blog:HeaderSnippet",
-          title: "Header Snippet",
+      let subList = await config.api.snippet.listSnippets("");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            type: "blog:HeaderSnippet",
+            title: "Header Snippet",
+          },
+          key: "header",
         },
-        key: "alt-header",
-      },
-    ]);
+        {
+          metadata: {
+            type: "blog:HeaderSnippet",
+            title: "Header Snippet",
+          },
+          key: "alt-header",
+        },
+      ]);
+
+      link = screen.getByText("Confirm Deletion");
+      fireEvent.click(link);
+
+      subList = await config.api.snippet.listSnippets("");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            type: "blog:HeaderSnippet",
+            title: "Header Snippet",
+          },
+          key: "alt-header",
+        },
+      ]);
+    });
   });
 });

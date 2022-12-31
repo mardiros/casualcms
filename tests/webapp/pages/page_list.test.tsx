@@ -60,167 +60,173 @@ describe("As a user, I can list pages", () => {
     await config.api.page.deleteDraft("", "/home");
     await config.api.page.deleteDraft("", "/root");
   });
+  describe("<PageRow />", () => {
+    it("Render a row for a page", async () => {
+      const page = {
+        slug: "home",
+        title: "Home Page",
+        metadata: {
+          path: "/home",
+          type: "casual:HomePage",
+          title: "Home Page Type",
+        },
+      };
+      renderWithRouter(
+        <Route
+          path="/admin/pagerow"
+          element={
+            <Table>
+              <Tbody>
+                <PageRow page={page} />
+              </Tbody>
+            </Table>
+          }
+        />,
+        "/admin/pagerow",
+      );
+      await waitForLoadingLabel("Loading pages list");
 
-  it("<PageRow /> Render a row for a page", async () => {
-    const page = {
-      slug: "home",
-      title: "Home Page",
-      metadata: {
-        path: "/home",
-        type: "casual:HomePage",
-        title: "Home Page Type",
-      },
-    };
-    renderWithRouter(
-      <Route
-        path="/admin/pagerow"
-        element={
-          <Table>
-            <Tbody>
-              <PageRow page={page} />
-            </Tbody>
-          </Table>
-        }
-      />,
-      "/admin/pagerow",
-    );
-    await waitForLoadingLabel("Loading pages list");
+      let link = screen.getByRole("link", { name: "home" });
+      expect(link).not.equal(undefined);
+      expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
 
-    let link = screen.getByRole("link", { name: "home" });
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
+      const type = screen.getByText("Home Page Type", { exact: false });
+      expect(type).not.equal(undefined);
 
-    const type = screen.getByText("Home Page Type", { exact: false });
-    expect(type).not.equal(undefined);
+      link = screen.getByText("Edit", { exact: false });
+      expect(link).not.equal(undefined);
+      expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
 
-    link = screen.getByText("Edit", { exact: false });
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/pages/edit?page=%2Fhome");
+      link = screen.getByText("Preview", { exact: false });
+      expect(link).not.equal(undefined);
+      expect(link.getAttribute("href")).equal("/admin/pages/preview?page=%2Fhome");
 
-    link = screen.getByText("Preview", { exact: false });
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/pages/preview?page=%2Fhome");
-
-    link = screen.getByTestId("View child pages");
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/pages/?parent=%2Fhome");
+      link = screen.getByTestId("View child pages");
+      expect(link).not.equal(undefined);
+      expect(link.getAttribute("href")).equal("/admin/pages/?parent=%2Fhome");
+    });
   });
-
-  it("<PageListTable />: Render root pages table from the API", async () => {
-    renderWithRouter(
-      <Route
-        path="/admin/pages"
-        element={
-          <PageListTable curPage={null} parentPath={null} config={config} token="" />
-        }
-      />,
-      "/admin/pages",
-    );
-    await waitForLoadingLabel("Loading pages list");
-    let links = screen.getAllByText("Edit", { exact: false });
-
-    expect(links.length).equal(3);
-  });
-
-  it("<PageListTable />: Render sub pages table from the API", async () => {
-    renderWithRouter(
-      <Route
-        path="/admin/pages"
-        element={
-          <PageListTable curPage={null} parentPath="/home" config={config} token="" />
-        }
-      />,
-      "/admin/pages?parent=/home",
-    );
-    await waitForLoadingLabel("Loading pages list");
-    let links = screen.getAllByText("Edit", { exact: false });
-    expect(links.length).equal(3);
-  });
-
-  it("<PageListButtons />: Redirect to the new page while clicking on the add button", async () => {
-    const page = {
-      metadata: {
-        path: "/home",
-        type: "casual:HomePage",
-        breadcrumb: { items: [] },
-      },
-      slug: "home",
-      title: "Home Page",
-      description: "describe the home",
-    };
-
-    renderWithRouter(
-      <>
+  describe("<PageListTable />", () => {
+    it("Render root pages table from the API", async () => {
+      renderWithRouter(
         <Route
           path="/admin/pages"
-          element={<PageListButtons curPage={page} subPages={[]} />}
-        />
-        <Route path="/admin/pages/new" element={<h4>New page page</h4>} />
-      </>,
-      "/admin/pages",
-    );
-    let link = screen.getByText("Add new page", { exact: false });
-    fireEvent.click(link);
-    const newPage = screen.getByText("New page page");
-    expect(newPage.nodeName).equal("H4");
+          element={
+            <PageListTable curPage={null} parentPath={null} config={config} token="" />
+          }
+        />,
+        "/admin/pages",
+      );
+      await waitForLoadingLabel("Loading pages list");
+      let links = screen.getAllByText("Edit", { exact: false });
+
+      expect(links.length).equal(3);
+    });
   });
 
-  it("<PageListButtons />: Render a delete button if there is no child pages", async () => {
-    const page = {
-      metadata: {
-        path: "/home/sub1",
-        type: "casual:HomePage",
-        breadcrumb: {
-          items: [
-            {
-              path: "/home",
-              title: "home",
-              slug: "home",
-            },
-            {
-              path: "/home/sub1",
-              title: "sub",
-              slug: "sub1",
-            },
-          ],
-        },
-      },
-      slug: "sub1",
-      title: "sub",
-      description: "",
-    };
-
-    renderWithRouter(
-      <>
+  describe("<PageListTable />", () => {
+    it("Render sub pages table from the API", async () => {
+      renderWithRouter(
         <Route
-          path="/admin/pages/btn"
-          element={<PageListButtons curPage={page} subPages={[]} />}
-        />
-        <Route path="/admin/pages" element={<h4>Page list</h4>} />
-      </>,
-      "/admin/pages/btn",
-    );
+          path="/admin/pages"
+          element={
+            <PageListTable curPage={null} parentPath="/home" config={config} token="" />
+          }
+        />,
+        "/admin/pages?parent=/home",
+      );
+      await waitForLoadingLabel("Loading pages list");
+      let links = screen.getAllByText("Edit", { exact: false });
+      expect(links.length).equal(3);
+    });
+  });
 
-    let link = screen.getByText("Delete this page");
-    fireEvent.click(link);
-
-    link = screen.getByText("Confirm Deletion");
-    fireEvent.click(link);
-
-    const newPage = await screen.findByText("Page list");
-    expect(newPage.nodeName).equal("H4");
-
-    const subList = await config.api.page.listDrafts("", "/home");
-    expect(subList._unsafeUnwrap()).eql([
-      {
+  describe("<PageListButtons />", async () => {
+    it("Redirect to the new page while clicking on the add button", async () => {
+      const page = {
         metadata: {
-          path: "/home/sub0",
-          type: "casual:SectionPage",
+          path: "/home",
+          type: "casual:HomePage",
+          breadcrumb: { items: [] },
+        },
+        slug: "home",
+        title: "Home Page",
+        description: "describe the home",
+      };
+
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/pages"
+            element={<PageListButtons curPage={page} subPages={[]} />}
+          />
+          <Route path="/admin/pages/new" element={<h4>New page page</h4>} />
+        </>,
+        "/admin/pages",
+      );
+      let link = screen.getByText("Add new page", { exact: false });
+      fireEvent.click(link);
+      const newPage = screen.getByText("New page page");
+      expect(newPage.nodeName).equal("H4");
+    });
+
+    it("Render a delete button if there is no child pages", async () => {
+      const page = {
+        metadata: {
+          path: "/home/sub1",
+          type: "casual:HomePage",
+          breadcrumb: {
+            items: [
+              {
+                path: "/home",
+                title: "home",
+                slug: "home",
+              },
+              {
+                path: "/home/sub1",
+                title: "sub",
+                slug: "sub1",
+              },
+            ],
+          },
+        },
+        slug: "sub1",
+        title: "sub",
+        description: "",
+      };
+
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/pages/btn"
+            element={<PageListButtons curPage={page} subPages={[]} />}
+          />
+          <Route path="/admin/pages" element={<h4>Page list</h4>} />
+        </>,
+        "/admin/pages/btn",
+      );
+
+      let link = screen.getByText("Delete this page");
+      fireEvent.click(link);
+
+      link = screen.getByText("Confirm Deletion");
+      fireEvent.click(link);
+
+      const newPage = await screen.findByText("Page list");
+      expect(newPage.nodeName).equal("H4");
+
+      const subList = await config.api.page.listDrafts("", "/home");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            path: "/home/sub0",
+            type: "casual:SectionPage",
+            title: "Section Page",
+          },
+          slug: "sub0",
           title: "Section Page",
         },
-        slug: "sub0",
-        title: "Section Page",
-      },
-    ]);
+      ]);
+    });
   });
 });

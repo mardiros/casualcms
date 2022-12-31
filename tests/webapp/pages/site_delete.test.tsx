@@ -24,51 +24,56 @@ describe("As a user, I can delete a site", () => {
     await config.api.site.deleteSite("", "*");
   });
 
-  it("Delete a site", async () => {
-    const site = {
-      hostname: "www.localhost",
-      default: false,
-      secure: false,
-      root_page_path: "/index",
-    };
-
-    renderWithRouter(
-      <>
-        <Route path="/admin/popin" element={<SiteDeletePopoverForm curSite={site} />} />
-        <Route path="/admin/sites" element={<h4>Site list</h4>} />
-      </>,
-      "/admin/popin",
-    );
-    let link = screen.getByText("Delete this site");
-    fireEvent.click(link);
-
-    let subList = await config.api.site.listSites("");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        default: true,
-        hostname: "*",
-        root_page_path: "/root",
-        secure: false,
-      },
-      {
-        default: false,
+  describe("<SiteDeletePopoverForm />", () => {
+    it("Delete a site", async () => {
+      const site = {
         hostname: "www.localhost",
+        default: false,
+        secure: false,
         root_page_path: "/index",
-        secure: false,
-      },
-    ]);
+      };
 
-    link = screen.getByText("Confirm Deletion");
-    fireEvent.click(link);
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/popin"
+            element={<SiteDeletePopoverForm curSite={site} />}
+          />
+          <Route path="/admin/sites" element={<h4>Site list</h4>} />
+        </>,
+        "/admin/popin",
+      );
+      let link = screen.getByText("Delete this site");
+      fireEvent.click(link);
 
-    subList = await config.api.site.listSites("");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        default: true,
-        hostname: "*",
-        root_page_path: "/root",
-        secure: false,
-      },
-    ]);
+      let subList = await config.api.site.listSites("");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          default: true,
+          hostname: "*",
+          root_page_path: "/root",
+          secure: false,
+        },
+        {
+          default: false,
+          hostname: "www.localhost",
+          root_page_path: "/index",
+          secure: false,
+        },
+      ]);
+
+      link = screen.getByText("Confirm Deletion");
+      fireEvent.click(link);
+
+      subList = await config.api.site.listSites("");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          default: true,
+          hostname: "*",
+          root_page_path: "/root",
+          secure: false,
+        },
+      ]);
+    });
   });
 });

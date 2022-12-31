@@ -41,76 +41,77 @@ describe("As a user, I can delete a setting", () => {
     await config.api.site.deleteSite("", "news");
     await config.api.site.deleteSite("", "www");
   });
-
-  it("<SettingDeletePopoverForm/> Delete a setting", async () => {
-    const setting = {
-      metadata: {
-        key: "blog:contact",
-        hostname: "www",
-      },
-      email: "alice@bob.net",
-    };
-
-    renderWithRouter(
-      <>
-        <Route
-          path="/admin/settings/:hostname/:key"
-          element={<SettingDeletePopoverForm curSetting={setting} />}
-        />
-        <Route path="/admin/settings/:hostname" element={<h4>Setting list</h4>} />
-      </>,
-      "/admin/settings/www/blog:contact",
-    );
-    let link = screen.getByText("Delete this setting");
-    fireEvent.click(link);
-
-    let subList = await config.api.setting.listSettings("", "www");
-    expect(subList._unsafeUnwrap()).eql([
-      {
+  describe("<SettingDeletePopoverForm/>", () => {
+    it("Delete a setting", async () => {
+      const setting = {
         metadata: {
-          hostname: "www",
           key: "blog:contact",
-        },
-      },
-      {
-        metadata: {
           hostname: "www",
-          key: "blog:ff",
         },
-      },
-    ]);
+        email: "alice@bob.net",
+      };
 
-    subList = await config.api.setting.listSettings("", "news");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        metadata: {
-          hostname: "news",
-          key: "blog:contact",
+      renderWithRouter(
+        <>
+          <Route
+            path="/admin/settings/:hostname/:key"
+            element={<SettingDeletePopoverForm curSetting={setting} />}
+          />
+          <Route path="/admin/settings/:hostname" element={<h4>Setting list</h4>} />
+        </>,
+        "/admin/settings/www/blog:contact",
+      );
+      let link = screen.getByText("Delete this setting");
+      fireEvent.click(link);
+
+      let subList = await config.api.setting.listSettings("", "www");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            hostname: "www",
+            key: "blog:contact",
+          },
         },
-      },
-    ]);
-
-    link = screen.getByText("Confirm Deletion");
-    fireEvent.click(link);
-
-    subList = await config.api.setting.listSettings("", "www");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        metadata: {
-          hostname: "www",
-          key: "blog:ff",
+        {
+          metadata: {
+            hostname: "www",
+            key: "blog:ff",
+          },
         },
-      },
-    ]);
+      ]);
 
-    subList = await config.api.setting.listSettings("", "news");
-    expect(subList._unsafeUnwrap()).eql([
-      {
-        metadata: {
-          hostname: "news",
-          key: "blog:contact",
+      subList = await config.api.setting.listSettings("", "news");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            hostname: "news",
+            key: "blog:contact",
+          },
         },
-      },
-    ]);
+      ]);
+
+      link = screen.getByText("Confirm Deletion");
+      fireEvent.click(link);
+
+      subList = await config.api.setting.listSettings("", "www");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            hostname: "www",
+            key: "blog:ff",
+          },
+        },
+      ]);
+
+      subList = await config.api.setting.listSettings("", "news");
+      expect(subList._unsafeUnwrap()).eql([
+        {
+          metadata: {
+            hostname: "news",
+            key: "blog:contact",
+          },
+        },
+      ]);
+    });
   });
 });

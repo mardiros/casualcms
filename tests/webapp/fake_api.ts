@@ -190,7 +190,9 @@ class FakePageApi implements IPageApi {
   ): AsyncApiResult<Draft> {
     let oldPage: Draft | null = null;
     const pages: Draft[] = [];
-    this.pages.map((p) => (p.metadata.path === path ? (oldPage = p) : pages.push(page)));
+    this.pages.map((p) =>
+      p.metadata.path === path ? (oldPage = p) : pages.push(page),
+    );
     if (oldPage !== null) {
       const newPage = { ...(oldPage as Draft), ...page };
       const newPath: string[] = newPage.metadata.path.split("/");

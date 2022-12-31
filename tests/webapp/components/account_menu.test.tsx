@@ -17,23 +17,25 @@ export const LogoutResult: React.FunctionComponent<{}> = () => {
 };
 
 describe("As a user, I can safely logout", () => {
-  it("Delete the session on logout", async () => {
-    renderWithRouter(
-      <>
-        <Route path="/admin/pages" element={<AccountMenu username="alice" />} />
-        <Route path="/admin/login" element={<LogoutResult />} />
-      </>,
-      "/admin/pages",
-    );
-    let link = screen.getByText("Logout");
-    const evt = fireEvent.click(link);
-    expect(evt).equal(true);
-    await waitForPath("/admin/login");
-    const account = await config.uow.account.getCurrent();
-    expect(account.isErr()).equal(true);
-    expect(account._unsafeUnwrapErr()).equal("Gone");
+  describe("<AccountMenu />", () => {
+    it("Delete the session on logout", async () => {
+      renderWithRouter(
+        <>
+          <Route path="/admin/pages" element={<AccountMenu username="alice" />} />
+          <Route path="/admin/login" element={<LogoutResult />} />
+        </>,
+        "/admin/pages",
+      );
+      let link = screen.getByText("Logout");
+      const evt = fireEvent.click(link);
+      expect(evt).equal(true);
+      await waitForPath("/admin/login");
+      const account = await config.uow.account.getCurrent();
+      expect(account.isErr()).equal(true);
+      expect(account._unsafeUnwrapErr()).equal("Gone");
 
-    const message = screen.getByText("Logged out");
-    expect(message.nodeName).equal("H4");
+      const message = screen.getByText("Logged out");
+      expect(message.nodeName).equal("H4");
+    });
   });
 });

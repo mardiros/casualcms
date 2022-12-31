@@ -8,47 +8,46 @@ import { HomePage } from "../../../src/webapp/ui/pages/home/components";
 import { ApiError } from "../../../src/webapp/casualcms/domain/ports";
 import { PageList } from "../../../src/webapp/ui/pages/pages/page_list";
 
-describe("As a user, I have to create a first root template", () => {
-  it("display onboarding message", async () => {
-    renderWithRouter(<Route path="/" element={<HomePage />} />, "/");
-    await screen.findByText("Welcome bob!");
-    let link = screen.getByText("Create my first page");
-    expect(link).not.equal(undefined);
-    expect(link.getAttribute("href")).equal("/admin/pages/new");
-  });
-});
+describe("As a user, I am onboarded with a distinct page", () => {
+  describe("<HomePage />", () => {
+    it("should display onboarding message", async () => {
+      renderWithRouter(<Route path="/" element={<HomePage />} />, "/");
+      await screen.findByText("Welcome bob!");
+      let link = screen.getByText("Create my first page");
+      expect(link.getAttribute("href")).equal("/admin/pages/new");
+    });
+    it("should redirect to root pages list if exists", async () => {
+      before(async function () {
+        const resp = await config.api.page.createDraft(
+          "",
+          "casual:HomePage",
+          {
+            slug: "root",
+            title: "dummy home",
+            description: "describe the dummy home",
+          },
+          null,
+        );
+        resp.mapErr((err: ApiError) => {
+          throw err;
+        });
+      });
+      after(async function () {
+        const resp = await config.api.page.deleteDraft("", "/root");
+        resp.mapErr((err: ApiError) => {
+          throw err;
+        });
+      });
 
-describe("As a user, I am redirected to the root list if one exists", () => {
-  before(async function () {
-    const resp = await config.api.page.createDraft(
-      "",
-      "casual:HomePage",
-      {
-        slug: "root",
-        title: "dummy home",
-        description: "describe the dummy home",
-      },
-      null,
-    );
-    resp.mapErr((err: ApiError) => {
-      throw err;
+      renderWithRouter(
+        <>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/admin/pages" element={<PageList />} />
+        </>,
+        "/",
+      );
+      let tpl = screen.queryByText("Create my first page");
+      expect(tpl).equal(null);
     });
-  });
-  after(async function () {
-    const resp = await config.api.page.deleteDraft("", "/root");
-    resp.mapErr((err: ApiError) => {
-      throw err;
-    });
-  });
-  it("redirect to root pages list if exists", async () => {
-    renderWithRouter(
-      <>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/admin/pages" element={<PageList />} />
-      </>,
-      "/",
-    );
-    let tpl = await screen.findByText("dummy home");
-    expect(tpl).not.equal(null);
   });
 });

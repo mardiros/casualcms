@@ -125,13 +125,8 @@ class FakePageApi implements IPageApi {
     payload: Payload,
     parent: string | null,
   ): AsyncApiResult<boolean> {
-    const titles: Record<string, string> = {
-      "casual:HomePage": "Home Page",
-      "casual:SectionPage": "Section Page",
-    };
     payload["metadata"] = {
       type: type,
-      title: titles[type],
       path: `${parent || ""}/${payload.slug}`,
       breadcrumb: { items: [] },
     };
@@ -160,7 +155,7 @@ class FakePageApi implements IPageApi {
           metadata: {
             path: page.metadata.path,
             type: page.metadata.type,
-            title: page.metadata.title,
+            title: page.title,
           },
         }),
       );
@@ -195,7 +190,7 @@ class FakePageApi implements IPageApi {
   ): AsyncApiResult<Draft> {
     let oldPage: Draft | null = null;
     const pages: Draft[] = [];
-    this.pages.map((p) => (p.path === path ? (oldPage = p) : pages.push(page)));
+    this.pages.map((p) => (p.metadata.path === path ? (oldPage = p) : pages.push(page)));
     if (oldPage !== null) {
       const newPage = { ...(oldPage as Draft), ...page };
       const newPath: string[] = newPage.metadata.path.split("/");

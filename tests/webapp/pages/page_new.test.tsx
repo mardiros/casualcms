@@ -41,8 +41,8 @@ describe("As a user, I can create the root page", () => {
       {
         metadata: {
           path: "/home",
+          title: "Welcome Home",
           type: "casual:HomePage",
-          title: "Home Page",
         },
         slug: "home",
         title: "Welcome Home",

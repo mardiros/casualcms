@@ -46,7 +46,6 @@ export type BreadCrumb = {
 export type PageMeta = {
   path: string;
   type: string;
-  title: string;
   breadcrumb: BreadCrumb;
 };
 
@@ -73,7 +72,7 @@ export type PartialSnippet = {
   metadata: PartialSnippetMeta;
 };
 
-export type Snippet = PartialSnippet;
+export type Snippet = PartialSnippet & Payload;
 
 export type PartialSnippetType = {
   type: string;

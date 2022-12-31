@@ -95,7 +95,7 @@ describe("As a user, I can delete a page", () => {
         metadata: {
           path: "/home/sub1",
           type: "casual:SectionPage",
-          title: "Section Page",
+          title: "Another Section Page",
         },
         slug: "sub1",
         title: "Another Section Page",

@@ -76,6 +76,8 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
     async def include_block(
         self, block: Block, page: AbstractPage, **kwargs: Any
     ) -> str:
+        if block is None:
+            return ""
         if isinstance(block, CodeBlock):
             ret = await self.render_codeblock(block=block, page=page, **kwargs)
         else:

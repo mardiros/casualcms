@@ -2,9 +2,9 @@ from types import NoneType
 from typing import Any, Mapping, Sequence
 
 import pytest
-from sqlalchemy.ext.asyncio import AsyncSession  # type: ignore
-from sqlalchemy.future import select  # type: ignore
-from sqlalchemy.sql.expression import func  # type: ignore
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
+from sqlalchemy.sql.expression import func
 
 from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import (
@@ -149,8 +149,9 @@ async def test_account_add(sqla_session: AsyncSession):
     assert acc in repo.seen
 
     qry = select(orm.accounts).filter(orm.accounts.c.id == acc.id)
-    accounts_ = await sqla_session.execute(qry)  # type: ignore
-    account = accounts_.first()  # type: ignore
+    accounts_ = await sqla_session.execute(qry)
+    account = accounts_.first()
+    assert account is not None
     assert account.username == "alice"
     assert account.email == acc.email
 
@@ -159,7 +160,7 @@ async def test_account_add(sqla_session: AsyncSession):
     "params",
     [
         {
-            "accounts": [alice, bob, dylan],  # type: ignore
+            "accounts": [alice, bob, dylan],
             "authn_tokens": [fake_authn_tokens(user_id=bob.id)],
         },
     ],
@@ -191,7 +192,7 @@ async def test_authntoken_by_token(
     "params",
     [
         {
-            "accounts": [bob],  # type: ignore
+            "accounts": [bob],
             "authn_token": fake_authn_tokens(user_id=bob.id),
         },
     ],
@@ -203,12 +204,12 @@ async def test_authntoken_add(
 ):
     authn_token: AuthnToken = params["authn_token"]
     repo = AuthnTokenSQLRepository(sqla_session)
-    resp = await repo.add(authn_token)
-    assert resp.is_ok()
+    rresp = await repo.add(authn_token)
+    assert rresp.is_ok()
 
     qry = select(orm.authn_tokens).filter(orm.authn_tokens.c.id == authn_token.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_token = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_token = resp.first()
     assert orm_token is not None
     assert orm_token.id == authn_token.id
     assert orm_token.token == authn_token.token
@@ -218,15 +219,15 @@ async def test_authntoken_add(
     assert orm_token.client_addr == authn_token.client_addr
     assert orm_token.user_agent == authn_token.user_agent
 
-    resp = await repo.add(authn_token)
-    assert resp.is_err()
+    rresp = await repo.add(authn_token)
+    assert rresp.is_err()
 
 
 @pytest.mark.parametrize(
     "params",
     [
         {
-            "accounts": [alice, bob, dylan],  # type: ignore
+            "accounts": [alice, bob, dylan],
             "authn_tokens": [fake_authn_tokens(user_id=bob.id)],
         },
     ],
@@ -238,7 +239,7 @@ async def test_authntoken_delete(
     authn_tokens: NoneType,
 ):
 
-    tokens_count = await sqla_session.execute(  # type: ignore
+    tokens_count = await sqla_session.execute(
         select(func.count(orm.authn_tokens.c.id)).filter_by(
             token=params["authn_tokens"][0].token
         )
@@ -249,7 +250,7 @@ async def test_authntoken_delete(
     resp = await repo.remove(params["authn_tokens"][0].token)
     assert resp.is_ok()
 
-    tokens_count = await sqla_session.execute(  # type: ignore
+    tokens_count = await sqla_session.execute(
         select(func.count(orm.authn_tokens.c.id)).filter_by(
             token=params["authn_tokens"][0].token
         )
@@ -266,19 +267,19 @@ async def test_authntoken_delete(
     [
         {
             "id": draft_hp.id,
-            "drafts": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],
             "expected_slug": "root",
             "expected_path": "/root",
         },
         {
             "id": cat_page.id,
-            "drafts": [draft_hp, cat_page, cat2_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page],
             "expected_slug": "tech",
             "expected_path": "/root/tech",
         },
         {
             "id": blog_page.id,
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slug": "seo",
             "expected_path": "/root/tech/seo",
         },
@@ -311,19 +312,19 @@ async def test_draft_by_id_err(sqla_session: AsyncSession):
     [
         {
             "path": "/root",
-            "drafts": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],
             "expected_slug": "root",
             "expected_id": draft_hp.id,
         },
         {
             "path": "/root/tech",
-            "drafts": [draft_hp, cat_page, cat2_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page],
             "expected_slug": "tech",
             "expected_id": cat_page.id,
         },
         {
             "path": "/root/tech/seo",
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slug": "seo",
             "expected_id": blog_page.id,
         },
@@ -345,7 +346,7 @@ async def test_page_by_path(
     [
         {
             "path": "/root",
-            "drafts": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],
             "expected_slug": "root",
             "expected_id": draft_hp.id,
         }
@@ -366,28 +367,28 @@ async def test_page_by_path_err(
     [
         {
             "parent": None,
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slugs": ["root"],
             "expected_ids": [draft_hp.id],
             "expected_paths": ["/root"],
         },
         {
             "parent": "/root",
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slugs": ["seo", "tech"],
             "expected_ids": [cat2_page.id, cat_page.id],
             "expected_paths": ["/root/seo", "/root/tech"],
         },
         {
             "parent": "/root/tech",
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slugs": ["seo"],
             "expected_ids": [blog_page.id],
             "expected_paths": ["/root/tech/seo"],
         },
         {
             "parent": "/root/seo",
-            "drafts": [draft_hp, cat_page, cat2_page, blog_page],  # type: ignore
+            "drafts": [draft_hp, cat_page, cat2_page, blog_page],
             "expected_slugs": [],
             "expected_ids": [],
             "expected_paths": [],
@@ -438,13 +439,13 @@ async def test_page_by_parent_err(
         {
             "parent": None,
             "page": draft_hp,
-            "drafts": [],  # type: ignore
+            "drafts": [],
             "expected_ancestors": [(draft_hp.id, 0)],
         },
         {
             "parent": draft_hp,
             "page": cat_page,
-            "drafts": [draft_hp],  # type: ignore
+            "drafts": [draft_hp],
             "expected_ancestors": [(draft_hp.id, 1), (cat_page.id, 0)],
         },
     ],
@@ -457,8 +458,8 @@ async def test_page_add(
 
     qry = select(orm.drafts).filter(orm.drafts.c.id == params["page"].id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    page = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    page = resp.first()
     assert page is not None
     assert page.id == params["page"].id
 
@@ -468,8 +469,8 @@ async def test_page_add(
         .order_by(orm.drafts_treepath.c.length.desc())
     )
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    assert list(resp) == params["expected_ancestors"]  # type: ignore
+    resp = await sqla_session.execute(qry)
+    assert list(resp) == params["expected_ancestors"]
 
     qry = (
         select(orm.drafts_treepath.c.descendant_id, orm.drafts_treepath.c.length)
@@ -477,8 +478,8 @@ async def test_page_add(
         .order_by(orm.drafts_treepath.c.length)
     )
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    assert list(resp) == [(params["page"].id, 0)]  # type: ignore
+    resp = await sqla_session.execute(qry)
+    assert list(resp) == [(params["page"].id, 0)]
 
 
 @pytest.mark.parametrize(
@@ -494,7 +495,7 @@ async def test_page_add(
                 description="new desc",
                 hero_title="my new hero",
             ),
-            "drafts": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],
             "expected_slug": "home",
             "expected_title": "new title",
             "expected_description": "new desc",
@@ -510,8 +511,9 @@ async def test_page_update(
 
     qry = select(orm.drafts).filter(orm.drafts.c.id == params["page"].id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    page: orm.drafts = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    page = resp.first()
+    assert page is not None
     assert page.slug == params["expected_slug"]
     assert page.title == params["expected_title"]
     assert page.description == params["expected_description"]
@@ -522,7 +524,7 @@ async def test_page_update(
     "params",
     [
         {
-            "drafts": [draft_hp, cat_page],  # type: ignore
+            "drafts": [draft_hp, cat_page],
         },
     ],
 )
@@ -609,8 +611,9 @@ async def test_snippet_add(params: Any, sqla_session: AsyncSession):
     await repo.add(params["snippet"])
     qry = select(orm.snippets).filter(orm.snippets.c.id == params["snippet"].id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    snippet: orm.snippets = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    snippet = resp.first()
+    assert snippet is not None
     assert snippet.key == params["snippet"].key
     assert snippet.body == {
         "title": params["snippet"].snippet.title,
@@ -638,14 +641,14 @@ async def test_snippet_remove(
 
     qry = select(orm.snippets).filter(orm.snippets.c.key == "snip-it")
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    snippet: orm.snippets = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    snippet = resp.first()
     assert snippet is None
 
     qry = select(orm.snippets).filter(orm.snippets.c.key == "snip-that")
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    snippet: orm.snippets = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    snippet = resp.first()
     assert snippet is not None
 
 
@@ -723,8 +726,9 @@ async def test_snippet_update(
 
     qry = select(orm.snippets).filter(orm.snippets.c.id == snippet.id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    rsnip: orm.snippets = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    rsnip = resp.first()
+    assert rsnip is not None
     assert rsnip.key == "new-snip-key"
     assert rsnip.body["title"] == "New title"
     assert rsnip.body["links"] == [{"title": "l1", "href": "/l1"}]
@@ -747,8 +751,9 @@ async def test_site_add(
 
     qry = select(orm.sites).filter(orm.sites.c.id == params["site"].id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    site: orm.sites = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    site = resp.first()
+    assert site is not None
     assert site.hostname == params["site"].hostname
     assert site.default == params["site"].default
 
@@ -867,15 +872,17 @@ async def test_site_update(
     assert rsite.is_ok()
 
     qry = select(orm.sites).filter(orm.sites.c.id == site.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    updated_site: orm.sites = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    updated_site = resp.first()
+    assert updated_site is not None
     assert updated_site.hostname == "www"
     assert updated_site.default is True
     assert updated_site.draft_id == draft_hp.id
 
     qry = select(orm.sites).filter(orm.sites.c.id == sites[0].id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    not_updated_site: orm.sites = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    not_updated_site = resp.first()
+    assert not_updated_site is not None
     assert not_updated_site.hostname == "www1"
     assert not_updated_site.draft_id == cat_page.id
 
@@ -943,12 +950,13 @@ async def test_site_remove(
 )
 async def test_setting_add(params: Any, sqla_session: AsyncSession, sites: list[Site]):
     repo = SettingSQLRepository(sqla_session)
-    resp = await repo.add(params["setting"])
-    assert resp.is_ok()
+    rresp = await repo.add(params["setting"])
+    assert rresp.is_ok()
     qry = select(orm.settings).filter(orm.settings.c.id == params["setting"].id)
 
-    resp = await sqla_session.execute(qry)  # type: ignore
-    setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    setting = resp.first()
+    assert setting is not None
     assert setting.value == {"use_stuff": True, "use_another_stuff": False}
     assert setting.site_id == sites[0].id
 
@@ -1133,8 +1141,9 @@ async def test_setting_update(
         .filter(orm.settings.c.key == "ff")
         .filter(orm.settings.c.site_id == sites[0].id)
     )
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_setting = resp.first()
+    assert orm_setting is not None
     assert orm_setting.value == {"use_another_stuff": True, "use_stuff": True}
 
     qry = (
@@ -1142,8 +1151,9 @@ async def test_setting_update(
         .filter(orm.settings.c.key == "ff")
         .filter(orm.settings.c.site_id == sites[1].id)
     )
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_setting = resp.first()
+    assert orm_setting is not None
     assert orm_setting.value == {"use_another_stuff": False, "use_stuff": True}
 
 
@@ -1180,8 +1190,8 @@ async def test_setting_remove(
         .filter(orm.settings.c.key == "ff")
         .filter(orm.settings.c.site_id == sites[0].id)
     )
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_setting = resp.first()
     assert orm_setting is None
 
     qry = (
@@ -1189,8 +1199,8 @@ async def test_setting_remove(
         .filter(orm.settings.c.key == "contact")
         .filter(orm.settings.c.site_id == sites[0].id)
     )
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_setting = resp.first()
     assert orm_setting is not None
 
     qry = (
@@ -1198,8 +1208,8 @@ async def test_setting_remove(
         .filter(orm.settings.c.key == "ff")
         .filter(orm.settings.c.site_id == sites[1].id)
     )
-    resp = await sqla_session.execute(qry)  # type: ignore
-    orm_setting: orm.settings = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    orm_setting = resp.first()
     assert orm_setting is not None
 
 
@@ -1251,7 +1261,7 @@ async def test_sql_uow_with_runtime_error(method: str, app_settings_sqlite: Sett
     "params",
     [
         {
-            "accounts": [alice, bob, dylan],  # type: ignore
+            "accounts": [alice, bob, dylan],
         },
     ],
 )
@@ -1450,8 +1460,9 @@ async def test_sql_uow_page_add(
     assert op_result.is_ok()
     assert page in repo.seen
     qry = select(orm.pages).filter(orm.pages.c.id == page.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    page = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    page = resp.first()
+    assert page is not None
     assert page.site_id == params["expected"]["site_id"]
     assert page.draft_id == params["expected"]["draft_id"]
     assert page.type == params["expected"]["type"]
@@ -1490,8 +1501,9 @@ async def test_sql_uow_page_update(
     assert op_result.is_ok()
 
     qry = select(orm.pages).filter(orm.pages.c.id == page.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    updated_page = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    updated_page = resp.first()
+    assert updated_page is not None
     assert updated_page.site_id == page.site.id
     assert updated_page.draft_id == page.draft_id
     assert updated_page.type == page.type
@@ -1507,8 +1519,9 @@ async def test_sql_uow_page_update(
 
     same_draft_other_site = params["pages"][1]
     qry = select(orm.pages).filter(orm.pages.c.id == same_draft_other_site.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    saved_same_draft_other_site = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    saved_same_draft_other_site = resp.first()
+    assert saved_same_draft_other_site is not None
     assert saved_same_draft_other_site.site_id == site_2.id
     assert saved_same_draft_other_site.draft_id == draft_hp.id
     assert saved_same_draft_other_site.title != page.title
@@ -1516,8 +1529,9 @@ async def test_sql_uow_page_update(
 
     other_draft_same_site = params["pages"][2]
     qry = select(orm.pages).filter(orm.pages.c.id == other_draft_same_site.id)
-    resp = await sqla_session.execute(qry)  # type: ignore
-    saved_same_draft_other_site = resp.first()  # type: ignore
+    resp = await sqla_session.execute(qry)
+    saved_same_draft_other_site = resp.first()
+    assert saved_same_draft_other_site is not None
     assert saved_same_draft_other_site.site_id == site_1.id
     assert saved_same_draft_other_site.draft_id == cat_page.id
     assert saved_same_draft_other_site.title != page.title

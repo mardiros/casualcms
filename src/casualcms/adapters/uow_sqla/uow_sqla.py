@@ -16,14 +16,14 @@ from typing import (
 from urllib.parse import urlparse
 
 from result import Err, Ok
-from sqlalchemy import Table, alias, delete, text  # type: ignore
-from sqlalchemy.engine import CursorResult, Row  # type: ignore
-from sqlalchemy.exc import IntegrityError  # type: ignore
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
-from sqlalchemy.ext.asyncio.engine import create_async_engine  # type: ignore
-from sqlalchemy.future import select  # type: ignore
-from sqlalchemy.orm import sessionmaker  # type: ignore
-from sqlalchemy.sql.expression import func  # type: ignore
+from sqlalchemy import Table, alias, delete, text
+from sqlalchemy.engine import Result as SQLResult
+from sqlalchemy.engine import Row
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
+from sqlalchemy.ext.asyncio.engine import create_async_engine
+from sqlalchemy.future import select
+from sqlalchemy.sql.expression import func
 
 from casualcms.adapters.uow_sqla.setup_database import create_database_schema
 from casualcms.config import Settings
@@ -99,7 +99,7 @@ from . import orm
 
 def mapped_result(
     column_descriptions: Sequence[Mapping[str, Any]],
-    row: Row,
+    row: Row[Any],
 ) -> Mapping[Table, MutableMapping[str, Any]]:
     ret: MutableMapping[Table, Any] = defaultdict(dict)
     for idx, col in enumerate(column_descriptions):
@@ -108,6 +108,21 @@ def mapped_result(
 
 
 def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
+    """Format the page to a dict ready to be inserted in the orm.drafts."""
+    p: Dict[str, Any] = page.page.dict()
+    formated_page: Dict[str, Any] = {
+        "id": page.id,
+        "type": page.type,
+        "created_at": page.created_at,
+        "slug": p.pop("slug"),
+        "title": p.pop("title"),
+        "description": p.pop("description"),
+    }
+    formated_page["body"] = p
+    return formated_page
+
+
+def format_draft_page_update(page: DraftPage[Any]) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.drafts."""
     p: Dict[str, Any] = page.page.dict()
     formated_page: Dict[str, Any] = {
@@ -174,7 +189,7 @@ class AccountSQLRepository(AbstractAccountRepository):
 
     async def by_username(self, username: str) -> AccountRepositoryResult:
         """Fetch one user account by its unique username."""
-        accounts_: CursorResult = await self.session.execute(
+        accounts_: SQLResult[Any] = await self.session.execute(
             select(orm.accounts).filter_by(username=username).limit(1)
         )
         account = cast(Account, accounts_.first())
@@ -222,7 +237,7 @@ class DraftSQLRepository(AbstractDraftRepository):
             )
             .order_by(orm.drafts_treepath.c.length.desc())
         )
-        orm_pages: CursorResult = await self.session.execute(qry)
+        orm_pages: SQLResult[Any] = await self.session.execute(qry)
         page: AbstractPage | None = None
         draft_page: DraftPage[Page_contra] | None = None
         orm_page_iter = iter(orm_pages)  # type: ignore
@@ -278,7 +293,7 @@ class DraftSQLRepository(AbstractDraftRepository):
             )
             qry = qry.filter(sub.exists())
 
-        page: CursorResult = await self.session.execute(qry)
+        page: SQLResult[Any] = await self.session.execute(qry)
         p: Any = page.first()
         if p:
             return await self.by_id(p.id)  # type: ignore
@@ -310,7 +325,7 @@ class DraftSQLRepository(AbstractDraftRepository):
             ).exists()
             parent_page = parent.page
         qry = select(orm.drafts).filter(sub).order_by(orm.drafts.c.slug)
-        pages: CursorResult = await self.session.execute(qry)
+        pages: SQLResult[Any] = await self.session.execute(qry)
 
         ret: list[DraftPage[Page_contra]] = [
             DraftPage(
@@ -379,10 +394,10 @@ class DraftSQLRepository(AbstractDraftRepository):
         """Update model in the repository."""
         page = format_draft_page(model)
         page.pop("id")
-        cursor: CursorResult = await self.session.execute(
-            orm.drafts.update(orm.drafts.c.id == model.id, values=page)  # type: ignore
+        cursor: SQLResult[Any] = await self.session.execute(
+            orm.drafts.update().where(orm.drafts.c.id == model.id).values(**page)
         )
-        if cursor.rowcount == 0:
+        if cursor.rowcount == 0:  # type: ignore
             return Err(DraftRepositoryError.page_not_found)
         self.seen.add(model)
         return Ok(...)
@@ -418,7 +433,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         self.seen = set()
 
     async def _format_response(
-        self, orm_snippets: CursorResult
+        self, orm_snippets: SQLResult[Any]
     ) -> SnippetRepositoryResult[Snippet_contra]:
         orm_snippet = orm_snippets.first()
         if orm_snippet:
@@ -441,7 +456,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique id."""
-        orm_snippets: CursorResult = await self.session.execute(
+        orm_snippets: SQLResult[Any] = await self.session.execute(
             select(orm.snippets).filter_by(id=id).limit(1)
         )
         return await self._format_response(orm_snippets)  # type: ignore
@@ -449,7 +464,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
     async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
         """Fetch one snippet by its unique key."""
 
-        orm_snippets: CursorResult = await self.session.execute(
+        orm_snippets: SQLResult[Any] = await self.session.execute(
             select(orm.snippets).filter_by(key=key).limit(1)
         )
         return await self._format_response(orm_snippets)  # type: ignore
@@ -463,7 +478,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         if type:
             qry = qry.filter_by(type=type)
         qry = qry.order_by(orm.snippets.c.key)
-        orm_snippets: CursorResult = await self.session.execute(qry)
+        orm_snippets: SQLResult[Any] = await self.session.execute(qry)
         orm_snippet: Any
         snippets: list[Snippet[Snippet_contra]] = []
         for orm_snippet in orm_snippets:
@@ -484,7 +499,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def add(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
         """Append a new model to the repository."""
-        qry: Any = orm.snippets.insert().values(format_snippet(model))
+        qry: Any = orm.snippets.insert().values(**format_snippet(model))
         await self.session.execute(qry)
         self.seen.add(model)
         return Ok(...)
@@ -504,9 +519,8 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         self.seen.add(model)
         snippet = format_snippet(model)
         snippet.pop("id")
-        qry = orm.snippets.update(  # type: ignore
-            orm.snippets.c.id == model.id,  # type: ignore
-            values=snippet,
+        qry = (
+            orm.snippets.update().where(orm.snippets.c.id == model.id).values(**snippet)
         )
         await self.session.execute(qry)  # type: ignore
         return Ok(...)
@@ -518,17 +532,17 @@ class SettingSQLRepository(AbstractSettingRepository):
         self.seen = set()
 
     async def _format_response(
-        self, orm_settings: CursorResult
+        self, orm_settings: SQLResult[Any]
     ) -> SettingRepositoryResult[Setting_contra]:
         resp = orm_settings.first()
         if resp:
-            typ: SettingType = resolve_setting_type(resp.key)  # type: ignore
+            typ: SettingType = resolve_setting_type(resp.key)
             return Ok(
                 Setting(
-                    id=resp.id,  # type: ignore
-                    key=resp.key,  # type: ignore
-                    hostname=resp.hostname,  # type: ignore
-                    setting=typ(**resp.value),  # type: ignore
+                    id=resp.id,
+                    key=resp.key,
+                    hostname=resp.hostname,
+                    setting=typ(**resp.value),
                 )
             )
         return Err(SettingRepositoryError.setting_not_found)
@@ -545,7 +559,7 @@ class SettingSQLRepository(AbstractSettingRepository):
             .filter(orm.settings.c.id == id)
             .limit(1)
         )
-        orm_settings: CursorResult = await self.session.execute(qry)
+        orm_settings: SQLResult[Any] = await self.session.execute(qry)
         return await self._format_response(orm_settings)
 
     async def by_key(
@@ -553,7 +567,7 @@ class SettingSQLRepository(AbstractSettingRepository):
     ) -> SettingRepositoryResult[Setting_contra]:
         """Fetch one setting by its unique key."""
 
-        orm_settings: CursorResult = await self.session.execute(
+        orm_settings: SQLResult[Any] = await self.session.execute(
             select(orm.settings, orm.sites.c.hostname)
             .select_from(orm.settings)
             .join(
@@ -581,7 +595,7 @@ class SettingSQLRepository(AbstractSettingRepository):
         if hostname:
             qry = qry.filter(orm.sites.c.hostname == hostname)
         qry = qry.order_by(orm.sites.c.hostname, orm.settings.c.key)
-        orm_settings: CursorResult = await self.session.execute(qry)
+        orm_settings: SQLResult[Any] = await self.session.execute(qry)
         orm_setting: Any
         settings: list[Setting[Setting_contra]] = []
 
@@ -603,19 +617,21 @@ class SettingSQLRepository(AbstractSettingRepository):
         if rsite.is_err():
             return Err(SettingRepositoryError.site_not_found)
         site_id = rsite.unwrap().id
-        qry: Any = orm.settings.insert().values(format_setting(site_id, model))
+        qry: Any = orm.settings.insert().values(
+            format_setting(site_id, model)  # type: ignore
+        )
         await self.session.execute(qry)
         self.seen.add(model)
         return Ok(...)
 
     async def remove(self, model: Setting[Setting_contra]) -> SettingOperationResult:
         """Remove the model from the repository."""
-        cursor: CursorResult = await self.session.execute(
+        cursor: SQLResult[Any] = await self.session.execute(
             delete(orm.settings).where(
-                orm.settings.c.id == model.id,  # type: ignore
+                orm.settings.c.id == model.id,
             ),
         )
-        if cursor.rowcount == 0:
+        if cursor.rowcount == 0:  # type: ignore
             return Err(SettingRepositoryError.setting_not_found)
         self.seen.add(model)
         return Ok(...)
@@ -629,9 +645,8 @@ class SettingSQLRepository(AbstractSettingRepository):
         site_id = rsite.unwrap().id
         setting = format_setting(site_id, model)
         setting.pop("id")
-        qry = orm.settings.update(  # type: ignore
-            orm.settings.c.id == model.id,  # type: ignore
-            values=setting,
+        qry = (
+            orm.settings.update().where(orm.settings.c.id == model.id).values(**setting)
         )
         await self.session.execute(qry)  # type: ignore
         return Ok(...)
@@ -643,7 +658,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
 
     async def by_token(self, token: str) -> AuthnTokenRepositoryResult:
         """Fetch given token informations from the given token."""
-        orm_tokens: CursorResult = await self.session.execute(
+        orm_tokens: SQLResult[Any] = await self.session.execute(
             select(orm.authn_tokens).filter_by(token=token).limit(1)
         )
         orm_token = cast(AuthnToken, orm_tokens.first())
@@ -674,12 +689,12 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
 
     async def remove(self, token: str) -> AuthnTokenOperationResult:
         """Delete a new model to the repository."""
-        cursor: CursorResult = await self.session.execute(
+        cursor: SQLResult[Any] = await self.session.execute(
             delete(orm.authn_tokens).where(
                 orm.authn_tokens.c.token == token,  # type: ignore
             ),
         )
-        if cursor.rowcount == 0:
+        if cursor.rowcount == 0:  # type: ignore
             return Err(AuthnTokenRepositoryError.token_not_found)
         return Ok(...)
 
@@ -691,7 +706,7 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def list(self) -> SiteSequenceRepositoryResult:
         """Fetch given token informations from the given token."""
-        orm_sites: CursorResult = await self.session.execute(
+        orm_sites: SQLResult[Any] = await self.session.execute(
             select(orm.sites).order_by(orm.sites.c.hostname)
         )
         sites: list[Site] = []
@@ -731,7 +746,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         self.seen.add(model)
         return Ok(...)
 
-    async def _to_site_result(self, orm_sites: CursorResult) -> SiteRepositoryResult:
+    async def _to_site_result(self, orm_sites: SQLResult[Any]) -> SiteRepositoryResult:
         orm_site = orm_sites.first()
         if orm_site:
             s = cast(Site, orm_site)
@@ -754,14 +769,14 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def by_id(self, id: str) -> SiteRepositoryResult:
         """Fetch site by id."""
-        orm_sites: CursorResult = await self.session.execute(
+        orm_sites: SQLResult[Any] = await self.session.execute(
             select(orm.sites).filter_by(id=id)
         )
         return await self._to_site_result(orm_sites)
 
     async def by_hostname(self, hostname: str) -> SiteRepositoryResult:
         """Fetch site by hostname."""
-        orm_sites: CursorResult = await self.session.execute(
+        orm_sites: SQLResult[Any] = await self.session.execute(
             select(orm.sites).filter_by(hostname=hostname)
         )
         return await self._to_site_result(orm_sites)
@@ -777,10 +792,10 @@ class SiteSQLRepository(AbstractSiteRepository):
             return Err(SiteRepositoryError.root_page_not_found)
         page = rpage.unwrap()  # FIXME, should return Ok(...)
         site["draft_id"] = page.id
-        cursor: CursorResult = await self.session.execute(
-            orm.sites.update(orm.sites.c.id == model.id, values=site)  # type: ignore
+        cursor = await self.session.execute(
+            orm.sites.update().where(orm.sites.c.id == model.id).values(**site)
         )
-        if cursor.rowcount == 0:
+        if cursor.rowcount == 0:  # type: ignore
             return Err(SiteRepositoryError.site_not_found)
 
         return Ok(...)
@@ -805,7 +820,7 @@ class PageSQLRepository(AbstractPageRepository):
     ) -> PageRepositoryResult[Page_contra]:
         """Fetch one page by its unique id."""
 
-        orm_pages: CursorResult = await self.session.execute(
+        orm_pages: SQLResult[Any] = await self.session.execute(
             select(orm.pages)
             .filter(orm.pages.c.draft_id == draft_id)
             .filter(orm.pages.c.site_id == site_id)
@@ -848,7 +863,7 @@ class PageSQLRepository(AbstractPageRepository):
             .order_by(func.length(orm.pages.c.path))
         )
 
-        orm_pages: CursorResult = await self.session.execute(qry)
+        orm_pages: SQLResult[Any] = await self.session.execute(qry)
         site_row = orm_pages.first()
         if not site_row:
             return Err(PageRepositoryError.page_not_found)
@@ -864,8 +879,7 @@ class PageSQLRepository(AbstractPageRepository):
         if rdraft.is_err():
             return Err(PageRepositoryError.page_not_found)
         root = rdraft.unwrap()
-
-        site = Site(root_page_path=root.path, **site_row)  # type: ignore
+        site = Site(root_page_path=root.path, **site_row._asdict())
 
         parent_path = list(build_parent_path(path))
         qry = (
@@ -876,7 +890,6 @@ class PageSQLRepository(AbstractPageRepository):
         )
         orm_pages = await self.session.execute(qry)
         page_result = orm_pages.all()
-        page_res: Row
         parent = None
         published_page = None
         for idx, page_res in enumerate(page_result):
@@ -917,13 +930,10 @@ class PageSQLRepository(AbstractPageRepository):
         """Update a model to the repository."""
         page = format_page(model)
         page.pop("id")
-        cursor: CursorResult = await self.session.execute(
-            orm.pages.update(
-                orm.pages.c.id == model.id,  # type: ignore
-                values=page,
-            )
+        cursor: SQLResult[Any] = await self.session.execute(
+            orm.pages.update().where(orm.pages.c.id == model.id).values(**page)
         )
-        if cursor.rowcount == 0:
+        if cursor.rowcount == 0:  # type: ignore
             return Err(PageRepositoryError.page_not_found)
         self.seen.add(model)
         return Ok(...)
@@ -961,14 +971,14 @@ class SQLUnitOfWorkBySession(AbstractUnitOfWork):
             await self.session.close()
 
 
-async def create_async_session(engine: AsyncEngine) -> Type[AsyncSession]:
-    return sessionmaker(
+async def create_async_session(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
+    return async_sessionmaker(
         engine,
         class_=AsyncSession,
         autoflush=True,
         autocommit=False,
         expire_on_commit=True,
-    )  # type: ignore
+    )
 
 
 class SQLUnitOfWork(AbstractUnitOfWork):

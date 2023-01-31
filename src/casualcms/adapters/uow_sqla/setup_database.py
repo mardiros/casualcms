@@ -33,8 +33,8 @@ async def create_database(settings: Settings, engine: AsyncEngine) -> None:
     username = url.username
     password = f":{url.password}" if url.password else ""
     database = url.database
-    url = f"{dialect}+{driver}://{username}{password}@{host}/"
-    engine = create_async_engine(url, future=True, echo=False)
+    engine_url = f"{dialect}+{driver}://{username}{password}@{host}/"
+    engine = create_async_engine(engine_url, future=True, echo=False)
     async with engine.begin() as conn:  # type: ignore
         await conn.execute(text("ROLLBACK"))
         await conn.execute(

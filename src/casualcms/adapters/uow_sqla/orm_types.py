@@ -1,10 +1,10 @@
 """SQLAlchemy schema for the supervisor api."""
 
 import json
-from typing import Any
+from typing import Any, Optional, Type
 
 from citext import CIText  # type: ignore
-from sqlalchemy import (  # type: ignore
+from sqlalchemy import (
     CHAR,
     Boolean,
     Column,
@@ -20,11 +20,11 @@ from sqlalchemy import (  # type: ignore
     TypeDecorator,
     event,
 )
-from sqlalchemy.dialects.postgresql import INET as PgINET  # type: ignore
+from sqlalchemy.dialects.postgresql import INET as PgINET
 from sqlalchemy.dialects.postgresql import JSONB as PgJSONB
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
-from sqlalchemy.engine.interfaces import Dialect  # type: ignore
-from sqlalchemy.sql.type_api import TypeEngine  # type: ignore
+from sqlalchemy.engine.interfaces import Dialect
+from sqlalchemy.sql.type_api import TypeEngine
 
 setattr(CIText, "cache_ok", True)  # useless SAWarning
 
@@ -49,33 +49,34 @@ __all__ = [
 ]
 
 
-class UUID(TypeDecorator):
+class UUID(TypeDecorator[String]):
     """Platform-independent UUID type."""
 
     impl = CHAR
-    _type_affinity = None
     cache_ok = True
 
-    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine:
+    @property
+    def _type_affinity(self) -> Optional[Type[TypeEngine[String]]]:
+        return None
+
+    def load_dialect_impl(self, dialect: Dialect) -> TypeEngine[str]:
         if dialect.name == "postgresql":
             return dialect.type_descriptor(PgUUID())  # type: ignore
         else:
-            return dialect.type_descriptor(CHAR(36))  # type: ignore
+            return dialect.type_descriptor(CHAR(36))
 
-    def process_bind_param(  # type: ignore
-        self, value: TypeEngine, dialect: Dialect
-    ) -> str:
+    def process_bind_param(self, value: Optional[String], dialect: Dialect) -> str:
         return str(value)
 
-    def process_result_value(  # type: ignore
+    def process_result_value(
         self,
-        value: TypeEngine,
+        value: Optional[Any],
         dialect: Dialect,
-    ) -> TypeEngine:
+    ) -> Optional[String]:
         return value
 
 
-class JSON(TypeDecorator):
+class JSON(TypeDecorator[Any]):
     """Platform-independent JSONB type, if not postgress limited query."""
 
     impl = CHAR
@@ -84,13 +85,13 @@ class JSON(TypeDecorator):
     def __init__(self, as_uuid: bool = False):
         self.as_uuid = as_uuid
 
-    def load_dialect_impl(self, dialect: Dialect) -> Any:  # FIXME: type
+    def load_dialect_impl(self, dialect: Dialect) -> Any:
         if dialect.name == "postgresql":
             return dialect.type_descriptor(PgJSONB())
         else:
             return dialect.type_descriptor(Text())
 
-    def process_bind_param(self, value: TypeEngine, dialect: Dialect) -> Any:
+    def process_bind_param(self, value: Optional[Any], dialect: Dialect) -> Any:
         if value is None:
             return value
         elif dialect.name == "postgresql":
@@ -98,11 +99,11 @@ class JSON(TypeDecorator):
         else:
             return json.dumps(value)
 
-    def process_result_value(  # type: ignore
+    def process_result_value(
         self,
-        value: Any,
+        value: Optional[Any],
         dialect: Dialect,
-    ) -> TypeEngine:
+    ) -> Optional[Any]:
         if value is None:
             return value
         elif dialect.name == "postgresql":
@@ -111,7 +112,7 @@ class JSON(TypeDecorator):
             return json.loads(value)
 
 
-class IpAddress(TypeDecorator):
+class IpAddress(TypeDecorator[String]):
 
     impl = CHAR
     cache_ok = True
@@ -119,22 +120,22 @@ class IpAddress(TypeDecorator):
     # bind/result is idempotent for this type
     cache_ok = True
 
-    def load_dialect_impl(self, dialect: Dialect) -> Any:  # FIXME: type
+    def load_dialect_impl(self, dialect: Dialect) -> Any:
         if dialect.name == "postgresql":
             return dialect.type_descriptor(PgINET())
         else:
             return dialect.type_descriptor(String(45))
 
-    def process_bind_param(self, value: TypeEngine, dialect: Dialect) -> Any:
+    def process_bind_param(self, value: Optional[String], dialect: Dialect) -> Any:
         if value is None:
             return value
         elif dialect.name == "postgresql":
             return str(value)  # coverage: ignore
         return value
 
-    def process_result_value(  # type: ignore
+    def process_result_value(
         self,
-        value: Any,
+        value: Optional[Any],
         dialect: Dialect,
-    ) -> TypeEngine:
+    ) -> Optional[String]:
         return value

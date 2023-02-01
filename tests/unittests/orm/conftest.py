@@ -12,11 +12,13 @@ from typing import (
 )
 
 import pytest
-from sqlalchemy import alias, delete, select, text  # type: ignore
-from sqlalchemy.engine.cursor import CursorResult  # type: ignore
-from sqlalchemy.ext.asyncio import create_async_engine  # type: ignore
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession  # type: ignore
-from sqlalchemy.orm import sessionmaker  # type: ignore
+from sqlalchemy import alias, delete, select, text
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from casualcms.adapters.uow_sqla import orm
 from casualcms.adapters.uow_sqla.uow_sqla import SQLUnitOfWork
@@ -70,7 +72,7 @@ async def sqla_engine(
 
 @pytest.fixture()
 def sqla_session(sqla_engine: AsyncEngine) -> Iterator[AsyncSession]:
-    async_session = sessionmaker(sqla_engine, class_=AsyncSession)
+    async_session = async_sessionmaker(sqla_engine, class_=AsyncSession)
     yield async_session()  # type: ignore
 
 
@@ -192,7 +194,7 @@ async def drafts(
             )
             qry = qry.filter(sub.exists())
 
-        res: CursorResult = await sqla_session.execute(qry)
+        res = await sqla_session.execute(qry)
         parent_page: Any = res.first()
         return parent_page.id
 
@@ -311,7 +313,7 @@ async def settings(
     for s in settings:
         settings_per_hosts[s.hostname].append(s)
     for hostname, hsettings in settings_per_hosts.items():
-        orm_sites: CursorResult = await sqla_session.execute(
+        orm_sites = await sqla_session.execute(
             select(orm.sites).filter_by(hostname=hostname).limit(1)  # type: ignore
         )
         orm_site: Any = orm_sites.first()

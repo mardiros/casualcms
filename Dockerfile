@@ -16,8 +16,8 @@ RUN useradd casualcms --home /home/casualcms && \
 USER casualcms
 
 COPY pyproject.toml poetry.lock /srv/casualcms/
-RUN poetry install --no-dev
+RUN poetry install --only main
 COPY . /srv/casualcms/
-RUN poetry install --no-dev
+RUN poetry install --only main
 
 CMD ["poetry", "run", "casualcms"]

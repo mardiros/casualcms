@@ -49,14 +49,14 @@ __all__ = [
 ]
 
 
-class UUID(TypeDecorator[String]):
+class UUID(TypeDecorator[str]):
     """Platform-independent UUID type."""
 
     impl = CHAR
     cache_ok = True
 
     @property
-    def _type_affinity(self) -> Optional[Type[TypeEngine[String]]]:
+    def _type_affinity(self) -> Optional[Type[TypeEngine[str]]]:
         return None
 
     def load_dialect_impl(self, dialect: Dialect) -> TypeEngine[str]:
@@ -65,15 +65,15 @@ class UUID(TypeDecorator[String]):
         else:
             return dialect.type_descriptor(CHAR(36))
 
-    def process_bind_param(self, value: Optional[String], dialect: Dialect) -> str:
+    def process_bind_param(self, value: Optional[str], dialect: Dialect) -> str:
         return str(value)
 
     def process_result_value(
         self,
         value: Optional[Any],
         dialect: Dialect,
-    ) -> Optional[String]:
-        return value
+    ) -> Optional[str]:
+        return str(value) if value else None
 
 
 class JSON(TypeDecorator[Any]):

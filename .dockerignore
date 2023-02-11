@@ -1,0 +1,16 @@
+*.egg-info
+*.pyc
+*.swp
+.coverage
+htmlcov/
+.nyc_output/
+*.csv
+*.log
+.*
+build/
+dist/
+
+node_modules
+src/webapp
+
+docker-compose.yml

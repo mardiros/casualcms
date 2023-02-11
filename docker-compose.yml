@@ -12,7 +12,7 @@ volumes:
 services:
 
   casualcms:
-    build: .
+    image: mardiros/casualcms
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.casualcms.entrypoints=web"

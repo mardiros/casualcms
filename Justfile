@@ -91,3 +91,9 @@ publish:
     git push
     git tag "$(poetry run python scripts/show_release.py)"
     git push origin "$(poetry run python scripts/show_release.py)"
+
+docker_build:
+    docker build -t mardiros/casualcms:latest .
+
+docker_push:
+    docker push mardiros/casualcms:latest

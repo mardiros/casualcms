@@ -1,16 +1,24 @@
 *.egg-info
 *.pyc
+__pycache__
 *.swp
-.coverage
 htmlcov/
-.nyc_output/
 *.csv
 *.log
 .*
+*.xcf
 build/
 dist/
+tests/
 
 node_modules
 src/webapp
+package.json
+rome.json
+package-lock.json
+tsconfig.json
+
+.flake8
+.editorconfig
 
 docker-compose.yml

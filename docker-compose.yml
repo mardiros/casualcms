@@ -26,9 +26,9 @@ services:
       - python
       - src/casualcms/entrypoint.py
     environment:
-      - "CASUALCMS_ASSETS_PATH=/app/casualcms_com/assets"
-      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/app/casualcms_com/models"
-      - "PYTHONPATH=/app"
+      - "CASUALCMS_ASSETS_PATH=/srv/casualcms/website/casualcms_com/assets"
+      - "CASUALCMS_TEMPLATE_SEARCH_PATH=/srv/casualcms/website/casualcms_com/models"
+      - "PYTHONPATH=/srv/casualcms/website"
       - 'CASUALCMS_IMPORT_MODELS=["casualcms_com.models"]'
       - "CASUALCMS_ADMIN_USERNAME=alice"
       - "CASUALCMS_ADMIN_PASSWORD=secret"
@@ -38,12 +38,11 @@ services:
       # - "CASUALCMS_DATABASE_URL=postgresql+asyncpg://postgres@postgresql/casualcms"
       # - "CASUALCMS_DATABASE_MIGRATIONS_PATH=/srv/casualcms/sql-migrations"
     volumes:
-      - "./casualcms.com:/app/casualcms_com"
       # development module
+      - "./website/casualcms.com:/srv/casualcms/website/casualcms_com"
       - "./src:/srv/casualcms/src"
       - "./alembic.ini:/srv/casualcms/alembic.ini"
       - "./sql-migrations:/srv/casualcms/sql-migrations"
-      - "/home/guillaume/.cache/pypoetry/virtualenvs/casualcms-tjAUXo7J-py3.10/lib/python3.10/site-packages/fastapi:/home/casualcms/.cache/pypoetry/virtualenvs/casualcms-i5MnOS1q-py3.10/lib/python3.10/site-packages/fastapi"
 
   postgresql:
     image: "postgres:12-alpine"

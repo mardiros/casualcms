@@ -40,6 +40,15 @@ async def get_root_draft_by_path(
     return rpage.unwrap()
 
 
+async def get_root_draft_by_path_or_none(
+    root_page_path: str | None = Body(default=None),
+    app: AppConfig = FastAPIConfigurator.depends,
+) -> DraftPage[Any] | None:
+    if root_page_path is not None:
+        return await get_root_draft_by_path(root_page_path, app)
+    return None
+
+
 async def get_site_by_current_hostname(
     current_hostname: str = Field(...),
     app: AppConfig = FastAPIConfigurator.depends,
@@ -124,7 +133,7 @@ async def update_site(
     secure: bool | None = Body(None),
     hostname: str | None = Body(None),
     site: Site = Depends(get_site_by_current_hostname),
-    root_page: DraftPage[Any] = Depends(get_root_draft_by_path),
+    root_page: DraftPage[Any] | None = Depends(get_root_draft_by_path_or_none),
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
@@ -134,7 +143,7 @@ async def update_site(
             id=site.id,
             hostname=hostname,
             default=default,
-            root_page_path=root_page.path,
+            root_page_path=root_page.path if root_page else None,
             secure=secure,
         )
         cmd.metadata.clientAddr = request.client.host

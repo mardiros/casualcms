@@ -42,15 +42,14 @@ async def update_site(
         rsite = await uow.sites.by_id(cmd.id)
         if rsite.is_err():
             return Err(rsite.unwrap_err())
-
     site = rsite.unwrap()
-    if cmd.hostname:
+    if cmd.hostname is not None:
         site.hostname = cmd.hostname
-    if cmd.root_page_path:
+    if cmd.root_page_path is not None:
         site.root_page_path = cmd.root_page_path
-    if cmd.default:
+    if cmd.default is not None:
         site.default = cmd.default
-    if cmd.secure:
+    if cmd.secure is not None:
         site.secure = cmd.secure
     resp = await uow.sites.update(site)
     return resp

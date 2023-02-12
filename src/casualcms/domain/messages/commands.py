@@ -98,10 +98,10 @@ class CreateSite(Command):
 
 class UpdateSite(Command):
     id: str = Field(default_factory=generate_id)
-    hostname: str | None = Field(...)
-    root_page_path: str | None = Field(...)
-    default: bool | None = Field(...)
-    secure: bool | None = Field(...)
+    hostname: str | None = Field(default=None)
+    root_page_path: str | None = Field(default=None)
+    default: bool | None = Field(default=None)
+    secure: bool | None = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.now)
     metadata: Metadata = Metadata(category="site", name="create_site", schemaVersion=1)
 

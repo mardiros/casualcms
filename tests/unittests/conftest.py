@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, AsyncGenerator, Iterator
+from typing import Any, AsyncGenerator, Iterator, Literal, Mapping
 
 import pytest
 from fastapi import FastAPI
@@ -426,6 +426,27 @@ async def default_site(
             uow,
         )
     yield site.unwrap()
+
+
+@pytest.fixture
+async def site(
+    app: FastAPI,
+    params: Mapping[Literal["site"], CreateSite],
+    uow: AbstractUnitOfWork,
+    messagebus: MessageRegistry,
+    draft_hp: DraftPage[Any],
+) -> AsyncGenerator[Site, None]:
+    async with uow as uow:
+        create = CreateSite(
+            **{**params["site"].dict(), "root_page_path": draft_hp.path}  # type: ignore
+        )
+
+        rsite = await messagebus.handle(
+            create,
+            uow,
+        )
+    site = rsite.unwrap()
+    yield site
 
 
 @pytest.fixture

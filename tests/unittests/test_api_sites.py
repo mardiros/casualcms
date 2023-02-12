@@ -1,7 +1,9 @@
-from typing import Any
+from typing import Any, Mapping
 
+import pytest
 from fastapi.testclient import TestClient
 
+from casualcms.domain.messages.commands import CreateSite
 from casualcms.domain.model import AuthnToken, DraftPage, Site
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from tests.unittests.orm.fixtures import fake_site
@@ -191,6 +193,77 @@ async def test_update_site(
         old_site = await uow.sites.by_hostname(old_hostname)
     assert old_site.is_err()
     assert old_site.unwrap_err().name == "site_not_found"
+
+
+@pytest.mark.parametrize(
+    "params",
+    [
+        {
+            "site": CreateSite(
+                hostname="example1.net",
+                default=False,
+                secure=False,
+                root_page_path="",
+            ),
+            "json": {
+                "secure": True,
+            },
+            "expect_default": False,
+            "expect_secure": True,
+        },
+        {
+            "site": CreateSite(
+                hostname="example2.net",
+                default=False,
+                secure=False,
+                root_page_path="",
+            ),
+            "json": {
+                "default": True,
+            },
+            "expect_default": True,
+            "expect_secure": False,
+        },
+        {
+            "site": CreateSite(
+                hostname="example3.net",
+                default=True,
+                secure=True,
+                root_page_path="",
+            ),
+            "json": {
+                "default": False,
+                "secure": False,
+            },
+            "expect_default": False,
+            "expect_secure": False,
+        },
+    ],
+)
+async def test_update_site_flags(
+    params: Mapping[str, Any],
+    client: TestClient,
+    authntoken: AuthnToken,
+    site: Site,
+    uow: AbstractUnitOfWork,
+):
+    old_hostname = site.hostname
+    resp = client.patch(
+        f"/api/sites/{old_hostname}",
+        headers={
+            "Authorization": f"Bearer {authntoken.token}",
+        },
+        json=params["json"],
+    )
+    # assert resp.status_code == 202
+    assert resp.json() == {"message": "Resource Updated"}
+
+    async with uow as uow:
+        rsaved_site = await uow.sites.by_hostname(params["site"].hostname)
+    assert rsaved_site.is_ok()
+    saved_site = rsaved_site.unwrap()
+    assert saved_site.secure is params["expect_secure"]
+    assert saved_site.default is params["expect_default"]
 
 
 async def test_delete_site_403(

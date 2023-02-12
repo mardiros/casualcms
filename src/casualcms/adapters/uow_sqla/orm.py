@@ -26,9 +26,9 @@ accounts = Table(
     metadata,
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
-    Column("username", CIText, nullable=False),
+    Column("username", CIText, nullable=False),  # type: ignore
     Column("password", String(60), nullable=False),
-    Column("email", CIText, nullable=False),
+    Column("email", CIText, nullable=False),  # type: ignore
     Column("lang", String(8), nullable=False),  # isocode such as fr or zh-Hant
     Column("status", Enum(AccountStatus, name="account_status"), nullable=False),
     Index("idx_users_username", "username", unique=True),
@@ -50,7 +50,7 @@ authn_tokens = Table(
     ),
     Column("expires_at", DateTime(), nullable=False),
     Column("client_addr", IpAddress(), nullable=False),
-    Column("user_agent", CIText, nullable=False),
+    Column("user_agent", CIText, nullable=False),  # type: ignore
     Index("idx_authn_tokens_token", "token", unique=True),
     Index("idx_authn_tokens_user_id", "user_id", unique=False),
     Index("idx_authn_tokens_client_addr", "client_addr", unique=False),
@@ -65,9 +65,9 @@ drafts = Table(
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
     Column("type", String(72), nullable=False),
-    Column("slug", CIText, nullable=False),
-    Column("title", CIText, nullable=False),
-    Column("description", CIText, nullable=False),
+    Column("slug", CIText, nullable=False),  # type: ignore
+    Column("title", CIText, nullable=False),  # type: ignore
+    Column("description", CIText, nullable=False),  # type: ignore
     Column("body", JSON, nullable=False),
     Index("idx_drafts_type", "type", unique=False),
     Index("idx_drafts_slug", "slug", unique=False),
@@ -104,7 +104,7 @@ snippets = Table(
     Column("id", UUID, primary_key=True),
     Column("created_at", DateTime(), nullable=False),
     Column("type", String(72), nullable=False),
-    Column("key", CIText, nullable=False),
+    Column("key", CIText, nullable=False),  # type: ignore
     Column("body", JSON, nullable=False),
     Index("idx_snippets_type", "type", unique=False),
     Index("idx_snippets_key", "key", unique=True),
@@ -167,7 +167,7 @@ pages = Table(
         nullable=True,
     ),
     Column("type", String(72), nullable=False),
-    Column("path", CIText, nullable=False),
-    Column("title", CIText, nullable=False),
+    Column("path", CIText, nullable=False),  # type: ignore
+    Column("title", CIText, nullable=False),  # type: ignore
     Column("body", JSON, nullable=False),
 )

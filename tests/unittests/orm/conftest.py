@@ -63,6 +63,7 @@ async def sqla_engine(
 ) -> AsyncGenerator[AsyncEngine, None]:
     async with bared_sqla_engine.begin() as conn:  # type: ignore
         await conn.run_sync(orm.metadata.create_all)
+        await conn.execute(text("pragma foreign_keys=on"))
 
     yield bared_sqla_engine
 
@@ -114,6 +115,14 @@ async def sites(
     await sqla_session.commit()
 
     yield sites
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages).where(orm.pages.c.site_id.in_([s.id for s in sites])),
+    )
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.settings).where(orm.settings.c.site_id.in_([s.id for s in sites])),
+    )
 
     await sqla_session.execute(  # type: ignore
         delete(orm.sites).where(orm.sites.c.hostname.in_([s.hostname for s in sites])),
@@ -252,6 +261,14 @@ async def drafts(
         delete(orm.drafts_treepath).where(
             orm.drafts_treepath.c.ancestor_id.in_([p.id for p in draft_pages])
         ),
+    )
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.pages).where(orm.pages.c.draft_id.in_([p.id for p in draft_pages])),
+    )
+
+    await sqla_session.execute(  # type: ignore
+        delete(orm.sites).where(orm.sites.c.draft_id.in_([p.id for p in draft_pages])),
     )
 
     await sqla_session.execute(  # type: ignore

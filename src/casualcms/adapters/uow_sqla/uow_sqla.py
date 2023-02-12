@@ -560,7 +560,7 @@ class SettingSQLRepository(AbstractSettingRepository):
             .limit(1)
         )
         orm_settings: SQLResult[Any] = await self.session.execute(qry)
-        return await self._format_response(orm_settings)
+        return await self._format_response(orm_settings)  # type: ignore
 
     async def by_key(
         self, hostname: str, key: str
@@ -580,7 +580,7 @@ class SettingSQLRepository(AbstractSettingRepository):
             .filter(orm.settings.c.key == key)
             .limit(1)
         )
-        return await self._format_response(orm_settings)
+        return await self._format_response(orm_settings)  # type: ignore
 
     async def list(
         self, hostname: Optional[str] = None
@@ -712,7 +712,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         sites: list[Site] = []
         for orm_site in orm_sites:  # type: ignore
             s = cast(Site, orm_site)
-            page = await DraftSQLRepository(self.session).by_id(
+            page: DraftRepositoryResult[Any] = await DraftSQLRepository(
+                self.session
+            ).by_id(
                 s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
@@ -750,7 +752,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         orm_site = orm_sites.first()
         if orm_site:
             s = cast(Site, orm_site)
-            page = await DraftSQLRepository(self.session).by_id(
+            page: DraftRepositoryResult[Any] = await DraftSQLRepository(
+                self.session
+            ).by_id(
                 s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
@@ -802,11 +806,24 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def remove(self, model: Site) -> SiteOperationResult:
         """Remove given model from the repository."""
+
         await self.session.execute(
-            delete(orm.sites).where(
-                orm.sites.c.id == model.id,  # type: ignore
+            delete(orm.pages).where(
+                orm.pages.c.site_id == model.id,
             )
         )
+        await self.session.execute(
+            delete(orm.settings).where(
+                orm.settings.c.site_id == model.id,
+            )
+        )
+        cursor = await self.session.execute(
+            delete(orm.sites).where(
+                orm.sites.c.id == model.id,
+            )
+        )
+        if cursor.rowcount == 0:  # type: ignore
+            return Err(SiteRepositoryError.site_not_found)
         return Ok(...)
 
 

@@ -906,14 +906,28 @@ async def test_site_update(
     assert site_err.name == "site_not_found"
 
 
+site_1 = fake_site(draft_hp, hostname="www1", secure=True)
+site_2 = fake_site(draft_hp, hostname="www2", secure=False)
+
+
 @pytest.mark.parametrize(
     "params",
     [
         {
             "drafts": [draft_hp, cat_page, cat2_page],
             "sites": [
-                fake_site(cat_page, hostname="www1"),
-                fake_site(cat2_page, hostname="www2"),
+                site_1,
+                site_2,
+            ],
+            "settings": [
+                fake_ff_setting("www1"),
+                fake_contact_setting("www1"),
+                fake_ff_setting("www2"),
+            ],
+            "pages": [
+                fake_page(draft_hp, site_1),
+                fake_page(draft_hp, site_2),
+                fake_page(cat_page, site_1),
             ],
         },
     ],
@@ -922,6 +936,8 @@ async def test_site_remove(
     params: Any,
     sqla_session: AsyncSession,
     drafts: Sequence[DraftPage[Any]],
+    settings: Sequence[Setting[Any]],
+    pages: Sequence[PublishedPage[Any]],
     sites: Sequence[Site],
 ):
     repo = SiteSQLRepository(sqla_session)
@@ -933,6 +949,9 @@ async def test_site_remove(
     assert rsite.is_err()
     site_err = rsite.unwrap_err()
     assert site_err.name == "site_not_found"
+
+    rsite = await repo.by_hostname("www2")
+    assert rsite.is_ok()
 
 
 @pytest.mark.parametrize(
@@ -979,7 +998,7 @@ async def test_setting_add(params: Any, sqla_session: AsyncSession, sites: list[
     ],
 )
 async def test_setting_list(
-    params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
+    params: Any, sqla_session: AsyncSession, settings: Sequence[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
     rsettings: SettingSequenceRepositoryResult[Any] = await repo.list()
@@ -1452,6 +1471,7 @@ async def test_sql_uow_page_add(
     params: Any,
     sqla_session: AsyncSession,
     sql_uow: SQLUnitOfWork,
+    sites: Sequence[Site],
     drafts: Sequence[DraftPage[Any]],
 ) -> None:
     page = params["page"]

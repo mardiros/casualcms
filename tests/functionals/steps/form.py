@@ -1,14 +1,13 @@
 import time
+from typing import Any
 
 from behave import when  # type:ignore
-
-from tests.functionals.typing import Context
 
 POSITIONS = {"first": 0, "second": 1, "third": 2}
 
 
 @when('I fill the field "{placeholder}" with "{value}"')
-def fill_input(context: Context, placeholder: str, value: str):
+def fill_input(context: Any, placeholder: str, value: str):
     field = context.browser.find_element_by_xpath(
         f"//input[@placeholder='{placeholder}']"
     )
@@ -17,12 +16,12 @@ def fill_input(context: Context, placeholder: str, value: str):
 
 
 @when('I fill the richtext field "{placeholder}" with "{value}"')
-def fill_textarea(context: Context, placeholder: str, value: str):
+def fill_textarea(context: Any, placeholder: str, value: str):
     fill_textarea_pos(context, "first", placeholder, value)
 
 
 @when('I fill the "{position}" richtext field "{placeholder}" with "{value}"')
-def fill_textarea_pos(context: Context, position: str, placeholder: str, value: str):
+def fill_textarea_pos(context: Any, position: str, placeholder: str, value: str):
     pos = POSITIONS[position]
     field = context.browser.find_elements_by_xpath(
         "//div[@role='textbox']/p[@data-slate-node='element']"
@@ -35,7 +34,7 @@ def fill_textarea_pos(context: Context, position: str, placeholder: str, value: 
 
 
 @when('I fill the "{position}" field "{placeholder}" with "{value}"')
-def fill_input_pos(context: Context, position: str, placeholder: str, value: str):
+def fill_input_pos(context: Any, position: str, placeholder: str, value: str):
     pos = POSITIONS[position]
     field = context.browser.find_elements_by_xpath(
         f"//input[@placeholder='{placeholder}']"
@@ -45,14 +44,14 @@ def fill_input_pos(context: Context, position: str, placeholder: str, value: str
 
 
 @when('I click on the "{text}" button')
-def click_button(context: Context, text: str):
+def click_button(context: Any, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(f'//button[contains(text(), "{text}")]')
     el.click()
 
 
 @when('I click on the "{position}" button "{text}"')
-def click_button_pos(context: Context, position: str, text: str):
+def click_button_pos(context: Any, position: str, text: str):
     pos = POSITIONS[position]
     text = text.replace('"', '\\"')
     el = context.browser.find_elements_by_xpath(f'//button[contains(text(), "{text}")]')
@@ -60,7 +59,7 @@ def click_button_pos(context: Context, position: str, text: str):
 
 
 @when('I click on the "{text}" button having the role "{role}"')
-def click_button_with_role(context: Context, text: str, role: str):
+def click_button_with_role(context: Any, text: str, role: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(
         f'//button[@role="{role}" and contains(text(), "{text}")]'
@@ -69,14 +68,14 @@ def click_button_with_role(context: Context, text: str, role: str):
 
 
 @when('I click on the "{text}" link')
-def click_link(context: Context, text: str):
+def click_link(context: Any, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(f'//a[contains(text(), "{text}")]')
     el.click()
 
 
 @when('I click on the "{text}" label')
-def click_label(context: Context, text: str):
+def click_label(context: Any, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(
         f'//label/span[contains(text(), "{text}")]'
@@ -85,7 +84,7 @@ def click_label(context: Context, text: str):
 
 
 @when('I click on the "{position}" link "{text}"')
-def click_link_pos(context: Context, position: str, text: str):
+def click_link_pos(context: Any, position: str, text: str):
     pos = POSITIONS[position]
     text = text.replace('"', '\\"')
     el = context.browser.find_elements_by_xpath(f'//a[contains(text(), "{text}")]')
@@ -93,7 +92,7 @@ def click_link_pos(context: Context, position: str, text: str):
 
 
 @when('I click on the "{text}" link ignoring the target attribute')
-def click_link_target_blank(context: Context, text: str):
+def click_link_target_blank(context: Any, text: str):
     text = text.replace('"', '\\"')
     el = context.browser.find_element_by_xpath(f'//a[contains(text(), "{text}")]')
     context.browser.remove_target_blank(f'//a[contains(text(), "{text}")]')

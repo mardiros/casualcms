@@ -60,7 +60,7 @@ async def create_setting(
         hostname=hostname,
         body=validated_payload,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
@@ -152,7 +152,7 @@ async def update_setting(
         key=key,  # type: ignore
         body=payload,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
@@ -181,7 +181,7 @@ async def delete_setting(
         hostname=setting.hostname,
         key=setting.key,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)

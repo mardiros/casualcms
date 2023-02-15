@@ -7,7 +7,7 @@ from ..casualblog.models import HomePage
 
 async def test_list_page_types_403(client: TestClient, authntoken: AuthnToken):
 
-    resp = client.get("/api/pages-types", headers={})
+    resp = client.get("/api/pages-types")
     assert resp.status_code == 403
     assert resp.json() == {"detail": "Not authenticated"}
 

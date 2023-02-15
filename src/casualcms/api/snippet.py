@@ -140,7 +140,7 @@ async def create_snippet(
 ) -> PartialSnippet:
     key = payload.pop("key")
     cmd = CreateSnippet(type=type, key=key, body=cast(dict[str, Any], payload))
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
@@ -214,7 +214,7 @@ async def update_snippet(
     new_key = payload.pop("key")
     payload.pop("metadata", None)
     cmd = UpdateSnippet(id=snippet.id, key=new_key, body=payload)
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)
@@ -261,7 +261,7 @@ async def delete_snippet(
         id=snippet.id,
         key=snippet.key,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)

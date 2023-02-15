@@ -40,7 +40,7 @@ async def authenticate(
     authenticated_user: Account = Depends(get_authenticated_user),
 ) -> dict[str, Any]:
 
-    client_addr: str = request.client.host
+    client_addr: str = request.client.host if request.client else ""
     cmd = CreateAuthnToken(
         user_id=authenticated_user.id,
         user_agent=user_agent,
@@ -71,7 +71,7 @@ async def logout(
     user_agent: str = Header(None),
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Response:
-    client_addr: str = request.client.host
+    client_addr: str = request.client.host if request.client else ""
     cmd = DeleteAuthnToken(
         token=token.token,
         user_id=token.user_id,

@@ -85,7 +85,7 @@ async def create_draft(
     token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
     cmd = CreatePage(type=type, payload=params)
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
@@ -220,7 +220,7 @@ async def update_draft(
         id=draft_page.id,
         payload=payload,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         res = await app.bus.handle(cmd, uow)
@@ -250,7 +250,7 @@ async def delete_draft(
         id=draft_page.id,
         path=draft_page.path,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)

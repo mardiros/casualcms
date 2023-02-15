@@ -53,7 +53,6 @@ async def test_publish_403(
 
     resp = client.post(
         "/api/pages",
-        headers={},
         json={"draft_id": draft_hp.metadata.path, "site_id": default_site.hostname},
     )
     assert resp.status_code == 403

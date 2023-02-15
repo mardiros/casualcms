@@ -27,8 +27,7 @@ async def serve_admin_ui(scope: Scope, receive: Receive, send: Send) -> None:
     """
     if "." not in scope["path"]:
         scope["path"] = "index.html"
-    resp = await react_app(scope, receive, send)
-    return resp
+    await react_app(scope, receive, send)
 
 
 @configure

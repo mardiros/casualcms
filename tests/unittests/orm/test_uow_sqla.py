@@ -1,4 +1,3 @@
-from types import NoneType
 from typing import Any, Mapping, Sequence
 
 import pytest
@@ -125,7 +124,7 @@ def test_build_parent_path(params: Mapping[str, Any]):
     ],
 )
 async def test_account_by_username(
-    params: Any, sqla_session: AsyncSession, accounts: NoneType
+    params: Any, sqla_session: AsyncSession, accounts: None
 ):
     repo = AccountSQLRepository(sqla_session)
     for account in params["accounts"]:
@@ -168,8 +167,8 @@ async def test_account_add(sqla_session: AsyncSession):
 async def test_authntoken_by_token(
     params: Any,
     sqla_session: AsyncSession,
-    accounts: NoneType,
-    authn_tokens: NoneType,
+    accounts: None,
+    authn_tokens: None,
 ):
     repo = AuthnTokenSQLRepository(sqla_session)
     tok = await repo.by_token(params["authn_tokens"][0].token)
@@ -200,7 +199,7 @@ async def test_authntoken_by_token(
 async def test_authntoken_add(
     params: Any,
     sqla_session: AsyncSession,
-    accounts: NoneType,
+    accounts: None,
 ):
     authn_token: AuthnToken = params["authn_token"]
     repo = AuthnTokenSQLRepository(sqla_session)
@@ -235,8 +234,8 @@ async def test_authntoken_add(
 async def test_authntoken_delete(
     params: Any,
     sqla_session: AsyncSession,
-    accounts: NoneType,
-    authn_tokens: NoneType,
+    accounts: None,
+    authn_tokens: None,
 ):
 
     tokens_count = await sqla_session.execute(
@@ -1285,7 +1284,7 @@ async def test_sql_uow_with_runtime_error(method: str, app_settings_sqlite: Sett
     ],
 )
 async def test_sql_uow_account_by_username(
-    params: Any, sql_uow: SQLUnitOfWork, accounts_uow: NoneType
+    params: Any, sql_uow: SQLUnitOfWork, accounts_uow: None
 ):
     async with sql_uow as uow:
         alice_from_uow = await uow.accounts.by_username("alice")
@@ -1473,7 +1472,7 @@ async def test_sql_uow_page_add(
     sql_uow: SQLUnitOfWork,
     sites: Sequence[Site],
     drafts: Sequence[DraftPage[Any]],
-) -> None:
+):
     page = params["page"]
     repo = PageSQLRepository(sqla_session)
     op_result = await repo.add(page)

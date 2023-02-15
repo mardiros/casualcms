@@ -14,7 +14,6 @@ from ..casualblog.models import FooterSnippet, HeaderSnippet
 async def test_api_create_snippet_403(client: TestClient, uow: AbstractUnitOfWork):
     resp = client.post(
         "/api/snippets",
-        headers={},
         json={"type": "blog:HeaderSnippet", "payload": {}},
     )
     # XXX Fast api is raising a 403, should be a 401 to me
@@ -109,10 +108,7 @@ async def test_api_create_snippet_422(
 
 
 async def test_api_list_snippet_403(client: TestClient, uow: AbstractUnitOfWork):
-    resp = client.get(
-        "/api/snippets",
-        headers={},
-    )
+    resp = client.get("/api/snippets")
     # XXX Fast api is raising a 403, should be a 401 to me
     assert resp.status_code == 403
     assert resp.json() == {"detail": "Not authenticated"}

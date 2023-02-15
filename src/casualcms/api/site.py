@@ -107,7 +107,7 @@ async def create_site(
         root_page_path=root_page.path,
         secure=secure,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
 
     async with app.uow as uow:
@@ -146,7 +146,7 @@ async def update_site(
             root_page_path=root_page.path if root_page else None,
             secure=secure,
         )
-        cmd.metadata.clientAddr = request.client.host
+        cmd.metadata.clientAddr = request.client.host if request.client else ""
         cmd.metadata.userId = token.user_id
 
         site = await app.bus.handle(cmd, uow)
@@ -210,7 +210,7 @@ async def delete_site(
         id=site.id,
         hostname=site.hostname,
     )
-    cmd.metadata.clientAddr = request.client.host
+    cmd.metadata.clientAddr = request.client.host if request.client else ""
     cmd.metadata.userId = token.user_id
     async with app.uow as uow:
         resp = await app.bus.handle(cmd, uow)

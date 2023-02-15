@@ -15,7 +15,6 @@ async def test_api_create_setting_403(
 ):
     resp = client.post(
         f"/api/settings/{default_site.hostname}",
-        headers={},
         json={"type": "blog:FeatureFlagSetting", "payload": {}},
     )
     # XXX Fast api is raising a 403, should be a 401 to me
@@ -65,7 +64,6 @@ async def test_api_create_setting(
 async def test_api_list_setting_403(client: TestClient, default_site: Site):
     resp = client.get(
         f"/api/settings/{default_site.hostname}",
-        headers={},
     )
     # XXX Fast api is raising a 403, should be a 401 to me
     assert resp.status_code == 403

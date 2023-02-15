@@ -14,7 +14,6 @@ async def test_api_create_draft_unauthenticated(
 ):
     resp = client.post(
         "/api/drafts",
-        headers={},
         json={"type": "blog:HomePage", "payload": {}},
     )
     # XXX Fast api is raising a 403, should be a 401 to me

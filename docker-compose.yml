@@ -39,7 +39,7 @@ services:
       # - "CASUALCMS_DATABASE_MIGRATIONS_PATH=/srv/casualcms/sql-migrations"
     volumes:
       # development module
-      - "./website/casualcms.com:/srv/casualcms/website/casualcms_com"
+      - "./website/casualcms_com:/srv/casualcms/website/casualcms_com"
       - "./src:/srv/casualcms/src"
       - "./alembic.ini:/srv/casualcms/alembic.ini"
       - "./sql-migrations:/srv/casualcms/sql-migrations"

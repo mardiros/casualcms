@@ -12,7 +12,7 @@ describe("As a user, I view a different homepage when I am authenticated or not"
   describe("<Header />", () => {
     it("Display a link to home when I am login", async () => {
       renderWithRouter(<Route path="/" element={<Header />} />, "/");
-      const link = await screen.findByText("👕 Casual CMS");
+      const link = await screen.findByText("Casual CMS");
       expect(link.getAttribute("href")).equal("/admin");
     });
     it("Display a link to the login page", async () => {

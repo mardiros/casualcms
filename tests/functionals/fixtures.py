@@ -188,6 +188,7 @@ def run_server(port: int, **kwargs: Any):
         "unit_of_work": "casualcms.adapters.uow_inmemory:InMemoryUnitOfWork",
         "admin_username": "alice",
         "admin_password": "secret",
+        "assets_path": str((p / "casualblog"/ "assets").resolve()),
         "import_models": '["casualblog.models"]',
         "template_search_path": str((Path(__file__).parent / "templates").resolve()),
         **kwargs,

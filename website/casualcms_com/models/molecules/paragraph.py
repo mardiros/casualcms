@@ -10,7 +10,7 @@ from ..atoms.rich_text import RichText
 
 
 class PyCodeBlock(CodeBlock):
-    language: Literal["Python"] = Field(default="hidden", widget="hidden")
+    language: Literal["Python"] = Field(default="Python", widget="hidden")
 
     class Meta:
         formatter = HtmlFormatter(  # type: ignore

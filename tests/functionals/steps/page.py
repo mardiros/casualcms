@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from behave import given  # type: ignore
-from blacksmith import HTTPError, SyncClient, SyncHTTPBearerMiddleware
+from blacksmith import SyncClient, SyncHTTPBearerMiddleware
 from faker import Faker
 
 fake = Faker()
@@ -16,7 +16,7 @@ def create_page(context: Any, path: str, page_type: str) -> None:
     account = context.browser.get_index_db_value("account", "alice")
     token: str = account["token"]
 
-    api: SyncClient[Any, Any] = context.apicli("casualcms")
+    api: SyncClient[Any] = context.apicli("casualcms")
     api.add_middleware(SyncHTTPBearerMiddleware(token))
 
     payload: Dict[str, Any] = {
@@ -75,11 +75,11 @@ def create_page(context: Any, path: str, page_type: str) -> None:
             },
         }
 
-    try:
-        api.draft.post(payload)
-    except HTTPError as exc:
+    resp = api.draft.post(payload)
+    if resp.is_err():
+        exc = resp.unwrap_err()
         print(exc.response.json)
-        raise
+        raise exc
 
 
 @given('publish the "{path}" page on "{hostname}"')
@@ -88,7 +88,7 @@ def publish_page(context: Any, path: str, hostname: str) -> None:
     account = context.browser.get_index_db_value("account", "alice")
     token: str = account["token"]
 
-    api: SyncClient[Any, Any] = context.apicli("casualcms")
+    api: SyncClient[Any] = context.apicli("casualcms")
     api.add_middleware(SyncHTTPBearerMiddleware(token))
 
     payload: Dict[str, Any] = {
@@ -96,8 +96,8 @@ def publish_page(context: Any, path: str, hostname: str) -> None:
         "hostname": hostname,
     }
 
-    try:
-        api.page.post(payload)
-    except HTTPError as exc:
+    resp = api.page.post(payload)
+    if resp.is_err():
+        exc = resp.unwrap_err()
         print(exc.response.json)
-        raise
+        raise exc

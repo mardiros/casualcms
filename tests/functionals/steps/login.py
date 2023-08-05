@@ -14,8 +14,13 @@ def start_fastcms_with_login(context: Any):
     # we don't test the login form again and again
 
     api = context.apicli("casualcms")
-    token = api.authntoken.post({"username": "alice", "password": "secret"})
-    authn = token.response.dict()
+    rtoken = api.authntoken.post({"username": "alice", "password": "secret"})
+    if rtoken.is_err():
+        exc = rtoken.unwrap_err()
+        print(exc.response.json)
+        raise exc
+    token = rtoken.unwrap()
+    authn = token.dict()
     context.browser.get("/admin/login")
     context.browser.add_index_db_value("account", "alice", authn)
     context.browser.add_index_db_value("default", "account", "alice")

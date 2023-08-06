@@ -5,16 +5,16 @@ from pydantic import BaseModel, Field
 
 from casualcms.domain.model import (
     AuthnToken,
-    SnippetKey,
     SnippetType,
     list_snippet_types,
     resolve_snippet_type,
 )
+from casualcms.domain.model.fields import SlugField
 
 from .base import get_token_info
 
 
-def get_snippet_type(type: SnippetKey) -> SnippetType:
+def get_snippet_type(type: SlugField) -> SnippetType:
     """Get the snippet type from its key as a non pure function for FastAPI."""
     rtype = resolve_snippet_type(type)
     if rtype.is_err():
@@ -52,7 +52,7 @@ async def list_types(
 
 
 async def show_type(
-    type: SnippetKey,
+    type: SlugField,
     token: AuthnToken = Depends(get_token_info),
     snippet_type: SnippetType = Depends(get_snippet_type),
 ) -> dict[str, Any]:

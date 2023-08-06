@@ -14,11 +14,9 @@ class SnippetRepositoryError(enum.Enum):
     snippet_type_not_found = "Snippet Type not found"
 
 
-SnippetRepositoryResult = RepositoryResult[
-    Snippet[Snippet_contra], SnippetRepositoryError
-]
+SnippetRepositoryResult = RepositoryResult[Snippet[Any], SnippetRepositoryError]
 SnippetSequenceRepositoryResult = RepositoryResult[
-    Sequence[Snippet[Snippet_contra]], SnippetRepositoryError
+    Sequence[Snippet[Any]], SnippetRepositoryError
 ]
 SnippetOperationResult = OperationResult[SnippetRepositoryError]
 
@@ -27,17 +25,15 @@ class AbstractSnippetRepository(AbstractRepository):
     seen: set[Snippet[Any]]
 
     @abc.abstractmethod
-    async def list(
-        self, type: Optional[str] = None
-    ) -> SnippetSequenceRepositoryResult[Snippet_contra]:
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
         """List all snippets, optionally filters on their types."""
 
     @abc.abstractmethod
-    async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_id(self, id: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique id."""
 
     @abc.abstractmethod
-    async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique slug."""
 
     @abc.abstractmethod

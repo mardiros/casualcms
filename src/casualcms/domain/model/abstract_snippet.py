@@ -2,19 +2,15 @@ import enum
 import re
 from typing import Any, Mapping, Set, Type, TypeVar, cast
 
-from pydantic import BaseModel, ConstrainedStr, Field
-from pydantic.main import ModelMetaclass
+from pydantic import BaseModel, Field
+from pydantic._internal._model_construction import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
 from casualcms.domain.model.abstract import BaseUIModel
+from casualcms.domain.model.fields import SlugField
 
 SnippetType = Type["AbstractSnippet"]
-
-
-class SnippetKey(ConstrainedStr):
-    regex = re.compile("^[^/]+$")
-    strip_whitespace = True
 
 
 class SnippetError(enum.Enum):
@@ -86,7 +82,7 @@ class SnippetMetaclass(ModelMetaclass):
             mcls, name, bases, new_namespace, **kwargs  # type: ignore
         )
         if snippet_meta and not snippet_meta.abstract:
-            ret.__config__.title = snippet_meta.title  # type: ignore
+            ret.model_config["title"] = snippet_meta.title  # type: ignore
             SnippetTypeList().register(ret)  # type: ignore
         return ret  # type: ignore
 
@@ -94,7 +90,7 @@ class SnippetMetaclass(ModelMetaclass):
 class AbstractSnippet(BaseUIModel, metaclass=SnippetMetaclass):
     __meta__: SnippetMeta
 
-    key: SnippetKey = Field(...)
+    key: SlugField = Field(...)
 
     class Meta:
         abstract = True
@@ -113,8 +109,8 @@ class AbstractSnippet(BaseUIModel, metaclass=SnippetMetaclass):
     @classmethod
     def ui_schema(cls) -> Mapping[str, Any]:
         ret: dict[str, Any] = {}
-        for key, val in cls.__fields__.items():
-            ret[key] = cls.get_widget(val)
+        for key, val in cls.model_fields.items():
+            ret[key] = cls.get_widget(key, val)
         return ret
 
 

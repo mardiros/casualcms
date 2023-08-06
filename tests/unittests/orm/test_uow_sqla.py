@@ -45,7 +45,7 @@ from casualcms.domain.repositories.snippet import (
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from casualcms.utils import generate_id
 
-from ...casualblog.models import HeaderSnippet, HomePage, Link
+from ...casualblog.models import HeaderSnippet, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -288,7 +288,7 @@ async def test_draft_by_id(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    r_draft_page: DraftRepositoryResult[HomePage] = await repo.by_id(params["id"])
+    r_draft_page: DraftRepositoryResult = await repo.by_id(params["id"])
     assert r_draft_page.is_ok()
     draft_page = r_draft_page.unwrap()
     # draft_page.page.__meta__.root_url = ""
@@ -298,7 +298,7 @@ async def test_draft_by_id(
 
 async def test_draft_by_id_err(sqla_session: AsyncSession):
     repo = DraftSQLRepository(sqla_session)
-    root_page: DraftRepositoryResult[HomePage] = await repo.by_id(  # type:ignore
+    root_page: DraftRepositoryResult = await repo.by_id(  # type:ignore
         draft_hp.id
     )
     assert root_page.is_err()
@@ -333,7 +333,7 @@ async def test_page_by_path(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page: DraftRepositoryResult[HomePage] = await repo.by_path(params["path"])
+    root_page: DraftRepositoryResult = await repo.by_path(params["path"])
     assert root_page.is_ok()
     rok = root_page.unwrap()
     assert rok.slug == params["expected_slug"]
@@ -355,7 +355,7 @@ async def test_page_by_path_err(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    root_page: DraftRepositoryResult[HomePage] = await repo.by_path("/e404")
+    root_page: DraftRepositoryResult = await repo.by_path("/e404")
     assert root_page.is_err()
     err = root_page.unwrap_err()
     assert err.name == "page_not_found"
@@ -398,9 +398,7 @@ async def test_page_by_parent(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    child_pages: DraftSequenceRepositoryResult[Any] = await repo.by_parent(
-        params["parent"]
-    )
+    child_pages: DraftSequenceRepositoryResult = await repo.by_parent(params["parent"])
     assert child_pages.is_ok()
     ps = child_pages.unwrap()
     assert [p.slug for p in ps] == params["expected_slugs"]
@@ -424,9 +422,7 @@ async def test_page_by_parent_err(
     params: Any, sqla_session: AsyncSession, drafts: Sequence[DraftPage[Any]]
 ):
     repo = DraftSQLRepository(sqla_session)
-    child_pages: DraftSequenceRepositoryResult[Any] = await repo.by_parent(
-        params["parent"]
-    )
+    child_pages: DraftSequenceRepositoryResult = await repo.by_parent(params["parent"])
     assert child_pages.is_err()
     err = child_pages.unwrap_err()
     assert err.name == "page_not_found"
@@ -561,7 +557,7 @@ async def test_snippet_by_key(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Any]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet: SnippetRepositoryResult[HeaderSnippet] = await repo.by_key("snip-it")
+    rsnippet: SnippetRepositoryResult = await repo.by_key("snip-it")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.id == snippets[1].id
@@ -587,7 +583,7 @@ async def test_snippet_by_id(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Any]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippet: SnippetRepositoryResult[Any] = await repo.by_id("123")
+    rsnippet: SnippetRepositoryResult = await repo.by_id("123")
     assert rsnippet.is_ok()
     snippet = rsnippet.unwrap()
     assert snippet.key == snippets[1].key
@@ -667,7 +663,7 @@ async def test_snippet_list_filter_type(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Snippet_contra]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list(
+    rsnippets: SnippetSequenceRepositoryResult = await repo.list(
         type="blog:HeaderSnippet"
     )
     assert rsnippets.is_ok()
@@ -692,7 +688,7 @@ async def test_snippet_list(
     params: Any, sqla_session: AsyncSession, snippets: list[Snippet[Snippet_contra]]
 ):
     repo = SnippetSQLRepository(sqla_session)
-    rsnippets: SnippetSequenceRepositoryResult[Any] = await repo.list()
+    rsnippets: SnippetSequenceRepositoryResult = await repo.list()
     assert rsnippets.is_ok()
     snips = rsnippets.unwrap()
     assert {s.id: s.key for s in snips} == {s.id: s.key for s in snippets}
@@ -1000,7 +996,7 @@ async def test_setting_list(
     params: Any, sqla_session: AsyncSession, settings: Sequence[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsettings: SettingSequenceRepositoryResult[Any] = await repo.list()
+    rsettings: SettingSequenceRepositoryResult = await repo.list()
     assert rsettings.is_ok()
     saved_settings = rsettings.unwrap()
     ss = [s.dict() for s in saved_settings]
@@ -1044,7 +1040,7 @@ async def test_setting_list_filter_hostname(
     params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsettings: SettingSequenceRepositoryResult[Any] = await repo.list(hostname="www")
+    rsettings: SettingSequenceRepositoryResult = await repo.list(hostname="www")
     assert rsettings.is_ok()
     saved_settings = rsettings.unwrap()
     ss = [s.dict() for s in saved_settings]
@@ -1083,7 +1079,7 @@ async def test_setting_by_id(
     params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsetting: SettingRepositoryResult[Any] = await repo.by_id(settings[0].id)
+    rsetting: SettingRepositoryResult = await repo.by_id(settings[0].id)
     assert rsetting.is_ok()
     setting = rsetting.unwrap()
     assert setting.key == "ff"
@@ -1115,7 +1111,7 @@ async def test_setting_by_key(
     params: Any, sqla_session: AsyncSession, settings: list[Setting[Any]]
 ):
     repo = SettingSQLRepository(sqla_session)
-    rsetting: SettingRepositoryResult[Any] = await repo.by_key("www", "ff")
+    rsetting: SettingRepositoryResult = await repo.by_key("www", "ff")
     assert rsetting.is_ok()
     setting = rsetting.unwrap()
     assert setting.id == settings[0].id
@@ -1326,7 +1322,7 @@ async def test_sql_uow_page_by_page_id_and_site_id(
 ):
     repo = PageSQLRepository(sqla_session)
 
-    rpage: PageRepositoryResult[Any] = await repo.by_draft_page_and_site(
+    rpage: PageRepositoryResult = await repo.by_draft_page_and_site(
         draft_hp.id, site_1.id
     )
 
@@ -1371,7 +1367,7 @@ async def test_sql_uow_page_by_url(
 ):
     repo = PageSQLRepository(sqla_session)
 
-    rpage: PageRepositoryResult[Any] = await repo.by_url("https://www")
+    rpage: PageRepositoryResult = await repo.by_url("https://www")
     assert rpage.is_ok()
     assert rpage.unwrap().id == pages[0].id
 
@@ -1420,7 +1416,7 @@ async def test_sql_uow_page_by_url_choose_root_page(
 ):
     repo = PageSQLRepository(sqla_session)
 
-    rpage: PageRepositoryResult[Any] = await repo.by_url("https://www/tech/seo")
+    rpage: PageRepositoryResult = await repo.by_url("https://www/tech/seo")
     assert rpage.is_ok()
     page: AbstractPage = rpage.unwrap().page
     assert page.metadata.path == "/tech/seo"

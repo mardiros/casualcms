@@ -8,7 +8,6 @@ from casualcms.domain.messages.commands import (
     UpdateSnippet,
 )
 from casualcms.domain.model import resolve_snippet_type
-from casualcms.domain.model.abstract_snippet import Snippet_contra
 from casualcms.domain.model.snippet import Snippet
 from casualcms.domain.repositories.snippet import (
     SnippetOperationResult,
@@ -23,7 +22,7 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_snippet(
     cmd: CreateSnippet,
     uow: AbstractUnitOfWork,
-) -> SnippetRepositoryResult[Snippet_contra]:
+) -> SnippetRepositoryResult:
     rsnip = resolve_snippet_type(cmd.type)
     if rsnip.is_err():
         return Err(SnippetRepositoryError.snippet_type_not_found)
@@ -47,7 +46,7 @@ async def update_snippet(
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
 
-    rsnippet: SnippetRepositoryResult[Any] = await uow.snippets.by_id(cmd.id)
+    rsnippet: SnippetRepositoryResult = await uow.snippets.by_id(cmd.id)
     if rsnippet.is_err():
         return Err(rsnippet.unwrap_err())
     snippet_wrapper = rsnippet.unwrap()
@@ -65,7 +64,7 @@ async def delete_snippet(
     cmd: DeleteSnippet,
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
-    snippet: SnippetRepositoryResult[Any] = await uow.snippets.by_id(cmd.id)
+    snippet: SnippetRepositoryResult = await uow.snippets.by_id(cmd.id)
     if snippet.is_err():
         return Err(SnippetRepositoryError.snippet_not_found)
     s = snippet.unwrap()

@@ -463,7 +463,7 @@ async def home_page(
             PublishPage(id=draft_hp.id, site_id=default_site.id),
             uow,
         )
-        ppage: PageRepositoryResult[HomePage] = await uow.pages.by_draft_page_and_site(
+        ppage: PageRepositoryResult = await uow.pages.by_draft_page_and_site(
             draft_hp.id, default_site.id
         )
         yield ppage.unwrap()

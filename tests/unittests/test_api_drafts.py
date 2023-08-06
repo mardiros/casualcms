@@ -430,7 +430,7 @@ async def test_delete_page(
     assert resp.status_code == 204
 
     async with uow as uow:
-        saved_home: DraftRepositoryResult[Any] = await uow.drafts.by_path("/home")
+        saved_home: DraftRepositoryResult = await uow.drafts.by_path("/home")
 
     assert saved_home.is_err()
     assert saved_home.unwrap_err().name == "page_not_found"

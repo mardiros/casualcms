@@ -20,7 +20,7 @@ async def publish_page(
 
     async with app.uow as uow:
         errs = []
-        rdraft: DraftRepositoryResult[Any] = await uow.drafts.by_path(path)
+        rdraft: DraftRepositoryResult = await uow.drafts.by_path(path)
         if rdraft.is_err():
             errs.append([{"loc": ["body", "path"], "msg": rdraft.unwrap_err().value}])
         rsite = await uow.sites.by_hostname(hostname)

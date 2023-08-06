@@ -2,8 +2,7 @@ import re
 from typing import Any, Dict, Literal, Sequence, cast
 
 from pydantic import BaseModel, Field
-from pydantic.generics import GenericModel
-from pydantic.main import ModelMetaclass
+from pydantic._internal._model_construction import ModelMetaclass
 from pygments.formatters import HtmlFormatter
 
 from casualcms.domain.exceptions import MissingMetaError
@@ -41,7 +40,7 @@ class BlockMetaclass(ModelMetaclass):
         else:
             raise MissingMetaError(long_name)
         ret = super().__new__(cls, name, bases, new_namespace, **kwargs)  # type: ignore
-        ret.__config__.title = block_meta.title  # type: ignore
+        ret.model_config["title"] = block_meta.title  # type: ignore
         return ret  # type: ignore
 
 
@@ -103,17 +102,3 @@ class CodeBlock(Block, metaclass=CodeBlockMetaclass):
         "Typescript",
     ] = Field(widget="select")
     code: str = Field(widget="textarea")
-
-
-class GenericBlock(GenericModel, Block):
-    """
-    Block that use Generic such as ListBlock[T].
-
-
-    class ListBlock(GenericBlock, Generic[T]):
-        ...
-
-    """
-
-    class Meta:
-        ...

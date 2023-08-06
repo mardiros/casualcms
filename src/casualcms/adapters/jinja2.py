@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from functools import partial
-from typing import Any, MutableMapping, MutableSet
+from typing import Any, Mapping, MutableMapping, MutableSet, cast
 
 import pkg_resources
 from jinja2 import Environment, FileSystemLoader, Template
@@ -154,10 +154,9 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         self, block: CodeBlock, page: AbstractPage, **kwargs: Any
     ) -> str:
         lexer = get_lexer_by_name(block.language)
-        formatter: HtmlFormatter[Any] = (
-            block.__fields__["code"].field_info.extra.get("formatter")
-            or HtmlFormatter()
-        )
+
+        xtra = cast(Mapping[str, Any], block.model_fields["code"].json_schema_extra)
+        formatter: HtmlFormatter[Any] = xtra.get("formatter") or HtmlFormatter()
         formatters: MutableSet[str] = self._formatter[id(page)]
         fmt = formatter.style.__class__
         name = f"{fmt.__module__}:{fmt.__qualname__}"

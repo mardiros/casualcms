@@ -1,4 +1,4 @@
-from typing import Any, Mapping, MutableMapping, Optional
+from typing import Annotated, Any, Mapping, MutableMapping, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
@@ -53,9 +53,9 @@ async def build_params(
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
-        params: MutableMapping[str, Any] = {**payload}
+        params: MutableMapping[str, Any] = {**payload.dict()}
         if parent:
-            parent_page: DraftRepositoryResult[Any] = await uow.drafts.by_path(parent)
+            parent_page: DraftRepositoryResult = await uow.drafts.by_path(parent)
             if parent_page.is_err():
                 raise HTTPException(
                     status_code=422,
@@ -112,7 +112,7 @@ async def list_drafts(
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
-        pages: DraftSequenceRepositoryResult[Any] = await uow.drafts.by_parent(parent)
+        pages: DraftSequenceRepositoryResult = await uow.drafts.by_parent(parent)
         await uow.rollback()
 
     if pages.is_err():
@@ -141,12 +141,12 @@ async def list_drafts(
 
 
 async def draft_by_path(
-    path: str = Field(...),
+    path: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> DraftPage[Any]:
     async with app.uow as uow:
         path = path.strip("/")
-        rpage: DraftRepositoryResult[Any] = await uow.drafts.by_path(f"/{path}")
+        rpage: DraftRepositoryResult = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
     if rpage.is_err():
         raise HTTPException(
@@ -162,8 +162,8 @@ async def draft_by_path(
 
 
 async def show_draft(
-    token: AuthnToken = Depends(get_token_info),
-    draft_page: DraftPage[Any] = Depends(draft_by_path),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
 ) -> Mapping[str, Any]:
     ret = draft_page.page.dict()
     ret["metadata"] = draft_page.metadata.dict(

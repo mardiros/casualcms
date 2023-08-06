@@ -17,13 +17,12 @@ from .abstract_snippet import (
     AbstractSnippet,
     AbstractSnippetError,
     Snippet_contra,
-    SnippetKey,
     SnippetType,
     list_snippet_types,
     resolve_snippet_type,
 )
 from .account import Account, AccountStatus, AuthnToken
-from .block import Block, GenericBlock
+from .block import Block
 from .draft_page import DraftPage
 from .published_page import PublishedPage
 from .setting import Setting
@@ -48,13 +47,11 @@ __all__ = [
     "PublishedPage",
     # Block,
     "Block",
-    "GenericBlock",
     # Snippets
     "AbstractSnippet",
     "AbstractSnippetError",
     "Snippet",
     "Snippet_contra",
-    "SnippetKey",
     "SnippetType",
     "list_snippet_types",
     "resolve_snippet_type",

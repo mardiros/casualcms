@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Optional
+from typing import Annotated, Any, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field
@@ -30,7 +30,7 @@ async def get_root_draft_by_path(
 ) -> DraftPage[Any]:
     async with app.uow as uow:
         path = root_page_path.strip("/")
-        rpage: DraftRepositoryResult[Any] = await uow.drafts.by_path(f"/{path}")
+        rpage: DraftRepositoryResult = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
     if rpage.is_err():
         raise HTTPException(
@@ -50,7 +50,7 @@ async def get_root_draft_by_path_or_none(
 
 
 async def get_site_by_current_hostname(
-    current_hostname: str = Field(...),
+    current_hostname: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Site:
     async with app.uow as uow:
@@ -70,7 +70,7 @@ async def get_site_by_current_hostname(
 
 
 async def get_site_by_hostname(
-    hostname: str = Field(...),
+    hostname: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Site:
     async with app.uow as uow:
@@ -129,13 +129,15 @@ async def create_site(
 
 async def update_site(
     request: Request,
+    site: Annotated[Site, Depends(get_site_by_current_hostname)],
+    root_page: Annotated[
+        DraftPage[Any] | None, Depends(get_root_draft_by_path_or_none)
+    ],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     default: bool | None = Body(None),
     secure: bool | None = Body(None),
     hostname: str | None = Body(None),
-    site: Site = Depends(get_site_by_current_hostname),
-    root_page: DraftPage[Any] | None = Depends(get_root_draft_by_path_or_none),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
 
     async with app.uow as uow:
@@ -186,9 +188,9 @@ async def list_sites(
 
 async def show_site(
     request: Request,
-    site: Site = Depends(get_site_by_hostname),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    site: Annotated[Site, Depends(get_site_by_hostname)],
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> PartialSite:
 
     return PartialSite(

@@ -224,7 +224,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         self.seen = set()
         self.session = session
 
-    async def by_id(self, id: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_id(self, id: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         qry = (
             select(orm.drafts)
@@ -239,7 +239,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         )
         orm_pages: SQLResult[Any] = await self.session.execute(qry)
         page: AbstractPage | None = None
-        draft_page: DraftPage[Page_contra] | None = None
+        draft_page: DraftPage[Any] | None = None
         orm_page_iter = iter(orm_pages)  # type: ignore
         try:
             orm_page = next(orm_page_iter)  # type: ignore
@@ -273,7 +273,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         # If we don't have a page here, it means that the tree path is broken
         return Err(DraftRepositoryError.page_broken_treepath)  # coverage: ignore
 
-    async def by_path(self, path: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         slugs = enumerate(reversed(path.strip("/").split("/")))
         qry = select(orm.drafts)
@@ -299,9 +299,7 @@ class DraftSQLRepository(AbstractDraftRepository):
             return await self.by_id(p.id)  # type: ignore
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_parent(
-        self, path: Optional[str]
-    ) -> DraftSequenceRepositoryResult[Page_contra]:
+    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch one page by its unique path."""
 
         if not path:
@@ -313,7 +311,7 @@ class DraftSQLRepository(AbstractDraftRepository):
             ).exists()
             parent_page = None
         else:
-            parent_res: DraftRepositoryResult[Any] = await self.by_path(path or "")
+            parent_res: DraftRepositoryResult = await self.by_path(path or "")
             if parent_res.is_err():
                 return cast(Err[DraftRepositoryError], parent_res)
             parent = parent_res.unwrap()
@@ -327,7 +325,7 @@ class DraftSQLRepository(AbstractDraftRepository):
         qry = select(orm.drafts).filter(sub).order_by(orm.drafts.c.slug)
         pages: SQLResult[Any] = await self.session.execute(qry)
 
-        ret: list[DraftPage[Page_contra]] = [
+        ret: list[DraftPage[Any]] = [
             DraftPage(
                 id=p.id,  # type:ignore
                 created_at=p.created_at,  # type:ignore
@@ -348,7 +346,7 @@ class DraftSQLRepository(AbstractDraftRepository):
 
         parent_draft = None
         if model.page.parent:
-            rparent_draft: DraftRepositoryResult[Any] = await self.by_path(
+            rparent_draft: DraftRepositoryResult = await self.by_path(
                 model.page.parent.metadata.path
             )
             if rparent_draft.is_err():
@@ -404,9 +402,7 @@ class DraftSQLRepository(AbstractDraftRepository):
 
     async def remove(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
         """Remove the model from the repository."""
-        child_pages: DraftSequenceRepositoryResult[Any] = await self.by_parent(
-            model.path
-        )
+        child_pages: DraftSequenceRepositoryResult = await self.by_parent(model.path)
         if child_pages.is_err():
             return cast(Err[DraftRepositoryError], child_pages)
 
@@ -434,7 +430,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
 
     async def _format_response(
         self, orm_snippets: SQLResult[Any]
-    ) -> SnippetRepositoryResult[Snippet_contra]:
+    ) -> SnippetRepositoryResult:
         orm_snippet = orm_snippets.first()
         if orm_snippet:
             rtyp = resolve_snippet_type(
@@ -454,14 +450,14 @@ class SnippetSQLRepository(AbstractSnippetRepository):
             )
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_id(self, id: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique id."""
         orm_snippets: SQLResult[Any] = await self.session.execute(
             select(orm.snippets).filter_by(id=id).limit(1)
         )
         return await self._format_response(orm_snippets)  # type: ignore
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique key."""
 
         orm_snippets: SQLResult[Any] = await self.session.execute(
@@ -469,9 +465,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         )
         return await self._format_response(orm_snippets)  # type: ignore
 
-    async def list(
-        self, type: Optional[str] = None
-    ) -> SnippetSequenceRepositoryResult[Snippet_contra]:
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
         """List all snippets, optionally filters on their types."""
 
         qry = select(orm.snippets)
@@ -480,7 +474,7 @@ class SnippetSQLRepository(AbstractSnippetRepository):
         qry = qry.order_by(orm.snippets.c.key)
         orm_snippets: SQLResult[Any] = await self.session.execute(qry)
         orm_snippet: Any
-        snippets: list[Snippet[Snippet_contra]] = []
+        snippets: list[Snippet[Any]] = []
         for orm_snippet in orm_snippets:
             rtyp = resolve_snippet_type(orm_snippet.type)  # type: ignore
             # if rtyp.is_err():
@@ -533,7 +527,7 @@ class SettingSQLRepository(AbstractSettingRepository):
 
     async def _format_response(
         self, orm_settings: SQLResult[Any]
-    ) -> SettingRepositoryResult[Setting_contra]:
+    ) -> SettingRepositoryResult:
         resp = orm_settings.first()
         if resp:
             typ: SettingType = resolve_setting_type(resp.key)
@@ -547,7 +541,7 @@ class SettingSQLRepository(AbstractSettingRepository):
             )
         return Err(SettingRepositoryError.setting_not_found)
 
-    async def by_id(self, id: str) -> SettingRepositoryResult[Setting_contra]:
+    async def by_id(self, id: str) -> SettingRepositoryResult:
         """Fetch one setting by its unique id."""
         qry = (
             select(orm.settings, orm.sites.c.hostname)
@@ -562,9 +556,7 @@ class SettingSQLRepository(AbstractSettingRepository):
         orm_settings: SQLResult[Any] = await self.session.execute(qry)
         return await self._format_response(orm_settings)  # type: ignore
 
-    async def by_key(
-        self, hostname: str, key: str
-    ) -> SettingRepositoryResult[Setting_contra]:
+    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
         """Fetch one setting by its unique key."""
 
         orm_settings: SQLResult[Any] = await self.session.execute(
@@ -584,7 +576,7 @@ class SettingSQLRepository(AbstractSettingRepository):
 
     async def list(
         self, hostname: Optional[str] = None
-    ) -> SettingSequenceRepositoryResult[Setting_contra]:
+    ) -> SettingSequenceRepositoryResult:
         """List all settings, optionally filters on their types."""
 
         qry = select(orm.settings, orm.sites.c.hostname)
@@ -597,7 +589,7 @@ class SettingSQLRepository(AbstractSettingRepository):
         qry = qry.order_by(orm.sites.c.hostname, orm.settings.c.key)
         orm_settings: SQLResult[Any] = await self.session.execute(qry)
         orm_setting: Any
-        settings: list[Setting[Setting_contra]] = []
+        settings: list[Setting[Any]] = []
 
         for orm_setting in orm_settings:
             typ: SettingType = resolve_setting_type(orm_setting.key)
@@ -712,9 +704,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         sites: list[Site] = []
         for orm_site in orm_sites:  # type: ignore
             s = cast(Site, orm_site)
-            page: DraftRepositoryResult[Any] = await DraftSQLRepository(
-                self.session
-            ).by_id(
+            page: DraftRepositoryResult = await DraftSQLRepository(self.session).by_id(
                 s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
@@ -735,9 +725,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Append a new model to the repository."""
         data = model.dict()
         data["created_at"] = model.created_at
-        rpage: DraftRepositoryResult[Any] = await DraftSQLRepository(
-            self.session
-        ).by_path(data.pop("root_page_path"))
+        rpage: DraftRepositoryResult = await DraftSQLRepository(self.session).by_path(
+            data.pop("root_page_path")
+        )
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
 
@@ -752,9 +742,7 @@ class SiteSQLRepository(AbstractSiteRepository):
         orm_site = orm_sites.first()
         if orm_site:
             s = cast(Site, orm_site)
-            page: DraftRepositoryResult[Any] = await DraftSQLRepository(
-                self.session
-            ).by_id(
+            page: DraftRepositoryResult = await DraftSQLRepository(self.session).by_id(
                 s.draft_id  # type: ignore
             )
             page_ok = page.unwrap()
@@ -789,9 +777,9 @@ class SiteSQLRepository(AbstractSiteRepository):
         """Update given model into the repository."""
         site = model.dict(exclude={"id", "draft_id", "root_page_path"})
 
-        rpage: DraftRepositoryResult[Any] = await DraftSQLRepository(
-            self.session
-        ).by_path(model.root_page_path)
+        rpage: DraftRepositoryResult = await DraftSQLRepository(self.session).by_path(
+            model.root_page_path
+        )
         if rpage.is_err():
             return Err(SiteRepositoryError.root_page_not_found)
         page = rpage.unwrap()  # FIXME, should return Ok(...)
@@ -834,7 +822,7 @@ class PageSQLRepository(AbstractPageRepository):
 
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
-    ) -> PageRepositoryResult[Page_contra]:
+    ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
 
         orm_pages: SQLResult[Any] = await self.session.execute(
@@ -867,7 +855,7 @@ class PageSQLRepository(AbstractPageRepository):
             )
         )
 
-    async def by_url(self, url: str) -> PageRepositoryResult[Page_contra]:
+    async def by_url(self, url: str) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
         url_ = urlparse(url)
         scheme, hostname, path = url_.scheme, url_.netloc, url_.path
@@ -888,15 +876,13 @@ class PageSQLRepository(AbstractPageRepository):
         if site_row.secure and scheme == "http":  # type: ignore
             return Err(PageRepositoryError.page_not_found)
 
-        rdraft: DraftRepositoryResult[Any] = await DraftSQLRepository(
-            self.session
-        ).by_id(
+        rdraft: DraftRepositoryResult = await DraftSQLRepository(self.session).by_id(
             site_row.draft_id
         )  # type: ignore
         if rdraft.is_err():
             return Err(PageRepositoryError.page_not_found)
         root = rdraft.unwrap()
-        site = Site(root_page_path=root.path, **site_row._asdict())
+        site = Site(root_page_path=root.path, **site_row._asdict())  # type: ignore
 
         parent_path = list(build_parent_path(path))
         qry = (

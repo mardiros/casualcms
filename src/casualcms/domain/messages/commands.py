@@ -3,8 +3,6 @@ from typing import Any, Mapping
 
 from pydantic import Field
 
-from casualcms.domain.model import SnippetKey
-from casualcms.domain.model.setting import SettingKey
 from casualcms.utils import generate_id, generate_secret
 
 from .base import Command, Metadata
@@ -115,7 +113,7 @@ class DeleteSite(Command):
 
 class CreateSnippet(Command):
     type: str = Field(...)
-    key: SnippetKey = Field(...)
+    key: str = Field(...)
     body: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(default_factory=generate_id)
@@ -125,7 +123,7 @@ class CreateSnippet(Command):
 
 
 class UpdateSnippet(Command):
-    key: SnippetKey | None = Field(..., description="New key")
+    key: str | None = Field(..., description="New key")
     body: Mapping[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
@@ -143,7 +141,7 @@ class DeleteSnippet(Command):
 
 
 class CreateSetting(Command):
-    key: SettingKey = Field(...)
+    key: str = Field(...)
     hostname: str = Field(...)
     body: Mapping[str, Any] = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
@@ -155,7 +153,7 @@ class CreateSetting(Command):
 
 class UpdateSetting(Command):
     hostname: str = Field(...)
-    key: SettingKey = Field(...)
+    key: str = Field(...)
     body: Mapping[str, Any] | None = Field(...)
     created_at: datetime = Field(default_factory=datetime.now)
     id: str = Field(...)
@@ -166,7 +164,7 @@ class UpdateSetting(Command):
 
 class DeleteSetting(Command):
     hostname: str = Field(...)
-    key: SettingKey = Field(...)
+    key: str = Field(...)
     id: str = Field(...)
     metadata: Metadata = Metadata(
         category="setting", name="update_setting", schemaVersion=1

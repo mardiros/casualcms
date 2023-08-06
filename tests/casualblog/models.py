@@ -2,13 +2,7 @@ from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import (
-    AbstractPage,
-    AbstractSetting,
-    AbstractSnippet,
-    Block,
-    GenericBlock,
-)
+from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet, Block
 from casualcms.domain.model.block import CodeBlock
 
 
@@ -19,7 +13,7 @@ class Link(BaseModel):
 
 class Box(Block):
     title: str = Field()
-    paragraph: str = Field(widget="textarea")
+    paragraph: str = Field(json_schema_extra={"widget": "textarea"})
 
     class Meta:
         template = "box.jinja2"
@@ -79,12 +73,16 @@ class RelatedPostSnippet(AbstractFooterSnippet):
 
 class Paragraph(BaseModel):
     title: Optional[str] = Field()
-    body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
+    body: str = Field(
+        json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
+    )
 
 
 class ParagraphBlock(Block):
     title: Optional[str] = Field()
-    body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
+    body: str = Field(
+        json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
+    )
 
     class Meta:
         template = "paragraph_block.jinja2"
@@ -142,7 +140,7 @@ class SnippetBlockPage(AbstractPage):
 T = TypeVar("T")
 
 
-class ListBlock(GenericBlock, Generic[T]):
+class ListBlock(Block, Generic[T]):
     items: list[T] = Field(default_factory=list)
 
     class Meta:
@@ -166,13 +164,13 @@ V = TypeVar("V")
 
 
 class DefinitionBlock(Block):
-    body: str = Field(widget="textarea")
+    body: str = Field(json_schema_extra={"widget": "textarea"})
 
     class Meta:
         template = "definition.jinja2"
 
 
-class StructBlock(GenericBlock, Generic[K, V]):
+class StructBlock(Block, Generic[K, V]):
     items: dict[K, V] = Field(default_factory=dict)
 
     class Meta:

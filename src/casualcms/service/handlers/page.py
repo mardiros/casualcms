@@ -41,7 +41,7 @@ async def update_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
@@ -56,7 +56,7 @@ async def delete_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
@@ -68,7 +68,7 @@ async def publish_page(
     cmd: PublishPage,
     uow: AbstractUnitOfWork,
 ) -> PageOperationResult:
-    rdraft_page: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rdraft_page: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rdraft_page.is_err():
         return Err(PageRepositoryError.draft_not_found)
     draft_page = rdraft_page.unwrap()
@@ -84,7 +84,7 @@ async def publish_page(
     lprefix = len(site.root_page_path)
     path = draft_page.path[lprefix:]
     path = f"//{site.hostname}{path}"
-    rpublished_page: PageRepositoryResult[Any] = await uow.pages.by_draft_page_and_site(
+    rpublished_page: PageRepositoryResult = await uow.pages.by_draft_page_and_site(
         draft_page.id, site.id
     )
     if rpublished_page.is_ok():

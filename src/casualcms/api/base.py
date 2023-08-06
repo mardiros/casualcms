@@ -1,9 +1,8 @@
 import re
-from typing import Any, Callable, Iterator, MutableMapping
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.model.account import AuthnToken
@@ -24,32 +23,14 @@ bearer = HTTPBearer()
 slug_type_regex = re.compile("^[^/]+$")
 
 
-class MappingWithKey(MutableMapping[str, Any]):
-    _key_name = "key"
-
-    @classmethod
-    def __get_validators__(cls) -> Iterator[Callable[[Any], MutableMapping[str, Any]]]:
-        yield cls.validate
-
-    @classmethod
-    def validate(cls, v: MutableMapping[str, Any]) -> MutableMapping[str, Any]:
-        if not isinstance(v, dict):
-            raise TypeError("Mapping required")
-
-        if cls._key_name not in v:
-            raise ValueError(f"Missing {cls._key_name}")
-
-        m = slug_type_regex.fullmatch(v[cls._key_name])
-        if not m:
-            raise ValueError(f"Invalid {cls._key_name} field")
-        return v
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({super().__repr__()})"
+class MappingWithKey(BaseModel):
+    key: str = Field(...)
+    model_config = ConfigDict(extra="allow")
 
 
-class MappingWithSlug(MappingWithKey):
-    _key_name = "slug"
+class MappingWithSlug(BaseModel):
+    slug: str = Field(...)
+    model_config = ConfigDict(extra="allow")
 
 
 class HTTPMessage(BaseModel):

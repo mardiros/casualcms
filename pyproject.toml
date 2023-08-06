@@ -10,7 +10,7 @@ casualcms = "casualcms.entrypoint:main"
 [tool.poetry.dependencies]
 python = "^3.10"
 bcrypt = "^3.2.0"
-fastapi = "^0.94.1"
+fastapi = "^0.100.1"
 hypercorn = "^0.14.3"
 Jinja2 = "^3.1.1"
 pytest-asyncio = "^0.18.3"
@@ -22,7 +22,8 @@ sqlalchemy-citext = "^1.8.0"
 psycopg2-binary = "^2.9.3"
 alembic = "^1.8.1"
 pygments = "^2.13.0"
-pydantic = "^1.10.6"
+pydantic = "^2.1.0"
+pydantic-settings = "^2.0.2"
 
 [tool.poetry.group.dev.dependencies]
 alembic = "^1.8.1"

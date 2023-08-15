@@ -17,7 +17,6 @@ from .base import (
     RESOURCE_DELETED,
     RESOURCE_UPDATED,
     HTTPMessage,
-    MappingWithSlug,
     get_token_info,
 )
 
@@ -47,13 +46,13 @@ def get_page_type(
 
 
 async def build_params(
-    payload: MappingWithSlug = Body(...),
-    parent: str = Body(None),
+    payload: Annotated[Mapping[str, Any], Body(...)],
+    parent: Annotated[Optional[str], Body()] = None,
     page_type: PageType = Depends(get_page_type),
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
-        params: MutableMapping[str, Any] = {**payload.dict()}
+        params: MutableMapping[str, Any] = {**payload}
         if parent:
             parent_page: DraftRepositoryResult = await uow.drafts.by_path(parent)
             if parent_page.is_err():
@@ -79,10 +78,10 @@ async def build_params(
 
 async def create_draft(
     request: Request,
-    type: str = Body(...),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    type: Annotated[str, Body(...)],
     params: Mapping[str, Any] = Depends(build_params),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host if request.client else ""

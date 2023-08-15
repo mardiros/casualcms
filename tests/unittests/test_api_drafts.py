@@ -40,8 +40,8 @@ async def test_api_create_draft(
             },
         },
     )
-    assert resp.status_code == 201
     assert resp.json() == {"message": "Resource Created"}
+    assert resp.status_code == 201
     async with uow as uow:
         page: DraftPage[Any] = (await uow.drafts.by_path("/index")).unwrap()
         assert page.page.dict() == {
@@ -49,69 +49,94 @@ async def test_api_create_draft(
             "title": "Root Page",
             "description": "The home page",
             "hero_title": "You are awesome",
-            "body": [{"title": None, "body": "lorem ipsum"}],
+            "body": [{"title": "", "body": "lorem ipsum"}],
         }
 
 
 @pytest.mark.parametrize(
     "params",
     [
-        {
-            "request": {
-                "type": "blog:HomePage",
-                "payload": {
-                    "title": 42,
-                    "description": "The home page",
-                    "hero_title": "You are awesome",
-                    "body": [{"body": True}],
+        pytest.param(
+            {  # type: ignore
+                "request": {
+                    "type": "blog:HomePage",
+                    "payload": {
+                        "title": "42",
+                        "description": "The home page",
+                        "hero_title": "You are awesome",
+                        "body": [],
+                    },
+                },
+                "expected_response": {
+                    "detail": [
+                        {
+                            "input": {
+                                "body": [],
+                                "description": "The home page",
+                                "hero_title": "You are awesome",
+                                "title": "42",
+                            },
+                            "loc": ["body", ["slug"]],
+                            "msg": "Field required",
+                            "type": "missing",
+                            "url": "https://errors.pydantic.dev/2.1/v/missing",
+                        }
+                    ],
                 },
             },
-            "expected_response": {
-                "detail": [
-                    {
-                        "loc": ["body", "payload"],
-                        "msg": "Missing slug",
-                        "type": "value_error",
-                    }
-                ],
-            },
-        },
-        {
-            "request": {
-                "type": "blog:UnknownPage",
-                "payload": {
-                    "slug": "homelander",
-                    "title": 42,
-                    "description": "The home page",
-                    "hero_title": "You are awesome",
-                    "body": [{"body": True}],
+            id="missing slug",
+        ),
+        pytest.param(
+            {
+                "request": {
+                    "type": "blog:UnknownPage",
+                    "payload": {
+                        "slug": "homelander",
+                        "title": 42,
+                        "description": "The home page",
+                        "hero_title": "You are awesome",
+                        "body": [],
+                    },
+                },
+                "expected_response": {
+                    "detail": [{"loc": ["body", "type"], "msg": "Unregistered type"}]
                 },
             },
-            "expected_response": {
-                "detail": [{"loc": ["body", "type"], "msg": "Unregistered type"}]
-            },
-        },
-        {
-            "request": {
-                "type": "blog:HomePage",
-                "payload": {
-                    "slug": "/homelander",
-                    "title": 42,
-                    "description": "The home page",
-                    "hero_title": "You are awesome",
-                    "body": [],
+            id="Unregistered type",
+        ),
+        pytest.param(
+            {
+                "request": {
+                    "type": "blog:HomePage",
+                    "payload": {
+                        "slug": "/homelander",
+                        "title": 42,
+                        "description": "The home page",
+                        "hero_title": "You are awesome",
+                        "body": [],
+                    },
+                },
+                "expected_response": {
+                    "detail": [
+                        {
+                            "ctx": {"pattern": "^[^/]+$"},
+                            "input": "/homelander",
+                            "loc": ["body", ["slug"]],
+                            "msg": "String should match pattern '^[^/]+$'",
+                            "type": "string_pattern_mismatch",
+                        },
+                        {
+                            "input": 42,
+                            "loc": ["body", ["title"]],
+                            "msg": "Input should be a valid string",
+                            "type": "string_type",
+                            "url": "https://errors.pydantic.dev/2.1/v/string_type",
+                        },
+                    ],
                 },
             },
-            "expected_response": {
-                "detail": [
-                    {
-                        "loc": ["body", "payload"],
-                        "msg": "Invalid slug field",
-                        "type": "value_error",
-                    }
-                ],
-            },
-        },
+            id="Invalid slug field",
+        ),
     ],
 )
 async def test_api_create_draft_invalid_data_422(

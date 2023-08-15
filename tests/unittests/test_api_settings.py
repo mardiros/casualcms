@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
+from casualcms.domain.model.setting import Setting
 from casualcms.domain.model.site import Site
 from casualcms.domain.repositories.setting import SettingRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
@@ -40,24 +41,26 @@ async def test_api_create_setting(
             },
         },
     )
-    assert resp.status_code == 201
     assert resp.json() == {
         "metadata": {
             "key": "ff",
             "hostname": default_site.hostname,
         },
     }
+    assert resp.status_code == 201
+
     async with uow as uow:
-        rsetting: SettingRepositoryResult[
-            FeatureFlagSetting
-        ] = await uow.settings.by_key(default_site.hostname, "ff")
+        rsetting: SettingRepositoryResult = await uow.settings.by_key(
+            default_site.hostname, "ff"
+        )
         assert rsetting.is_ok()
-        setting = rsetting.unwrap()
+        setting: Setting[FeatureFlagSetting] = rsetting.unwrap()
+        # https://github.com/pydantic/pydantic/issues/6895
         assert setting.key == "ff"
-        assert setting.dict() == {
-            "hostname": "www.example.net",
-            "key": "ff",
-            "setting": {"use_another_stuff": None, "use_stuff": True},
+        assert setting.hostname == "www.example.net"
+        assert setting.setting.model_dump() == {
+            "use_another_stuff": False,
+            "use_stuff": True,
         }
 
 
@@ -132,9 +135,9 @@ async def test_api_patch_setting(
     }
 
     async with uow as uow:
-        rsetting: SettingRepositoryResult[
-            FeatureFlagSetting
-        ] = await uow.settings.by_key(default_site.hostname, "ff")
+        rsetting: SettingRepositoryResult = await uow.settings.by_key(
+            default_site.hostname, "ff"
+        )
         assert rsetting.is_ok()
         setting = rsetting.unwrap()
         assert setting.setting.use_stuff is True
@@ -170,7 +173,7 @@ async def test_api_get_setting(
             "hostname": default_site.hostname,
         },
         "use_stuff": True,
-        "use_another_stuff": None,
+        "use_another_stuff": False,
     }
 
 
@@ -202,9 +205,9 @@ async def test_api_delete_setting(
     assert resp.text == ""
 
     async with uow as uow:
-        rsetting: SettingRepositoryResult[
-            FeatureFlagSetting
-        ] = await uow.settings.by_key(default_site.hostname, "ff")
+        rsetting: SettingRepositoryResult = await uow.settings.by_key(
+            default_site.hostname, "ff"
+        )
         assert rsetting.is_err()
         assert rsetting.unwrap_err().name == "setting_not_found"
 

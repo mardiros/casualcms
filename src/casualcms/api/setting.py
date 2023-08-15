@@ -27,8 +27,8 @@ class PartialSetting(BaseModel):
 async def validate_payload(
     request: Request,
     hostname: str,
-    key: str = Body(...),
-    payload: dict[str, Any] = Body(...),
+    key: Annotated[str, Body(...)],
+    payload: Annotated[Mapping[str, Any], Body(...)],
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     setting_type = resolve_setting_type(key)
@@ -49,11 +49,11 @@ async def validate_payload(
 
 async def create_setting(
     request: Request,
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     hostname: str,
-    key: str = Body(...),
+    key: Annotated[str, Body(pattern="^[^/]+$")],
+    validated_payload: Annotated[Mapping[str, Any], Depends(validate_payload)],
     app: AppConfig = FastAPIConfigurator.depends,
-    validated_payload: Mapping[str, Any] = Depends(validate_payload),
-    token: AuthnToken = Depends(get_token_info),
 ) -> PartialSetting:
     cmd = CreateSetting(
         key=key,  # type: ignore

@@ -80,10 +80,16 @@ async def test_api_create_snippet(
             },
             "expected": {
                 "detail": [
+                    # "input": "/header",
+                    # "loc": ["body", "payload"],
+                    # "msg": "Invalid key field",
+                    # "type": "value_error",
                     {
-                        "loc": ["body", "payload"],
-                        "msg": "Invalid key field",
-                        "type": "value_error",
+                        "ctx": {"pattern": "^[^/]+$"},
+                        "input": "/header",
+                        "loc": ["body", ["payload", "key"]],
+                        "msg": "String should match pattern '^[^/]+$'",
+                        "type": "string_pattern_mismatch",
                     }
                 ],
             },
@@ -259,7 +265,13 @@ async def test_api_patch_snippet_422(
     assert resp.status_code == 422
     assert resp.json() == {
         "detail": [
-            {"loc": ["body"], "msg": "Invalid key field", "type": "value_error"}
+            {
+                "ctx": {"pattern": "^[^/]+$"},
+                "input": "hea/der",
+                "loc": ["body", ["payload", "key"]],
+                "msg": "String should match pattern '^[^/]+$'",
+                "type": "string_pattern_mismatch",
+            }
         ],
     }
 

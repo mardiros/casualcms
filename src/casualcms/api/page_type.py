@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Depends, Query
 from pydantic import BaseModel, Field
@@ -32,13 +32,13 @@ async def list_templates(
 
 async def show_template(
     type: str,
-    token: AuthnToken = Depends(get_token_info),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> dict[str, Any]:
     ptype = resolve_page_type(type).unwrap()
-    jsonschema = ptype.schema()
-    jsonschema["definitions"].pop("Event", None)
-    jsonschema["definitions"].pop("AbstractPage", None)
-    jsonschema["definitions"].pop("Site", None)
+    jsonschema = ptype.model_json_schema()
+    jsonschema["$defs"].pop("Event", None)
+    jsonschema["$defs"].pop("AbstractPage", None)
+    jsonschema["$defs"].pop("Site", None)
     for key in ("id", "parent", "site", "events", "created_at"):
         jsonschema["properties"].pop(key, None)
     return {

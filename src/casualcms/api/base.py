@@ -1,8 +1,9 @@
 import re
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from fastapi.security.http import HTTPAuthorizationCredentials, HTTPBearer
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, Field
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator
 from casualcms.domain.model.account import AuthnToken
@@ -10,8 +11,6 @@ from casualcms.domain.model.account import AuthnToken
 __all__ = [
     "router",
     "get_token_info",
-    "MappingWithKey",
-    "MappingWithSlug",
     "RESOURCE_CREATED",
     "RESOURCE_UPDATED",
     "RESOURCE_DELETED",
@@ -21,16 +20,6 @@ router = APIRouter()
 bearer = HTTPBearer()
 
 slug_type_regex = re.compile("^[^/]+$")
-
-
-class MappingWithKey(BaseModel):
-    key: str = Field(...)
-    model_config = ConfigDict(extra="allow")
-
-
-class MappingWithSlug(BaseModel):
-    slug: str = Field(...)
-    model_config = ConfigDict(extra="allow")
 
 
 class HTTPMessage(BaseModel):
@@ -43,8 +32,8 @@ RESOURCE_DELETED = Response(content="", status_code=204)
 
 
 async def get_token_info(
-    token: HTTPAuthorizationCredentials = Depends(bearer),
-    app: AppConfig = FastAPIConfigurator.depends,
+    token: Annotated[HTTPAuthorizationCredentials, Depends(bearer)],
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> AuthnToken:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

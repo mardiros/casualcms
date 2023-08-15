@@ -31,7 +31,7 @@ class HeaderSnippet(AbstractSnippet):
 
 class FeatureFlagSetting(AbstractSetting):
     use_stuff: bool = False
-    use_another_stuff: bool | None
+    use_another_stuff: bool = False
 
     class Meta:
         key = "ff"
@@ -72,14 +72,14 @@ class RelatedPostSnippet(AbstractFooterSnippet):
 
 
 class Paragraph(BaseModel):
-    title: Optional[str] = Field()
+    title: Optional[str] = Field(None)
     body: str = Field(
         json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
     )
 
 
 class ParagraphBlock(Block):
-    title: Optional[str] = Field()
+    title: str = ""
     body: str = Field(
         json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
     )
@@ -133,6 +133,7 @@ class SnippetBlock(AbstractSnippet):
 
 class SnippetBlockPage(AbstractPage):
     class Meta:
+        parent_types = [HomePage]
         template = "page_with_snippet_block.jinja2"
         type = "blog:SnippetBlockPage"
 

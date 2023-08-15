@@ -39,6 +39,7 @@ async def test_list_page_types_for_childs(client: TestClient, authntoken: AuthnT
     assert resp.json() == [
         {"title": "Category Page", "type": "blog:CategoryPage"},
         {"title": "Section Page", "type": "blog:SectionPage"},
+        {"title": "Snippet Block Page", "type": "blog:SnippetBlockPage"},
     ]
 
 
@@ -58,7 +59,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
     assert resp.status_code == 200
     assert resp.json() == {
         "schema": {
-            "definitions": {
+            "$defs": {
                 "CodeBlock": {
                     "properties": {
                         "code": {
@@ -96,7 +97,7 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                             "type": "string",
                             "widget": "richtext",
                         },
-                        "title": {"title": "Title", "type": "string"},
+                        "title": {"title": "Title", "type": "string", "default": ""},
                     },
                     "required": ["body"],
                     "title": "Paragraph Block",
@@ -108,8 +109,8 @@ async def test_show_template(client: TestClient, authntoken: AuthnToken):
                     "default": [],
                     "items": {
                         "anyOf": [
-                            {"$ref": "#/definitions/ParagraphBlock"},
-                            {"$ref": "#/definitions/CodeBlock"},
+                            {"$ref": "#/$defs/ParagraphBlock"},
+                            {"$ref": "#/$defs/CodeBlock"},
                         ]
                     },
                     "title": "Body",

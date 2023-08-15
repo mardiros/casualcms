@@ -146,7 +146,7 @@ class AbstractPage(BaseUIModel, metaclass=PageMetaclass):
     parent: Optional["AbstractPage"] = Field(None, exclude=True)
 
     class Meta:
-        ...
+        abstract = True
 
     def __init__(self, **kwargs: Any) -> None:  # type: ignore
         if self.__meta__.abstract is True:

@@ -42,7 +42,11 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
     assert resp.json() == {
         "schema": {
             "properties": {
-                "use_another_stuff": {"title": "Use Another Stuff", "type": "boolean"},
+                "use_another_stuff": {
+                    "title": "Use Another Stuff",
+                    "type": "boolean",
+                    "default": False,
+                },
                 "use_stuff": {
                     "title": "Use Stuff",
                     "type": "boolean",

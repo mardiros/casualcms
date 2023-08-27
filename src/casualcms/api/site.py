@@ -25,8 +25,8 @@ class PartialSite(BaseModel):
 
 
 async def get_root_draft_by_path(
-    root_page_path: str = Body(...),
-    app: AppConfig = FastAPIConfigurator.depends,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    root_page_path: Annotated[str, Body(...)],
 ) -> DraftPage[Any]:
     async with app.uow as uow:
         path = root_page_path.strip("/")
@@ -41,17 +41,17 @@ async def get_root_draft_by_path(
 
 
 async def get_root_draft_by_path_or_none(
-    root_page_path: str | None = Body(default=None),
-    app: AppConfig = FastAPIConfigurator.depends,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    root_page_path: Annotated[str | None, Body(...)] = None,
 ) -> DraftPage[Any] | None:
     if root_page_path is not None:
-        return await get_root_draft_by_path(root_page_path, app)
+        return await get_root_draft_by_path(app=app, root_page_path=root_page_path)
     return None
 
 
 async def get_site_by_current_hostname(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     current_hostname: str,
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> Site:
     async with app.uow as uow:
         rsite = await uow.sites.by_hostname(current_hostname)
@@ -70,8 +70,8 @@ async def get_site_by_current_hostname(
 
 
 async def get_site_by_hostname(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     hostname: str,
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> Site:
     async with app.uow as uow:
         rsite = await uow.sites.by_hostname(hostname)
@@ -90,13 +90,13 @@ async def get_site_by_hostname(
 
 
 async def create_site(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    hostname: str = Body(...),
-    default: bool = Body(...),
-    secure: bool = Body(...),
-    root_page: DraftPage[Any] = Depends(get_root_draft_by_path),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    hostname: Annotated[str, Body(...)],
+    default: Annotated[bool, Body(...)],
+    secure: Annotated[bool, Body(...)],
+    root_page: Annotated[DraftPage[Any], Depends(get_root_draft_by_path)],
 ) -> PartialSite:
 
     cmd = CreateSite(
@@ -128,16 +128,16 @@ async def create_site(
 
 
 async def update_site(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     site: Annotated[Site, Depends(get_site_by_current_hostname)],
     root_page: Annotated[
         DraftPage[Any] | None, Depends(get_root_draft_by_path_or_none)
     ],
-    token: Annotated[AuthnToken, Depends(get_token_info)],
-    default: bool | None = Body(None),
-    secure: bool | None = Body(None),
-    hostname: str | None = Body(None),
-    app: AppConfig = FastAPIConfigurator.depends,
+    default: Annotated[bool | None, Body()] = None,
+    secure: Annotated[bool | None, Body()] = None,
+    hostname: Annotated[str | None, Body()] = None,
 ) -> HTTPMessage:
 
     async with app.uow as uow:
@@ -158,10 +158,10 @@ async def update_site(
 
 
 async def list_sites(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     parent: Optional[str] = None,
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> list[PartialSite]:
 
     async with app.uow as uow:
@@ -187,10 +187,10 @@ async def list_sites(
 
 
 async def show_site(
-    request: Request,
-    site: Annotated[Site, Depends(get_site_by_hostname)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
     token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
+    site: Annotated[Site, Depends(get_site_by_hostname)],
 ) -> PartialSite:
 
     return PartialSite(
@@ -202,10 +202,10 @@ async def show_site(
 
 
 async def delete_site(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    site: Site = Depends(get_site_by_hostname),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    site: Annotated[Site, Depends(get_site_by_hostname)],
 ) -> Response:
 
     cmd = DeleteSite(

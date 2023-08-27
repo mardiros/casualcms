@@ -25,11 +25,11 @@ class PartialSetting(BaseModel):
 
 
 async def validate_payload(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     request: Request,
     hostname: str,
     key: Annotated[str, Body(...)],
     payload: Annotated[Mapping[str, Any], Body(...)],
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     setting_type = resolve_setting_type(key)
     async with app.uow as uow:
@@ -48,12 +48,12 @@ async def validate_payload(
 
 
 async def create_setting(
-    request: Request,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
     hostname: str,
     key: Annotated[str, Body(pattern="^[^/]+$")],
     validated_payload: Annotated[Mapping[str, Any], Depends(validate_payload)],
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> PartialSetting:
     cmd = CreateSetting(
         key=key,  # type: ignore
@@ -85,9 +85,9 @@ async def create_setting(
 
 
 async def list_settings(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     hostname: str,
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> Sequence[PartialSetting]:
 
     async with app.uow as uow:
@@ -106,9 +106,9 @@ async def list_settings(
 
 
 async def get_setting_by_path(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     hostname: str,
     key: str,
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> Setting[Any]:
     async with app.uow as uow:
         rsetting: SettingRepositoryResult = await uow.settings.by_key(hostname, key)
@@ -125,8 +125,8 @@ async def get_setting_by_path(
 
 
 async def show_setting(
-    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
-    token: AuthnToken = Depends(get_token_info),
+    setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> Any:
     ret = setting.setting.dict()
     ret["metadata"] = {"key": setting.key, "hostname": setting.hostname}
@@ -134,13 +134,13 @@ async def show_setting(
 
 
 async def update_setting(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
-    token: Annotated[AuthnToken, Depends(get_token_info)],
     hostname: str,
     key: str,
-    payload: dict[str, Any] = Body(...),
-    app: AppConfig = FastAPIConfigurator.depends,
+    payload: Annotated[dict[str, Any], Body(...)],
 ) -> PartialSetting:
 
     payload.pop("metadata", None)
@@ -168,10 +168,10 @@ async def update_setting(
 
 
 async def delete_setting(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
-    token: Annotated[AuthnToken, Depends(get_token_info)],
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> Response:
 
     cmd = DeleteSetting(

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Body, Depends, Header, HTTPException, Request, Response, status
 
@@ -10,9 +10,9 @@ from casualcms.domain.model.account import AuthnToken
 
 
 async def get_authenticated_user(
-    username: str = Body(...),
-    password: str = Body(...),
-    app: AppConfig = FastAPIConfigurator.depends,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    username: Annotated[str, Body(...)],
+    password: Annotated[str, Body(...)],
 ) -> Account:
     authenticated_user: Account | None = None
     async with app.uow as uow:
@@ -34,10 +34,10 @@ async def get_authenticated_user(
 
 
 async def authenticate(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     request: Request,
-    user_agent: str = Header(None),
-    app: AppConfig = FastAPIConfigurator.depends,
-    authenticated_user: Account = Depends(get_authenticated_user),
+    user_agent: Annotated[str, Header(...)],
+    authenticated_user: Annotated[Account, Depends(get_authenticated_user)],
 ) -> dict[str, Any]:
 
     client_addr: str = request.client.host if request.client else ""
@@ -66,10 +66,10 @@ async def authenticate(
 
 
 async def logout(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    token: AuthnToken = Depends(get_token_info),
-    user_agent: str = Header(None),
-    app: AppConfig = FastAPIConfigurator.depends,
+    user_agent: Annotated[str, Header(...)],
 ) -> Response:
     client_addr: str = request.client.host if request.client else ""
     cmd = DeleteAuthnToken(

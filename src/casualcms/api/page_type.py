@@ -14,8 +14,11 @@ class PartialPageType(BaseModel):
 
 
 async def list_templates(
-    type: str | None = Query(None, description="Filter templates for a parent type"),
-    token: AuthnToken = Depends(get_token_info),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    type: Annotated[
+        str | None,
+        Query(description="Filter templates for a parent type"),
+    ] = None,
 ) -> list[PartialPageType]:
     ptypes = get_available_subtypes(type)
     return sorted(

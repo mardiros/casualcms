@@ -32,8 +32,8 @@ RESOURCE_DELETED = Response(content="", status_code=204)
 
 
 async def get_token_info(
-    token: Annotated[HTTPAuthorizationCredentials, Depends(bearer)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[HTTPAuthorizationCredentials, Depends(bearer)],
 ) -> AuthnToken:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,

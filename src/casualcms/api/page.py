@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Body, Depends, HTTPException
 from result import Result
@@ -12,10 +12,10 @@ from .base import RESOURCE_CREATED, HTTPMessage, get_token_info
 
 
 async def publish_page(
-    hostname: str = Body(...),
-    path: str = Body(...),
-    token: AuthnToken = Depends(get_token_info),
-    app: AppConfig = FastAPIConfigurator.depends,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    hostname: Annotated[str, Body(...)],
+    path: Annotated[str, Body(...)],
 ) -> HTTPMessage:
 
     async with app.uow as uow:

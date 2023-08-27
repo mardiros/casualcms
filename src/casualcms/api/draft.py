@@ -34,7 +34,7 @@ class PartialPage(BaseModel):
 
 
 def get_page_type(
-    type: str = Body(...),
+    type: Annotated[str, Body(...)],
 ) -> PageType:
     rpage_type = resolve_page_type(type)
     if rpage_type.is_err():
@@ -46,10 +46,10 @@ def get_page_type(
 
 
 async def build_params(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    page_type: Annotated[PageType, Depends(get_page_type)],
     payload: Annotated[Mapping[str, Any], Body(...)],
-    parent: Annotated[Optional[str], Body()] = None,
-    page_type: PageType = Depends(get_page_type),
-    app: AppConfig = FastAPIConfigurator.depends,
+    parent: Annotated[Optional[str], Body(...)] = None,
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {**payload}
@@ -77,11 +77,11 @@ async def build_params(
 
 
 async def create_draft(
-    request: Request,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
     type: Annotated[str, Body(...)],
-    params: Mapping[str, Any] = Depends(build_params),
-    app: AppConfig = FastAPIConfigurator.depends,
+    params: Annotated[Mapping[str, Any], Depends(build_params)],
 ) -> HTTPMessage:
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host if request.client else ""
@@ -105,9 +105,9 @@ async def create_draft(
 
 
 async def list_drafts(
-    parent: Optional[str] = None,
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    parent: str | None = None,
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
@@ -140,8 +140,8 @@ async def list_drafts(
 
 
 async def draft_by_path(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     path: str,
-    app: AppConfig = FastAPIConfigurator.depends,
 ) -> DraftPage[Any]:
     async with app.uow as uow:
         path = path.strip("/")
@@ -186,10 +186,10 @@ async def show_draft(
 
 
 async def preview_draft(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    draft_page: DraftPage[Any] = Depends(draft_by_path),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
 ) -> Response:
 
     async with app.uow as uow:
@@ -206,11 +206,11 @@ async def preview_draft(
 
 
 async def update_draft(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    draft_page: DraftPage[Any] = Depends(draft_by_path),
-    payload: dict[str, Any] = Body(...),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
+    payload: Annotated[dict[str, Any], Body(...)],
 ) -> HTTPMessage:
 
     payload.pop("metadata", None)
@@ -240,10 +240,10 @@ async def update_draft(
 
 
 async def delete_draft(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
-    draft_page: DraftPage[Any] = Depends(draft_by_path),
-    app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
+    draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
 ) -> Response:
     cmd = DeletePage(
         id=draft_page.id,

@@ -34,14 +34,18 @@ async def test_publish_422(client: TestClient, authntoken: AuthnToken):
     assert resp.json() == {
         "detail": [
             {
+                "input": None,
                 "loc": ["body", "hostname"],
-                "msg": "field required",
-                "type": "value_error.missing",
+                "msg": "Field required",
+                "type": "missing",
+                "url": "https://errors.pydantic.dev/2.2/v/missing",
             },
             {
+                "input": None,
                 "loc": ["body", "path"],
-                "msg": "field required",
-                "type": "value_error.missing",
+                "msg": "Field required",
+                "type": "missing",
+                "url": "https://errors.pydantic.dev/2.2/v/missing",
             },
         ],
     }

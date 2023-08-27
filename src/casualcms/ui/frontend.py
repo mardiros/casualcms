@@ -1,11 +1,8 @@
-from typing import Any
-
 from fastapi import HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 
 from casualcms.adapters.fastapi import AppConfig, FastAPIConfigurator, configure
 from casualcms.adapters.jinja2 import Jinja2TemplateRender
-from casualcms.domain.repositories.page import PageRepositoryResult
 
 
 async def serve_pages(
@@ -38,9 +35,7 @@ async def serve_pages(
                     headers={"location": f"https://{hostname}{request.url.path}"},
                 )
 
-        rpage: PageRepositoryResult[Any] = await uow.pages.by_url(
-            f"//{hostname}{request.url.path}".rstrip("/")
-        )
+        rpage = await uow.pages.by_url(f"//{hostname}{request.url.path}".rstrip("/"))
         # page = await uow.drafts.by_path(f"{root_page_path}/{path}".rstrip("/"))
         if rpage.is_err():
             raise HTTPException(

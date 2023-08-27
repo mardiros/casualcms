@@ -3,13 +3,12 @@ import abc
 import enum
 from typing import Any, Optional, Sequence
 
-from casualcms.domain.model import Page_contra
-
 from ..model import DraftPage
 from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class DraftRepositoryError(enum.Enum):
+    validation_error = "Validation Error"
     page_not_found = "Page not found"
     page_broken_treepath = "Page not found"  # we can set the same error message
     page_has_children = "Page has child pages"
@@ -17,9 +16,9 @@ class DraftRepositoryError(enum.Enum):
     publication_error = "Cannot publish page"
 
 
-DraftRepositoryResult = RepositoryResult[DraftPage[Page_contra], DraftRepositoryError]
+DraftRepositoryResult = RepositoryResult[DraftPage[Any], DraftRepositoryError]
 DraftSequenceRepositoryResult = RepositoryResult[
-    Sequence[DraftPage[Page_contra]], DraftRepositoryError
+    Sequence[DraftPage[Any]], DraftRepositoryError
 ]
 DraftOperationResult = OperationResult[DraftRepositoryError]
 
@@ -28,27 +27,25 @@ class AbstractDraftRepository(AbstractRepository):
     seen: set[DraftPage[Any]]
 
     @abc.abstractmethod
-    async def by_id(self, id: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_id(self, id: str) -> DraftRepositoryResult:
         """Fetch one page by its unique id."""
 
     @abc.abstractmethod
-    async def by_path(self, path: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
 
     @abc.abstractmethod
-    async def by_parent(
-        self, path: Optional[str]
-    ) -> DraftSequenceRepositoryResult[Page_contra]:
+    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch child pages of a page identified by its path."""
 
     @abc.abstractmethod
-    async def add(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
+    async def add(self, model: DraftPage[Any]) -> DraftOperationResult:
         """Append a new model to the repository."""
 
     @abc.abstractmethod
-    async def update(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
+    async def update(self, model: DraftPage[Any]) -> DraftOperationResult:
         """Append a new model to the repository."""
 
     @abc.abstractmethod
-    async def remove(self, model: DraftPage[Page_contra]) -> DraftOperationResult:
+    async def remove(self, model: DraftPage[Any]) -> DraftOperationResult:
         """Remove the model from the repository."""

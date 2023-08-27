@@ -1,20 +1,20 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Depends, HTTPException
 from pydantic import BaseModel, Field
 
 from casualcms.domain.model import (
     AuthnToken,
-    SnippetKey,
     SnippetType,
     list_snippet_types,
     resolve_snippet_type,
 )
+from casualcms.domain.model.fields import SlugField
 
 from .base import get_token_info
 
 
-def get_snippet_type(type: SnippetKey) -> SnippetType:
+def get_snippet_type(type: SlugField) -> SnippetType:
     """Get the snippet type from its key as a non pure function for FastAPI."""
     rtype = resolve_snippet_type(type)
     if rtype.is_err():
@@ -36,7 +36,7 @@ class PartialSnippetType(BaseModel):
 
 
 async def list_types(
-    token: AuthnToken = Depends(get_token_info),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> list[PartialSnippetType]:
     stypes = list_snippet_types()
     return sorted(
@@ -52,12 +52,12 @@ async def list_types(
 
 
 async def show_type(
-    type: SnippetKey,
-    token: AuthnToken = Depends(get_token_info),
-    snippet_type: SnippetType = Depends(get_snippet_type),
+    type: SlugField,
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    snippet_type: Annotated[SnippetType, Depends(get_snippet_type)],
 ) -> dict[str, Any]:
     jsonschema = snippet_type.schema()
-    jsonschema["definitions"].pop("Event", None)
+    jsonschema["$defs"].pop("Event", None)
     for key in ("id", "events", "created_at"):
         jsonschema["properties"].pop(key, None)
     return {

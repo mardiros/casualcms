@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Sequence
+from typing import Annotated, Any, Mapping, Sequence
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
@@ -26,9 +26,9 @@ class PartialSetting(BaseModel):
 
 async def validate_payload(
     request: Request,
-    hostname: str = Field(...),
-    key: str = Body(...),
-    payload: dict[str, Any] = Body(...),
+    hostname: str,
+    key: Annotated[str, Body(...)],
+    payload: Annotated[Mapping[str, Any], Body(...)],
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     setting_type = resolve_setting_type(key)
@@ -49,11 +49,11 @@ async def validate_payload(
 
 async def create_setting(
     request: Request,
-    hostname: str = Field(...),
-    key: str = Body(...),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    hostname: str,
+    key: Annotated[str, Body(pattern="^[^/]+$")],
+    validated_payload: Annotated[Mapping[str, Any], Depends(validate_payload)],
     app: AppConfig = FastAPIConfigurator.depends,
-    validated_payload: Mapping[str, Any] = Depends(validate_payload),
-    token: AuthnToken = Depends(get_token_info),
 ) -> PartialSetting:
     cmd = CreateSetting(
         key=key,  # type: ignore
@@ -85,13 +85,13 @@ async def create_setting(
 
 
 async def list_settings(
-    hostname: str = Field(...),
+    hostname: str,
     app: AppConfig = FastAPIConfigurator.depends,
     token: AuthnToken = Depends(get_token_info),
 ) -> Sequence[PartialSetting]:
 
     async with app.uow as uow:
-        settings: SettingSequenceRepositoryResult[Any] = await uow.settings.list(
+        settings: SettingSequenceRepositoryResult = await uow.settings.list(
             hostname=hostname
         )
         await uow.rollback()
@@ -106,14 +106,12 @@ async def list_settings(
 
 
 async def get_setting_by_path(
-    hostname: str = Field(...),
-    key: str = Field(...),
+    hostname: str,
+    key: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Setting[Any]:
     async with app.uow as uow:
-        rsetting: SettingRepositoryResult[Any] = await uow.settings.by_key(
-            hostname, key
-        )
+        rsetting: SettingRepositoryResult = await uow.settings.by_key(hostname, key)
         await uow.rollback()
 
     if rsetting.is_err():
@@ -137,12 +135,12 @@ async def show_setting(
 
 async def update_setting(
     request: Request,
-    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
-    app: AppConfig = FastAPIConfigurator.depends,
-    hostname: str = Field(...),
-    key: str = Field(...),
+    setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    hostname: str,
+    key: str,
     payload: dict[str, Any] = Body(...),
-    token: AuthnToken = Depends(get_token_info),
+    app: AppConfig = FastAPIConfigurator.depends,
 ) -> PartialSetting:
 
     payload.pop("metadata", None)
@@ -171,9 +169,9 @@ async def update_setting(
 
 async def delete_setting(
     request: Request,
-    setting: Setting[Setting_contra] = Depends(get_setting_by_path),
+    setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> Response:
 
     cmd = DeleteSetting(

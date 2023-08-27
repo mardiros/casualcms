@@ -2,13 +2,7 @@ from typing import Generic, Optional, TypeVar
 
 from pydantic import BaseModel, Field
 
-from casualcms.domain.model import (
-    AbstractPage,
-    AbstractSetting,
-    AbstractSnippet,
-    Block,
-    GenericBlock,
-)
+from casualcms.domain.model import AbstractPage, AbstractSetting, AbstractSnippet, Block
 from casualcms.domain.model.block import CodeBlock
 
 
@@ -19,7 +13,7 @@ class Link(BaseModel):
 
 class Box(Block):
     title: str = Field()
-    paragraph: str = Field(widget="textarea")
+    paragraph: str = Field(json_schema_extra={"ui:widget": "textarea"})
 
     class Meta:
         template = "box.jinja2"
@@ -37,7 +31,7 @@ class HeaderSnippet(AbstractSnippet):
 
 class FeatureFlagSetting(AbstractSetting):
     use_stuff: bool = False
-    use_another_stuff: bool | None
+    use_another_stuff: bool = False
 
     class Meta:
         key = "ff"
@@ -78,13 +72,23 @@ class RelatedPostSnippet(AbstractFooterSnippet):
 
 
 class Paragraph(BaseModel):
-    title: Optional[str] = Field()
-    body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
+    title: Optional[str] = Field(None)
+    body: str = Field(
+        json_schema_extra={
+            "ui:widget": "richtext",
+            "ui:options": {"features": ["bold", "italic", "h5"]},
+        }
+    )
 
 
 class ParagraphBlock(Block):
-    title: Optional[str] = Field()
-    body: str = Field(widget="richtext", features=["bold", "italic", "h5"])
+    title: str = ""
+    body: str = Field(
+        json_schema_extra={
+            "ui:widget": "richtext",
+            "ui:options": {"features": ["bold", "italic", "h5"]},
+        }
+    )
 
     class Meta:
         template = "paragraph_block.jinja2"
@@ -135,6 +139,7 @@ class SnippetBlock(AbstractSnippet):
 
 class SnippetBlockPage(AbstractPage):
     class Meta:
+        parent_types = [HomePage]
         template = "page_with_snippet_block.jinja2"
         type = "blog:SnippetBlockPage"
 
@@ -142,7 +147,7 @@ class SnippetBlockPage(AbstractPage):
 T = TypeVar("T")
 
 
-class ListBlock(GenericBlock, Generic[T]):
+class ListBlock(Block, Generic[T]):
     items: list[T] = Field(default_factory=list)
 
     class Meta:
@@ -151,7 +156,7 @@ class ListBlock(GenericBlock, Generic[T]):
 
 class SectionPage(BasePage):
 
-    intro: Optional[Paragraph] = Field()
+    intro: Optional[Paragraph] = Field(default=None)
     box: Box = Field()
     boxes: ListBlock[Box] = Field(default_factory=ListBlock)
 
@@ -166,13 +171,13 @@ V = TypeVar("V")
 
 
 class DefinitionBlock(Block):
-    body: str = Field(widget="textarea")
+    body: str = Field(json_schema_extra={"ui:widget": "textarea"})
 
     class Meta:
         template = "definition.jinja2"
 
 
-class StructBlock(GenericBlock, Generic[K, V]):
+class StructBlock(Block, Generic[K, V]):
     items: dict[K, V] = Field(default_factory=dict)
 
     class Meta:

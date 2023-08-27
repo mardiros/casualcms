@@ -11,7 +11,14 @@ from casualcms.domain.model.abstract_page import AbstractPage, PublicMetadata
 from casualcms.domain.model.breadcrumb import Breadcrumb, BreadcrumbItem
 from casualcms.domain.model.site import Site
 
-from ..casualblog.models import BasePage, BlogPage, CategoryPage, HomePage, SectionPage
+from ..casualblog.models import (
+    BasePage,
+    BlogPage,
+    CategoryPage,
+    HomePage,
+    SectionPage,
+    SnippetBlockPage,
+)
 
 site = Site(
     id="xxx",
@@ -110,6 +117,9 @@ def test_page_abstract_raise():
     ],
 )
 def test_page_ui_schema(page_type: AbstractPage, expected: Mapping[str, Any]):
+    for key, val in page_type.ui_schema().items():
+        if val != expected[key]:
+            assert expected[key] == val, f"{key}: {val}"
     assert page_type.ui_schema() == expected
 
 
@@ -213,7 +223,7 @@ def test_page_types():
     assert pages == {HomePage}
 
     pages = get_available_subtypes(HomePage)
-    assert pages == {CategoryPage, SectionPage}
+    assert pages == {CategoryPage, SnippetBlockPage, SectionPage}
 
 
 @pytest.mark.parametrize(

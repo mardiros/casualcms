@@ -14,7 +14,6 @@ from casualcms.domain.model import (
     Setting_contra,
     Site,
     Snippet,
-    Snippet_contra,
 )
 from casualcms.domain.repositories import (
     AbstractAccountRepository,
@@ -92,7 +91,7 @@ class DraftInMemoryRepository(AbstractDraftRepository):
     def __init__(self) -> None:
         self.seen = set()
 
-    async def by_id(self, id: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_id(self, id: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         for page in self.pages.values():
             if page.id == id:
@@ -100,17 +99,15 @@ class DraftInMemoryRepository(AbstractDraftRepository):
 
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_path(self, path: str) -> DraftRepositoryResult[Page_contra]:
+    async def by_path(self, path: str) -> DraftRepositoryResult:
         """Fetch one page by its unique path."""
         if path in self.pages:
             return Ok(self.pages[path])
         return Err(DraftRepositoryError.page_not_found)
 
-    async def by_parent(
-        self, path: Optional[str]
-    ) -> DraftSequenceRepositoryResult[Page_contra]:
+    async def by_parent(self, path: Optional[str]) -> DraftSequenceRepositoryResult:
         """Fetch one page by its unique path."""
-        ret: list[DraftPage[Page_contra]] = []
+        ret: list[DraftPage[Any]] = []
         if path:
             cnt = len(path.strip("/").split("/")) + 1
         else:
@@ -154,7 +151,7 @@ class PageInMemoryRepository(AbstractPageRepository):
 
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
-    ) -> PageRepositoryResult[Page_contra]:
+    ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
         try:
             ppage = self.pages[draft_id, site_id]
@@ -162,7 +159,7 @@ class PageInMemoryRepository(AbstractPageRepository):
             return Err(PageRepositoryError.page_not_found)
         return Ok(ppage)
 
-    async def by_url(self, url: str) -> PageRepositoryResult[Page_contra]:
+    async def by_url(self, url: str) -> PageRepositoryResult:
         url_ = urlparse(url)
         hostname, path = url_.netloc, url_.path
         path = f"//{hostname}{path.rstrip('/')}"
@@ -244,7 +241,7 @@ class SiteInMemoryRepository(AbstractSiteRepository):
         for site in self.sites:
             if site.id != model.id:
                 sites.append(site)
-        rpage: DraftRepositoryResult[Any] = await DraftInMemoryRepository().by_path(
+        rpage: DraftRepositoryResult = await DraftInMemoryRepository().by_path(
             model.root_page_path
         )
         if rpage.is_err():
@@ -270,42 +267,40 @@ class SnippetInMemoryRepository(AbstractSnippetRepository):
     def __init__(self) -> None:
         self.seen = set()
 
-    async def list(
-        self, type: Optional[str] = None
-    ) -> SnippetSequenceRepositoryResult[Snippet_contra]:
+    async def list(self, type: Optional[str] = None) -> SnippetSequenceRepositoryResult:
         """List all snippets, optionally filters on their types."""
-        values: Iterable[Snippet[Snippet_contra]] = self.snippets.values()
+        values: Iterable[Snippet[Any]] = self.snippets.values()
         if type:
             values = filter(lambda s: s.type == type, values)
         return Ok(sorted(values, key=lambda s: s.key))
 
-    async def by_id(self, id: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_id(self, id: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique id."""
         for snippet in self.snippets.values():
             if snippet.id == id:
                 return Ok(snippet)
         return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def by_key(self, key: str) -> SnippetRepositoryResult[Snippet_contra]:
+    async def by_key(self, key: str) -> SnippetRepositoryResult:
         """Fetch one snippet by its unique key."""
         try:
             return Ok(self.snippets[key])
         except KeyError:
             return Err(SnippetRepositoryError.snippet_not_found)
 
-    async def add(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
+    async def add(self, model: Snippet[Any]) -> SnippetOperationResult:
         """Append a new model to the repository."""
         self.seen.add(model)
         self.snippets[model.key] = model
         return Ok(...)
 
-    async def remove(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
+    async def remove(self, model: Snippet[Any]) -> SnippetOperationResult:
         """Remove the model from the repository."""
         self.seen.add(model)
         del self.snippets[model.key]
         return Ok(...)
 
-    async def update(self, model: Snippet[Snippet_contra]) -> SnippetOperationResult:
+    async def update(self, model: Snippet[Any]) -> SnippetOperationResult:
         """Update a model from the repository."""
         self.seen.add(model)
         k = None
@@ -327,23 +322,21 @@ class SettingInMemoryRepository(AbstractSettingRepository):
 
     async def list(
         self, hostname: Optional[str] = None
-    ) -> SettingSequenceRepositoryResult[Setting_contra]:
+    ) -> SettingSequenceRepositoryResult:
         """List all settings, optionally filters on their types."""
-        values: Iterable[Setting[Setting_contra]] = self.settings.values()
+        values: Iterable[Setting[Any]] = self.settings.values()
         if hostname:
             values = filter(lambda s: s.hostname == hostname, values)
         return Ok(sorted(values, key=lambda s: (s.hostname, s.key)))
 
-    async def by_id(self, id: str) -> SettingRepositoryResult[Setting_contra]:
+    async def by_id(self, id: str) -> SettingRepositoryResult:
         """Fetch one setting by its unique id."""
         for setting in self.settings.values():
             if setting.id == id:
                 return Ok(setting)
         return Err(SettingRepositoryError.setting_not_found)
 
-    async def by_key(
-        self, hostname: str, key: str
-    ) -> SettingRepositoryResult[Setting_contra]:
+    async def by_key(self, hostname: str, key: str) -> SettingRepositoryResult:
         """Fetch one setting by its unique slug."""
         try:
             return Ok(self.settings[(hostname, key)])

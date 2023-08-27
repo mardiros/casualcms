@@ -55,7 +55,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
     assert resp.status_code == 200
     assert resp.json() == {
         "schema": {
-            "definitions": {
+            "$defs": {
                 "Link": {
                     "properties": {
                         "href": {"title": "Href", "type": "string"},
@@ -68,7 +68,7 @@ async def test_get_type(client: TestClient, authntoken: AuthnToken):
             },
             "properties": {
                 "links": {
-                    "items": {"$ref": "#/definitions/Link"},
+                    "items": {"$ref": "#/$defs/Link"},
                     "title": "Links",
                     "type": "array",
                 },

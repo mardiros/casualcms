@@ -1,7 +1,7 @@
 from typing import Any, Dict
 
 from behave import given  # type: ignore
-from blacksmith import HTTPError, SyncClient, SyncHTTPBearerMiddleware
+from blacksmith import SyncClient, SyncHTTPBearerMiddleware
 
 
 @given('a "{key}" snippet of type "{snippet_type}"')
@@ -10,7 +10,7 @@ def create_snippet(context: Any, key: str, snippet_type: str) -> None:
     account = context.browser.get_index_db_value("account", "alice")
     token: str = account["token"]
 
-    api: SyncClient[Any, Any] = context.apicli("casualcms")
+    api: SyncClient[Any] = context.apicli("casualcms")
     api.add_middleware(SyncHTTPBearerMiddleware(token))
 
     payload: Dict[str, Any] = {
@@ -40,8 +40,8 @@ def create_snippet(context: Any, key: str, snippet_type: str) -> None:
         }
 
     print(payload)
-    try:
-        api.snippet.post(payload)
-    except HTTPError as exc:
+    resp = api.snippet.post(payload)
+    if resp.is_err():
+        exc = resp.unwrap_err()
         print(exc.response.json)
-        raise
+        raise exc

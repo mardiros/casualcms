@@ -7,7 +7,7 @@ from casualcms.domain.messages.commands import (
     DeleteSetting,
     UpdateSetting,
 )
-from casualcms.domain.model import Setting, Setting_contra, resolve_setting_type
+from casualcms.domain.model import Setting, resolve_setting_type
 from casualcms.domain.repositories.setting import (
     SettingOperationResult,
     SettingRepositoryError,
@@ -21,7 +21,7 @@ from casualcms.service.unit_of_work import AbstractUnitOfWork
 async def create_setting(
     cmd: CreateSetting,
     uow: AbstractUnitOfWork,
-) -> SettingRepositoryResult[Setting_contra]:
+) -> SettingRepositoryResult:
     setting_class = resolve_setting_type(cmd.key)
     setting: Setting[Any] = Setting(
         id=cmd.id,
@@ -44,7 +44,7 @@ async def update_setting(
     uow: AbstractUnitOfWork,
 ) -> SettingOperationResult:
 
-    rsetting: SettingRepositoryResult[Any] = await uow.settings.by_id(cmd.id)
+    rsetting: SettingRepositoryResult = await uow.settings.by_id(cmd.id)
     if rsetting.is_err():
         return Err(rsetting.unwrap_err())
     setting = rsetting.unwrap()
@@ -59,7 +59,7 @@ async def delete_setting(
     cmd: DeleteSetting,
     uow: AbstractUnitOfWork,
 ) -> SettingOperationResult:
-    rsetting: SettingRepositoryResult[Any] = await uow.settings.by_id(cmd.id)
+    rsetting: SettingRepositoryResult = await uow.settings.by_id(cmd.id)
     if rsetting.is_err():
         return Err(SettingRepositoryError.setting_not_found)
     setting = rsetting.unwrap()

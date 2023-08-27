@@ -5,7 +5,6 @@ from fastapi.testclient import TestClient
 
 from casualcms.domain.model.account import AuthnToken
 from casualcms.domain.model.snippet import Snippet
-from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 from ..casualblog.models import FooterSnippet, HeaderSnippet
@@ -80,10 +79,16 @@ async def test_api_create_snippet(
             },
             "expected": {
                 "detail": [
+                    # "input": "/header",
+                    # "loc": ["body", "payload"],
+                    # "msg": "Invalid key field",
+                    # "type": "value_error",
                     {
-                        "loc": ["body", "payload"],
-                        "msg": "Invalid key field",
-                        "type": "value_error",
+                        "ctx": {"pattern": "^[^/]+$"},
+                        "input": "/header",
+                        "loc": ["body", ["payload", "key"]],
+                        "msg": "String should match pattern '^[^/]+$'",
+                        "type": "string_pattern_mismatch",
                     }
                 ],
             },
@@ -227,9 +232,7 @@ async def test_api_patch_snippet(
     }
 
     async with uow as uow:
-        snip: SnippetRepositoryResult[HeaderSnippet] = await uow.snippets.by_key(
-            "new-key"
-        )
+        snip = await uow.snippets.by_key("new-key")
         assert snip.is_ok()
         snipok = snip.unwrap()
         assert snipok.snippet.title == "new title"
@@ -259,7 +262,13 @@ async def test_api_patch_snippet_422(
     assert resp.status_code == 422
     assert resp.json() == {
         "detail": [
-            {"loc": ["body"], "msg": "Invalid key field", "type": "value_error"}
+            {
+                "ctx": {"pattern": "^[^/]+$"},
+                "input": "hea/der",
+                "loc": ["body", ["payload", "key"]],
+                "msg": "String should match pattern '^[^/]+$'",
+                "type": "string_pattern_mismatch",
+            }
         ],
     }
 
@@ -326,8 +335,6 @@ async def test_api_delete_snippet(
     assert resp.text == ""
 
     async with uow as uow:
-        snip: SnippetRepositoryResult[HeaderSnippet] = await uow.snippets.by_key(
-            "header"
-        )
+        snip = await uow.snippets.by_key("header")
         assert snip.is_err()
         assert snip.unwrap_err().name == "snippet_not_found"

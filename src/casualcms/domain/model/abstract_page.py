@@ -3,20 +3,16 @@ import re
 from collections import defaultdict
 from typing import Any, Iterable, Optional, Set, Type, TypeVar, cast
 
-from pydantic import BaseModel, ConstrainedStr, Field
-from pydantic.main import ModelMetaclass
+from pydantic import BaseModel, Field
+from pydantic._internal._model_construction import ModelMetaclass
 from result import Err, Ok, Result
 
 from casualcms.domain.exceptions import MissingMetaError
 from casualcms.domain.model.abstract import BaseUIModel
+from casualcms.domain.model.fields import SlugField
 
 from .breadcrumb import Breadcrumb, BreadcrumbItem
 from .site import Site
-
-
-class Slug(ConstrainedStr):
-    regex = re.compile("^[^/]+$")
-    strip_whitespace = True
 
 
 class AbstractPageError(Exception):
@@ -81,12 +77,26 @@ def resolve_page_type(typ: str) -> Result[PageType, PageTypeError]:
     return TypeTree().resolve_type(typ)
 
 
-class PageMeta(BaseModel):
-    template: str = Field(...)
-    parent_types: Optional[Iterable[PageType]] = Field(...)
-    abstract: bool = Field(...)
-    type: str = Field(...)
-    title: str = Field(...)
+class PageMeta:
+    template: str
+    parent_types: Optional[Iterable[PageType]]
+    abstract: bool
+    type: str
+    title: str
+
+    def __init__(
+        self,
+        template: str,
+        parent_types: Optional[Iterable[PageType]],
+        abstract: bool,
+        type: str,
+        title: str,
+    ) -> None:
+        self.template = template
+        self.parent_types = parent_types
+        self.abstract = abstract
+        self.type = type
+        self.title = title
 
 
 class PageMetaclass(ModelMetaclass):
@@ -116,7 +126,7 @@ class PageMetaclass(ModelMetaclass):
             mcls, name, bases, new_namespace, **kwargs  # type: ignore
         )
         # inject jsonschema title in pydantic config here
-        ret.__config__.title = page_meta.title  # type: ignore
+        ret.model_config["title"] = page_meta.title  # type: ignore
         if not page_meta.abstract:
             TypeTree().register(
                 # ret is a metaclass for pylance
@@ -129,14 +139,14 @@ class PageMetaclass(ModelMetaclass):
 class AbstractPage(BaseUIModel, metaclass=PageMetaclass):
     __meta__: PageMeta
 
-    slug: Slug = Field(...)
+    slug: SlugField = Field(...)
     title: str = Field(...)
     description: str = Field(...)
     site: Optional["Site"] = Field(None, exclude=True)
     parent: Optional["AbstractPage"] = Field(None, exclude=True)
 
     class Meta:
-        ...
+        abstract = True
 
     def __init__(self, **kwargs: Any) -> None:  # type: ignore
         if self.__meta__.abstract is True:

@@ -1,4 +1,4 @@
-from typing import Any, Mapping, MutableMapping, Optional
+from typing import Annotated, Any, Mapping, MutableMapping, Optional
 
 from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
@@ -17,7 +17,6 @@ from .base import (
     RESOURCE_DELETED,
     RESOURCE_UPDATED,
     HTTPMessage,
-    MappingWithSlug,
     get_token_info,
 )
 
@@ -47,15 +46,15 @@ def get_page_type(
 
 
 async def build_params(
-    payload: MappingWithSlug = Body(...),
-    parent: str = Body(None),
+    payload: Annotated[Mapping[str, Any], Body(...)],
+    parent: Annotated[Optional[str], Body()] = None,
     page_type: PageType = Depends(get_page_type),
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
         params: MutableMapping[str, Any] = {**payload}
         if parent:
-            parent_page: DraftRepositoryResult[Any] = await uow.drafts.by_path(parent)
+            parent_page: DraftRepositoryResult = await uow.drafts.by_path(parent)
             if parent_page.is_err():
                 raise HTTPException(
                     status_code=422,
@@ -79,10 +78,10 @@ async def build_params(
 
 async def create_draft(
     request: Request,
-    type: str = Body(...),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    type: Annotated[str, Body(...)],
     params: Mapping[str, Any] = Depends(build_params),
     app: AppConfig = FastAPIConfigurator.depends,
-    token: AuthnToken = Depends(get_token_info),
 ) -> HTTPMessage:
     cmd = CreatePage(type=type, payload=params)
     cmd.metadata.clientAddr = request.client.host if request.client else ""
@@ -112,7 +111,7 @@ async def list_drafts(
 ) -> list[PartialPage]:
 
     async with app.uow as uow:
-        pages: DraftSequenceRepositoryResult[Any] = await uow.drafts.by_parent(parent)
+        pages: DraftSequenceRepositoryResult = await uow.drafts.by_parent(parent)
         await uow.rollback()
 
     if pages.is_err():
@@ -141,12 +140,12 @@ async def list_drafts(
 
 
 async def draft_by_path(
-    path: str = Field(...),
+    path: str,
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> DraftPage[Any]:
     async with app.uow as uow:
         path = path.strip("/")
-        rpage: DraftRepositoryResult[Any] = await uow.drafts.by_path(f"/{path}")
+        rpage: DraftRepositoryResult = await uow.drafts.by_path(f"/{path}")
         await uow.rollback()
     if rpage.is_err():
         raise HTTPException(
@@ -162,8 +161,8 @@ async def draft_by_path(
 
 
 async def show_draft(
-    token: AuthnToken = Depends(get_token_info),
-    draft_page: DraftPage[Any] = Depends(draft_by_path),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
 ) -> Mapping[str, Any]:
     ret = draft_page.page.dict()
     ret["metadata"] = draft_page.metadata.dict(

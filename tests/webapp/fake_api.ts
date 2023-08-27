@@ -358,11 +358,11 @@ class FakeSnippetTypeApi implements ISnippetTypeApi {
           links: {
             title: "Links",
             type: "array",
-            items: { $ref: "#/definitions/Link" },
+            items: { $ref: "#/$defs/Link" },
           },
         },
         required: ["key", "title"],
-        definitions: {
+        $defs: {
           Link: {
             title: "Link",
             type: "object",

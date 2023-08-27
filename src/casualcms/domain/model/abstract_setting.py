@@ -2,7 +2,7 @@ import re
 from typing import Any, Set, Type, TypeVar, cast
 
 from pydantic import BaseModel, Field
-from pydantic.main import ModelMetaclass
+from pydantic._internal._model_construction import ModelMetaclass
 
 from casualcms.domain.exceptions import MissingMetaError
 from casualcms.domain.model.abstract import BaseUIModel
@@ -76,7 +76,7 @@ class SettingMetaclass(ModelMetaclass):
             mcls, name, bases, new_namespace, **kwargs  # type: ignore
         )
         if setting_meta:
-            ret.__config__.title = setting_meta.title  # type: ignore
+            ret.model_config["title"] = setting_meta.title  # type: ignore
             if not setting_meta.abstract:
                 SettingTypeList().register(ret)  # type: ignore
         return ret  # type: ignore

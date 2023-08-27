@@ -1,19 +1,14 @@
-import re
 from datetime import datetime
 from typing import Generic
 
-from pydantic import BaseModel, ConstrainedStr, Field
+from pydantic import BaseModel, Field
 
 from casualcms.domain.messages import Event
 from casualcms.domain.model.abstract_setting import Setting_contra
+from casualcms.domain.model.fields import SlugField
 from casualcms.utils import generate_id
 
 uuid = str
-
-
-class SettingKey(ConstrainedStr):
-    regex = re.compile("^[^/]+$")
-    strip_whitespace = True
 
 
 class PublicMetadata(BaseModel):
@@ -27,7 +22,7 @@ class Setting(BaseModel, Generic[Setting_contra]):
 
     id: uuid = Field(default_factory=generate_id, exclude=True)
     hostname: str = Field(...)
-    key: SettingKey = Field(...)
+    key: SlugField = Field(...)
 
     events: list[Event] = Field(default_factory=list, exclude=True)
     created_at: datetime = Field(default_factory=datetime.utcnow, exclude=True)

@@ -3,7 +3,7 @@ import abc
 import enum
 from typing import Any
 
-from casualcms.domain.model import Page_contra, PublishedPage
+from casualcms.domain.model import PublishedPage
 
 from .base import AbstractRepository, OperationResult, RepositoryResult
 
@@ -16,7 +16,7 @@ class PageRepositoryError(enum.Enum):
     publication_error = "Cannot publish page"
 
 
-PageRepositoryResult = RepositoryResult[PublishedPage[Page_contra], PageRepositoryError]
+PageRepositoryResult = RepositoryResult[PublishedPage[Any], PageRepositoryError]
 PageOperationResult = OperationResult[PageRepositoryError]
 
 
@@ -26,17 +26,17 @@ class AbstractPageRepository(AbstractRepository):
     @abc.abstractmethod
     async def by_draft_page_and_site(
         self, draft_id: str, site_id: str
-    ) -> PageRepositoryResult[Page_contra]:
+    ) -> PageRepositoryResult:
         """Fetch one page by its unique id."""
 
     @abc.abstractmethod
-    async def by_url(self, url: str) -> PageRepositoryResult[Page_contra]:
+    async def by_url(self, url: str) -> PageRepositoryResult:
         """Fetch one page by its url."""
 
     @abc.abstractmethod
-    async def add(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
+    async def add(self, model: PublishedPage[Any]) -> PageOperationResult:
         """Append a new model to the repository."""
 
     @abc.abstractmethod
-    async def update(self, model: PublishedPage[Page_contra]) -> PageOperationResult:
+    async def update(self, model: PublishedPage[Any]) -> PageOperationResult:
         """Update a model to the repository."""

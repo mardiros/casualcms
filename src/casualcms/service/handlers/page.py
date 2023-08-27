@@ -1,5 +1,6 @@
 from typing import Any
 
+from pydantic import ValidationError
 from result import Err, Ok
 
 from casualcms.domain.messages.commands import (
@@ -11,6 +12,7 @@ from casualcms.domain.messages.commands import (
 from casualcms.domain.model import DraftPage, PublishedPage, resolve_page_type
 from casualcms.domain.repositories.draft import (
     DraftOperationResult,
+    DraftRepositoryError,
     DraftRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
@@ -28,7 +30,10 @@ async def create_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
     tpage = resolve_page_type(cmd.type).unwrap()
-    page = tpage(**cmd.payload)
+    try:
+        page = tpage(**cmd.payload)
+    except ValidationError:
+        return Err(DraftRepositoryError.validation_error)
     draft_page: DraftPage[Any] = DraftPage(
         id=cmd.id, created_at=cmd.created_at, page=page
     )
@@ -41,7 +46,7 @@ async def update_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
@@ -56,7 +61,7 @@ async def delete_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
 
-    rpage: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rpage: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rpage.is_err():
         return Err(rpage.unwrap_err())
     page = rpage.unwrap()
@@ -68,7 +73,7 @@ async def publish_page(
     cmd: PublishPage,
     uow: AbstractUnitOfWork,
 ) -> PageOperationResult:
-    rdraft_page: DraftRepositoryResult[Any] = await uow.drafts.by_id(cmd.id)
+    rdraft_page: DraftRepositoryResult = await uow.drafts.by_id(cmd.id)
     if rdraft_page.is_err():
         return Err(PageRepositoryError.draft_not_found)
     draft_page = rdraft_page.unwrap()
@@ -84,7 +89,7 @@ async def publish_page(
     lprefix = len(site.root_page_path)
     path = draft_page.path[lprefix:]
     path = f"//{site.hostname}{path}"
-    rpublished_page: PageRepositoryResult[Any] = await uow.pages.by_draft_page_and_site(
+    rpublished_page: PageRepositoryResult = await uow.pages.by_draft_page_and_site(
         draft_page.id, site.id
     )
     if rpublished_page.is_ok():

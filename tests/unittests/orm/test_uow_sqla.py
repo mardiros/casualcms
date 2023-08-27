@@ -45,7 +45,7 @@ from casualcms.domain.repositories.snippet import (
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from casualcms.utils import generate_id
 
-from ...casualblog.models import HeaderSnippet, Link
+from ...casualblog.models import ContactSetting, FeatureFlagSetting, HeaderSnippet, Link
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -999,23 +999,28 @@ async def test_setting_list(
     rsettings: SettingSequenceRepositoryResult = await repo.list()
     assert rsettings.is_ok()
     saved_settings = rsettings.unwrap()
-    ss = [s.dict() for s in saved_settings]
-    assert ss == [
-        {
-            "hostname": "www",
-            "key": "contact",
-            "setting": {"email": "bob@alice.net"},
-        },
-        {
-            "hostname": "www",
-            "key": "ff",
-            "setting": {"use_another_stuff": False, "use_stuff": True},
-        },
-        {
-            "hostname": "www2",
-            "key": "ff",
-            "setting": {"use_another_stuff": False, "use_stuff": True},
-        },
+    assert saved_settings == [
+        Setting(
+            id=saved_settings[0].id,
+            created_at=saved_settings[0].created_at,
+            hostname="www",
+            key="contact",
+            setting=ContactSetting(email="bob@alice.net"),
+        ),
+        Setting(
+            id=saved_settings[1].id,
+            created_at=saved_settings[1].created_at,
+            hostname="www",
+            key="ff",
+            setting=FeatureFlagSetting(use_stuff=True, use_another_stuff=False),
+        ),
+        Setting(
+            id=saved_settings[2].id,
+            created_at=saved_settings[2].created_at,
+            hostname="www2",
+            key="ff",
+            setting=FeatureFlagSetting(use_stuff=True, use_another_stuff=False),
+        ),
     ]
 
 
@@ -1043,18 +1048,21 @@ async def test_setting_list_filter_hostname(
     rsettings: SettingSequenceRepositoryResult = await repo.list(hostname="www")
     assert rsettings.is_ok()
     saved_settings = rsettings.unwrap()
-    ss = [s.dict() for s in saved_settings]
-    assert ss == [
-        {
-            "hostname": "www",
-            "key": "contact",
-            "setting": {"email": "bob@alice.net"},
-        },
-        {
-            "hostname": "www",
-            "key": "ff",
-            "setting": {"use_another_stuff": False, "use_stuff": True},
-        },
+    assert saved_settings == [
+        Setting(
+            id=saved_settings[0].id,
+            created_at=saved_settings[0].created_at,
+            hostname="www",
+            key="contact",
+            setting=ContactSetting(email="bob@alice.net"),
+        ),
+        Setting(
+            id=saved_settings[1].id,
+            created_at=saved_settings[1].created_at,
+            hostname="www",
+            key="ff",
+            setting=FeatureFlagSetting(use_stuff=True, use_another_stuff=False),
+        ),
     ]
 
 

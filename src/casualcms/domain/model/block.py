@@ -100,5 +100,5 @@ class CodeBlock(Block, metaclass=CodeBlockMetaclass):
         "Rust",
         "SQL",
         "Typescript",
-    ] = Field(widget="select")
-    code: str = Field(widget="textarea")
+    ] = Field(json_schema_extra={"ui:widget": "select"})
+    code: str = Field(json_schema_extra={"ui:widget": "textarea"})

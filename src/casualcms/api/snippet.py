@@ -9,7 +9,7 @@ from typing import (
     TypedDict,
 )
 
-from fastapi import Body, Depends, HTTPException, Path, Request, Response
+from fastapi import Body, Depends, HTTPException, Request, Response
 from pydantic import BaseModel, Field, ValidationError
 from pydantic.config import ConfigDict
 
@@ -28,10 +28,7 @@ from casualcms.domain.model import (
 )
 from casualcms.domain.model.fields import SlugField
 from casualcms.domain.model.snippet import PublicMetadata
-from casualcms.domain.repositories.snippet import (
-    SnippetRepositoryResult,
-    SnippetSequenceRepositoryResult,
-)
+from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 
 from .base import get_token_info
 
@@ -67,7 +64,7 @@ async def get_snippet_by_key(
     app: AppConfig = FastAPIConfigurator.depends,
 ) -> Snippet[Any]:
     async with app.uow as uow:
-        rsnippet: SnippetRepositoryResult = await uow.snippets.by_key(key)
+        rsnippet = await uow.snippets.by_key(key)
         if rsnippet.is_err():
             raise HTTPException(
                 status_code=404,
@@ -187,7 +184,7 @@ async def list_snippets(
 ) -> Sequence[PartialSnippet]:
 
     async with app.uow as uow:
-        snippets: SnippetSequenceRepositoryResult = await uow.snippets.list(type=type)
+        snippets = await uow.snippets.list(type=type)
         await uow.rollback()
     if snippets.is_err():
         raise HTTPException(
@@ -258,7 +255,7 @@ async def delete_snippet(
 
     async with app.uow as uow:
         key = key.strip("/")
-        rsnippet: SnippetRepositoryResult = await uow.snippets.by_key(key)
+        rsnippet = await uow.snippets.by_key(key)
         await uow.rollback()
 
     if rsnippet.is_err():

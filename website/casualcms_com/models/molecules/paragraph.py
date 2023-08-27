@@ -11,7 +11,7 @@ from ..atoms.rich_text import RichText
 
 class PyCodeBlock(CodeBlock):
     language: Literal["Python"] = Field(
-        default="Python", json_schema_extra={"widget": "hidden"}
+        default="Python", json_schema_extra={"ui:widget": "hidden"}
     )
 
     class Meta:

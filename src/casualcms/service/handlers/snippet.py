@@ -46,7 +46,7 @@ async def update_snippet(
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
 
-    rsnippet: SnippetRepositoryResult = await uow.snippets.by_id(cmd.id)
+    rsnippet = await uow.snippets.by_id(cmd.id)
     if rsnippet.is_err():
         return Err(rsnippet.unwrap_err())
     snippet_wrapper = rsnippet.unwrap()
@@ -64,7 +64,7 @@ async def delete_snippet(
     cmd: DeleteSnippet,
     uow: AbstractUnitOfWork,
 ) -> SnippetOperationResult:
-    snippet: SnippetRepositoryResult = await uow.snippets.by_id(cmd.id)
+    snippet = await uow.snippets.by_id(cmd.id)
     if snippet.is_err():
         return Err(SnippetRepositoryError.snippet_not_found)
     s = snippet.unwrap()

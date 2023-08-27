@@ -1,5 +1,6 @@
 from typing import Any
 
+from pydantic import ValidationError
 from result import Err, Ok
 
 from casualcms.domain.messages.commands import (
@@ -11,6 +12,7 @@ from casualcms.domain.messages.commands import (
 from casualcms.domain.model import DraftPage, PublishedPage, resolve_page_type
 from casualcms.domain.repositories.draft import (
     DraftOperationResult,
+    DraftRepositoryError,
     DraftRepositoryResult,
 )
 from casualcms.domain.repositories.page import (
@@ -28,7 +30,10 @@ async def create_page(
     uow: AbstractUnitOfWork,
 ) -> DraftOperationResult:
     tpage = resolve_page_type(cmd.type).unwrap()
-    page = tpage(**cmd.payload)
+    try:
+        page = tpage(**cmd.payload)
+    except ValidationError:
+        return Err(DraftRepositoryError.validation_error)
     draft_page: DraftPage[Any] = DraftPage(
         id=cmd.id, created_at=cmd.created_at, page=page
     )

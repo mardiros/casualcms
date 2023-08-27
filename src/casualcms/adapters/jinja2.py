@@ -12,8 +12,6 @@ from pygments.lexers import get_lexer_by_name
 from casualcms.domain.model import AbstractPage
 from casualcms.domain.model.abstract_snippet import AbstractSnippet
 from casualcms.domain.model.block import Block, CodeBlock
-from casualcms.domain.repositories.setting import SettingRepositoryResult
-from casualcms.domain.repositories.snippet import SnippetRepositoryResult
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
@@ -85,7 +83,7 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         return ret
 
     async def include_snippet(self, key: str, page: AbstractPage, **kwargs: Any) -> str:
-        rsnippet: SnippetRepositoryResult[Any] = await self.uow.snippets.by_key(key)
+        rsnippet = await self.uow.snippets.by_key(key)
         if rsnippet.is_ok():
             snippet = rsnippet.unwrap()
             ret = await self.render_snippet(
@@ -99,9 +97,7 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
     async def _try_get_from_cache(self, key: str) -> Any:
         if key in self._settings:
             return self._settings[key]
-        rsetting: SettingRepositoryResult[Any] = await self.uow.settings.by_key(
-            self.hostname, key
-        )
+        rsetting = await self.uow.settings.by_key(self.hostname, key)
         self._settings[key] = rsetting
         return rsetting
 

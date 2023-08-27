@@ -1,13 +1,14 @@
 from typing import Sequence
 
 from pydantic import Field
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from casualcms.service.messagebus import MessageRegistry
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="casualcms_")
 
     # Jinja2 config
     template_search_path: str = Field(...)
@@ -34,6 +35,3 @@ class Settings(BaseSettings):
     database_migration_cfg: str = "/srv/casualcms/alembic.ini"
 
     messagebus: MessageRegistry | None = None
-
-    class Config:  # type: ignore
-        env_prefix = "casualcms_"

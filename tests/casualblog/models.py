@@ -13,7 +13,7 @@ class Link(BaseModel):
 
 class Box(Block):
     title: str = Field()
-    paragraph: str = Field(json_schema_extra={"widget": "textarea"})
+    paragraph: str = Field(json_schema_extra={"ui:widget": "textarea"})
 
     class Meta:
         template = "box.jinja2"
@@ -74,14 +74,20 @@ class RelatedPostSnippet(AbstractFooterSnippet):
 class Paragraph(BaseModel):
     title: Optional[str] = Field(None)
     body: str = Field(
-        json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
+        json_schema_extra={
+            "ui:widget": "richtext",
+            "ui:options": {"features": ["bold", "italic", "h5"]},
+        }
     )
 
 
 class ParagraphBlock(Block):
     title: str = ""
     body: str = Field(
-        json_schema_extra={"widget": "richtext", "features": ["bold", "italic", "h5"]}
+        json_schema_extra={
+            "ui:widget": "richtext",
+            "ui:options": {"features": ["bold", "italic", "h5"]},
+        }
     )
 
     class Meta:
@@ -150,7 +156,7 @@ class ListBlock(Block, Generic[T]):
 
 class SectionPage(BasePage):
 
-    intro: Optional[Paragraph] = Field()
+    intro: Optional[Paragraph] = Field(default=None)
     box: Box = Field()
     boxes: ListBlock[Box] = Field(default_factory=ListBlock)
 
@@ -165,7 +171,7 @@ V = TypeVar("V")
 
 
 class DefinitionBlock(Block):
-    body: str = Field(json_schema_extra={"widget": "textarea"})
+    body: str = Field(json_schema_extra={"ui:widget": "textarea"})
 
     class Meta:
         template = "definition.jinja2"

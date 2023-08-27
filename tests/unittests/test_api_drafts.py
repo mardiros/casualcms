@@ -79,7 +79,7 @@ async def test_api_create_draft(
                             "loc": ["body", ["slug"]],
                             "msg": "Field required",
                             "type": "missing",
-                            "url": "https://errors.pydantic.dev/2.1/v/missing",
+                            "url": "https://errors.pydantic.dev/2.2/v/missing",
                         }
                     ],
                 },
@@ -130,7 +130,7 @@ async def test_api_create_draft(
                             "loc": ["body", ["title"]],
                             "msg": "Input should be a valid string",
                             "type": "string_type",
-                            "url": "https://errors.pydantic.dev/2.1/v/string_type",
+                            "url": "https://errors.pydantic.dev/2.2/v/string_type",
                         },
                     ],
                 },

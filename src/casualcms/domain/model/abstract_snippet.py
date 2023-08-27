@@ -106,12 +106,5 @@ class AbstractSnippet(BaseUIModel, metaclass=SnippetMetaclass):
             "type": self.__meta__.type,
         }
 
-    @classmethod
-    def ui_schema(cls) -> Mapping[str, Any]:
-        ret: dict[str, Any] = {}
-        for key, val in cls.model_fields.items():
-            ret[key] = cls.get_widget(key, val)
-        return ret
-
 
 Snippet_contra = TypeVar("Snippet_contra", bound=AbstractSnippet, contravariant=True)

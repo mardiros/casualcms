@@ -8,6 +8,7 @@ from .base import AbstractRepository, OperationResult, RepositoryResult
 
 
 class DraftRepositoryError(enum.Enum):
+    validation_error = "Validation Error"
     page_not_found = "Page not found"
     page_broken_treepath = "Page not found"  # we can set the same error message
     page_has_children = "Page has child pages"

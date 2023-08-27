@@ -15,7 +15,7 @@ from tests.casualblog.models import BlockInSnippet, Box
                     "paragraph": {
                         "title": "Paragraph",
                         "type": "string",
-                        "widget": "textarea",
+                        "ui:widget": "textarea",
                     },
                     "title": {"title": "Title", "type": "string"},
                 },

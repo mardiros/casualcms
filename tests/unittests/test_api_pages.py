@@ -38,14 +38,14 @@ async def test_publish_422(client: TestClient, authntoken: AuthnToken):
                 "loc": ["body", "hostname"],
                 "msg": "Field required",
                 "type": "missing",
-                "url": "https://errors.pydantic.dev/2.2/v/missing",
+                "url": "https://errors.pydantic.dev/2.3/v/missing",
             },
             {
                 "input": None,
                 "loc": ["body", "path"],
                 "msg": "Field required",
                 "type": "missing",
-                "url": "https://errors.pydantic.dev/2.2/v/missing",
+                "url": "https://errors.pydantic.dev/2.3/v/missing",
             },
         ],
     }

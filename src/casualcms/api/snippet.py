@@ -60,8 +60,8 @@ def get_snippet_type_body(type: SlugField = Body(...)) -> SnippetType:
 
 
 async def get_snippet_by_key(
-    key: str,
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    key: str,
 ) -> Snippet[Any]:
     async with app.uow as uow:
         rsnippet = await uow.snippets.by_key(key)
@@ -81,8 +81,8 @@ async def get_snippet_by_key(
 
 
 async def get_validated_payload(
-    payload: Annotated[Mapping[str, Any], Body(...)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    payload: Annotated[Mapping[str, Any], Body(...)],
     snippet_type: SnippetType = Depends(get_snippet_type_body),
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
@@ -106,8 +106,8 @@ async def get_validated_payload(
 
 
 async def validate_updated_payload(
-    payload: Annotated[Mapping[str, Any], Body(...)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    payload: Annotated[Mapping[str, Any], Body(...)],
     snippet: Snippet[Any] = Depends(get_snippet_by_key),
 ) -> Mapping[str, Any]:
     async with app.uow as uow:
@@ -143,11 +143,11 @@ async def validate_updated_payload(
 
 
 async def create_snippet(
-    request: Request,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
     type: Annotated[SlugField, Body()],
     payload: Annotated[Payload, Depends(get_validated_payload)],
-    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> PartialSnippet:
     key = payload.pop("key")
     cmd = CreateSnippet(type=type, key=key, body=payload)
@@ -177,9 +177,9 @@ async def create_snippet(
 
 
 async def list_snippets(
-    request: Request,
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
     token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
     type: Optional[str] = None,
 ) -> Sequence[PartialSnippet]:
 
@@ -213,11 +213,11 @@ async def show_snippet(
 
 
 async def update_snippet(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     snippet: Annotated[Snippet[Any], Depends(get_snippet_by_key)],
     payload: Annotated[Payload, Depends(validate_updated_payload)],
-    token: Annotated[AuthnToken, Depends(get_token_info)],
-    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> PartialSnippet:
 
     new_key = payload.pop("key")
@@ -247,10 +247,10 @@ async def update_snippet(
 
 
 async def delete_snippet(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
     request: Request,
     key: str,
-    token: Annotated[AuthnToken, Depends(get_token_info)],
-    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> Response:
 
     async with app.uow as uow:

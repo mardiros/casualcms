@@ -10,9 +10,9 @@ from casualcms.domain.model.account import AuthnToken
 
 
 async def get_authenticated_user(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     username: Annotated[str, Body(...)],
     password: Annotated[str, Body(...)],
-    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> Account:
     authenticated_user: Account | None = None
     async with app.uow as uow:
@@ -34,10 +34,10 @@ async def get_authenticated_user(
 
 
 async def authenticate(
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
     request: Request,
     user_agent: Annotated[str, Header(...)],
-    app: Annotated[AppConfig, FastAPIConfigurator.depends],
-    authenticated_user: Account = Depends(get_authenticated_user),
+    authenticated_user: Annotated[Account, Depends(get_authenticated_user)],
 ) -> dict[str, Any]:
 
     client_addr: str = request.client.host if request.client else ""
@@ -66,10 +66,10 @@ async def authenticate(
 
 
 async def logout(
-    request: Request,
-    token: Annotated[AuthnToken, Depends(get_token_info)],
-    user_agent: Annotated[str, Header(...)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
+    token: Annotated[AuthnToken, Depends(get_token_info)],
+    request: Request,
+    user_agent: Annotated[str, Header(...)],
 ) -> Response:
     client_addr: str = request.client.host if request.client else ""
     cmd = DeleteAuthnToken(

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Annotated, Any
 
 from fastapi import Depends
 from pydantic import BaseModel, Field
@@ -14,7 +14,7 @@ class PartialSettingType(BaseModel):
 
 
 async def list_types(
-    token: AuthnToken = Depends(get_token_info),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> list[PartialSettingType]:
     stypes = list_setting_types()
     return sorted(
@@ -31,7 +31,7 @@ async def list_types(
 
 async def show_type(
     key: str,
-    token: AuthnToken = Depends(get_token_info),
+    token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> dict[str, Any]:
     ptype = resolve_setting_type(key)
     return {

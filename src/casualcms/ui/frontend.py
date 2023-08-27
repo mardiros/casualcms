@@ -1,3 +1,4 @@
+from typing import Annotated
 from fastapi import HTTPException, Request, Response
 from fastapi.staticfiles import StaticFiles
 
@@ -8,7 +9,7 @@ from casualcms.adapters.jinja2 import Jinja2TemplateRender
 async def serve_pages(
     path: str,
     request: Request,
-    app: AppConfig = FastAPIConfigurator.depends,
+    app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> Response:
     path = path.strip("/") or "/"
     async with app.uow as uow:

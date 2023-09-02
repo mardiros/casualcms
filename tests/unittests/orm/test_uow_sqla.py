@@ -45,7 +45,13 @@ from casualcms.domain.repositories.snippet import (
 from casualcms.service.unit_of_work import AbstractUnitOfWork
 from casualcms.utils import generate_id
 
-from ...casualblog.models import ContactSetting, FeatureFlagSetting, HeaderSnippet, Link
+from ...casualblog.models import (
+    ContactSetting,
+    FeatureFlagSetting,
+    HeaderSnippet,
+    Link,
+    ParagraphBlock,
+)
 from .fixtures import (
     fake_account,
     fake_authn_tokens,
@@ -1451,7 +1457,7 @@ async def test_sql_uow_page_by_url_choose_root_page(
                 "template": "homepage.jinja2",
                 "path": "//www",
                 "title": draft_hp.title,
-                "body": draft_hp.page.dict(),
+                "body": draft_hp.page.model_dump(),
             },
         },
         {
@@ -1465,7 +1471,7 @@ async def test_sql_uow_page_by_url_choose_root_page(
                 "template": "category.jinja2",
                 "path": "//www/tech",
                 "title": cat_page.title,
-                "body": cat_page.page.dict(),
+                "body": cat_page.page.model_dump(),
             },
         },
     ],
@@ -1516,7 +1522,7 @@ async def test_sql_uow_page_update(
 ):
     page = params["pages"][0]
     page.page.title = "My new page title"
-    page.page.body = {"body": "my new body"}
+    page.page.body = [ParagraphBlock(body="my new body")]
 
     repo = PageSQLRepository(sqla_session)
     op_result = await repo.update(page)
@@ -1534,7 +1540,7 @@ async def test_sql_uow_page_update(
     assert updated_page.title == page.title
     assert updated_page.body == {
         "title": "My new page title",
-        "body": {"body": "my new body"},
+        "body": [{"title": "", "body": "my new body"}],
         "description": page.page.description,
         "hero_title": page.page.hero_title,
         "slug": "root",
@@ -1548,7 +1554,7 @@ async def test_sql_uow_page_update(
     assert saved_same_draft_other_site.site_id == site_2.id
     assert saved_same_draft_other_site.draft_id == draft_hp.id
     assert saved_same_draft_other_site.title != page.title
-    assert saved_same_draft_other_site.body != page.dict()
+    assert saved_same_draft_other_site.body != page.model_dump()
 
     other_draft_same_site = params["pages"][2]
     qry = select(orm.pages).filter(orm.pages.c.id == other_draft_same_site.id)
@@ -1558,4 +1564,4 @@ async def test_sql_uow_page_update(
     assert saved_same_draft_other_site.site_id == site_1.id
     assert saved_same_draft_other_site.draft_id == cat_page.id
     assert saved_same_draft_other_site.title != page.title
-    assert saved_same_draft_other_site.body != page.dict()
+    assert saved_same_draft_other_site.body != page.model_dump()

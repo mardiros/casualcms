@@ -164,8 +164,8 @@ async def show_draft(
     token: Annotated[AuthnToken, Depends(get_token_info)],
     draft_page: Annotated[DraftPage[Any], Depends(draft_by_path)],
 ) -> Mapping[str, Any]:
-    ret = draft_page.page.dict()
-    ret["metadata"] = draft_page.metadata.dict(
+    ret = draft_page.page.model_dump()
+    ret["metadata"] = draft_page.metadata.model_dump(
         by_alias=False,
         include={
             "type": True,

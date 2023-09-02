@@ -56,7 +56,7 @@ async def show_type(
     token: Annotated[AuthnToken, Depends(get_token_info)],
     snippet_type: Annotated[SnippetType, Depends(get_snippet_type)],
 ) -> dict[str, Any]:
-    jsonschema = snippet_type.schema()
+    jsonschema = snippet_type.model_json_schema()
     jsonschema["$defs"].pop("Event", None)
     for key in ("id", "events", "created_at"):
         jsonschema["properties"].pop(key, None)

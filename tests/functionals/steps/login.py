@@ -20,7 +20,7 @@ def start_fastcms_with_login(context: Any):
         print(exc.response.json)
         raise exc
     token = rtoken.unwrap()
-    authn = token.dict()
+    authn = token.model_dump()
     context.browser.get("/admin/login")
     context.browser.add_index_db_value("account", "alice", authn)
     context.browser.add_index_db_value("default", "account", "alice")

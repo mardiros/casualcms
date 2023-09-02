@@ -44,7 +44,7 @@ async def test_api_create_draft(
     assert resp.status_code == 201
     async with uow as uow:
         page: DraftPage[Any] = (await uow.drafts.by_path("/index")).unwrap()
-        assert page.page.dict() == {
+        assert page.page.model_dump() == {
             "slug": "index",
             "title": "Root Page",
             "description": "The home page",
@@ -210,7 +210,7 @@ async def test_create_draft_subpages(
     assert resp.json() == {"message": "Resource Created"}
     async with uow as uow:
         page: DraftPage[Any] = (await uow.drafts.by_path("/home/test")).unwrap()
-        assert page.page.dict() == {
+        assert page.page.model_dump() == {
             "slug": "test",
             "title": "sub Page",
             "description": "A sub page",
@@ -220,7 +220,7 @@ async def test_create_draft_subpages(
 
     async with uow as uow:
         pages: Sequence[DraftPage[Any]] = (await uow.drafts.by_parent("/home")).unwrap()
-        pages_dict = [page.page.dict() for page in pages]
+        pages_dict = [page.page.model_dump() for page in pages]
         assert pages_dict == [
             {
                 "slug": "test",

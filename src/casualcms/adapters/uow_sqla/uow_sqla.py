@@ -109,7 +109,7 @@ def mapped_result(
 
 def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.drafts."""
-    p: Dict[str, Any] = page.page.dict()
+    p: Dict[str, Any] = page.page.model_dump()
     formated_page: Dict[str, Any] = {
         "id": page.id,
         "type": page.type,
@@ -124,7 +124,7 @@ def format_draft_page(page: DraftPage[Any]) -> Dict[str, Any]:
 
 def format_draft_page_update(page: DraftPage[Any]) -> Dict[str, Any]:
     """Format the page to a dict ready to be inserted in the orm.drafts."""
-    p: Dict[str, Any] = page.page.dict()
+    p: Dict[str, Any] = page.page.model_dump()
     formated_page: Dict[str, Any] = {
         "id": page.id,
         "type": page.type,
@@ -138,11 +138,11 @@ def format_draft_page_update(page: DraftPage[Any]) -> Dict[str, Any]:
 
 
 def format_page(page: PublishedPage[Any]) -> Dict[str, Any]:
-    formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
+    formated_page: Dict[str, Any] = page.model_dump(exclude={"site", "page"})
     formated_page["id"] = page.id
     formated_page["type"] = page.type
     formated_page["title"] = page.title
-    formated_page["body"] = page.page.dict()
+    formated_page["body"] = page.page.model_dump()
     formated_page["created_at"] = page.created_at
     formated_page["draft_id"] = page.draft_id
     formated_page["site_id"] = page.site.id
@@ -155,7 +155,7 @@ def format_snippet(snippet: Snippet[Any]) -> Dict[str, Any]:
         "type": snippet.type,
         "created_at": snippet.created_at,
         "key": snippet.key,
-        "body": snippet.snippet.dict(exclude={"key"}),
+        "body": snippet.snippet.model_dump(exclude={"key"}),
     }
     return formated_snippet
 
@@ -166,7 +166,7 @@ def format_setting(site_id: str, setting: Setting[Setting_contra]) -> Dict[str, 
         "key": setting.key,
         "created_at": setting.created_at,
         "site_id": site_id,
-        "value": setting.setting.dict(),
+        "value": setting.setting.model_dump(),
     }
     return formated_setting
 
@@ -211,7 +211,7 @@ class AccountSQLRepository(AbstractAccountRepository):
         """Append a new model to the repository."""
         try:
             await self.session.execute(  # type: ignore
-                orm.accounts.insert().values(model.dict())  # type: ignore
+                orm.accounts.insert().values(model.model_dump())  # type: ignore
             )
         except IntegrityError:
             return Err(AccountRepositoryError.integrity_error)
@@ -672,7 +672,7 @@ class AuthnTokenSQLRepository(AbstractAuthnRepository):
         """Append a new model to the repository."""
         try:
             await self.session.execute(
-                orm.authn_tokens.insert().values(model.dict())  # type: ignore
+                orm.authn_tokens.insert().values(model.model_dump())  # type: ignore
             )
         except IntegrityError:
             return Err(AuthnTokenRepositoryError.integrity_error)
@@ -723,7 +723,7 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def add(self, model: Site) -> SiteOperationResult:
         """Append a new model to the repository."""
-        data = model.dict()
+        data = model.model_dump()
         data["created_at"] = model.created_at
         rpage: DraftRepositoryResult = await DraftSQLRepository(self.session).by_path(
             data.pop("root_page_path")
@@ -775,7 +775,7 @@ class SiteSQLRepository(AbstractSiteRepository):
 
     async def update(self, model: Site) -> SiteOperationResult:
         """Update given model into the repository."""
-        site = model.dict(exclude={"id", "draft_id", "root_page_path"})
+        site = model.model_dump(exclude={"id", "draft_id", "root_page_path"})
 
         rpage: DraftRepositoryResult = await DraftSQLRepository(self.session).by_path(
             model.root_page_path

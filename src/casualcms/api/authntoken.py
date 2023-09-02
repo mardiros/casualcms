@@ -59,7 +59,9 @@ async def authenticate(
         await uow.commit()
 
     token: AuthnToken = resp.unwrap()
-    token_dict = token.dict(exclude={"id", "created_at", "client_addr", "user_agent"})
+    token_dict = token.model_dump(
+        exclude={"id", "created_at", "client_addr", "user_agent"}
+    )
     token_dict["username"] = authenticated_user.username
     token_dict["lang"] = authenticated_user.lang
     return token_dict

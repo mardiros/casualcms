@@ -1,7 +1,7 @@
 import re
 from typing import Any, Dict, Literal, Sequence, cast
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic._internal._model_construction import ModelMetaclass
 from pygments.formatters import HtmlFormatter
 
@@ -52,10 +52,8 @@ class Block(BaseModel, metaclass=BlockMetaclass):
 
 
 class CodeBlockMeta(BlockMeta):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     formatter: HtmlFormatter = Field(...)  # type: ignore
-
-    class Config:
-        arbitrary_types_allowed = True
 
 
 class CodeBlockMetaclass(BlockMetaclass):

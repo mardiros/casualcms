@@ -128,7 +128,7 @@ async def show_setting(
     setting: Annotated[Setting[Setting_contra], Depends(get_setting_by_path)],
     token: Annotated[AuthnToken, Depends(get_token_info)],
 ) -> Any:
-    ret = setting.setting.dict()
+    ret = setting.setting.model_dump()
     ret["metadata"] = {"key": setting.key, "hostname": setting.hostname}
     return ret
 

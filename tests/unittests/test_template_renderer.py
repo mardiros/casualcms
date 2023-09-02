@@ -76,7 +76,9 @@ async def test_get_setting(
         assert renderer._settings == {  # type: ignore
             "foo": Err(SettingRepositoryError.setting_not_found),
         }
-        assert await renderer.get_setting("contact") == contact_setting.setting.dict()
+
+        r_contact_setting = await renderer.get_setting("contact")
+        assert r_contact_setting == contact_setting.setting.model_dump()
         assert renderer._settings == {  # type: ignore
             "foo": Err(SettingRepositoryError.setting_not_found),
             "contact": Ok(contact_setting),

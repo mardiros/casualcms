@@ -207,7 +207,7 @@ async def show_snippet(
     token: Annotated[AuthnToken, Depends(get_token_info)],
     app: Annotated[AppConfig, FastAPIConfigurator.depends],
 ) -> Any:
-    ret = snippet.snippet.dict()
+    ret = snippet.snippet.model_dump()
     ret["metadata"] = snippet.metadata
     return ret
 

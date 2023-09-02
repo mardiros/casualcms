@@ -438,7 +438,10 @@ async def site(
 ) -> AsyncGenerator[Site, None]:
     async with uow as uow:
         create = CreateSite(
-            **{**params["site"].model_dump(), "root_page_path": draft_hp.path}  # type: ignore
+            **{  # type: ignore
+                **params["site"].model_dump(),
+                "root_page_path": draft_hp.path,
+            }
         )
 
         rsite = await messagebus.handle(

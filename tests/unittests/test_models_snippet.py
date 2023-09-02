@@ -44,6 +44,6 @@ def test_snippet_get_context():
         "key": "header",
         "title": "awesome",
     }
-    context = snip.dict()
+    context = snip.model_dump()
     assert context == expected_context
     assert snip.metadata == {"type": "blog:HeaderSnippet"}

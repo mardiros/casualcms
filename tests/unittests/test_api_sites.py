@@ -14,7 +14,7 @@ async def test_api_create_site_403(
     draft_hp: DraftPage[Any],
 ):
     site = fake_site(draft_hp)
-    resp = client.post("/api/sites", json=site.dict())
+    resp = client.post("/api/sites", json=site.model_dump())
     assert resp.status_code == 403
 
 
@@ -29,7 +29,7 @@ async def test_api_create_site(
         headers={
             "Authorization": f"Bearer {authntoken.token}",
         },
-        json=site.dict(),
+        json=site.model_dump(),
     )
     assert resp.status_code == 201
     assert resp.json() == {
@@ -45,7 +45,7 @@ async def test_api_create_site_422(
     authntoken: AuthnToken,
     draft_hp: DraftPage[Any],
 ):
-    site = fake_site(draft_hp).dict()
+    site = fake_site(draft_hp).model_dump()
     site["root_page_path"] = "/not-me"
     resp = client.post(
         "/api/sites",

@@ -36,5 +36,5 @@ from tests.casualblog.models import BlockInSnippet, Box
     ],
 )
 def test_block_schema(params: Mapping[str, Any]):
-    schema = params["block"].schema()
+    schema = params["block"].model_json_schema()
     assert schema == params["expected_schema"]

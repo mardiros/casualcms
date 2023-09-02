@@ -47,4 +47,4 @@ def assert_settings(context: Any, key: str, hostname: str):
         raise exc
     setting = rsetting.unwrap()
     data = context.table[0]
-    assert_that(data.as_dict(), equal_to(setting.dict()))
+    assert_that(data.as_dict(), equal_to(setting.model_dump()))

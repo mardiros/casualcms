@@ -106,7 +106,7 @@ class Jinja2TemplateRender(AbstractTemplateRenderer):
         rsettings = await self._try_get_from_cache(key)
         if rsettings.is_err():
             return ""
-        settings = rsettings.unwrap().setting.dict()
+        settings = rsettings.unwrap().setting.model_dump()
         for k in subkeys:
             if k in settings:
                 settings = settings[k]

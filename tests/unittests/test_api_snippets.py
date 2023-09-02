@@ -47,7 +47,7 @@ async def test_api_create_snippet(
     }
     async with uow as uow:
         snippet: Snippet[Any] = (await uow.snippets.by_key("header")).unwrap()
-        assert snippet.snippet.dict() == {
+        assert snippet.snippet.model_dump() == {
             "key": "header",
             "title": "My Blog",
             "links": [{"title": "cat", "href": "/cats"}],

@@ -35,6 +35,6 @@ async def show_type(
 ) -> dict[str, Any]:
     ptype = resolve_setting_type(key)
     return {
-        "schema": ptype.schema(),
+        "schema": ptype.model_json_schema(),
         "uiSchema": ptype.ui_schema(),
     }

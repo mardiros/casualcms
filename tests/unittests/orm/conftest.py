@@ -86,7 +86,7 @@ async def accounts(
     accounts: Sequence[Account] = params["accounts"]
     await sqla_session.execute(  # type: ignore
         orm.accounts.insert(),  # type: ignore
-        [a.dict() for a in accounts],
+        [a.model_dump() for a in accounts],
     )
     await sqla_session.commit()
 
@@ -110,7 +110,7 @@ async def sites(
     sites: Sequence[Site] = params["sites"]
     await sqla_session.execute(  # type: ignore
         orm.sites.insert(),  # type: ignore
-        [{"created_at": s.created_at, **s.dict()} for s in sites],
+        [{"created_at": s.created_at, **s.model_dump()} for s in sites],
     )
     await sqla_session.commit()
 
@@ -139,7 +139,7 @@ async def authn_tokens(
     authn_tokens: Sequence[AuthnToken] = params["authn_tokens"]
     await sqla_session.execute(  # type: ignore
         orm.authn_tokens.insert(),  # type: ignore
-        [t.dict() for t in authn_tokens],
+        [t.model_dump() for t in authn_tokens],
     )
     await sqla_session.commit()
 
@@ -168,7 +168,7 @@ async def drafts(
             "slug": page.slug,
             "title": page.title,
             "description": page.description,
-            "body": page.page.dict(
+            "body": page.page.model_dump(
                 exclude={
                     "slug",
                     "title",
@@ -283,7 +283,7 @@ async def snippets(
     params: Mapping[str, Any],
 ) -> AsyncGenerator[Sequence[Snippet[Any]], None]:
     def format_snippet(snippet: Snippet[Snippet_contra]) -> Dict[str, Any]:
-        s: Dict[str, Any] = snippet.snippet.dict()
+        s: Dict[str, Any] = snippet.snippet.model_dump()
         formated_snippet: Dict[str, Any] = {
             "id": snippet.id,
             "type": snippet.type,
@@ -321,7 +321,7 @@ async def settings(
             "key": setting.key,
             "created_at": setting.created_at,
             "site_id": site_id,
-            "value": setting.setting.dict(),
+            "value": setting.setting.model_dump(),
         }
         return formated_setting
 
@@ -357,14 +357,14 @@ async def pages(
     drafts: list[DraftPage[Any]],
 ):
     def format_page(page: PublishedPage[Any]) -> Dict[str, Any]:
-        formated_page: Dict[str, Any] = page.dict(exclude={"site", "page"})
+        formated_page: Dict[str, Any] = page.model_dump(exclude={"site", "page"})
         formated_page["id"] = page.id
         formated_page["type"] = page.type
         formated_page["created_at"] = page.created_at
         formated_page["draft_id"] = page.draft_id
         formated_page["site_id"] = page.site.id
         formated_page["title"] = page.title
-        formated_page["body"] = page.page.dict()
+        formated_page["body"] = page.page.model_dump()
         return formated_page
 
     pages = params["pages"]

@@ -65,6 +65,14 @@ profile = "black"
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
+filterwarnings = [
+    "error",
+    # venusian
+    'ignore:.*find_module\(\) is deprecated.*:DeprecationWarning',
+    'ignore:.*FileFinder.find_loader\(\) is deprecated.*:DeprecationWarning',
+    # result
+    'ignore:.*Accessing `.value` on Result type is deprecated.*:DeprecationWarning',
+]
 
 [tool.coverage.report]
 exclude_lines = [
